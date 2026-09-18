@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>22&nbsp; Target Tracking and Visual Servoing – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" rel="next">
+<link href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</a></li><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">22.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">22.2</span> Key Vocabulary</a></li>
+  <li><a href="#two-ways-to-use-a-camera" id="toc-two-ways-to-use-a-camera" class="nav-link" data-scroll-target="#two-ways-to-use-a-camera"><span class="header-section-number">22.3</span> Two Ways to Use a Camera</a></li>
+  <li><a href="#the-centering-law" id="toc-the-centering-law" class="nav-link" data-scroll-target="#the-centering-law"><span class="header-section-number">22.4</span> The Centering Law</a></li>
+  <li><a href="#the-loop-run-by-numbers" id="toc-the-loop-run-by-numbers" class="nav-link" data-scroll-target="#the-loop-run-by-numbers"><span class="header-section-number">22.5</span> The Loop, Run by Numbers</a></li>
+  <li><a href="#complementary-not-redundant" id="toc-complementary-not-redundant" class="nav-link" data-scroll-target="#complementary-not-redundant"><span class="header-section-number">22.6</span> Complementary, Not Redundant</a></li>
+  <li><a href="#the-centering-loop-in-code" id="toc-the-centering-loop-in-code" class="nav-link" data-scroll-target="#the-centering-loop-in-code"><span class="header-section-number">22.7</span> The Centering Loop in Code</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">22.8</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">22.9</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</a></li><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The previous chapter built the arbiter and left one box running on credit. HARASS_TARGET earned its full citizenship in the five-state machine — an entry guard with <span class="math inline">\(k\)</span>-frame persistence, a dwell-time exit, stash-and-resume semantics under preemption — while its actual flying stayed deliberately thin: the Try It stubbed it as a fixed-radius orbit about the reported target, and the deterrence patterns themselves arrive in the next chapter. But between the arbiter and the patterns sits a premise that neither supplies. Every tick that HARASS_TARGET runs, it consumes a <em>target track</em>, and everything downstream — the dwell guard, the orbit stub, the swooping and circling patterns to come — assumes that track stays fresh for tens of seconds while the aircraft maneuvers aggressively around the very animal it is tracking. Nothing built so far makes that true. A track is fed by detections; detections come from a camera with a finite field of view; and the aircraft’s own motion is constantly working to carry the goose out of that field of view.</p>
+<p>The Coordinate Frames chapter is why this gap carries a price tag rather than a vague unease. That chapter turned a bounding box and a depth value into a world-frame NED position — and then priced the result honestly: calibration, attitude error, synchronization, and depth uncertainty stack to perhaps half a metre at 6 m range, which is why it closed by insisting the transformed position be treated as <em>an estimate to be refined — re-detected, re-transformed, and filtered as the aircraft approaches</em>. Refinement has a precondition the transform cannot enforce: the goose must still be in the frame when the next image arrives. Fly toward a half-metre-wrong estimate of a moving bird, with a camera whose 640 columns span 90°, and a few seconds of accumulated error, target motion, and attitude transients will walk the bounding box to the image border and off it — at which point the detector goes silent, the track goes stale, and the position estimate that navigation depends on stops updating precisely when it is needed most. The machinery that prevents this is <strong>visual servoing</strong>: closing a control loop directly on what the camera sees, so that “keep the target in view” is not a hope but a feedback law. This chapter builds that law — a proportional controller whose error signal is measured in pixels — and makes the architectural argument the running example depends on: the image-plane loop and the world-frame estimate are not two answers to one question but answers to two different questions, and the system needs both.</p>
+<section id="learning-objectives" class="level2" data-number="22.1">
+<h2 data-number="22.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">22.1</span> Learning Objectives</h2>
+<ul>
+<li>Distinguish position-based visual servoing (PBVS) from image-based visual servoing (IBVS) — what kind of sensor each treats the camera as, which space its error signal lives in, and which failure modes each inherits — and classify the running example’s existing detection-to-waypoint pipeline within that taxonomy.</li>
+<li>Derive the decoupled proportional centering law from first principles: pixel error from the image centre, normalization that makes the gains resolution-independent, the sign discipline that keeps the loop negative-feedback in PX4’s FRD/NED conventions, and deadband and saturation as the practical guards around it.</li>
+<li>Predict the closed-loop behavior of the centering loop quantitatively — its exponential time constant from the gain, the steady-state lag it leaves against a moving target, and the gain ceiling imposed by perception latency — using the same machinery as the Closed-Loop Control chapter, with pixel error as a new kind of error signal.</li>
+<li>Explain, at an introductory level, what the interaction matrix (image Jacobian) is, and why rotational centering channels are depth-independent while translational channels have loop gain that scales inversely with target range.</li>
+<li>Argue the “complementary, not redundant” two-loop architecture: an outer position-based loop that navigates on the Coordinate Frames chapter’s world-frame estimate, an inner image-based loop that keeps the target centered at frame rate — and why the inner loop is what keeps the outer loop’s estimate alive.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="22.2">
+<h2 data-number="22.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">22.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Visual servoing</strong> — controlling a robot’s motion by closing a feedback loop directly on live camera measurements, as opposed to <em>look-then-move</em>, in which vision is consulted once to plan a motion that then executes open-loop.</li>
+<li><strong>Position-based visual servoing</strong> (PBVS) — the scheme that treats the camera as a 3D sensor: image measurements are first converted into a Cartesian position or pose estimate of the target, and the control error is computed in that 3D task space — “fly to where the goose is.”</li>
+<li><strong>Image-based visual servoing</strong> (IBVS) — the scheme that treats the camera as a 2D sensor: the control error is computed directly in the image plane, as the offset between where a feature is and where it should be, with no 3D reconstruction inside the loop — “put the goose back in the middle of the picture.”</li>
+<li><strong>Pixel error</strong> (centering error) — the image-plane offset <span class="math inline">\((e_x, e_y)\)</span> between a detected feature’s pixel coordinates and its desired location, here the image centre; the error signal of the centering loop, and the only measurement it needs.</li>
+<li><strong>Interaction matrix</strong> (image Jacobian) — the matrix <span class="math inline">\(\mathbf{L}\)</span> relating the velocity of image features to the camera’s velocity, <span class="math inline">\(\dot{\mathbf{s}} = \mathbf{L}\,\mathbf{v}_c\)</span>; its entries depend on the target’s depth, which is why translational visual-servo channels need at least a rough range estimate to scale their gains.</li>
+<li><strong>Deadband</strong> — a small zone around zero error inside which the controller commands nothing, so that a target already near-centered does not keep the aircraft hunting against detector noise.</li>
+<li><strong>Gain scheduling</strong> — adjusting a controller gain as an operating condition changes; here, scaling the translational centering gain with the depth estimate so the loop behaves the same at 3 m as at 12 m.</li>
+<li><strong>Target-following control loop</strong> — the complete cycle detection → pixel error → velocity/yaw-rate command → aircraft motion → new detection; a closed loop whose total latency sets how hard its gains can be pushed.</li>
+</ul>
+</section>
+<section id="two-ways-to-use-a-camera" class="level2" data-number="22.3">
+<h2 data-number="22.3" class="anchored" data-anchor-id="two-ways-to-use-a-camera"><span class="header-section-number">22.3</span> Two Ways to Use a Camera</h2>
+<p>The field’s standard taxonomy, established in the two tutorial papers every treatment of this subject descends from <span class="citation" data-cites="hutchinson1996tutorial chaumette2006visual">(<a href="#ref-hutchinson1996tutorial" role="doc-biblioref">Hutchinson, Hager, and Corke 1996</a>; <a href="#ref-chaumette2006visual" role="doc-biblioref">Chaumette and Hutchinson 2006</a>)</span>, splits visual servo control by a single question: <em>in which space does the error live?</em></p>
+<p><strong>Position-based visual servoing</strong> treats the camera as a 3D sensor. Image measurements — feature points, marker corners, a bounding box plus a depth value — are first pushed through a calibrated camera model into an estimate of the target’s position or pose in Cartesian space, and the controller drives a 3D error: the vector from where the vehicle is to where the estimate says it should be. The reader has already built one. The pipeline of the Coordinate Frames chapter — pixel and depth, through the intrinsics, through the fixed extrinsic rotation, through the attitude quaternion, out to a NED coordinate handed to navigation — is PBVS in everything but name. Its virtues are exactly the ones that chapter cashed in: the output is a geometrically meaningful world position, directly usable for waypoint navigation, standoff-distance logic, geofence checks, and logging where the goose was on a map. Its weakness was priced in the same chapter’s error budget: every link in the reconstruction — intrinsics, extrinsics, attitude, synchronization, depth — feeds its error straight into the commanded destination, with nothing inside the loop to notice or correct. And one more weakness went unstated there because no chapter yet needed it: <em>nothing in a PBVS loop knows about the image border.</em> The controller reasons entirely in world coordinates; it will happily command a maneuver that is correct in 3D and sweeps the target out of the camera’s field of view on the way.</p>
+<p><strong>Image-based visual servoing</strong> treats the camera as a 2D sensor and refuses the reconstruction step entirely. The error is computed where the measurement lives — in the image — as the offset between the feature’s current pixel coordinates and its desired ones, and that offset maps through a control law directly to motion commands. No pose estimate exists inside the loop, so no pose-estimation error can bias it: if the camera’s focal length is 5% wrong, or the mounting pitch is 2° off, an IBVS loop’s <em>path</em> to the goal bends, but its destination does not move, because the loop keeps pushing until the thing it actually measures — pixel error — reaches zero. The general IBVS control law, given in both tutorials, is a proportional law:</p>
+<p><span class="math display">\[
+\mathbf{v}_c = -\lambda\, \mathbf{L}^{+}\, \mathbf{e},
+\]</span></p>
+<p>where <span class="math inline">\(\mathbf{e}\)</span> is the stacked image-feature error, <span class="math inline">\(\mathbf{L}^{+}\)</span> is the pseudoinverse of the interaction matrix, and <span class="math inline">\(\lambda &gt; 0\)</span> is the gain. The interaction matrix is where IBVS keeps its one debt to 3D geometry: <span class="math inline">\(\mathbf{L}\)</span>’s entries depend on the target’s depth <span class="math inline">\(Z\)</span>, so even a scheme that never reconstructs a pose needs a rough range to scale its commands sensibly — a point the next section makes concrete. IBVS’s classical pathologies are the mirror image of its virtues: it is only locally stable in general, and for large errors — especially large rotations — the commanded 3D trajectory can be strange, including the well-known <em>camera retreat</em>, where the camera backs away unnecessarily while sorting out a rotation <span class="citation" data-cites="chaumette2006visual">(<a href="#ref-chaumette2006visual" role="doc-biblioref">Chaumette and Hutchinson 2006</a>)</span>.</p>
+<div id="tbl-ibvs-pbvs" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-ibvs-pbvs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;22.1: The classical trade-offs between the two visual-servoing schemes <span class="citation" data-cites="chaumette2006visual hutchinson1996tutorial">(<a href="#ref-chaumette2006visual" role="doc-biblioref">Chaumette and Hutchinson 2006</a>; <a href="#ref-hutchinson1996tutorial" role="doc-biblioref">Hutchinson, Hager, and Corke 1996</a>)</span>.
+</figcaption>
+<div aria-describedby="tbl-ibvs-pbvs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>PBVS</th>
+<th>IBVS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Camera treated as</td>
+<td>3D sensor</td>
+<td>2D sensor</td>
+</tr>
+<tr class="even">
+<td>Error computed in</td>
+<td>Cartesian/task space</td>
+<td>the image plane</td>
+</tr>
+<tr class="odd">
+<td>Needs in the loop</td>
+<td>intrinsics, extrinsics, depth, attitude</td>
+<td>pixel coordinates (plus rough depth for gain scaling)</td>
+</tr>
+<tr class="even">
+<td>Calibration error becomes</td>
+<td>bias in the <em>destination</em></td>
+<td>distortion of the <em>path</em></td>
+</tr>
+<tr class="odd">
+<td>Keeps target in frame</td>
+<td>no mechanism</td>
+<td>that <em>is</em> the objective</td>
+</tr>
+<tr class="even">
+<td>Trajectory in 3D</td>
+<td>clean, predictable, plannable</td>
+<td>can be indirect or non-intuitive</td>
+</tr>
+<tr class="odd">
+<td>Natural tasks</td>
+<td>navigate to, stand off from, log a 3D position</td>
+<td>center, point at, follow in view</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Two cautions before the table hardens into dogma. First, the “IBVS is robust, PBVS is fragile” summary is a statement about error <em>structure</em>, not a guaranteed performance ranking: in a direct head-to-head on a real robotic assembly task, a well-calibrated PBVS system converged faster and slightly more accurately than its IBVS counterpart, because once calibration is trustworthy, PBVS’s clean Cartesian trajectory wins and IBVS’s theoretical robustness edge has little left to pay for <span class="citation" data-cites="peng2020comparing">(<a href="#ref-peng2020comparing" role="doc-biblioref">Peng and Radke 2020</a>)</span>. The trade-offs are real; their sign, in any given system, is an empirical question. Second, the schemes are endpoints of a spectrum, not a binary: hybrid formulations that blend a partial 3D estimate with image-plane features in one control law exist precisely because each pure scheme has failure modes the other lacks <span class="citation" data-cites="chaumette2006visual">(<a href="#ref-chaumette2006visual" role="doc-biblioref">Chaumette and Hutchinson 2006</a>)</span> — a fact the two-loop architecture later in this chapter exploits at the systems level rather than the control-law level.</p>
+<p>For the specific task in front of the running example — keep a detected goose centered in the frame while the aircraft works around it — the choice is not close. “Target at image centre” <em>is</em> an image-space objective; reconstructing a 3D pose to answer “is the goose left or right of centre, and by how much” would launder a two-subtraction question through the entire error budget of the frame chain and hand back a worse answer, later. Applied UAV target-following systems make the same call, defining the error as the pixel offset between the detected feature and the desired (centered) position <span class="citation" data-cites="chen2021visual">(<a href="#ref-chen2021visual" role="doc-biblioref">Chen et al. 2021</a>)</span> and, in the simplest implementations, driving it with proportional or PID control. PBVS keeps the jobs it is actually good at — approach, standoff, mapping — and IBVS takes the one it was born for.</p>
+</section>
+<section id="the-centering-law" class="level2" data-number="22.4">
+<h2 data-number="22.4" class="anchored" data-anchor-id="the-centering-law"><span class="header-section-number">22.4</span> The Centering Law</h2>
+<p>The construction needs three ingredients: an error, a sign discipline, and two guards. All three fit in <a href="#fig-pixel-error-centering" class="quarto-xref">Figure&nbsp;<span>22.1</span></a>.</p>
+<div id="fig-pixel-error-centering" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Diagram titled the centering error: where the goose is, minus where you want it, showing one frame from the running example's 640 by 480 camera. A large rectangle represents the image, with u and v axes drawn from a top-left origin labeled zero zero and the opposite corner labeled 640, 480. A crosshair marks the image centre at c x, c y equals 320, 240, surrounded by a small dashed rectangle labeled deadband plus or minus five percent, exaggerated for legibility. An amber bounding box in the upper right contains a small goose silhouette, with its centroid marked at u, v equals 480, 180. Two teal arrows decompose the error: a horizontal arrow from the centre labeled e x equals u minus c x equals plus 160 pixels, positive meaning right of centre, and a vertical arrow labeled e y equals v minus c y equals minus 60 pixels, negative meaning above centre; a dashed grey hypotenuse is labeled error vector e. A sidebar titled from pixels to commands normalizes by the half-frame, e hat x equals 160 over 320 equals plus 0.50 and e hat y equals minus 60 over 240 equals minus 0.25, notes both exceed the 0.05 deadband, and computes omega z equals K yaw times e hat x equals 0.8 times 0.50 equals plus 0.40 radians per second, yaw right about 23 degrees per second, and v D equals K alt times e hat y equals 1.2 times minus 0.25 equals minus 0.30 metres per second, climb, noting normalized error is resolution-independent so the gains survive a camera-mode change. A second sidebar titled sign discipline FRD slash NED explains that positive yaw rate means nose right so the image slides left and e x shrinks, negative feedback; positive v D means descend so the image slides up and e y shrinks; and warns that one flipped sign is positive feedback, with every correction pushing the goose farther from centre until it leaves the frame. A footer states that the error lives entirely in the image plane, with no depth, calibration, or world frame, and that this loop answers only which way did the target move, at frame rate.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pixel-error-centering-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/pixel-error-centering-geometry.svg" class="img-fluid figure-img" style="width:100.0%" alt="Diagram titled the centering error: where the goose is, minus where you want it, showing one frame from the running example's 640 by 480 camera. A large rectangle represents the image, with u and v axes drawn from a top-left origin labeled zero zero and the opposite corner labeled 640, 480. A crosshair marks the image centre at c x, c y equals 320, 240, surrounded by a small dashed rectangle labeled deadband plus or minus five percent, exaggerated for legibility. An amber bounding box in the upper right contains a small goose silhouette, with its centroid marked at u, v equals 480, 180. Two teal arrows decompose the error: a horizontal arrow from the centre labeled e x equals u minus c x equals plus 160 pixels, positive meaning right of centre, and a vertical arrow labeled e y equals v minus c y equals minus 60 pixels, negative meaning above centre; a dashed grey hypotenuse is labeled error vector e. A sidebar titled from pixels to commands normalizes by the half-frame, e hat x equals 160 over 320 equals plus 0.50 and e hat y equals minus 60 over 240 equals minus 0.25, notes both exceed the 0.05 deadband, and computes omega z equals K yaw times e hat x equals 0.8 times 0.50 equals plus 0.40 radians per second, yaw right about 23 degrees per second, and v D equals K alt times e hat y equals 1.2 times minus 0.25 equals minus 0.30 metres per second, climb, noting normalized error is resolution-independent so the gains survive a camera-mode change. A second sidebar titled sign discipline FRD slash NED explains that positive yaw rate means nose right so the image slides left and e x shrinks, negative feedback; positive v D means descend so the image slides up and e y shrinks; and warns that one flipped sign is positive feedback, with every correction pushing the goose farther from centre until it leaves the frame. A footer states that the error lives entirely in the image plane, with no depth, calibration, or world frame, and that this loop answers only which way did the target move, at frame rate.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pixel-error-centering-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;22.1: The pixel-error geometry of the centering loop: the detected bounding-box centroid, the image centre, the two error components, and the commands they produce under the running example’s gains.
+</figcaption>
+</figure>
+</div>
+<p><strong>The error.</strong> Let the image be <span class="math inline">\(W \times H\)</span> pixels with the origin at the top-left — the convention the Images as Data chapter fixed, <span class="math inline">\(u\)</span> increasing rightward, <span class="math inline">\(v\)</span> increasing downward — so the centre sits at <span class="math inline">\((c_x, c_y) = (W/2,\, H/2)\)</span>. The Part III detector reports a bounding box; its centroid <span class="math inline">\((u, v)\)</span> is the feature. The pixel error is the componentwise offset,</p>
+<p><span class="math display">\[
+\begin{aligned}
+e_x &amp;= u - c_x \qquad \text{(positive: target right of centre)} \\
+e_y &amp;= v - c_y \qquad \text{(positive: target below centre),}
+\end{aligned}
+\]</span></p>
+<p>and dividing each component by its half-frame dimension normalizes it into <span class="math inline">\([-1, 1]\)</span>:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\hat{e}_x &amp;= \frac{e_x}{W/2} \\
+\hat{e}_y &amp;= \frac{e_y}{H/2}.
+\end{aligned}
+\]</span></p>
+<p>The normalization looks cosmetic and is not. It makes the gains <em>resolution-independent</em>: a target one-quarter of the way to the frame edge produces <span class="math inline">\(\hat{e}_x = 0.5\)</span> whether the camera is running its 640 × 480 depth-aligned mode or a 1280 × 720 mode, so a tuning session survives a camera-mode change, and the gains acquire honest physical units — radians per second of yaw, metres per second of climb, <em>at full-scale error</em>.</p>
+<p><strong>The law.</strong> The full IBVS machinery would build the interaction matrix for the centroid feature and invert it. For this task, the matrix collapses. One feature, near the image centre, at a roughly known working distance, controlled through two nearly decoupled channels — horizontal error corrected by yaw, vertical error corrected by vertical velocity — makes <span class="math inline">\(\mathbf{L}\)</span> effectively constant and near-diagonal, so its pseudoinverse folds into two per-axis constants, and the general law <span class="math inline">\(\mathbf{v}_c = -\lambda \mathbf{L}^{+}\mathbf{e}\)</span> specializes to two independent proportional controllers:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\omega_z &amp;= K_{\text{yaw}}\, \hat{e}_x \\
+v_D &amp;= K_{\text{alt}}\, \hat{e}_y,
+\end{aligned}
+\]</span></p>
+<p>with <span class="math inline">\(\omega_z\)</span> the commanded yaw rate, <span class="math inline">\(v_D\)</span> the commanded vertical velocity in NED (positive down), and <span class="math inline">\(K_{\text{yaw}}, K_{\text{alt}} &gt; 0\)</span>. This decoupled-proportional pattern is exactly the simplified form applied UAV tracking systems fly before the controller is upgraded (below); the justification for the simplification is the near-constancy of <span class="math inline">\(\mathbf{L}\)</span> for this one-feature, small-error, known-ranges regime — push outside that regime (large errors, features far off-axis, unknown depth) and the full matrix earns its keep.</p>
+<p><strong>The signs.</strong> The alert reader will notice the minus sign of <span class="math inline">\(-\lambda \mathbf{L}^{+}\mathbf{e}\)</span> has vanished, and the explanation is worth a paragraph because a wrong sign here is the single most common visual-servoing bug. What the general law’s minus sign encodes is negative feedback — commands must shrink the error — and whether that surfaces as a plus or minus in code depends entirely on the axis conventions at both ends of the loop. Trace the horizontal channel in the book’s conventions. In PX4’s FRD body frame, positive yaw rate swings the nose <em>right</em>. A camera panning right drags the whole scene <em>left</em> across the image: for a target near the centre, <span class="math inline">\(\dot{u} \approx -f_x\, \omega_z\)</span>, with <span class="math inline">\(f_x\)</span> the focal length in pixels playing its geometric role as <em>pixels per radian</em>. So a target right of centre (<span class="math inline">\(\hat{e}_x &gt; 0\)</span>) commanded through <span class="math inline">\(\omega_z = K_{\text{yaw}}\hat{e}_x &gt; 0\)</span> yaws the nose right, slides the image left, and shrinks the error — two sign conventions (image-<span class="math inline">\(u\)</span> rightward, FRD-yaw rightward) composing into a <em>positive</em> gain. The vertical channel composes the same way: positive <span class="math inline">\(\hat{e}_y\)</span> (target below centre) commands positive <span class="math inline">\(v_D\)</span> (descend, in down-positive NED), the descending camera slides the image up, and <span class="math inline">\(e_y\)</span> shrinks. In a z-up convention — common in the literature — the same physics surfaces with minus signs, which is why published control laws disagree about signs while agreeing about everything real. The invariant to verify is never the symbol; it is the loop: <em>does each channel’s command move the target toward the centre?</em> Get one sign backwards and the loop is positive feedback — every correction pushes the goose farther out, exponentially, until it exits the frame in under a second. The Coordinate Frames chapter’s warning that a reflection in the transform surfaces in flight as mirrored behavior — steering left toward a target on the right — has a control-loop twin here, and the bench test in this chapter’s Try It exists to catch it before flight ever does.</p>
+<p><strong>The guards.</strong> Two practical amendments, both standard in fielded systems, complete the law. First, a <strong>deadband</strong>: inside a small normalized radius of the centre — 5% is typical, about 16 columns and 12 rows here — command zero. Detector centroids jitter by pixels frame to frame even on a stationary bird; without a deadband the loop dutifully chases that jitter, and the aircraft hunts — small perpetual yaw and climb oscillations that waste battery, smear the camera, and accomplish nothing, since a goose 15 pixels off-centre is exactly as tracked as one dead-centre. (One refinement worth knowing: commanding zero inside the band and <span class="math inline">\(K\hat{e}\)</span> outside it puts a step discontinuity at the band’s edge, so implementations often subtract the band instead — command proportional to <span class="math inline">\(\hat{e}\)</span> <em>beyond</em> the deadband — trading the step for a smooth ramp.) Second, <strong>saturation</strong>: clip each command to a ceiling well inside the airframe’s capability, for the same reason every state’s output in the previous chapter passed through the shared slew limiter — a bounding box appearing at the frame edge should produce a brisk turn, not a full-authority lunge that trades tracking accuracy for drama. The centering loop’s output joins every other behavior’s output at that same limiter; the loop decides direction and urgency, the limiter keeps the airframe’s experience continuous.</p>
+<p>One structural fact about this law deserves to be stated before the numbers, because the whole architecture argument rests on it: <em>the law says nothing about distance.</em> Both channels rotate or translate the camera to re-point it; neither knows how far away the goose is, whether the aircraft is closing or retreating, or when to stop. A pure centering loop would keep a goose perfectly framed from 400 m away, forever. Approach and standoff belong to the world-frame estimate — which is the “complementary, not redundant” section’s business.</p>
+</section>
+<section id="the-loop-run-by-numbers" class="level2" data-number="22.5">
+<h2 data-number="22.5" class="anchored" data-anchor-id="the-loop-run-by-numbers"><span class="header-section-number">22.5</span> The Loop, Run by Numbers</h2>
+<p>Take the frame in <a href="#fig-pixel-error-centering" class="quarto-xref">Figure&nbsp;<span>22.1</span></a>: the running example’s 640 × 480 camera, a confirmed track whose bounding-box centroid sits at <span class="math inline">\((u, v) = (480, 180)\)</span> — upper right, a goose lifting away to the right of the aircraft’s nose. With gains <span class="math inline">\(K_{\text{yaw}} = 0.8\)</span> rad/s and <span class="math inline">\(K_{\text{alt}} = 1.2\)</span> m/s at full-scale error and a 0.05 deadband:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\hat{e}_x &amp;= \frac{480 - 320}{320} = +0.50 \\
+\hat{e}_y &amp;= \frac{180 - 240}{240} = -0.25,
+\end{aligned}
+\]</span></p>
+<p>both far outside the deadband, so the loop acts:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\omega_z &amp;= 0.8 \times 0.50 = +0.40\ \text{rad/s} \approx 23^{\circ}/\text{s (yaw right)} \\
+v_D &amp;= 1.2 \times (-0.25) = -0.30\ \text{m/s (negative D: climb).}
+\end{aligned}
+\]</span></p>
+<p>Yaw right at 23°/s, climb at 0.3 m/s — a firm, unhurried correction, reproducible on paper from four numbers and two gains.</p>
+<p>What happens next is where the Closed-Loop Control chapter’s machinery takes over, because a pixel error is just an error signal, and this is just a P controller wearing a camera. Combine the image kinematics with the control law: <span class="math inline">\(\dot{e}_x = \dot{u} \approx -f_x \omega_z\)</span> and <span class="math inline">\(\omega_z = K_{\text{yaw}} e_x / (W/2)\)</span> give</p>
+<p><span class="math display">\[
+\dot{\hat{e}}_x = -\frac{f_x}{W/2}\, K_{\text{yaw}}\, \hat{e}_x,
+\]</span></p>
+<p>a first-order exponential decay. The running example’s camera makes the constant memorable: a 90° horizontal field of view over 640 columns gave <span class="math inline">\(f_x = 320\)</span> pixels in the Coordinate Frames chapter — exactly <span class="math inline">\(W/2\)</span> — so the ratio is 1 and the normalized gain <em>is</em> the closed-loop bandwidth: time constant <span class="math inline">\(\tau = 1/K_{\text{yaw}} = 1.25\)</span> s. From <span class="math inline">\(\hat{e}_x = 0.50\)</span> the error decays to the 0.05 deadband in <span class="math inline">\(\tau \ln(0.50/0.05) \approx 2.9\)</span> s, and the yaw rate decays with it — the proportional controller’s signature soft landing, no overshoot, no ringing, provided the gain respects the loop’s delay.</p>
+<p>That proviso is the tuning story in one inequality. The error the controller acts on is old: roughly 50 ms of capture-to-publish pipeline (the Real-Time Inference chapter’s budget) plus up to one 20 Hz mission tick, call it a delay <span class="math inline">\(T_d \approx 0.1\)</span> s. A proportional loop with pure delay, <span class="math inline">\(\dot{e}(t) = -K\,e(t - T_d)\)</span>, goes formally unstable when <span class="math inline">\(K\,T_d\)</span> reaches <span class="math inline">\(\pi/2\)</span> — here <span class="math inline">\(K \approx 15\)</span> — but degrades long before: as <span class="math inline">\(K T_d\)</span> grows past a few tenths, the controller is forever correcting an error that no longer exists, overshooting centre and swinging back, the same phase-lag mechanism the Closed-Loop Control chapter exposed. At <span class="math inline">\(K_{\text{yaw}} = 0.8\)</span>, <span class="math inline">\(K T_d = 0.08\)</span> and the delay is invisible; crank the gain to 5 for “snappier” tracking and <span class="math inline">\(K T_d = 0.5\)</span> buys visible hunting. The engineering rule is the usual one: the closed-loop time constant should sit an order of magnitude above the total loop delay, and the way to make the loop faster is to shrink the delay — a faster detector, a tick that reads fresher boxes — not to raise the gain into the oscillation regime.</p>
+<p>Two more inherited results round out the analysis. A <em>moving</em> target turns the P controller’s steady-state error loose: a goose crossing the line of sight at 2.5 m/s at 10 m range subtends an angular rate of 0.25 rad/s, and holding the nose on it requires <span class="math inline">\(\omega_z = 0.25\)</span> rad/s forever — which a proportional law only produces at a standing error <span class="math inline">\(\hat{e}_x = 0.25/0.8 \approx 0.31\)</span>, about 100 pixels. The goose rides a third of the way toward the frame edge, tracked but off-centre: the Closed-Loop Control chapter’s constant-disturbance standoff, re-materialized in pixels. The remedies are also that chapter’s — an integral term to grind the standing error away (with windup guards when the target accelerates), or feedforward of the track’s estimated angular rate — and the running example accepts the lag instead, because 100 pixels off-centre still leaves 220 pixels of margin, and simplicity is worth more here than perfection. Finally, depth: the yaw channel’s loop gain contains only <span class="math inline">\(f_x\)</span> — <em>rotation</em> moves pixels at the same rate whatever the range, which is one reason yaw-based centering is the robust default. But the vertical channel is <em>translational</em>, and a translating camera moves a target’s image in proportion to <span class="math inline">\(f_y/Z\)</span>: the same 0.3 m/s climb that nudges a goose at 12 m nudges one at 3 m four times harder. A vertical gain tuned crisp at long range rings at short range. This is the interaction matrix’s depth-dependence stripped to one fraction, and the practical fix is one line of gain scheduling — scale <span class="math inline">\(K_{\text{alt}}\)</span> with the depth estimate the outer loop already computes — or the conservative alternative, tuning at the closest working range and accepting sluggishness far out.</p>
+</section>
+<section id="complementary-not-redundant" class="level2" data-number="22.6">
+<h2 data-number="22.6" class="anchored" data-anchor-id="complementary-not-redundant"><span class="header-section-number">22.6</span> Complementary, Not Redundant</h2>
+<p>The system now holds two complete answers to “a goose was detected — do something”: the Coordinate Frames chapter’s transform, which produces a world position to navigate toward, and this chapter’s law, which produces re-pointing commands to keep the detection in frame. It is tempting to see them as rivals — the fast cheap loop versus the slow rigorous one — and to ask which the running example should use. The correct answer is that they are not answering the same question, and <a href="#fig-two-loop-servoing" class="quarto-xref">Figure&nbsp;<span>22.2</span></a> draws the architecture that uses both.</p>
+<div id="fig-two-loop-servoing" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Block diagram titled two loops, one camera, with the subtitle that both loops consume the same detection but differ in what they compute, how fast they act, and what they can fail at. On the left, a box labeled Detector, the Part III pipeline, outputs bounding box plus depth, tracked frame to frame. Its output splits into two bands. The upper teal band, labeled inner loop, image-based IBVS, every frame at about 30 hertz, contains two boxes: pixel error e x, e y from image centre, annotated no depth, no calibration, feeding a proportional centering law box computing omega z equals K yaw e hat x and v D equals K alt e hat y with deadband and saturation; an italic note says this loop answers am I still looking at it and which way did it just move. The lower amber band, labeled outer loop, position-based PBVS, at detection plus transform rate, chains three boxes: depth lookup at the box centroid, frame chain camera to body to NED from the Coordinate Frames chapter, and approach slash standoff to the 3D estimate; notes say it answers where is it, how do I get there, when do I stop, carries the calibration and depth error budget of about half a metre at six metres, and updates only while the target is seen. Both bands feed a combine-commands box, yaw and vertical from the inner loop, approach from the outer loop, which passes through a shared slew limiter into a PX4 flight controller box accepting Offboard velocity and yaw-rate setpoints. A dashed grey feedback path loops from the flight controller back to the detector, captioned aircraft motion moves the camera, the world closes both loops through the same lens. A note box titled the coupling warns that if the goose leaves the frame the detector goes silent and both loops lose their input, so the inner loop's job is to keep the outer loop's estimate alive, because you cannot localize what you cannot see. The footer states that neither loop is redundant: delete the outer loop and the drone can stare but never arrive or stop; delete the inner loop and one aggressive correction walks the goose out of frame, blinding both.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-two-loop-servoing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/two-loop-visual-servoing.svg" class="img-fluid figure-img" style="width:100.0%" alt="Block diagram titled two loops, one camera, with the subtitle that both loops consume the same detection but differ in what they compute, how fast they act, and what they can fail at. On the left, a box labeled Detector, the Part III pipeline, outputs bounding box plus depth, tracked frame to frame. Its output splits into two bands. The upper teal band, labeled inner loop, image-based IBVS, every frame at about 30 hertz, contains two boxes: pixel error e x, e y from image centre, annotated no depth, no calibration, feeding a proportional centering law box computing omega z equals K yaw e hat x and v D equals K alt e hat y with deadband and saturation; an italic note says this loop answers am I still looking at it and which way did it just move. The lower amber band, labeled outer loop, position-based PBVS, at detection plus transform rate, chains three boxes: depth lookup at the box centroid, frame chain camera to body to NED from the Coordinate Frames chapter, and approach slash standoff to the 3D estimate; notes say it answers where is it, how do I get there, when do I stop, carries the calibration and depth error budget of about half a metre at six metres, and updates only while the target is seen. Both bands feed a combine-commands box, yaw and vertical from the inner loop, approach from the outer loop, which passes through a shared slew limiter into a PX4 flight controller box accepting Offboard velocity and yaw-rate setpoints. A dashed grey feedback path loops from the flight controller back to the detector, captioned aircraft motion moves the camera, the world closes both loops through the same lens. A note box titled the coupling warns that if the goose leaves the frame the detector goes silent and both loops lose their input, so the inner loop's job is to keep the outer loop's estimate alive, because you cannot localize what you cannot see. The footer states that neither loop is redundant: delete the outer loop and the drone can stare but never arrive or stop; delete the inner loop and one aggressive correction walks the goose out of frame, blinding both.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-two-loop-servoing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;22.2: The two-loop tracking architecture: the outer position-based loop navigates on the world-frame estimate, the inner image-based loop re-points the aircraft at frame rate, and both consume — and protect — the same detection stream.
+</figcaption>
+</figure>
+</div>
+<p>Run the failure analysis in both directions. A system with <em>only</em> the outer, position-based loop inherits the full error budget with no in-loop correction — the half-metre at 6 m is commanded, not just estimated — and, worse, nothing anywhere enforces that the target stays visible while the vehicle flies its correct-in-3D trajectory. One noisy depth sample, one aggressive correction, one goose that flaps ten metres during the estimate’s latency, and the bounding box crosses the image border. At that moment the failure compounds: the position estimate is built <em>from</em> detections, so losing sight doesn’t degrade the estimate, it stops it — the aircraft is now navigating to where a goose used to be, on a track aging toward the FSM’s 3 s dwell cutoff. You cannot localize what you cannot see. A system with <em>only</em> the inner, image-based loop fails in the complementary direction: it can hold the goose in frame from any distance, indefinitely, but it has no notion of range, closure, or standoff — it cannot approach, cannot stop approaching, cannot log where the goose is for the sweep planner, cannot answer a single question that the mission’s other consumers ask in world coordinates.</p>
+<p>So the architecture stacks them, each at the rate its data supports. The <strong>outer loop</strong> runs at detection-plus-transform rate: box, depth, frame chain, filtered NED estimate, approach and standoff commands — the camera as 3D sensor, PBVS in spirit, feeding everything downstream that thinks in world coordinates. The <strong>inner loop</strong> runs every frame on raw pixel error — no depth lookup, no transform, nothing between the detector and the command but two subtractions and two multiplies — continuously absorbing exactly the errors the outer loop is blind to: target motion since the last estimate, attitude transients, the accumulated bias of calibration. The split is also an honest division by <em>what can hurt each loop</em>: the inner loop is immune to the calibration budget (it measures pixels and commands until pixels say centered) but knows nothing of the world; the outer loop knows the world but believes its calibration. Chained, the inner loop’s centering keeps the detection stream — the outer loop’s raw material — flowing, while the outer loop supplies the two things the inner loop structurally lacks: a range (which the vertical channel’s gain scheduling already wanted) and a destination.</p>
+<p>This two-loop pattern is not an invention of convenience. At the control-theory level it is the systems-engineering cousin of hybrid visual servoing, which combines partial 3D estimates with image-plane features in one law precisely because the pure schemes fail differently <span class="citation" data-cites="chaumette2006visual">(<a href="#ref-chaumette2006visual" role="doc-biblioref">Chaumette and Hutchinson 2006</a>)</span>. At the applied level it is how working UAV systems are built: a monocular precision-landing system for a moving platform, for instance, runs a fiducial-based localization stage to get the vehicle to the platform’s vicinity and image-plane PID corrections to keep the marker centered through the terminal approach <span class="citation" data-cites="salagame2022precision">(<a href="#ref-salagame2022precision" role="doc-biblioref">Salagame, Govindraj, and Omkar 2022</a>)</span> — coarse navigation from reconstruction, fine correction from pixels, the same architecture with a landing pad in place of a goose. And when the stakes or the dynamics outgrow proportional control, the error definition survives even as the controller is upgraded: a published UAV target-following system defines its objective as exactly this chapter’s centered-feature error and drives it with nonlinear model-predictive control <span class="citation" data-cites="chen2021visual">(<a href="#ref-chen2021visual" role="doc-biblioref">Chen et al. 2021</a>)</span> — the production-grade descendant of the same loop, solving for the command sequence rather than multiplying by a gain.</p>
+<p>For the mission machine, the division of labor lands cleanly on the FSM’s states. SEARCH_GRID consumes the outer loop’s output at the moment of detection — the world-frame position that tells HARASS_TARGET where to go. HARASS_TARGET flies on both: the outer loop’s estimate governs approach and standoff radius, while the inner loop, ticking underneath, keeps the goose in frame so the track that entry guard confirmed stays fresh — feeding the dwell guard, feeding the estimate, and feeding the pattern generators the next chapter builds, every one of which (“swoop toward, circle around, feint away”) presumes the aircraft continuously knows which way the goose is. Harassment Pattern Generation will spend its pages on <em>what</em> to fly around a target; this chapter is why, throughout those maneuvers, there will still be a target to fly around.</p>
+</section>
+<section id="the-centering-loop-in-code" class="level2" data-number="22.7">
+<h2 data-number="22.7" class="anchored" data-anchor-id="the-centering-loop-in-code"><span class="header-section-number">22.7</span> The Centering Loop in Code</h2>
+<p>The law, its guards, and its conventions compress into one plain function, shaped — like everything the mission machine calls — to be invoked from the tick:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>IMG_W, IMG_H <span class="op">=</span> <span class="dv">640</span>, <span class="dv">480</span>   <span class="co"># the depth-aligned mode from Part III</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>DEADBAND <span class="op">=</span> <span class="fl">0.05</span>           <span class="co"># normalized: 5% of the half-frame</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>K_YAW <span class="op">=</span> <span class="fl">0.8</span>               <span class="co"># rad/s of yaw rate at full-scale error</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>K_ALT <span class="op">=</span> <span class="fl">1.2</span>               <span class="co"># m/s of vertical rate at full-scale error</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>MAX_YAW_RATE <span class="op">=</span> <span class="fl">0.6</span>        <span class="co"># rad/s   } ceilings well inside the airframe;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>MAX_VERT_RATE <span class="op">=</span> <span class="fl">0.8</span>       <span class="co"># m/s     } the shared slew limiter still applies</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _p_channel(err, gain, limit):</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""One axis: deadband, then proportional, then saturation."""</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">abs</span>(err) <span class="op">&lt;</span> DEADBAND:</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="fl">0.0</span>                     <span class="co"># near-centered: don't hunt</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    cmd <span class="op">=</span> gain <span class="op">*</span> err</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">max</span>(<span class="op">-</span>limit, <span class="bu">min</span>(limit, cmd))</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> centering_command(bbox_center, image_size<span class="op">=</span>(IMG_W, IMG_H)):</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Pixel centroid of the tracked target -&gt; (yaw_rate, vertical_rate).</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">    Signs follow PX4 conventions: positive yaw rate is nose-right (FRD),</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">    positive vertical rate is downward (NED). Both channels are negative</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">    feedback: each command moves the target's image toward the centre.</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    u, v <span class="op">=</span> bbox_center</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    w, h <span class="op">=</span> image_size</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    e_x <span class="op">=</span> (u <span class="op">-</span> w <span class="op">/</span> <span class="dv">2</span>) <span class="op">/</span> (w <span class="op">/</span> <span class="dv">2</span>)        <span class="co"># [-1, 1], + = right of centre</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    e_y <span class="op">=</span> (v <span class="op">-</span> h <span class="op">/</span> <span class="dv">2</span>) <span class="op">/</span> (h <span class="op">/</span> <span class="dv">2</span>)        <span class="co"># [-1, 1], + = below centre</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    yaw_rate <span class="op">=</span> _p_channel(e_x, K_YAW, MAX_YAW_RATE)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    vert_rate <span class="op">=</span> _p_channel(e_y, K_ALT, MAX_VERT_RATE)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> yaw_rate, vert_rate</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Wiring it into the previous chapter’s machine changes a handful of lines in the HARASS_TARGET case. The state’s action asked <code>fly_pattern()</code> to close on the target and work it; the centering loop now supplies the <em>aim</em> underneath whatever pattern is flown:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">case</span> MissionState.HARASS_TARGET:</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="va">self</span>.track_is_fresh():          <span class="co"># measured or briefly coasted box</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        yaw_rate, vert_rate <span class="op">=</span> centering_command(<span class="va">self</span>.track.bbox_center)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fly_pattern(yaw_rate, vert_rate)  <span class="co"># pattern: next chapter</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.hold_pattern()            <span class="co"># no fresh pixels: freeze the aim</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="va">self</span>.target_gone(dwell<span class="op">=</span><span class="fl">3.0</span>):</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.transition(MissionState.SEARCH_GRID, <span class="st">"resume sweep"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Three disciplines from the previous chapters carry over unchanged and are worth naming, because each guards a real failure. <em>Freshness first</em>: <code>centering_command</code> must only ever see a measured box — or one the Part III tracker is coasting through a few missed frames — never a stale one; servoing on a track that has been silent for a second steers the aircraft by a fiction, and the honest response to missing pixels is to freeze the aim and let the dwell guard, not the servo, decide what happens next (dead data is worse than no data, exactly as the FSM chapter argued for guards). <em>One writer</em>: the loop computes commands, but only the tick issues them — the centering law is a pure function called from the state’s action, not a callback with opinions about <code>self.state</code>. <em>One limiter</em>: its output merges with the pattern generator’s and passes through the same shared slew limiter as every other behavior, so a bounding box that jumps (an ID switch, a second goose) produces a bounded swing of the nose, not a snap.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="For More">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>For More
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The full interaction matrix is worth meeting once, even though this chapter’s task never inverts it. For a single image point at normalized coordinates <span class="math inline">\((x, y)\)</span> and depth <span class="math inline">\(Z\)</span>, the classic result is a 2 × 6 matrix mapping the camera’s full velocity screw — three translations, three rotations — to the feature’s image velocity; its translational columns all carry <span class="math inline">\(1/Z\)</span> while its rotational columns carry none, which is the general form of this chapter’s observation that yaw centering is depth-free and vertical-velocity centering is not <span class="citation" data-cites="chaumette2006visual">(<a href="#ref-chaumette2006visual" role="doc-biblioref">Chaumette and Hutchinson 2006</a>)</span>. Stacking the matrices of several features and pseudoinverting yields servo laws that control all six degrees of freedom from imagery alone — the machinery behind precision manipulation and marker-based docking — at the price of the singularity and local-minimum pathologies the tutorials catalogue. The mature open-source implementation of all of it, PBVS and IBVS and the hybrid schemes, is INRIA’s ViSP library, which ships ROS integration and is a sensible next stop for a reader who wants to fly more than two channels. On the estimation side, production trackers rarely feed raw centroids to the servo: a constant-velocity Kalman filter over the track smooths detector jitter and supplies the angular-rate feedforward that eliminates the moving-target lag computed in this chapter — the same filter-then-control layering the reader has now seen at every level of the stack.</p>
+</div>
+</div>
+</section>
+<section id="check-your-understanding" class="level2" data-number="22.8">
+<h2 data-number="22.8" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">22.8</span> Check Your Understanding</h2>
+<ol type="1">
+<li>Classify each within the IBVS/PBVS taxonomy, with one sentence of justification: (a) the running example’s detection → depth → frame chain → NED waypoint pipeline from the Coordinate Frames chapter; (b) this chapter’s centering loop; (c) a precision-landing system that estimates a known-size fiducial marker’s full 3D pose and flies to a fixed offset above it.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>PBVS: the camera is used as a 3D sensor — image measurements are reconstructed into a Cartesian target position, and the error driven to zero (vehicle-to-waypoint) lives in task space. (b) IBVS: the error is the pixel offset from image centre, computed and controlled entirely in the image plane with no pose reconstruction in the loop. (c) PBVS, and a well-chosen use of it: the marker’s known geometry and the trusted calibration make the 3D reconstruction reliable, and the objective — a fixed spatial offset from the pad — is inherently a Cartesian goal, exactly the regime where PBVS’s clean, predictable trajectory is the advantage <span class="citation" data-cites="peng2020comparing">(<a href="#ref-peng2020comparing" role="doc-biblioref">Peng and Radke 2020</a>)</span>.</li>
+</ol>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>A camera runs at 1280 × 720. The tracked centroid is at <span class="math inline">\((u, v) = (400, 500)\)</span>, the gains are <span class="math inline">\(K_{\text{yaw}} = 0.6\)</span> rad/s and <span class="math inline">\(K_{\text{alt}} = 1.0\)</span> m/s at full-scale error, and the deadband is 0.08. Compute both commands, state each one’s physical direction, and then show what the same physical scene would command if the camera were switched to 640 × 360.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Centre is <span class="math inline">\((640, 360)\)</span>. <span class="math inline">\(\hat{e}_x = (400 - 640)/640 = -0.375\)</span>; <span class="math inline">\(\hat{e}_y = (500 - 360)/360 = +0.389\)</span>. Both magnitudes exceed the 0.08 deadband. Yaw: <span class="math inline">\(\omega_z = 0.6 \times (-0.375) = -0.225\)</span> rad/s — negative is nose-left in FRD, correct for a target left of centre. Vertical: <span class="math inline">\(v_D = 1.0 \times 0.389 = +0.39\)</span> m/s — positive D is downward, a descent toward a target below centre. At 640 × 360 the same scene puts the centroid at <span class="math inline">\((200, 250)\)</span>: pixel errors halve to <span class="math inline">\((-120, +70)\)</span>, but the half-frame normalizers halve too, so <span class="math inline">\(\hat{e}_x = -0.375\)</span> and <span class="math inline">\(\hat{e}_y = +0.389\)</span> exactly as before — the commands are identical. That invariance is what the normalization buys: gains tuned in one camera mode survive a mode change.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>A teammate ports a published centering law verbatim — <code>yaw_rate = -K * e_x_norm</code> — onto the running example’s PX4 stack. Predict the flight behavior on the first confirmed detection, explain the mechanism in feedback terms, and describe a ground test that would have caught it.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The published law was almost certainly written for a z-up yaw convention; under PX4’s FRD (positive yaw = nose right) the minus sign turns the loop into positive feedback. A goose detected right of centre commands nose-<em>left</em>, the image slides right, the error grows, and the command grows with it: the error compounds exponentially and the goose exits the frame edge within a second or two, every correction accelerating the departure. The FSM survives — track lost, dwell expires, resume sweep — but harassment becomes structurally impossible, and the log shows the same signature every time: detection, brief yaw away, track lost. The catch-it-first test needs no flight: on the bench (or in SITL with a planted target), present a detection right of centre and assert the sign of the commanded yaw rate is positive — “target right must command nose right.” One assertion per channel, run against synthetic boxes at all four frame edges, pins all the sign conventions at once.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>The perception pipeline delivers boxes with 50 ms of end-to-end latency and the mission tick runs at 20 Hz, so the centering loop acts on errors up to about <span class="math inline">\(T_d = 0.1\)</span> s old. For <span class="math inline">\(K_{\text{yaw}} = 0.8\)</span> and for an impatient retune to <span class="math inline">\(K_{\text{yaw}} = 6\)</span>, evaluate <span class="math inline">\(K T_d\)</span>, describe the qualitative closed-loop behavior in each case, and state where the formal stability boundary lies. Which chapter’s machinery is this?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>At <span class="math inline">\(K = 0.8\)</span>: <span class="math inline">\(K T_d = 0.08\)</span>, a factor of twenty below the instability boundary <span class="math inline">\(K T_d = \pi/2 \approx 1.57\)</span> (i.e.&nbsp;<span class="math inline">\(K \approx 15.7\)</span> for this delay); the closed-loop time constant <span class="math inline">\(\tau = 1/K = 1.25\)</span> s dwarfs the delay, and the response is a clean exponential settle. At <span class="math inline">\(K = 6\)</span>: <span class="math inline">\(K T_d = 0.6\)</span> — still formally stable but badly damped: the controller keeps acting on 100 ms-old error, repeatedly overshooting centre and swinging back, visible as the aircraft hunting left-right across the target. This is the Closed-Loop Control chapter’s phase-lag story with a new error signal: delay in the loop converts gain into oscillation, and the honest route to a faster loop is shrinking the delay (faster detector, fresher reads), not raising the gain toward the boundary.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>During a harassment run a goose walks steadily across the line of sight at 2 m/s at 8 m range. With <span class="math inline">\(K_{\text{yaw}} = 0.8\)</span>, compute where in the frame the P-only loop holds the goose at steady state, explain why the offset cannot decay to zero, and name the two standard remedies and the cost of each.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Required tracking rate: <span class="math inline">\(\omega = v/r = 2/8 = 0.25\)</span> rad/s. A proportional law produces that only at a standing normalized error <span class="math inline">\(\hat{e}_x = 0.25/0.8 = 0.3125\)</span> — about <span class="math inline">\(0.3125 \times 320 = 100\)</span> pixels right of centre on the 640-wide frame, a steady lead the aircraft never closes. It cannot decay because zero error would mean zero commanded yaw rate, and a nose that stops turning immediately falls behind a target that does not stop moving — the same structural standoff as the Closed-Loop Control chapter’s proportional controller against a constant disturbance. Remedies: an integral term, which winds up the extra yaw rate until the error truly zeros but must be guarded against windup when the target reverses or the command saturates; or feedforward of the track’s estimated angular rate (e.g., from a Kalman filter over the track), which removes the lag without integral dynamics but is only as good as the rate estimate it is fed.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>Explain why <span class="math inline">\(K_{\text{yaw}}\)</span> can be tuned once and trusted from 3 m to 30 m, while a <span class="math inline">\(K_{\text{alt}}\)</span> tuned for crisp response at 12 m may oscillate as the aircraft closes to 3 m. Connect the explanation to the structure of the interaction matrix, and give the one-line fix.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Yaw is a rotational channel: a rotation sweeps every pixel at <span class="math inline">\(f_x\)</span> pixels per radian regardless of how far away the scene is, so the loop gain contains no depth and the tuning is range-invariant. Vertical velocity is a translational channel: a camera translating at <span class="math inline">\(v\)</span> moves a target’s image at <span class="math inline">\(f_y\,v/Z\)</span> pixels per second, so the loop gain scales as <span class="math inline">\(1/Z\)</span> — closing from 12 m to 3 m multiplies it by four, shrinking the effective time constant fourfold and pushing a crisply tuned loop toward the hunting regime. This is the interaction matrix’s structure in miniature: its translational columns carry <span class="math inline">\(1/Z\)</span>, its rotational columns do not — the precise reason IBVS needs at least a rough depth estimate even though it never reconstructs a pose. The fix is one line of gain scheduling: scale <span class="math inline">\(K_{\text{alt}}\)</span> proportionally with the outer loop’s depth estimate (or, conservatively, tune at the closest working range and accept sluggishness far out).</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="22.9">
+<h2 data-number="22.9" class="anchored" data-anchor-id="try-it"><span class="header-section-number">22.9</span> Try It</h2>
+<p><strong>Part 1 — build the law and pin its signs.</strong> Implement <code>centering_command()</code> exactly as in this chapter, then test it before any aircraft is involved. First, unit tests: boxes planted at all four frame edges and at centre must produce the four correct command signs and one all-zeros result; a centroid just inside the deadband must command zero on that channel while the other still acts; commands at full-scale error must clip at the ceilings. Second — the test that catches convention bugs — generate the <em>inputs</em> with the Coordinate Frames chapter’s inverse chain: plant a synthetic goose at a known NED position, use <code>ned_point_to_optical()</code> plus the intrinsics to project it to a pixel, and assert end-to-end that a goose planted east of a north-facing drone commands positive (rightward) yaw. Then close the loop kinematically, no simulator yet: in a small script, hold the goose fixed in NED, integrate the commanded yaw rate and vertical rate into the drone’s pose at 20 Hz with a 0.1 s command delay, re-project the goose each step, and plot <span class="math inline">\(\hat{e}_x(t)\)</span>. Verify the exponential settle and measure its time constant against the predicted <span class="math inline">\(1/K_{\text{yaw}}\)</span>; then raise <span class="math inline">\(K_{\text{yaw}}\)</span> until the trace hunts, and check the onset against the <span class="math inline">\(K T_d\)</span> arithmetic.</p>
+<p><strong>Part 2 — wire it into the machine and track something that moves.</strong> In SITL, replace the previous chapter’s HARASS_TARGET stub aim with <code>centering_command()</code>, fed by a scripted target that the simulation projects into synthetic bounding boxes (the Part 1 projection code, now driven by a moving NED trajectory): a goose that holds still for 5 s, walks at 2 m/s across the line of sight for 10 s, then flaps away at 6 m/s. Log pixel error, commanded rates, and the FSM state at full rate. Confirm four behaviors against this chapter’s numbers: the initial centering settles with the predicted time constant; the walking phase holds the goose at the predicted steady-state offset (<span class="math inline">\(\hat{e} = \omega_{\text{target}}/K_{\text{yaw}}\)</span> — compute it from your geometry before you fly it); the deadband keeps the aircraft quiet, not hunting, when the goose is stationary; and the flap-away phase either tracks or cleanly loses the target into the FSM’s dwell logic — kill the synthetic detections mid-run and confirm the aim freezes and the 3 s dwell, not the servo, hands control back to SEARCH_GRID with a <code>[STATE CHANGE]</code> line that explains itself. Finish with the sign-flip experiment from the checks: negate one gain, re-run the stationary phase, and keep the plot of the error diverging exponentially — the clearest picture of positive feedback a logbook can hold.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#autonomous-state-machine-control">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-chaumette2006visual" class="csl-entry" role="listitem">
+Chaumette, François, and Seth Hutchinson. 2006. <span>“Visual Servo Control, <span>P</span>art <span>I</span>: Basic Approaches.”</span> <em>IEEE Robotics &amp; Automation Magazine</em> 13 (4): 82–90. <a href="https://doi.org/10.1109/MRA.2006.250573">https://doi.org/10.1109/MRA.2006.250573</a>.
+</div>
+<div id="ref-chen2021visual" class="csl-entry" role="listitem">
+Chen, Chien-Wei, Hsiao-An Hung, Ping-Hsuan Yang, and Ta-Hsin Cheng. 2021. <span>“Visual Servoing of a Moving Target by an Unmanned Aerial Vehicle.”</span> <em>Sensors</em> 21 (17): 5708. <a href="https://doi.org/10.3390/s21175708">https://doi.org/10.3390/s21175708</a>.
+</div>
+<div id="ref-hutchinson1996tutorial" class="csl-entry" role="listitem">
+Hutchinson, Seth, Gregory D. Hager, and Peter I. Corke. 1996. <span>“A Tutorial on Visual Servo Control.”</span> <em>IEEE Transactions on Robotics and Automation</em> 12 (5): 651–70. <a href="https://doi.org/10.1109/70.538972">https://doi.org/10.1109/70.538972</a>.
+</div>
+<div id="ref-peng2020comparing" class="csl-entry" role="listitem">
+Peng, William, and Richard J. Radke. 2020. <span>“Comparing Position- and Image-Based Visual Servoing for Robotic Assembly of Large Structures.”</span> In <em>2020 IEEE 16th International Conference on Automation Science and Engineering (CASE)</em>. <a href="https://doi.org/10.1109/CASE48305.2020.9217028">https://doi.org/10.1109/CASE48305.2020.9217028</a>.
+</div>
+<div id="ref-salagame2022precision" class="csl-entry" role="listitem">
+Salagame, Adarsh, Sushant Govindraj, and S. N. Omkar. 2022. <span>“Precision Landing of a <span>UAV</span> on a Moving Platform for Outdoor Applications.”</span> <a href="https://arxiv.org/abs/2209.14436">https://arxiv.org/abs/2209.14436</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="pagination-link" aria-label="Finite State Machines and Behavior Trees for Mission Logic">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="pagination-link" aria-label="Harassment Pattern Generation: Designing Deterrent Flight Paths">
+        <span class="nav-page-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

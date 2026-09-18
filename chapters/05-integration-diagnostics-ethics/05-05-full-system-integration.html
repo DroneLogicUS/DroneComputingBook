@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>29&nbsp; Full-System Integration: The Goose Management System End to End – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../appendices/appendix-a-glossary.html" rel="next">
+<link href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html">Part V — Systems Integration, Diagnostics &amp; Ethics</a></li><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">29.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">29.2</span> Key Vocabulary</a></li>
+  <li><a href="#one-flight-the-whole-book" id="toc-one-flight-the-whole-book" class="nav-link" data-scroll-target="#one-flight-the-whole-book"><span class="header-section-number">29.3</span> One Flight, the Whole Book</a></li>
+  <li><a href="#merging-the-modules-what-only-the-whole-can-fail" id="toc-merging-the-modules-what-only-the-whole-can-fail" class="nav-link" data-scroll-target="#merging-the-modules-what-only-the-whole-can-fail"><span class="header-section-number">29.4</span> Merging the Modules: What Only the Whole Can Fail</a></li>
+  <li><a href="#five-deliveries-each-one-a-working-system" id="toc-five-deliveries-each-one-a-working-system" class="nav-link" data-scroll-target="#five-deliveries-each-one-a-working-system"><span class="header-section-number">29.5</span> Five Deliveries, Each One a Working System</a></li>
+  <li><a href="#what-only-the-field-can-teach" id="toc-what-only-the-field-can-teach" class="nav-link" data-scroll-target="#what-only-the-field-can-teach"><span class="header-section-number">29.6</span> What Only the Field Can Teach</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">29.7</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">29.8</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html">Part V — Systems Integration, Diagnostics &amp; Ethics</a></li><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The previous chapter closed the book’s last open account and set the terms for this one: the welfare constraints ride along as requirements, checked where everything else is checked — in the code, in the parameters, and in the logs. What remains is the thing the Preface promised on its first page and every Part has advanced by one layer since: the whole system, running, once, end to end. The System Architecture chapter already did the anatomical version of this — seven nodes, ten services, eight topics, eleven states, every edge named and every trigger classified. This chapter does the physiological one. It follows a single flight of the Goose Management System from the operator’s service call to the disarm that closes the log, and at each phase asks not <em>what fires the next transition</em> — that trace is drawn, and will only be cited — but <em>whose engineering is holding the aircraft up right now</em>: which Part of this book built the machinery currently load-bearing, what it took to get right, and what would be going wrong at this exact moment if it hadn’t been.</p>
+<p>A closing chapter owes more than a victory lap, so two harder questions frame the flight. The first is about testing: what does it mean to <em>verify</em> an assembly like this one? Every node in the graph has been exercised in its own chapter, most of them to destruction — and none of that, it turns out, establishes that the system works, because there is a whole class of failure that lives not in modules but in the seams between modules that are each, separately, correct. The engineering name for hunting that class is <strong>monolithic integration and stress testing</strong>, and the middle of this chapter gives it a concrete treatment using the book’s own machinery as both the examples and the defenses. The second question is about construction: how does a system like this come to exist at all? Not all at once. The running example was built the way working field systems generally are — as five incremental stages, each one a working, demonstrable system in its own right, each adding one layer to a foundation already proven. The order of those stages is a piece of transferable engineering doctrine, worth stating explicitly, because it will outlive this particular aircraft: the reader’s next autonomous system will not detect geese, but it will still need its telemetry proven before its autonomy and its failsafes proven before both.</p>
+<section id="learning-objectives" class="level2" data-number="29.1">
+<h2 data-number="29.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">29.1</span> Learning Objectives</h2>
+<ul>
+<li>Trace a complete Goose Management System mission — takeoff, search, detection, harassment, an injected evasion event, and safe return — naming for each phase the real states and triggers established in the System Architecture chapter and the Part of the book where that phase’s internals live.</li>
+<li>Explain what monolithic integration and stress testing mean in practice for a multi-node ROS 2 system — merging the vision, safety, and control modules into one coherently running whole — and characterize the three failure species that only appear at integration time: convention mismatches, ordering and handoff failures, and shared-resource conflicts.</li>
+<li>Identify the running example’s designed defenses against each integration-time failure species — the centralized constants and frame modules, the ENGAGE_PREP warmup state, the active-controller token, and the single-writer tick — and explain why unit-level testing cannot substitute for any of them.</li>
+<li>Apply the five-stage incremental-delivery pattern — telemetry and environment, SITL and failsafes, live inference, simulated mission logic, field validation — as a general systems-engineering practice, and justify each of its ordering principles: infrastructure before autonomy, safety before capability, perception before decision-making, simulated logic before committed flight.</li>
+<li>Distinguish what simulation can validate from what only field validation reveals — GPS multipath near structures, lighting the detector’s dataset never sampled, radio-link degradation at range, real wind against the coverage budget — and pair each field-only failure with the machinery that predicts it and the log signature that diagnoses it.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="29.2">
+<h2 data-number="29.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">29.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Systems integration</strong> — the engineering phase in which separately developed, separately validated subsystems are combined into one running whole, and the <em>interactions</em> between them — rather than the subsystems themselves — become the object under test.</li>
+<li><strong>Monolithic integration</strong> — the point at which every module runs together as a single coherent system: vision, safety, and control merged, all rates live, all resources shared. The word describes the <em>test scope</em>, not the software structure — the running example remains seven independent processes; what becomes monolithic is the thing being verified.</li>
+<li><strong>Integration-time failure</strong> — a failure that exists only in the interaction between modules that each pass their own tests: a units or frame convention two nodes read differently, an ordering assumption each side believes the other satisfies, a race at a state boundary, a resource two correct processes both consume.</li>
+<li><strong>Stress testing</strong> — deliberately operating the integrated system at and beyond its worst-case point — every module live, every rate at maximum, resources contended, failures injected — to surface behavior that appears only under load, where the margins that unit tests measured individually must all hold simultaneously.</li>
+<li><strong>Incremental delivery</strong> — building a system as a sequence of stages, each independently a working, demonstrable system, so that integration risk is spent a little at a time and every new failure arrives with a one-layer suspect list rather than a whole-system one.</li>
+<li><strong>Dry run</strong> — a complete end-to-end mission executed with the full system live, in the deployment environment where possible, before the flights that count; the unit of field validation.</li>
+<li><strong>Field validation</strong> — the final validation stage, conducted in the real deployment environment, aimed specifically at the conditions simulation cannot faithfully produce: real GNSS propagation, real lighting, real radio behavior, real wind, and real animals.</li>
+</ul>
+</section>
+<section id="one-flight-the-whole-book" class="level2" data-number="29.3">
+<h2 data-number="29.3" class="anchored" data-anchor-id="one-flight-the-whole-book"><span class="header-section-number">29.3</span> One Flight, the Whole Book</h2>
+<p>Here is the flight. It is hypothetical only in its particulars; every state, trigger, threshold, and parameter in it is the real system’s, as the preceding chapters established them, and <a href="#fig-mission-trace" class="quarto-xref">Figure&nbsp;<span>29.1</span></a> draws the whole arc with the provenance lane this chapter exists to add. Two configuration notes before the props turn, because both are the direct product of earlier chapters’ arguments. First, the harassment parameters are set through the ROS 2 parameter system into the design band — a 12 m orbit radius at 6 m altitude, speed under the 5 m/s group-proximity recommendation — and the behavioral termination rule runs alongside the shipped timer, exactly the configuration the Ethics and Ecology chapter’s review demanded and its Try It had the reader build. Their presence in the startup logs is the first checkable evidence that the previous chapter’s requirements genuinely ride along. Second, the flight carries the book’s own evasion layer — the Vector-Based Threat Evasion chapter’s <code>evasion_command</code> under the Finite State Machines chapter’s preemption discipline — attached at the seam the System Architecture chapter named for it. That honesty note gets its full paragraph when the threat appears.</p>
+<div id="fig-mission-trace" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Timeline diagram titled one flight through the whole book, tracing a complete Goose Management System mission left to right through eight phases: launch, search, detect and confirm, engage, harass, an injected evade phase, resume to done, and return and land. Across the top an altitude profile shows the climb from arming, a constant 5.5 metre search altitude with a zigzag suggesting the lawnmower sweep, an orbit loop at 12 metre radius and 6 metre altitude labeled field-configured in band, a dashed amber spike climbing toward a safe altitude during the evade phase, a return to search altitude, then a climb to return altitude and descent to disarm. A mode strip shows PX4 in AUTO.MISSION for the search, OFFBOARD with token-gated companion setpoint streams for engage, harass, and evade, AUTO.MISSION again for resume, and AUTO.RTL for the return. Each phase column lists its real states and triggers: the launch ladder of IDLE, PREFLIGHT, ARMING, and START underscore MISSION with verified service calls, at least eight satellites, battery at least fifty percent; the search in MISSION with PX4 flying the pre-uploaded 6.6 metre rows while the companion streams nothing; detection requiring five clustered hits in two seconds to set target confirmed and flip the token to navigation; the engagement's one second setpoint warmup before mode offboard, the twenty hertz approach, and nav arrived flipping the token to harassment; the harassment orbit around the tracked flock centre ending on behavior with the timer as backstop under ninety second and five second watchdogs; the evade phase triggered by the three-part conjunction closing, soon, and inside the safety radius, stashing state, climbing out, and resuming the search if the target track has gone stale; the resume path returning the token to none, re-entering mission mode with a twenty second cooldown, and ending the sweep on the in-mission-then-in-loiter signature; and the wind-down with return-to-launch sized by the battery arithmetic, landing, disarming, and the ULog closing. A provenance lane beneath names, for each phase, which Parts of the book hold the internals, from Part I's airframe, battery, companion computer, and airspace law through Part II's PX4 services and offboard rules, Part III's inference pipeline, Part IV's planner, frames, patterns, tracking, and evasion, to Part V's architecture, ethics, and diagnostics. An amber band notes that the failsafe watchdog, PX4's native failsafes, and the safety pilot run beneath every phase. A footer explains that the evade phase is drawn dashed because it is the book's own Part IV extension, attached where the System Architecture chapter said it would attach, while the shipped machine routes threats through the severity protocol.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mission-trace-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/full-system-mission-trace.svg" class="img-fluid figure-img" style="width:100.0%" alt="Timeline diagram titled one flight through the whole book, tracing a complete Goose Management System mission left to right through eight phases: launch, search, detect and confirm, engage, harass, an injected evade phase, resume to done, and return and land. Across the top an altitude profile shows the climb from arming, a constant 5.5 metre search altitude with a zigzag suggesting the lawnmower sweep, an orbit loop at 12 metre radius and 6 metre altitude labeled field-configured in band, a dashed amber spike climbing toward a safe altitude during the evade phase, a return to search altitude, then a climb to return altitude and descent to disarm. A mode strip shows PX4 in AUTO.MISSION for the search, OFFBOARD with token-gated companion setpoint streams for engage, harass, and evade, AUTO.MISSION again for resume, and AUTO.RTL for the return. Each phase column lists its real states and triggers: the launch ladder of IDLE, PREFLIGHT, ARMING, and START underscore MISSION with verified service calls, at least eight satellites, battery at least fifty percent; the search in MISSION with PX4 flying the pre-uploaded 6.6 metre rows while the companion streams nothing; detection requiring five clustered hits in two seconds to set target confirmed and flip the token to navigation; the engagement's one second setpoint warmup before mode offboard, the twenty hertz approach, and nav arrived flipping the token to harassment; the harassment orbit around the tracked flock centre ending on behavior with the timer as backstop under ninety second and five second watchdogs; the evade phase triggered by the three-part conjunction closing, soon, and inside the safety radius, stashing state, climbing out, and resuming the search if the target track has gone stale; the resume path returning the token to none, re-entering mission mode with a twenty second cooldown, and ending the sweep on the in-mission-then-in-loiter signature; and the wind-down with return-to-launch sized by the battery arithmetic, landing, disarming, and the ULog closing. A provenance lane beneath names, for each phase, which Parts of the book hold the internals, from Part I's airframe, battery, companion computer, and airspace law through Part II's PX4 services and offboard rules, Part III's inference pipeline, Part IV's planner, frames, patterns, tracking, and evasion, to Part V's architecture, ethics, and diagnostics. An amber band notes that the failsafe watchdog, PX4's native failsafes, and the safety pilot run beneath every phase. A footer explains that the evade phase is drawn dashed because it is the book's own Part IV extension, attached where the System Architecture chapter said it would attach, while the shipped machine routes threats through the severity protocol.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mission-trace-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;29.1: One complete mission of the Goose Management System, phase by phase: the altitude profile across the flight, the PX4 mode that owns each segment, the real states and triggers from the System Architecture chapter, and — the lane this chapter adds — which Part of the book built the machinery that is load-bearing at each moment.
+</figcaption>
+</figure>
+</div>
+<p><strong>Before the props turn, the flight is already running on Part I.</strong> The aircraft on the pad is that Part’s work standing still: the airframe the Anatomy of a Multirotor chapter sized against this mission’s payload, the battery whose limits the Materials and Power chapter established and Part I’s closing chapter converted into a mission time budget with an explicit reserve, the GNSS-IMU-barometer suite whose fusion the Sensing the World chapter followed from silicon flexure to attitude estimate. The operator’s pre-flight brief is the Airspace Law chapter compressed into a checklist — Part 107 currency, the visual-line-of-sight plan, the organization’s own ceilings sitting deliberately under the FAA’s — and the operator’s terminal session is the From Radio to Root Shell chapter’s whole thesis in one command: a secure shell into a Linux host that happens to be able to fly, with a MAVLink heartbeat as the first diagnostic, exactly as it was on the bench.</p>
+<p><strong>The ladder up is one operator call and three verified services.</strong> The operator calls <code>/goose/start_mission</code>, and the Mission Manager climbs the startup ladder the System Architecture chapter traced: PREFLIGHT passes only on a real GPS fix with at least eight satellites, battery at or above the 50 % launch floor — a threshold sitting far above PX4’s own failsafe tiers, the Geofencing and Fail-Safes chapter’s layered-margin doctrine made numeric — a valid local position, and a recorded home position; ARMING returns success only when PX4’s own telemetry shows the vehicle armed; START_MISSION confirms AUTO.MISSION the same way. Command verification, the Flight Controller’s one discipline, is why each rung of this ladder means something. And the moment the vehicle arms, a file begins: the autopilot’s logger opens the flight’s <code>.ulg</code>, the black-box recorder the Post-Flight Diagnostics chapter will read this evening whether or not anything goes wrong.</p>
+<p><strong>The search is Part IV’s arithmetic flown by Part II’s machinery.</strong> In MISSION, PX4’s onboard executor flies the pre-uploaded survey — the <code>.plan</code> file the Mission Scripting chapter learned to read field by field, its rows spaced by the Path Planning on the Edge chapter’s generator: a 90° camera at 5.5 m altitude with 40 % overlap demands legs at most 6.6 m apart, and the constant altitude is not a preference but the thing holding the swath width, and therefore the coverage guarantee, still. The companion computer streams nothing during this phase — the architectural choice the System Architecture chapter defended as robustness exactly where the mission spends most of its airborne time — but it is anything but idle. Part III’s pipeline runs continuously: capture, preprocess, infer, postprocess, publish, the latency budget the Real-Time Inference chapter itemized, with the detector holding its deliberately low 0.6 confidence floor because a missed goose costs coverage — while the Ethics and Ecology chapter’s caveat stands upstream of any commitment: the bar for <em>initiating harassment</em> sits far above the bar for merely investigating, because a false alarm at the engagement stage is not a wasted look but a delivered orbit. Every detection that survives the floor crosses the Coordinate Frames chapter’s mathematics — pixel and depth to camera point, to body, to local NED — before it becomes one hit in the Detector’s rolling buffer. And underneath everything, the Failsafe node ticks at 1 Hz, watching thresholds it will hopefully never cross.</p>
+<p><strong>The find takes about two seconds, on purpose.</strong> A flock enters the frame near the third leg’s far end. One glimpse makes the target <code>valid</code>; five hits inside two seconds, clustered within 3 m of their own median, make it <code>confirmed</code> — the two-boolean hysteresis that demands a track, not a bounding box, before the aircraft commits. The Mission Manager’s next tick reads the flag, checks that the engagement cooldown has elapsed, flips the token to <code>'navigation'</code>, and enters ENGAGE_PREP — where it deliberately waits. Offboard mode’s first hard rule, standing since the PX4 Autopilot Stack chapter, is that the setpoint stream must exist before the mode switch; Navigation, newly named by the token, is already streaming, and after the 1.0 s warmup <code>mode_offboard</code> succeeds on PX4’s own confirmation. From first glimpse to verified Offboard: roughly two seconds, almost all of it confirmation and warmup — delays the system chose, not delays it suffered.</p>
+<p><strong>The engagement is the book’s reactive machinery, each piece where it belongs.</strong> ENGAGE streams the approach at 20 Hz — the stream-a-setpoint, test-arrival mechanics built in Part II and relocated here, pointed at a standoff point recomputed from the flock’s tracked position — while the dead-man’s switch quietly becomes the phase’s safety net: silence for half a second would now be a mode change, which is why this phase is short and the search was not flown this way. Arrival flips the token to <code>'harassment'</code>, and HARASS flies the Harassment Pattern Generation chapter’s re-centering orbit around a flock center the Target Tracking and Visual Servoing chapter’s two-loop machinery keeps continuously fresh. The parameters flying are the field configuration, not the shipped defaults — 12 m and 6 m, the lateral geometry of the design band — and the engagement ends the way the Ethics and Ecology chapter argued it must: on the flock’s observed departure toward the open corridor, with the timer and the 90 s and 5 s watchdogs as backstops rather than as the rule. The geese lift, cohere, and move off along the corridor. The behavioral termination fires, <code>harass_done</code> publishes, and the engagement log records what the system believed it engaged, for how long, and with what response — the welfare record and the effectiveness record in the same rows.</p>
+<p><strong>Then the injected event: something turns toward the aircraft.</strong> Call it what the exercise scripts it as — a large bird peeling off the departing flock and closing. Perception delivers its track; the differenced world-frame positions give a relative velocity; and the three-part conjunction the Vector-Based Threat Evasion chapter derived — closing (<span class="math inline">\(\mathbf{r} \cdot \mathbf{v}_{rel} &lt; 0\)</span>), soon (<span class="math inline">\(t^*\)</span> inside the horizon), and inside the safety radius — goes true at the estimator’s rate, not the detector’s. The preemption discipline does the rest: evaluated before the state dispatch on every tick, the trigger stashes the interrupted state and sweep index, slews onto the perpendicular escape vector, and climbs toward the safe altitude. The encounter clears — opening <em>and</em> beyond the radius with margin, hysteresis doing its quiet work — and the resume guard makes the honest choice the Finite State Machines chapter taught: the stashed harassment target is now a stale track, so control returns to the search, from which any fresh confirmation can re-enter the engagement through the front door.</p>
+<p>One paragraph of candor, because this trace’s credibility depends on it. The shipped <code>mission_manager.py</code> contains no evasion state; the System Architecture chapter said so plainly, and nothing here retracts it. In the shipped machine, an uncooperative mover would have to reach the aircraft through the severity protocol — a watchdog publishing <code>SEVERITY:reason</code>, <code>_enter_failsafe</code> parsing it, the token zeroed, a recovery service called — which is a blunt but sound response: break off, don’t compute. The evasion phase this flight just flew is the book’s Part IV extension, installed at exactly the attachment point the System Architecture chapter identified — a new severity in the protocol, or a new state between the engagement watchdogs and RESUME. That such a layer <em>can</em> be added without touching Navigation, Harass, or the Flight Controller is not luck; it is the repository’s own claimed design benefit — a scalable architecture for adding future behaviors — and the claim is only testable at integration time, which is precisely why this chapter is where the extension finally flies.</p>
+<p><strong>The wind-down is deliberately boring.</strong> RESUME zeroes the token, re-enters AUTO.MISSION on a verified service call, and starts the 20 s cooldown that keeps the resumed sweep from instantly re-engaging the flock it just moved; had that service failed three times, the escalation path — <code>RTL:cannot resume mission</code> — stood ready. The sweep completes its remaining legs; the Mission Manager reads the end-of-search signature, <code>in_mission</code> seen and then <code>in_loiter</code>, and enters DONE. Return-to-Launch flies home on margins the Geofencing and Fail-Safes chapter sized from mission geometry, against the reserve Part I wrote into the time budget. Land. Disarm. The ULog closes, and the evening’s real work begins: the two recorders — the autopilot’s <code>.ulg</code> and the companion’s bag of <code>/goose/*</code> topics — correlated on one timeline, each authoritative for its own questions, exactly as the Post-Flight Diagnostics chapter prescribed.</p>
+<p>Count what just flew. No phase of that flight was held up by one Part alone: the search was Part IV’s arithmetic in Part II’s executor watched by Part III’s pipeline through Part IV’s frames under Part V’s architecture, with Part I’s physics carrying all of it and the Ethics chapter’s constraints configured into the parameters. That entanglement is not a complication of the system — it <em>is</em> the system, and it is why the next section exists. Nothing about seven separately correct processes guarantees the sentence this paragraph just wrote.</p>
+</section>
+<section id="merging-the-modules-what-only-the-whole-can-fail" class="level2" data-number="29.4">
+<h2 data-number="29.4" class="anchored" data-anchor-id="merging-the-modules-what-only-the-whole-can-fail"><span class="header-section-number">29.4</span> Merging the Modules: What Only the Whole Can Fail</h2>
+<p>The Goose Management System’s verification story, module by module, is as good as this book could make it: control loops stepped and plotted, detectors validated against honest splits, planners checked against coverage arithmetic, state machines tortured at their boundaries, failsafes fired on purpose in simulation. <strong>Monolithic integration</strong> is the step all of that cannot substitute for: merging the vision module, the safety module, and the control modules into one coherently running system, everything live at once, and testing <em>that</em> — the whole as the unit under test. The word “monolithic” earns its place with a precision worth keeping: the software stays modular — seven processes, each separately crashable, which the System Architecture chapter argued is a feature — but the <em>verification target</em> becomes indivisible. A unit test validates a module against its own assumptions. Integration testing validates the assumptions against each other. The failures it exists to catch come in three recurring species, and the running example supplies a vivid instance of each — along with, in each case, a defense the book has already built, whose real purpose only becomes visible now.</p>
+<p><strong>Species one: convention mismatches.</strong> Two modules agree perfectly about an interface and silently disagree about what the numbers in it mean. The book’s sharpest standing example is the one the Coordinate Frames chapter drilled: local NED’s <span class="math inline">\(z\)</span> axis points <em>down</em>, so altitude is negative and “climb to six metres” is <span class="math inline">\(z = -6.0\)</span>. Now imagine a contributed patch in which some node computes a setpoint altitude as a positive “metres up” and writes it into the <span class="math inline">\(z\)</span> field unnegated. That node’s unit tests pass — its arithmetic is self-consistent. The consumer’s tests pass — it faithfully flies whatever <span class="math inline">\(z\)</span> it is handed. The integrated system commands a descent into the ground, and only a test that runs both modules against one simulated aircraft can see it. The same species covers degrees handed to a radians consumer, a message stamped in one clock read against another, and — the documentation variant the System Architecture chapter catalogued — a README asserting token values the code never publishes. The defenses are centralization and diff-testing: one <code>frames.py</code> as the single authority for every transformation, one <code>px4_defs.py</code> as the single authority for every topic name and constant, so a convention has exactly one place to be right; and the habit of arbitrating documentation against running introspection — <code>ros2 topic list</code> outranks the README — because prose conventions decay and code conventions bind.</p>
+<p><strong>Species two: ordering and handoff failures.</strong> Each module’s contract is satisfiable; the <em>sequence</em> of satisfying them is not, or is racy. The running example’s canonical case is the Offboard handoff, and it is worth savoring because the shipped system contains a whole state that exists only to solve it. PX4 refuses to enter Offboard mode unless a setpoint stream is already flowing — the dead-man’s rule from Part II. A behavior node, correctly, streams only while the token names it. Sequence those two correct rules naively — switch the mode, then grant the token — and the mode switch is refused every time; grant and switch in the same instant and it is refused <em>some</em> of the time, which is worse, because intermittent integration failures are the expensive kind. ENGAGE_PREP is the integrated answer: token first, a 1.0 s warmup during which Navigation’s stream establishes itself, then the verified mode switch. No unit test of the Flight Controller or of Navigation could ever demand that state’s existence; only the pairing does. The same species includes the race conditions the Finite State Machines chapter dissected — the threat trigger landing on the exact tick of a grid-corner arrival, callbacks writing state out from under a half-finished transition — and the defense is the same one taught there, now legible as an integration measure: the single-writer tick, all triggers evaluated in one fixed priority order, at most one transition per tick, so that simultaneity is resolved by decree rather than by scheduler accident.</p>
+<p><strong>Species three: shared-resource conflicts.</strong> Two correct modules consume one thing that cannot serve both. The aircraft itself is the system’s most important shared resource, and the clearest way to see the token’s real job is to delete it: Navigation and Harass are both, by their own specs, entitled to stream setpoints; run both without arbitration and PX4 receives two interleaved 20 Hz streams commanding different points — an aircraft lurching between two masters, each master’s unit tests green. The <code>/goose/active_controller</code> token is mutual exclusion by broadcast: one writer, one named node, checked at the top of every behavior tick, revocable by decree. The subtler shared resource is the companion computer’s processor. Part III’s inference, Navigation’s 20 Hz stream, the Detector’s frame conversions, the bag recorder, and the Mission Manager’s tick all buy their guarantees from the same CPU — and the dead-man’s switch prices CPU exhaustion in flight modes: stretch the setpoint period past PX4’s tolerance and a saturated processor becomes an Offboard drop mid-engagement. The Real-Time Inference chapter’s benchmarking discipline — measure on the target hardware, under the mission’s real competing load, long enough to catch thermal throttling — was this species’ unit-level defense; the integration-level one is the stress test.</p>
+<p>That is what <strong>stress testing</strong> means for this system, and it is more specific than “run it hard.” Assemble the worst honest case: the full graph live, the detector inferring on real imagery at full rate, an engagement active so the 20 Hz stream is load-bearing, the bag recording everything, on the actual companion computer at its actual thermal steady state — and then measure the margins that unit tests measured separately, all at once: setpoint-period tail latency against the Offboard tolerance, detection latency against the reaction budget, tick jitter against the transition-latency bound. Then inject the failures the architecture claims to absorb, in the worst phase: kill the Detector mid-engagement and time the 5 s target-lost watchdog; freeze telemetry and confirm the staleness ladder holds and then goes home; script the threat onto the exact tick of a state boundary, the torture case the Finite State Machines chapter designed. Each of those was rehearsed somewhere in this book against one module. The integration version asks the only question the field will ask: do all the margins hold <em>simultaneously</em>, when every subsystem is spending from the same budgets? A system that passes fails the way the Geofencing chapter said good systems fail — boringly — and a system that fails has told you, on the bench, what would otherwise have been a field incident. Either answer is a bargain, and the price of admission is simply doing it: everything on, everything measured, everything injected, before the flight that counts.</p>
+</section>
+<section id="five-deliveries-each-one-a-working-system" class="level2" data-number="29.5">
+<h2 data-number="29.5" class="anchored" data-anchor-id="five-deliveries-each-one-a-working-system"><span class="header-section-number">29.5</span> Five Deliveries, Each One a Working System</h2>
+<p>How does a system that must eventually pass that test come to exist? The tempting answer — build all the modules, then merge them — has a name in the systems-engineering literature, <em>big-bang integration</em>, and a well-earned reputation: it defers every seam failure to the end, then delivers them all at once, into the largest possible search space, at the moment of maximum schedule pressure. The Goose Management System was built the other way, as five incremental stages, and <a href="#fig-delivery-stages" class="quarto-xref">Figure&nbsp;<span>29.2</span></a> draws the staircase. The pattern is worth studying not as this project’s history but as a reusable shape: each stage is the cheapest, most isolated piece that can be made to work next, each is independently a working system someone could demonstrate, and each becomes the proven foundation the next stage stands on.</p>
+<div id="fig-delivery-stages" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Staircase diagram titled five deliveries, each one a working system. Five boxes ascend from lower left to upper right, connected by arrows labeled with what each step adds. Stage one, telemetry and environment: companion computer running, remote shell into the aircraft, sensor data confirmed flowing and logged; proves the data path is real; machinery from Part I's companion computer and UART chapter and Part V's logging posture. An arrow labeled plus flight and failsafes leads to stage two, SITL and safety failsafes: waypoints flying in simulation, geofence armed and a kill-switch proven before any autonomy exists to constrain; proves the envelope holds; machinery from Part II end to end. An arrow labeled plus real perception leads to stage three, live inference pipeline: real camera frames through an optimized edge model on the real hardware, the first stage where perception stops being scripted; proves perception is real at measured rates; machinery from Part III and Part IV's frame chain. An arrow labeled plus autonomous decisions leads to stage four, simulated mission logic: the full state machine in SITL, search grid, transition to harassment, a computed evasion vector, deliberately not yet flown for real; proves the decisions are right before flight; machinery from Part IV and Part V's architecture. A final arrow labeled plus the real world leads to stage five, live field validation, drawn as the filled summit box: the full autonomous loop, every prior stage's work integrated and flown at the deployment site under real conditions; proves the assumptions survive the world; machinery from everything, with Part V's diagnostics as the instrument. An amber panel titled the order is the lesson lists the principles: infrastructure before autonomy, safety before capability with the fence and kill-switch preceding the behaviors they will one day have to stop, perception before decision-making so thresholds are sized against a real detector rather than a perfect one, simulated logic before committed flight, and real-world integration last but integration risk spent all along. A footer states that each stage is a working demonstrable system rather than a fragment, that the diff between adjacent stages is one layer, and that when integration breaks, so is the suspect list.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-delivery-stages-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/incremental-delivery-stages.svg" class="img-fluid figure-img" style="width:100.0%" alt="Staircase diagram titled five deliveries, each one a working system. Five boxes ascend from lower left to upper right, connected by arrows labeled with what each step adds. Stage one, telemetry and environment: companion computer running, remote shell into the aircraft, sensor data confirmed flowing and logged; proves the data path is real; machinery from Part I's companion computer and UART chapter and Part V's logging posture. An arrow labeled plus flight and failsafes leads to stage two, SITL and safety failsafes: waypoints flying in simulation, geofence armed and a kill-switch proven before any autonomy exists to constrain; proves the envelope holds; machinery from Part II end to end. An arrow labeled plus real perception leads to stage three, live inference pipeline: real camera frames through an optimized edge model on the real hardware, the first stage where perception stops being scripted; proves perception is real at measured rates; machinery from Part III and Part IV's frame chain. An arrow labeled plus autonomous decisions leads to stage four, simulated mission logic: the full state machine in SITL, search grid, transition to harassment, a computed evasion vector, deliberately not yet flown for real; proves the decisions are right before flight; machinery from Part IV and Part V's architecture. A final arrow labeled plus the real world leads to stage five, live field validation, drawn as the filled summit box: the full autonomous loop, every prior stage's work integrated and flown at the deployment site under real conditions; proves the assumptions survive the world; machinery from everything, with Part V's diagnostics as the instrument. An amber panel titled the order is the lesson lists the principles: infrastructure before autonomy, safety before capability with the fence and kill-switch preceding the behaviors they will one day have to stop, perception before decision-making so thresholds are sized against a real detector rather than a perfect one, simulated logic before committed flight, and real-world integration last but integration risk spent all along. A footer states that each stage is a working demonstrable system rather than a fragment, that the diff between adjacent stages is one layer, and that when integration breaks, so is the suspect list.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-delivery-stages-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;29.2: The five-stage incremental delivery of the running example: telemetry and environment, SITL and safety failsafes, the live inference pipeline, simulated mission logic, and live field validation — each stage a working system, each adding one layer, with the ordering principles the sequence encodes.
+</figcaption>
+</figure>
+</div>
+<p><strong>Stage 1 — telemetry and environment.</strong> The companion computer running on the airframe, a remote shell into it, and real sensor data confirmed flowing <em>and logged</em>. Nothing flies; nothing decides. It is also the stage nothing above can be trusted without, because every later stage will be debugged <em>through</em> this layer: the topic echoes, the logs, the shell session. This is Part I’s closing chapters as a delivery — the From Radio to Root Shell chapter’s bench verification, heartbeat first, promoted to the aircraft — and it encodes the first ordering principle: <em>infrastructure before autonomy</em>. An autonomy bug on top of an unproven data path is two bugs that look like one.</p>
+<p><strong>Stage 2 — SITL and safety failsafes.</strong> Waypoint commands flying in software-in-the-loop, with the geofence armed and a kill-switch routine — the abort path — demonstrated, <em>before any live inference or autonomy logic exists</em>. This is Part II delivered whole: the three-process workbench, the mission as data, the fence with consequences, the graded failsafe ladder. The ordering principle here is the pattern’s least intuitive and most important: <em>safety before capability</em>. The fence and the abort are cheap to build now, when there is nothing dangerous for them to constrain, and nearly impossible to retrofit honestly later — a failsafe bolted onto an already-flying autonomous system inherits every architectural assumption that system made without it, and the Geofencing chapter’s default-safe doctrine cuts the same way: the constraint must be in place before the thing it constrains, or the thing defines the defaults. Note also what Stage 2 already is: a working survey aircraft. The Remote Sensing at Scale chapter flew serious agricultural missions on exactly this capability set — coverage flight plus a payload — with no goose, no detector, and no state machine anywhere in sight. A stage is a system, not a fragment.</p>
+<p><strong>Stage 3 — the live inference pipeline.</strong> Dynamic camera-frame ingestion through an optimized edge model, identifying targets on the real hardware — the first stage where perception stops being scripted. Part III delivered: the pipeline, the quantized and compiled model, the honest benchmarks on the target processor, and the frame chain from the Coordinate Frames chapter turning boxes into world points. The principle: <em>perception before decision-making</em>. The confirmation thresholds, persistence windows, and confidence floors that Stage 4’s state machine will depend on can only be sized against a real detector’s real false-positive and false-negative behavior; tune them against simulated perfect detections and every guard in the mission logic learns numbers the field will refuse to honor.</p>
+<p><strong>Stage 4 — simulated mission logic.</strong> The comprehensive state machine, in SITL: executing the search grid, transitioning to the harassment pattern, computing an evasion vector — deliberately still in simulation, with all of Part IV live at once: planner, frames, patterns, tracker, FSM, evasion, and the token discipline of the eventual architecture. The principle is the simulate-then-fly rule of Part II, applied now at mission scale: <em>simulated logic before committed flight</em>. This is where the integration failures of the previous section are cheapest to find — the torture cases, the boundary races, the handoff ordering — because a crash costs a restart, and because the diff from Stage 3 is exactly one layer: if Stage 4 misbehaves, the perception it consumes and the flight envelope it flies in are already proven, so the suspect is the new decision logic and nothing else. That one-layer suspect list is incremental delivery’s whole economic argument, and it is why the stages are ordered by dependency rather than by glamour.</p>
+<p><strong>Stage 5 — live field validation.</strong> The full autonomous loop — every prior stage’s work, integrated — flown at the actual deployment site. It is the first moment everything must work together outdoors, and the pattern’s last principle is a double negative worth untangling: <em>real-world integration comes last, but integration risk is not deferred to it</em>. By the time Stage 5 flies, every seam has already been exercised somewhere cheaper; what remains for the field is the set of conditions no simulator was asked to produce. That set is real, structured, and predictable enough to deserve its own section.</p>
+</section>
+<section id="what-only-the-field-can-teach" class="level2" data-number="29.6">
+<h2 data-number="29.6" class="anchored" data-anchor-id="what-only-the-field-can-teach"><span class="header-section-number">29.6</span> What Only the Field Can Teach</h2>
+<p>The field is not a harsher simulator. It is a different epistemic regime: the place where conditions nobody modeled — because nobody thought of them, or because modeling them faithfully is harder than encountering them — finally get their vote. Field validation is therefore not a rerun of Stage 4 with grass; it is a distinct activity with its own target list, conducted as complete end-to-end dry runs at the deployment site, tuning flight behavior against real conditions and finalizing the edge-case parameters that only reveal themselves outdoors. Four entries recur on that list for a system like this one, and the book has, without always saying so, already armed the reader against each.</p>
+<p><strong>Real GNSS propagation.</strong> Simulation’s GPS is a clean constellation; the deployment site has a tree line, a maintenance shed, and a pond — surfaces that reflect satellite signals into the receiver alongside the direct path. That <em>multipath</em> corrupts pseudoranges and sets the position estimate wandering by metres precisely where the site’s structures are, which is often precisely where the geofence margin is thinnest. The system’s layered defenses were built chapters ago — EKF2’s innovation monitoring down-weights a satellite stream that stops agreeing with the inertial evidence, and the Post-Flight Diagnostics chapter’s GPS-glitch signature (satellite-count drops, position jumps against a smooth IMU) makes the event legible in the log — but the <em>parameter</em> consequence is a field decision: the fence margins and arrival radii that were comfortable under open-sky scatter get re-sized against the site’s measured worst corner. That is what “finalizing edge-case parameters” means in practice: the number was always a placeholder for a measurement the bench could not make.</p>
+<p><strong>Real light.</strong> The detector’s validation score was earned on its dataset’s distribution, and the Real-Time Inference chapter was blunt about what happens when the field leaves it: the score silently stops predicting. Dusk shifts the color balance and stretches exposures into motion blur; low sun drapes half the pond in shadow; none of it announces itself, because the model keeps emitting confident boxes either way. Field validation is where the per-condition evaluation table gets its field-collected rows — morning, noon, overcast, dusk — and where the runtime health monitoring that chapter demanded proves it can notice a sagging confidence trend and degrade gracefully instead of steering on fiction. A dry run that includes a deliberately marginal-light flight is not pessimism; it is the only honest way to learn where the mission’s operating window actually closes.</p>
+<p><strong>Real radio.</strong> The bench link of Part I was a metre of wire; the field link crosses hundreds of metres, vegetation, and the site’s own reflections, and degrades with all three. The link-loss failsafe has been configured since Part II — but field validation is where it gets <em>rehearsed at range</em>, and where an operational fact gets checked that is easy to overlook on the bench: the operator’s two buttons, <code>/goose/start_mission</code> and <code>/goose/abort</code>, ride the network too. An abort path that works only where the link is strong is an abort path that fails exactly when the aircraft is far, low, or behind the shed — so the dry-run script includes calling it from the worst corner of the site, and timing it.</p>
+<p><strong>Real wind.</strong> Gazebo’s optional wind is a disturbance model; the site’s wind is gusts, gradients, and rotor from the tree line. Part II’s controllers were designed for disturbance rejection and Part IV’s coverage arithmetic budgeted the cross-track error that keeps adjacent swaths overlapping — but the budget’s numbers came from assumptions, and the field flight is where the assumption meets the anemometer. The tuning loop is the Post-Flight Diagnostics chapter’s workflow run at tempo: fly the sweep in the morning’s real wind, pull the cross-track series from the log, check it against the overlap margin, adjust, re-fly. If the margin holds in the site’s typical worst wind, the coverage guarantee survives contact with the world; if it does not, the honest fixes are the planner’s — tighten the spacing, accept the longer track — before they are the controller’s.</p>
+<p>Two habits make these dry runs compound rather than merely accumulate. First, every anomaly becomes a log artifact and every log artifact becomes a hypothesis — the review-hypothesize-bench-test-fix-refly discipline, applied now to the integrated whole, with both recorders correlated so that a mission-level symptom can be traced to an autopilot-level cause. Second, the constraints that rode along get checked too: the field is where the Ethics and Ecology chapter’s behavioral termination meets actual geese, where the flock’s real responses populate the engagement log’s welfare fields, and where the parameter file that was audited on the bench is confirmed — from the logs, not from memory — to be the configuration that actually flew. The field validates the system; the logs validate the field work; and the same evening ritual that closes each dry run is the one that will close every operational flight after it.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="29.7">
+<h2 data-number="29.7" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">29.7</span> Check Your Understanding</h2>
+<ol type="1">
+<li>Using only numbers established in this Part — detection hits landing at 5 Hz, five clustered hits to confirm, Detector publishing at 10 Hz, Mission Manager ticking at 10 Hz, a 1.0 s Offboard warmup, and (given for this problem) a confirmed target 18 m away approached at 3 m/s to a 3 m standoff with a 2.0 m arrival radius — estimate the time from a goose’s first detected frame to the token flipping to <code>'harassment'</code>. Which terms dominate, and what does that say about where integration effort should go?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Confirmation: four inter-hit intervals at 5 Hz <span class="math inline">\(= 0.8\)</span> s; up to one Detector publish period (<span class="math inline">\(0.1\)</span> s) plus one manager tick (<span class="math inline">\(0.1\)</span> s) before the flag is read — call it <span class="math inline">\(1.0\)</span> s to enter ENGAGE_PREP. Warmup and verified <code>mode_offboard</code>: <span class="math inline">\(1.0\)</span> s. The approach must close from 18 m to within 2.0 m of the 3 m standoff point, roughly 13 m of flight at 3 m/s <span class="math inline">\(\approx 4.3\)</span> s. Total <span class="math inline">\(\approx 6.3\)</span> s, of which the flight itself is about two-thirds and the two deliberate delays (confirmation, warmup) most of the rest; middleware latency is noise. The lesson generalizes: the integrated system’s end-to-end tempo is dominated by physics and by chosen safety delays, not by message plumbing — so integration effort belongs on verifying that the chosen delays are actually enforced (the warmup really precedes the mode switch; confirmation really precedes commitment), not on shaving ticks.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Classify each incident as a convention mismatch, an ordering/handoff failure, or a shared-resource conflict, and name the running example’s designed defense: (a) a new deterrence node publishes trajectory setpoints whenever it sees a confirmed target, and the aircraft occasionally lurches between two flight paths; (b) a patch computes the approach altitude as <span class="math inline">\(+3.0\)</span> “metres up” and writes it directly into the NED <span class="math inline">\(z\)</span> field; (c) a “snappier” Mission Manager calls <code>mode_offboard</code> on the same tick it grants the token, and the switch is refused roughly one time in five.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Shared-resource conflict — two behavior nodes streaming to one autopilot. Defense: the active-controller token; the new node must gate every tick on being named, and the Mission Manager remains the token’s only writer. (b) Convention mismatch — a self-consistent module handing a positive-up altitude to a <span class="math inline">\(z\)</span>-down consumer, commanding descent underground; both modules’ unit tests pass. Defense: centralized conventions — all altitude handling through <code>frames.py</code> and the shared constants module — plus an integrated SITL flight, the only test that runs both sides against one simulated aircraft. (c) Ordering failure — PX4’s stream-before-switch rule racing the token grant; the intermittency is the tell, because whether the first setpoints beat the mode command depends on scheduling. Defense: ENGAGE_PREP itself, the state that exists to sequence the handoff — token first, warmup, then the verified switch.</li>
+</ol>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>A teammate argues the delivery order should start with Stage 3: “the detector is the highest-risk item, so de-risk it first.” Steelman the proposal, then defend the pattern’s actual order using at least two of its principles.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The steelman is real: schedule risk concentrates in the hardest component, and detector work (data collection, training, optimization) has long lead times — and indeed nothing stops <em>model development</em> from proceeding in parallel on recorded data. But <em>delivering</em> live inference first inverts two principles. Infrastructure before autonomy: Stage 3’s definition is inference on the real hardware with real frames — which requires the companion computer, the camera path, the logging, and the remote access that Stage 1 exists to prove; attempted first, every model bug is indistinguishable from a plumbing bug. Safety before capability: Stage 3’s output will immediately create pressure to fly against it, and flying anything before the fence, the failsafes, and the abort exist means the constraint layer gets retrofitted around a system already shaped without it — the exact bolt-on the Geofencing chapter’s doctrine forbids. The pattern’s answer to the schedule concern is not reordering but parallelism: train offline early; <em>integrate</em> in dependency order.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>Four anomalies appear during field validation that never appeared in SITL: (a) the position estimate wanders near the maintenance shed; (b) recall collapses on the evening dry run; (c) the abort call times out at the site’s far corner; (d) adjacent swaths lose overlap on a gusty afternoon. For each, name the field condition, the chapter machinery that anticipated it, and the log evidence that diagnoses it.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>GPS multipath off the structure: reflected signals corrupt pseudoranges. Anticipated by EKF2’s innovation monitoring (Part I) down-weighting inconsistent GPS; diagnosed by the Post-Flight Diagnostics chapter’s GPS-glitch signature — satellite-count drops and position jumps unsupported by IMU evidence. Consequence: re-size fence margins near the shed. (b) Distribution shift, lighting column: dusk lies outside the training distribution, so the validation score silently stops predicting (Real-Time Inference chapter); diagnosed by sagging confidence and detection-rate trends in the bagged Target stream, and answered by per-condition evaluation rows and graceful degradation, then targeted evening data collection. (c) Radio-link degradation at range — the operator’s service calls ride the same network as everything else; anticipated by the link-loss failsafe (Part II), diagnosed by comparing the call’s send time against the manager’s log, and fixed operationally: relocate the ground station or shrink the operating area. (d) Real wind against the coverage budget: the cross-track error series pulled from the ULog, checked against the overlap margin the Path Planning chapter budgeted; if it exceeds the margin in typical site wind, tighten the sweep spacing — the coverage guarantee, not aesthetics, is what is at stake.</li>
+</ol>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>During HARASS, a scripted intruder begins closing on the aircraft. Contrast what the <em>shipped</em> system does with what the system flown in this chapter’s trace does, and name the exact attachment seam that separates them.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The shipped machine has no evasion state and no threat trigger; its reactive-safety path is the severity protocol. Unless a watchdog translates the intruder into a <code>SEVERITY:reason</code> message, the shipped system continues its orbit until <code>harass_done</code> or a watchdog fires — and if a severity <em>is</em> published, <code>_enter_failsafe</code> parses it, zeroes the token (silencing Harass within a tick), and calls the matching recovery service: a blunt break-off, terminal for the mission. The traced system carries the book’s Part IV extension: the three-part conjunction (closing, soon, inside the safety radius) evaluated at estimator rate in the tick’s preamble, preemption with a stash, a perpendicular escape climb, a hysteretic clearance test — and a guarded resume that returns to the <em>search</em>, not the harassment, because the stashed target track has gone stale. The seam is the one the System Architecture chapter named: a new severity in the <code>SEVERITY:reason</code> protocol, or a new state between the engagement watchdogs and RESUME. The contrast is the point: both responses are defensible engineering; only one of them is in the repository, and an integrated test is where the difference stops being theoretical.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>Design the single most informative stress test for the claim “the engagement loop holds under full load.” Specify what runs, what is measured against what bound, and which of the three integration-failure species it hunts.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Run the whole graph on the real companion computer at thermal steady state (a long warm-up first, per the benchmarking discipline): detector inferring on real recorded imagery at full rate, an active engagement so Navigation’s 20 Hz stream is load-bearing, the bag recorder capturing all topics, Mission Manager ticking at 10 Hz. Measure tails, not means: the setpoint inter-publish interval against PX4’s Offboard timeout (the dead-man’s floor of roughly 2 Hz), end-to-end detection latency against the reaction budget, and tick jitter against the transition-latency bound — each margin was verified separately in its own chapter, and this test asks whether they hold <em>simultaneously</em>. It hunts species three, shared-resource conflict: the CPU (and its thermal envelope) is the contended resource, and the failure it would expose — a stretched setpoint period dropping Offboard mid-engagement — is invisible to every per-module benchmark because each module, tested alone, has the whole processor to itself.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="29.8">
+<h2 data-number="29.8" class="anchored" data-anchor-id="try-it"><span class="header-section-number">29.8</span> Try It</h2>
+<p><strong>Part 1 — deliver the system, in the stages’ order.</strong> This is the book’s closing exercise: stand up the full Goose Management System — the shipped repository if you have it, or your own Part II–IV implementations against the System Architecture chapter’s interface table — and bring it to a complete end-to-end mission, <em>delivering it to yourself in the five stages</em> rather than launching everything at once. Stage 1: SITL (or the real companion computer) up, <code>ros2 topic hz</code> proving the telemetry streams, one arm-disarm cycle proving a ULog gets written. Stage 2: the lawnmower <code>.plan</code> flying in AUTO.MISSION with the geofence armed and one deliberate breach demonstrated, plus <code>/goose/abort</code> called mid-flight and timed — before any autonomy node runs. Stage 3: the Detector live against scripted or recorded imagery, <code>/goose/target</code> at 10 Hz, and a logged measurement of its confirm latency and false-alarm behavior. Stage 4: the full mission machine in SITL — and, at the seam the System Architecture chapter named, the evasion layer from Part IV. Then the full trace, as one flight: startup ladder, sweep, scripted goose, engagement, behavioral termination (implement it beside the timer if you built the Ethics chapter’s Try It — this is where it finally flies), an injected threat during HARASS, resume, sweep completion on the <code>in_loiter</code> signature, RTL. Before takeoff, audit the parameters as a field crew would: <code>ros2 param get</code> on the harassment node must show the design band, not the defaults, and the startup log must record it. The acceptance test is the trace itself: every transition in the Mission Manager’s log matched to its trigger and checked against the System Architecture chapter’s figure, with no transition you cannot explain.</p>
+<p><strong>Part 2 — stress it, then read it back.</strong> With the full mission running, apply the load and the knives: record everything with the bag recorder while the detector runs at full rate, and capture the setpoint-period and detection-latency tails during the engagement (on a desktop SITL host these margins will be comfortable — state them anyway, and note which would tighten on embedded hardware and by roughly how much, using the Real-Time Inference chapter’s measured ratios). Kill the Detector process mid-engagement and time the target-lost watchdog; freeze the telemetry bridge and watch the staleness response; re-inject the threat on the exact tick of a leg-corner arrival, the race the Finite State Machines chapter taught you to script from the arrival guard’s own log line. Then close the loop the way every field evening should: correlate the ULog and the bag on one timeline and write the flight’s one-page account — every state change with its trigger, every injected fault with the response and its measured latency, the engagement’s welfare-relevant fields (what was engaged, for how long, ending on which criterion), and the parameter configuration that actually flew, read from the logs rather than from memory. If that page is boring, the system passed. File it the way the Post-Flight Diagnostics chapter taught you to file everything: as the baseline the <em>next</em> flight’s anomalies will be diffed against.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#autonomous-state-machine-control">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+<p>The Preface made one promise about the running example: that each part of the book would pick the thread back up, so the reader could see exactly where the material just read lands in a working system. This chapter is where the threads stop being picked up one at a time, because they are all load-bearing at once — which was the point of choosing a system, rather than a topic, as the book’s spine. The Goose Management System itself was never the destination. It is one modest aircraft with one eccentric mission, its swoop pattern still unbuilt, its evasion layer still the book’s extension rather than shipped code, its multi-aircraft future still the design exercise the Multi-Agent Systems and Coordination chapter closed Part IV with — the normal condition of a real system, which ends its chapters mid-story or not at all. What the system was, from the Commercial Drone Landscape chapter forward, was a forcing function: a single concrete artifact demanding that control theory, middleware, perception, planning, safety engineering, and ethics all be <em>true at the same time</em>, which is the one demand no sequence of isolated topics ever makes.</p>
+<p>What the reader keeps is correspondingly not a drone but a competence the Preface called by name: the ability to reason about an autonomous aerial system end to end, and to know where to look when it misbehaves in the field. Size the airframe against the mission; prove the data path before the autonomy and the failsafe before the capability; buy perception’s numbers honestly, on the target hardware; keep decisions in one tick and conventions in one file; deliver in working layers; test the whole as a whole; read the logs every evening; and hold the system answerable — in its parameters and its records — to every party in the frame, including the ones with feathers. Those habits transfer to systems that will look nothing like this one, and that is the real closing state of the book: not a finished aircraft, but an engineer who knows, next time and from the start, in what order a working system is built.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="pagination-link" aria-label="The Ethics and Ecology of Autonomous Wildlife Management">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../appendices/appendix-a-glossary.html" class="pagination-link" aria-label="Appendix A: Glossary">
+        <span class="nav-page-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

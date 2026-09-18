@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>16&nbsp; Real-Time Inference on the Edge: Latency and Trade-offs – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" rel="next">
+<link href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html">Part III — Perception at the Edge: TinyML &amp; Computer Vision</a></li><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">16.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">16.2</span> Key Vocabulary</a></li>
+  <li><a href="#what-real-time-actually-requires" id="toc-what-real-time-actually-requires" class="nav-link" data-scroll-target="#what-real-time-actually-requires"><span class="header-section-number">16.3</span> What “Real-Time” Actually Requires</a></li>
+  <li><a href="#the-latency-budget" id="toc-the-latency-budget" class="nav-link" data-scroll-target="#the-latency-budget"><span class="header-section-number">16.4</span> The Latency Budget</a></li>
+  <li><a href="#measuring-honestly" id="toc-measuring-honestly" class="nav-link" data-scroll-target="#measuring-honestly"><span class="header-section-number">16.5</span> Measuring Honestly</a></li>
+  <li><a href="#the-accuracyspeed-frontier" id="toc-the-accuracyspeed-frontier" class="nav-link" data-scroll-target="#the-accuracyspeed-frontier"><span class="header-section-number">16.6</span> The Accuracy–Speed Frontier</a></li>
+  <li><a href="#from-frames-to-decisions-tracking" id="toc-from-frames-to-decisions-tracking" class="nav-link" data-scroll-target="#from-frames-to-decisions-tracking"><span class="header-section-number">16.7</span> From Frames to Decisions: Tracking</a></li>
+  <li><a href="#robustness-when-the-world-leaves-the-dataset" id="toc-robustness-when-the-world-leaves-the-dataset" class="nav-link" data-scroll-target="#robustness-when-the-world-leaves-the-dataset"><span class="header-section-number">16.8</span> Robustness: When the World Leaves the Dataset</a></li>
+  <li><a href="#a-note-on-responsibility" id="toc-a-note-on-responsibility" class="nav-link" data-scroll-target="#a-note-on-responsibility"><span class="header-section-number">16.9</span> A Note on Responsibility</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">16.10</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">16.11</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html">Part III — Perception at the Edge: TinyML &amp; Computer Vision</a></li><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The previous chapter ended with a validated detector and an unpaid debt. The pipeline it built runs from raw footage to a model with a measured mAP, and the chapter before it carried that model through quantization and into TensorRT on the companion computer — but every number produced so far describes <em>accuracy</em>, and accuracy says nothing about time. A detector that finds nineteen geese in twenty is useless to the running example if each answer arrives half a second after the frame that prompted it, because the target-position topic the mission logic has consumed since Part II is only worth publishing while the goose is still near the position being published. The demand the deployment stage places on the system is usually compressed into one hyphenated word — the system must detect targets in <em>real-time</em> — and this chapter’s first job is to take that word apart, because it names not one requirement but two, each measured differently, each failed differently.</p>
+<p>The second job is the trades. When measurement says the deadline is missed — and on a first attempt it usually does — the engineer holds a small set of levers, and every one of them buys time by spending something the mission also wants: a smaller model spends accuracy, a lower input resolution spends detection range, a skipped frame spends freshness. The previous two chapters built the levers themselves — quantization, resolution, model choice; this chapter is about <em>pulling</em> them deliberately: reading an accuracy-versus-speed frontier, pricing a model-size step in both currencies, and measuring the result honestly, which turns out to be its own discipline with its own failure modes. The chapter then follows the deployed detector into two subjects that only exist after deployment. The first is time-smoothing: a per-frame detector flickers, and the machinery that turns flickering boxes into stable, trackable objects — and the decision delay that stability costs — is what lets the state machine act on perception without overreacting to one noisy frame. The second is robustness: the gap between the validation set and the world, which widens on a vibrating, altitude-changing, weather-exposed aircraft faster than on any other deployment platform a vision model is likely to meet.</p>
+<section id="learning-objectives" class="level2" data-number="16.1">
+<h2 data-number="16.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">16.1</span> Learning Objectives</h2>
+<ul>
+<li>Distinguish throughput (FPS) from end-to-end latency, state the two separate conditions a real-time perception system must satisfy, and explain how a pipelined system can post a high frame rate and a long latency at the same time.</li>
+<li>Itemize the end-to-end latency budget of an onboard inference pipeline — capture, preprocess, infer, postprocess, publish — and compute both the pipeline’s latency and its throughput ceiling from per-stage timings.</li>
+<li>Benchmark inference honestly: exclude warm-up, report tail latency rather than the mean alone, run long enough to expose thermal throttling, and measure on the target hardware under the mission’s real competing load.</li>
+<li>Read an accuracy-versus-latency frontier for a model family, and choose a model size by combining the mission’s accuracy floor with diminishing-returns arithmetic.</li>
+<li>Explain what object tracking adds to per-frame detection, trace the detect–associate–update–decide loop, and compute the decision delay a persistence threshold trades for stability.</li>
+<li>Identify lighting change, motion blur, and occlusion as instances of distribution shift, pair each with at least one mitigation, and describe the runtime monitoring and fallback behavior a deployed perception system owes the vehicle’s safety stack.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="16.2">
+<h2 data-number="16.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">16.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>FPS</strong> (frames per second) — the throughput of a perception pipeline: how many frames complete processing per second of wall-clock time, sustained; set by the pipeline’s slowest stage, not by the sum of its stages.</li>
+<li><strong>End-to-end latency</strong> — the age of the information at the moment it is acted on: the wall-clock time from the instant light left the scene to the instant the pipeline’s output is available to the consumer, summed across every stage in between — of which model inference is only one.</li>
+<li><strong>Tail latency</strong> — the high-percentile behavior of a latency distribution (the 95th or 99th percentile frame); the number a control deadline actually cares about, since a loop that misses its deadline one frame in twenty misses it every second at 20 FPS.</li>
+<li><strong>Thermal throttling</strong> — an embedded processor’s self-protection under sustained load: as die temperature rises, clock speeds are cut and latency rises, minutes into exactly the kind of continuous inference a mission demands and a short benchmark never sees.</li>
+<li><strong>Model size trade-off</strong> — the family-wide pattern that detection accuracy rises with parameter count while latency rises with it too, at sharply diminishing accuracy returns; choosing a variant is choosing a point on that frontier, not maximizing either axis.</li>
+<li><strong>Object tracking</strong> — associating per-frame detections across time so that the same physical object keeps a stable identity from frame to frame; the output is tracks — object histories with IDs, positions, and motion — rather than isolated boxes.</li>
+<li><strong>Persistence threshold</strong> — the number of consecutive frames (or the duration) a track must survive before the system treats it as real and acts on it; the standard defense against acting on one spurious detection, purchased at a computable delay.</li>
+<li><strong>Robustness</strong> — a deployed model’s ability to keep performing as conditions drift away from those of its training data: different lighting, motion blur, partial occlusion, new backgrounds.</li>
+<li><strong>Distribution shift</strong> — the statistical name for that drift: the deployed input distribution no longer matches the distribution the training and validation data were drawn from, so the validation score silently stops predicting field performance.</li>
+<li><strong>Responsible AI</strong> — the engineering obligation that follows from deploying a model whose errors move a physical machine through public airspace: privacy, safety, bias, and accountability treated as design requirements rather than afterthoughts.</li>
+</ul>
+</section>
+<section id="what-real-time-actually-requires" class="level2" data-number="16.3">
+<h2 data-number="16.3" class="anchored" data-anchor-id="what-real-time-actually-requires"><span class="header-section-number">16.3</span> What “Real-Time” Actually Requires</h2>
+<p>“Real-time” is not a synonym for “fast.” It is a relationship between the pipeline and two clocks. The first clock is the camera’s: frames arrive every 33.3 ms at the 30 frames-per-second mode the running example’s camera delivers, and a pipeline that takes longer than that per frame cannot keep up. If it tries anyway — queuing every frame and processing them in order — the queue grows without bound and so does the age of the frame being processed: after a minute, the detector is diligently finding geese where they were a minute ago. The practical discipline is to <em>drop stale frames</em> and always process the newest one, which caps the damage but concedes the point: a pipeline slower than the arrival rate sees only a fraction of what the camera saw. The first condition, then, is a <strong>throughput</strong> condition: sustained FPS must meet the rate at which the mission needs fresh answers.</p>
+<p>The second clock belongs to the consumer. The deterrence behavior steers toward the target position at frame rate, and a position is useful only while the goose is still near it. That is a <strong>latency</strong> condition — from photons to published position must be short enough that the answer is still true — and it is genuinely independent of the first. The independence is worth one concrete illustration, because it is the most common confusion in performance claims. A pipeline whose stages run concurrently — frame <span class="math inline">\(n\)</span> being captured while frame <span class="math inline">\(n-1\)</span> is preprocessed while frame <span class="math inline">\(n-2\)</span> is in the network — completes one frame per duration of its <em>slowest stage</em>, so its FPS can be excellent while each individual answer still takes the <em>sum</em> of all stages to emerge. A vendor demo showing smooth 30 FPS detection overlays can be carrying 150 ms of pipeline depth, and for a control loop those are entirely different numbers: FPS says how often a new answer arrives; latency says how old each answer is on arrival. A surveillance dashboard cares about the first. A vehicle steering toward a moving animal cares about both.</p>
+<p>How stale is too stale? Arithmetic the reader has done since Part I settles it. A goose that has decided to relocate moves at several metres per second — call it 5 m/s walking-to-flapping. In 50 ms it moves 25 cm, comfortably inside the deterrence maneuver’s tolerance; in 500 ms it moves 2.5 m, several body lengths, and the published position is fiction. The freshness requirement is therefore mission-derived, not universal — a crop-survey pipeline mapping static fields could tolerate seconds — and stating it explicitly, in milliseconds, is the first act of real-time engineering. For the running example this chapter adopts a round budget: <em>end-to-end latency under 100 ms, sustained throughput matching the camera’s 30 FPS or degrading gracefully below it.</em></p>
+</section>
+<section id="the-latency-budget" class="level2" data-number="16.4">
+<h2 data-number="16.4" class="anchored" data-anchor-id="the-latency-budget"><span class="header-section-number">16.4</span> The Latency Budget</h2>
+<p>Where do the milliseconds go? The instinctive answer — “inference” — is wrong in the same way the previous Part’s instinctive answer to memory (“the weights”) was wrong, and the correction is the same: itemize the whole bill. <a href="#fig-latency-budget-timeline" class="quarto-xref">Figure&nbsp;<span>16.1</span></a> walks one frame through a representative deployment of the running example’s detector — YOLOv8n, int8, TensorRT, on the companion computer — and then shows the same stages pipelined.</p>
+<div id="fig-latency-budget-timeline" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two-panel timing diagram titled the latency budget: two clocks, two verdicts. The top panel, one frame end to end, latency is the sum, shows a horizontal bar of five colored segments totaling 50 milliseconds: capture, exposure, readout, and USB transfer, 15 milliseconds; preprocess, resize, letterbox, normalize, 5 milliseconds; infer, YOLOv8n int8 TensorRT, 25 milliseconds; postprocess, NMS, depth lookup, frame transform, 3 milliseconds; track and publish, 2 milliseconds. An annotation notes that inference is only half the bill, and a bracket labels the total, 50 milliseconds from photons to published target position, against the mission budget of 100 milliseconds. The bottom panel, frames pipelined, throughput is the slowest stage, shows three staggered rows for frames n, n plus 1, and n plus 2, each with the same five segments, overlapping in time; a ruler marks the camera's 33.3 millisecond frame interval, and an annotation states that a new result emerges every 25 milliseconds, the inference stage, so the pipeline sustains the camera's 30 FPS with headroom, yet every individual answer is still 50 milliseconds old on arrival. A footer states the two conditions of real-time: throughput, slowest stage at most the frame interval, and freshness, sum of stages at most the mission's staleness budget — and warns that a pipeline can pass either test while failing the other.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-latency-budget-timeline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/latency-budget-timeline.svg" class="img-fluid figure-img" style="width:95.0%" alt="Two-panel timing diagram titled the latency budget: two clocks, two verdicts. The top panel, one frame end to end, latency is the sum, shows a horizontal bar of five colored segments totaling 50 milliseconds: capture, exposure, readout, and USB transfer, 15 milliseconds; preprocess, resize, letterbox, normalize, 5 milliseconds; infer, YOLOv8n int8 TensorRT, 25 milliseconds; postprocess, NMS, depth lookup, frame transform, 3 milliseconds; track and publish, 2 milliseconds. An annotation notes that inference is only half the bill, and a bracket labels the total, 50 milliseconds from photons to published target position, against the mission budget of 100 milliseconds. The bottom panel, frames pipelined, throughput is the slowest stage, shows three staggered rows for frames n, n plus 1, and n plus 2, each with the same five segments, overlapping in time; a ruler marks the camera's 33.3 millisecond frame interval, and an annotation states that a new result emerges every 25 milliseconds, the inference stage, so the pipeline sustains the camera's 30 FPS with headroom, yet every individual answer is still 50 milliseconds old on arrival. A footer states the two conditions of real-time: throughput, slowest stage at most the frame interval, and freshness, sum of stages at most the mission's staleness budget — and warns that a pipeline can pass either test while failing the other.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-latency-budget-timeline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;16.1: One frame’s journey through the inference pipeline, itemized in milliseconds, and the same stages pipelined across consecutive frames: end-to-end latency is the sum of the stages, while sustained FPS is set by the slowest stage alone.
+</figcaption>
+</figure>
+</div>
+<p>The numbers are representative rather than universal — the whole point of the next section is that they must be measured, not copied — but their <em>shape</em> is typical and instructive. Inference, the stage every optimization guide obsesses over, is half the bill. Capture is a heavy line item that no model compression touches: the sensor must expose (longer in low light — a robustness thread picked up later), read out, and push 921,600 bytes over USB before software sees anything. Preprocessing is the resize-letterbox-normalize gauntlet of the Images as Data chapter, cheap but not free. Postprocessing covers non-maximum suppression, the depth lookup, and the pixel-to-vehicle-frame transform that turns a box into the target position. Summed: 50 ms of age on every published position — within the 100 ms budget, with room for the degradation that field conditions will impose.</p>
+<p>The pipelined view yields the throughput verdict. With stages overlapped, a new result emerges once per slowest stage — 25 ms here, a 40 FPS ceiling — so the camera’s 30 FPS is sustained with headroom. But the same figure shows how quickly the ledger can flip: swap in a model whose inference takes 40 ms, and the bottleneck stage exceeds the 33.3 ms frame interval; the pipeline now completes at most 25 frames per second, frames drop, and — if the queueing discipline is wrong — latency compounds frame over frame. One stage’s overrun degrades both conditions at once, which is why the budget is kept as a <em>table of stages</em> and re-measured whenever any stage changes. The habit should feel familiar: it is Part I’s power budget and the TinyML chapter’s memory bill, transposed into milliseconds.</p>
+</section>
+<section id="measuring-honestly" class="level2" data-number="16.5">
+<h2 data-number="16.5" class="anchored" data-anchor-id="measuring-honestly"><span class="header-section-number">16.5</span> Measuring Honestly</h2>
+<p>The latency budget is only as good as its numbers, and timing a neural network is strewn with ways to get flattering, wrong ones. Four disciplines separate a measurement from an anecdote.</p>
+<p><strong>Exclude warm-up.</strong> The first inference after a model loads pays one-time costs — kernel compilation, memory allocation, cache population — that can run to hundreds of milliseconds and will never recur in flight. A benchmark that includes them overstates latency; a benchmark of <em>only</em> the first few frames can also understate steady-state FPS while the GPU’s clocks ramp. Run tens of inferences before recording anything.</p>
+<p><strong>Report the tail, not just the mean.</strong> Latency is a distribution, and control deadlines are violated by its worst cases, not its average. A pipeline averaging 30 ms with a 99th-percentile of 80 ms misses a 60 ms deadline about once every hundred frames — at 30 FPS, several times every ten seconds, each miss a stale position published to the steering loop. The mean hides this entirely; the percentiles are the honest summary, and the maximum over a long run is worth recording besides.</p>
+<p><strong>Run long enough to get hot.</strong> An embedded computer under sustained inference load heats up, and when it reaches its thermal limit it protects itself by cutting clock speeds — <strong>thermal throttling</strong> — at which point latency quietly rises. The effect takes minutes to appear and a 30-second benchmark will never see it, which is exactly why it surfaces in the field instead: the mission’s twentieth minute, a warm afternoon, a heatsink sized for the bench. Benchmarks intended to clear a flight readiness bar run for the duration of a flight, and log temperature alongside latency so the correlation is visible.</p>
+<p><strong>Measure on the target, under the mission’s load.</strong> The Jetson’s GPU shares memory bandwidth, power budget, and (for some stages) CPU cores with everything else Part II put on the aircraft — the ROS 2 graph, the MAVLink bridge, logging, the camera driver itself. A model benchmarked alone on the bench inherits resources the mission will take back. The previous chapter’s doctrine — the model is a component, not the system — becomes a measurement rule here: the number that matters is the latency of the <em>assembled stack</em>, measured at the output topic, while everything else runs.</p>
+<p>The measurement itself needs no framework, only care with what is timed:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>lat <span class="op">=</span> []</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1000</span>):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    frame <span class="op">=</span> get_latest_frame()          <span class="co"># drops stale frames; returns newest</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    t0 <span class="op">=</span> time.perf_counter()</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    boxes <span class="op">=</span> detector.infer(frame)       <span class="co"># preprocess + model + NMS inside</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    lat.append((time.perf_counter() <span class="op">-</span> t0) <span class="op">*</span> <span class="fl">1000.0</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>lat <span class="op">=</span> np.array(lat[<span class="dv">50</span>:])                <span class="co"># discard warm-up</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"mean </span><span class="sc">{</span>lat<span class="sc">.</span>mean()<span class="sc">:.1f}</span><span class="ss"> ms   p50 </span><span class="sc">{</span>np<span class="sc">.</span>percentile(lat, <span class="dv">50</span>)<span class="sc">:.1f}</span><span class="ss">"</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"   p99 </span><span class="sc">{</span>np<span class="sc">.</span>percentile(lat, <span class="dv">99</span>)<span class="sc">:.1f}</span><span class="ss">   max </span><span class="sc">{</span>lat<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.1f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Note what this loop measures and what it does not: it times preprocess-through-postprocess — the software stages — but starts its clock <em>after</em> capture, so the capture line of the latency budget must be measured separately (typically from the frame’s hardware timestamp, which the camera driver attaches, to the moment <code>get_latest_frame</code> returns). Timing from the hardware timestamp to the published topic, inside the running ROS 2 graph, is the full end-to-end figure; the snippet’s figure is the part the model choice controls. Keeping the two straight — and saying which one a reported “latency” is — is half of measurement honesty.</p>
+</section>
+<section id="the-accuracyspeed-frontier" class="level2" data-number="16.6">
+<h2 data-number="16.6" class="anchored" data-anchor-id="the-accuracyspeed-frontier"><span class="header-section-number">16.6</span> The Accuracy–Speed Frontier</h2>
+<p>Suppose the measurement disappoints: the tail latency blows the budget, or the sustained FPS sags under load. Two of the levers are inherited from earlier chapters and need only naming: quantization (the TinyML chapter’s factor of two-to-four, already spent if the deployment followed that chapter) and input resolution (the Images as Data chapter’s quadratic lever, pulled against pixels-on-target and detection range). The third lever is the one this Part has so far held fixed: the <em>model itself</em>. Modern detector families are published as a ladder of sizes — the same architecture scaled in depth and width — and the YOLOv8 family the pipeline trains is typical: nano, small, medium, large, extra-large, from 3.2 million parameters to 68.2 million. The published benchmarks of the family, plotted in <a href="#fig-accuracy-latency-frontier" class="quarto-xref">Figure&nbsp;<span>16.2</span></a>, form the curve on which every model-size decision is made.</p>
+<div id="fig-accuracy-latency-frontier" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot titled the accuracy-speed frontier, one architecture, five sizes. The horizontal axis is computational cost in billions of operations per frame, GFLOPs, on which relative latency scales, running 0 to 280. The vertical axis is COCO mAP at 0.5 to 0.95, running 30 to 60. Five labeled points trace a rising, flattening curve: YOLOv8n at 8.7 GFLOPs, 3.2 million parameters, 37.3 mAP, circled and marked as what the running example flies; YOLOv8s at 28.6 GFLOPs, 11.2 million parameters, 44.9 mAP; YOLOv8m at 78.9 GFLOPs, 25.9 million parameters, 50.2 mAP; YOLOv8l at 165.2 GFLOPs, 43.7 million parameters, 52.9 mAP; YOLOv8x at 257.8 GFLOPs, 68.2 million parameters, 53.9 mAP. Annotations price two steps: n to s, 3.3 times the compute buys plus 7.6 mAP, the steep segment; and l to x, 1.6 times the compute buys plus 1.0 mAP, the flat segment. A shaded band on the right marks where Jetson-class frame-rate operation becomes infeasible. A footer states three readings: accuracy saturates while cost does not; the knee of the curve, around s to m, is where each further point of accuracy starts costing multiples of compute; and the correct question is not which model is best but which is the smallest that clears the mission's accuracy floor at the mission's frame rate.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-accuracy-latency-frontier-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/accuracy-latency-frontier.svg" class="img-fluid figure-img" style="width:95.0%" alt="Scatter plot titled the accuracy-speed frontier, one architecture, five sizes. The horizontal axis is computational cost in billions of operations per frame, GFLOPs, on which relative latency scales, running 0 to 280. The vertical axis is COCO mAP at 0.5 to 0.95, running 30 to 60. Five labeled points trace a rising, flattening curve: YOLOv8n at 8.7 GFLOPs, 3.2 million parameters, 37.3 mAP, circled and marked as what the running example flies; YOLOv8s at 28.6 GFLOPs, 11.2 million parameters, 44.9 mAP; YOLOv8m at 78.9 GFLOPs, 25.9 million parameters, 50.2 mAP; YOLOv8l at 165.2 GFLOPs, 43.7 million parameters, 52.9 mAP; YOLOv8x at 257.8 GFLOPs, 68.2 million parameters, 53.9 mAP. Annotations price two steps: n to s, 3.3 times the compute buys plus 7.6 mAP, the steep segment; and l to x, 1.6 times the compute buys plus 1.0 mAP, the flat segment. A shaded band on the right marks where Jetson-class frame-rate operation becomes infeasible. A footer states three readings: accuracy saturates while cost does not; the knee of the curve, around s to m, is where each further point of accuracy starts costing multiples of compute; and the correct question is not which model is best but which is the smallest that clears the mission's accuracy floor at the mission's frame rate.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-accuracy-latency-frontier-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;16.2: The YOLOv8 family’s published COCO accuracy against computational cost: accuracy climbs with model size at sharply diminishing returns, while latency grows roughly in proportion to compute, so the mission’s accuracy floor — not the top of the curve — selects the variant.
+</figcaption>
+</figure>
+</div>
+<p>Three readings of the curve matter more than any point on it. First, its <em>shape</em>: accuracy saturates while cost does not. The step from nano to small buys 7.6 points of COCO mAP for 3.3× the compute — a defensible trade; the step from large to extra-large buys 1.0 point for 1.6× the compute on top of an already-unflyable base. The saturation is not an accident of this family but the general pattern of scaling within a task: the easy accuracy is bought first, cheaply, and each further point costs more than the last. Second, the <em>latency axis is the binding one onboard</em>: on the companion computer’s fixed compute budget, a model’s GFLOPs translate roughly into its inference time, and somewhere along the curve — the shaded region of the figure — the frame-rate condition of the first section fails outright, making the upper family members not slower options but non-options. Third, and most important, the <em>question the curve answers</em>: not “which model is best” — the top of the curve is best, uselessly — but “which is the smallest model that clears the mission’s accuracy floor at the mission’s frame rate.” That is the same question the TinyML chapter’s placement problem asked of hardware tiers, now asked within a tier, and it explains the deployment folklore the source material compresses into a tip: <em>start with the nano model and scale up only when measurement says the accuracy floor is unmet.</em> Starting large and shrinking under schedule pressure runs the same search from the expensive end.</p>
+<p>Two refinements keep the frontier honest in practice. The published mAP figures are COCO numbers — eighty everyday object classes — and a two-class goose detector fine-tuned per the previous chapter will not match them numerically; the <em>ordering and the shape</em> transfer, the absolute values do not, so the family comparison worth trusting is run on the mission’s own validation set. And the frontier interacts with the resolution lever: a larger model at a smaller input can land at the same latency as a smaller model at full input with different accuracy — the small model preserving small-object range (more pixels on the distant goose), the large one classifying what it sees more reliably. The two-lever grid — family member × input size — is small enough to measure exhaustively in an afternoon of benchmarking, and for a mission whose targets are 7-pixel smudges at range, the pixels usually win. There is no closed-form answer here, which is the section’s real lesson: the frontier tells the engineer where to <em>look</em>; only the stopwatch and the validation set say where to <em>land</em>. The “best” model, as the source material puts it, is a system-level trade-off — accuracy, latency, energy, memory, robustness, and the cost of being wrong, negotiated together.</p>
+</section>
+<section id="from-frames-to-decisions-tracking" class="level2" data-number="16.7">
+<h2 data-number="16.7" class="anchored" data-anchor-id="from-frames-to-decisions-tracking"><span class="header-section-number">16.7</span> From Frames to Decisions: Tracking</h2>
+<p>Everything so far treats each frame as an isolated question. But the mission does not consume frames — it consumes <em>decisions</em>: begin the deterrence run, steer toward this goose, break off. And between per-frame detections and sound decisions sits a gap that latency and accuracy numbers do not describe. A detector operating deliberately down-threshold — as the previous chapter argued the running example should, trading precision for recall — emits occasional false positives by design; even on true geese, boxes flicker as confidence hovers near threshold, vanish for a frame of motion blur, and reappear. A state machine wired directly to raw detections inherits every flicker: it would launch a deterrence run at a shadow, abort when a real goose blinks out for two frames, and re-acquire the same bird as a new target ten times a minute. The missing machinery is <strong>object tracking</strong>: associating detections across frames so that the same physical goose keeps the same identity over time, converting a stream of stateless boxes into a set of <em>object histories</em>. <a href="#fig-detection-to-tracking" class="quarto-xref">Figure&nbsp;<span>16.3</span></a> shows the transformation on a strip of frames.</p>
+<div id="fig-detection-to-tracking" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two-lane timeline diagram titled from flickering boxes to stable objects, covering ten consecutive frames at 30 FPS. The top lane, raw per-frame detections, what the detector alone provides, shows ten frame slots: a goose box present in most frames but missing at frames 4 and 8, marked missed, blur, and a spurious box at frame 6 marked false positive, shadow, with a red italic caption that logic wired to this lane aborts on every dropout and acts on every false alarm. The bottom lane, tracks, after association across frames, shows a continuous track bar labeled track ID 7, goose, spanning all ten frames, carried through the two missed frames by motion prediction, shown as dashed segments, while the frame-6 false positive begins a tentative track that dies after one frame and never reaches confirmed status. A marker at frame 5 shows the persistence threshold, five consecutive frames, where track 7 is promoted to confirmed and the decision fires; an annotation prices the delay, five frames at 33 milliseconds equals 167 milliseconds from first sighting to action. Beneath, a four-step loop reads detect, run the detector on the frame; associate, match new boxes to existing tracks by overlap, predicted motion, and confidence; update, extend matched tracks, coast unmatched ones briefly, retire dead ones; decide, act only on confirmed tracks. A footer lists the three tracking failure modes with one-line definitions: ID switch, the same goose gets a new identity after blur or crossing; duplicate track, one goose becomes two flickering tracks; lost track, the track dies while the goose is still present — and notes each corrupts a different consumer: counts, decisions, and deterrence runs respectively.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-detection-to-tracking-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/detection-to-tracking.svg" class="img-fluid figure-img" style="width:95.0%" alt="Two-lane timeline diagram titled from flickering boxes to stable objects, covering ten consecutive frames at 30 FPS. The top lane, raw per-frame detections, what the detector alone provides, shows ten frame slots: a goose box present in most frames but missing at frames 4 and 8, marked missed, blur, and a spurious box at frame 6 marked false positive, shadow, with a red italic caption that logic wired to this lane aborts on every dropout and acts on every false alarm. The bottom lane, tracks, after association across frames, shows a continuous track bar labeled track ID 7, goose, spanning all ten frames, carried through the two missed frames by motion prediction, shown as dashed segments, while the frame-6 false positive begins a tentative track that dies after one frame and never reaches confirmed status. A marker at frame 5 shows the persistence threshold, five consecutive frames, where track 7 is promoted to confirmed and the decision fires; an annotation prices the delay, five frames at 33 milliseconds equals 167 milliseconds from first sighting to action. Beneath, a four-step loop reads detect, run the detector on the frame; associate, match new boxes to existing tracks by overlap, predicted motion, and confidence; update, extend matched tracks, coast unmatched ones briefly, retire dead ones; decide, act only on confirmed tracks. A footer lists the three tracking failure modes with one-line definitions: ID switch, the same goose gets a new identity after blur or crossing; duplicate track, one goose becomes two flickering tracks; lost track, the track dies while the goose is still present — and notes each corrupts a different consumer: counts, decisions, and deterrence runs respectively.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-detection-to-tracking-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;16.3: Per-frame detections are noisy — boxes flicker, drop out, and false-alarm — while a tracker’s association across frames produces stable object identities, and a persistence threshold converts them into decisions at a computable delay.
+</figcaption>
+</figure>
+</div>
+<p>The mechanics are lighter than the word “tracking” suggests. Each frame, the tracker matches the detector’s new boxes against its live tracks using cheap evidence — box overlap with the track’s last position, a constant-velocity prediction of where the track should be now, detection confidence — then extends matched tracks, lets unmatched tracks <em>coast</em> on their predicted motion for a few frames before retiring them, and opens tentative tracks for unmatched detections. Standard lightweight implementations such as ByteTrack and BoT-SORT do exactly this with no neural network of their own and no training: their cost is microseconds of bookkeeping per frame, which is why the tracking line of the latency budget was near-zero. For that price the mission logic gains three things it cannot get from any single frame: <em>stability</em> (one goose is one object, not a re-detected stranger every frame), <em>motion</em> (a track has a velocity — where the goose is heading, which the deterrence approach can lead), and <em>evidence accumulation</em> — the ability to require that an object persist before acting on it.</p>
+<p>That last item is where tracking rejoins this chapter’s subject, because persistence is bought with time. A <strong>persistence threshold</strong> of <span class="math inline">\(N\)</span> consecutive frames means a track is confirmed — and the deterrence decision fires — only after the object has survived <span class="math inline">\(N\)</span> association rounds, which at frame interval <span class="math inline">\(\Delta t\)</span> adds a decision delay of <span class="math inline">\(N \Delta t\)</span>: five frames at 30 FPS is 167 ms between first genuine sighting and action. That delay is not overhead to be minimized to zero; it is the <em>price of not chasing shadows</em>, and it is tuned, like the confidence threshold it complements, in mission currency. A spurious deterrence run costs a full flight leg of battery; 167 ms of deliberation costs 80 cm of goose travel. The running example takes that trade — and takes the symmetric one on the way out, coasting a confirmed track through several missed frames before declaring the goose gone, so one blurred frame does not abort a deterrence run in progress. Both thresholds lengthen the effective latency between the world changing and the system’s model of it changing; both are the reason the raw pipeline latency needed headroom under its 100 ms budget rather than merely meeting it.</p>
+<p>Tracking earns its keep, and then it fails in its own ways, worth naming because each corrupts a different downstream consumer. An <strong>ID switch</strong> — the same goose re-identified as a new object after a blur or a crossing with another bird — corrupts <em>counting</em> and re-triggers per-target logic. A <strong>duplicate track</strong> — one goose carried as two flickering identities — inflates counts and can split the deterrence logic’s attention. A <strong>lost track</strong> — the track dying while the goose remains — silently ends a deterrence run early. None of these appear in detector metrics; they are evaluated on video with track-level checks — identity consistency, count stability over a sequence with known ground truth — one more instance of this chapter’s refrain that the deployed system must be measured at the level its consumers consume.</p>
+</section>
+<section id="robustness-when-the-world-leaves-the-dataset" class="level2" data-number="16.8">
+<h2 data-number="16.8" class="anchored" data-anchor-id="robustness-when-the-world-leaves-the-dataset"><span class="header-section-number">16.8</span> Robustness: When the World Leaves the Dataset</h2>
+<p>The previous chapter’s split discipline produced an honest validation score — honest, that is, about footage statistically like the dataset. The field makes no such promise. A deployed model’s inputs drift away from its training distribution — the phenomenon called <strong>distribution shift</strong> — and when they do, the validation score stops predicting anything without announcing that it has stopped: the model still runs, still emits confident boxes, and is simply wrong more often. A drone is close to the worst platform imaginable on this axis. Its viewpoint changes continuously with altitude and attitude; its scenes change with weather, season, and site; its own propulsion vibrates the camera; and its mistakes cost energy and, in the limit, safety. The maxim from the source material deserves its italics: <em>a model that works in a notebook is not necessarily ready to fly.</em> <a href="#fig-robustness-failure-modes" class="quarto-xref">Figure&nbsp;<span>16.4</span></a> catalogs the three failure modes a flying camera meets first, with the symptom each produces and the mitigations each admits.</p>
+<div id="fig-robustness-failure-modes" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Three-column diagram titled when the world leaves the dataset, three failure modes and their mitigations. Column one, lighting change: cause, low sun, overcast, glare, shadows across the field, dusk; a sketched scene shows a goose silhouette half in harsh shadow; symptom, confidence sags across whole flights, recall drops in exactly the conditions the dataset undersampled, and longer exposures in dim light add blur; mitigations, brightness and contrast augmentation in training, collection across times of day per the detection pipeline chapter's checklist, and reporting metrics per condition so the gap is visible before deployment. Column two, motion blur: cause, vehicle vibration, fast yaw during search turns, low-light exposure stretch; a sketched scene shows a smeared goose; symptom, single-frame dropouts, boxes vanish for one to three frames then return, and small distant targets smear into the background first; mitigations, blur and noise augmentation, gimbal stabilization and shorter exposure where hardware allows, slower gentler flight during detection legs, and track coasting to carry identity through blurred frames. Column three, occlusion: cause, vegetation, terrain, other birds, the frame edge during turns; a sketched scene shows a goose half-hidden behind reeds; symptom, partial boxes with depressed confidence, missed detections while the object is genuinely present, ID switches when two birds cross; mitigations, labeling partially visible targets in the dataset per its written class-boundary rules, persistence and coasting in the tracker, and approach geometry that keeps the target in open view. A footer defines distribution shift as the common structure, deployment inputs drifting from the training distribution while the validation score silently stops predicting field performance, and adds the runtime rule: monitor confidence and detection-rate statistics in flight, and on sustained anomaly degrade gracefully, hold position, slow the search, or hand control back, rather than steering on fiction.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-robustness-failure-modes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/robustness-failure-modes.svg" class="img-fluid figure-img" style="width:100.0%" alt="Three-column diagram titled when the world leaves the dataset, three failure modes and their mitigations. Column one, lighting change: cause, low sun, overcast, glare, shadows across the field, dusk; a sketched scene shows a goose silhouette half in harsh shadow; symptom, confidence sags across whole flights, recall drops in exactly the conditions the dataset undersampled, and longer exposures in dim light add blur; mitigations, brightness and contrast augmentation in training, collection across times of day per the detection pipeline chapter's checklist, and reporting metrics per condition so the gap is visible before deployment. Column two, motion blur: cause, vehicle vibration, fast yaw during search turns, low-light exposure stretch; a sketched scene shows a smeared goose; symptom, single-frame dropouts, boxes vanish for one to three frames then return, and small distant targets smear into the background first; mitigations, blur and noise augmentation, gimbal stabilization and shorter exposure where hardware allows, slower gentler flight during detection legs, and track coasting to carry identity through blurred frames. Column three, occlusion: cause, vegetation, terrain, other birds, the frame edge during turns; a sketched scene shows a goose half-hidden behind reeds; symptom, partial boxes with depressed confidence, missed detections while the object is genuinely present, ID switches when two birds cross; mitigations, labeling partially visible targets in the dataset per its written class-boundary rules, persistence and coasting in the tracker, and approach geometry that keeps the target in open view. A footer defines distribution shift as the common structure, deployment inputs drifting from the training distribution while the validation score silently stops predicting field performance, and adds the runtime rule: monitor confidence and detection-rate statistics in flight, and on sustained anomaly degrade gracefully, hold position, slow the search, or hand control back, rather than steering on fiction.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-robustness-failure-modes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;16.4: Three robustness failure modes of onboard vision — lighting change, motion blur, and occlusion — each an instance of distribution shift, each with a distinct symptom in the detector’s output and a distinct set of mitigations spanning data, hardware, and system design.
+</figcaption>
+</figure>
+</div>
+<p>The three columns share a structure worth extracting. Each failure mode is, at bottom, a <em>coverage statement about the dataset</em> — the conditions under which the detector degrades are precisely the conditions the training distribution undersampled — which is why the first mitigation in every column is data: targeted augmentation for the perturbation’s cheap approximations, targeted collection for the real thing. The distinction between those two matters and the source material states it exactly: augmentation simulates <em>small variations around known examples</em> — a brightness shift, a synthetic blur — and cannot conjure <em>missing domains</em>; no augmentation of daytime meadow footage produces the statistics of dusk, rain, or a new site. Augmentation stretches coverage; only collection extends it. This is the closing loop of the previous chapter wearing its field clothes: failures cluster by condition, and the cluster names the next collection flight. The second mitigation in every column is <em>system</em> design rather than model design — stabilization hardware, flight profiles that respect the camera (slower, smoother legs while detecting), tracker persistence carrying identity through transient dropouts — a reminder that the perception system extends well beyond the network. And the third is <em>evaluation</em> design: reporting metrics per condition (morning versus noon, calm versus windy, near versus far) rather than as one pooled number, so that a model strong on average and blind at dusk cannot hide inside its own mean. The habit of building that per-condition table <em>before</em> collecting data — deciding what the mission envelope contains and measuring coverage against it — is the cheapest robustness tool in the kit.</p>
+<p>One mitigation belongs to no column because it belongs to all of them: admitting, at runtime, that the model may currently be wrong. A perception system cannot detect its own distribution shift directly, but it can watch proxies — detection confidence trending down, detection rate collapsing or spiking, track churn rising, inputs statistically unlike anything calibrated for — and treat sustained anomaly as a signal to <em>degrade gracefully</em>: widen persistence thresholds, slow the search, hold position, or hand the decision back to the operator, rather than continue steering on fiction. Part II built exactly this reflex into the flight stack — the watchdog, the failsafe ladder, the principle that every autonomous behavior needs a defined behavior for its own failure — and the perception system, as the newest autonomous behavior aboard, owes the same contract. The Detector node that publishes target positions should also publish its own health, and the state machine that consumes the first should consume the second.</p>
+</section>
+<section id="a-note-on-responsibility" class="level2" data-number="16.9">
+<h2 data-number="16.9" class="anchored" data-anchor-id="a-note-on-responsibility"><span class="header-section-number">16.9</span> A Note on Responsibility</h2>
+<p>There is a last trade-off in this chapter’s territory that is not measured in milliseconds. The system now assembled — a camera, a detector, a tracker, an aircraft that acts on what they say — watches a physical place continuously, and its errors move a machine through that place. That raises obligations beyond engineering correctness. On-device inference, adopted in Part I for bandwidth and here for latency, turns out to carry a privacy dividend — raw imagery of whoever walks through the protected area never leaves the aircraft, and the system can be designed to transmit and retain only derived summaries — but the dividend is not automatic and it is not absolution: what is stored, for how long, who may access it, and what the system does about people it was never meant to watch are design decisions, made explicitly or made badly. Dataset bias has already appeared in this Part as an accuracy problem; it returns as a fairness and safety problem when the failures cluster on particular conditions, places, or bystanders. And a wildlife-deterrence system in particular owes an account of its effects on the animals themselves. These questions get a chapter of their own — The Ethics and Ecology of Autonomous Wildlife Management, in Part V — with the full treatment of privacy-by-design, bias auditing, and the ecology of deterrence. They are flagged here, before the system flies, for one reason: <strong>responsible AI</strong> is a set of design requirements, and design requirements bind earliest, when the logging format, the retention policy, and the evaluation table are still cheap to change.</p>
+<p>The Part’s arc is now complete: pixels became tensors, tensors met budgets, budgets shaped a trained detector, and this chapter held the assembled pipeline to the two clocks the mission runs on — then smoothed its output into objects worth acting on and armored it against the field. What the running example’s perception stack now publishes is exactly what Part II’s state machine was built waiting for: a confirmed, tracked, health-annotated target position, fresh to within a measured bound. One chapter remains before Part IV takes up the autonomy that decides what to do with that position: a case study that holds this Part’s entire approach against the published record of detecting animals from the air — and against the measured behavior of the geese themselves.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="16.10">
+<h2 data-number="16.10" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">16.10</span> Check Your Understanding</h2>
+<ol type="1">
+<li>A vendor demo shows a detection overlay updating smoothly at 30 FPS, and the vendor claims the system is “real-time.” State the two separate conditions a real-time perception pipeline must satisfy, and describe a stage structure under which this demo passes one condition while carrying 150 ms of end-to-end latency. Which condition does the smooth overlay actually demonstrate?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The conditions are throughput — sustained FPS at least the rate at which the mission needs fresh answers (bounded by the slowest pipeline stage) — and freshness: end-to-end latency (the sum of all stages) within the mission’s staleness budget. A five-stage pipeline whose stages each take 30 ms, run concurrently, emits a new result every 30 ms (33 FPS — smooth overlay) while each result is 150 ms old on arrival. The overlay demonstrates only throughput: it shows how often a new answer appears, not how old each answer is. For a display, age barely matters; for a loop steering toward a moving animal, 150 ms is 75 cm of goose travel at 5 m/s, and the latency condition must be verified separately, by measuring from the frame’s hardware timestamp to the published output.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>A pipeline’s measured stages are: capture 15 ms, preprocess 5 ms, inference 40 ms, postprocess 3 ms, track-and-publish 2 ms, with a 30 FPS camera (33.3 ms frame interval). Compute the end-to-end latency and the sustained throughput ceiling, state which real-time condition fails, and explain what happens to latency over time if the pipeline naively queues every frame instead of dropping stale ones.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Latency is the sum: <span class="math inline">\(15 + 5 + 40 + 3 + 2 = 65\)</span> ms. Throughput is set by the slowest stage: one result per 40 ms, a ceiling of 25 FPS. The freshness condition can still pass (65 ms is under a 100 ms budget), but the throughput condition fails: 25 FPS cannot keep up with 30 FPS arrival. With naive queueing, frames arrive every 33.3 ms and leave every 40 ms, so the queue grows by one frame every ~200 ms and the <em>age</em> of the frame being processed grows without bound — after a minute the detector is analyzing footage from seconds ago, and the published positions are systematically stale even though each individual frame still takes only 65 ms of processing. Dropping stale frames caps latency at the pipeline depth but concedes that only ~25 of every 30 frames are seen; fixing the condition properly requires shrinking the 40 ms bottleneck stage (smaller model, lower resolution) or accepting a lower target rate.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Using the published YOLOv8 family figures (n: 8.7 GFLOPs / 37.3 mAP; s: 28.6 / 44.9; m: 78.9 / 50.2; l: 165.2 / 52.9; x: 257.8 / 53.9), compute the compute-cost multiplier and the mAP gain for the steps n→s and l→x, and state the general shape of the frontier these two numbers illustrate. Then explain why the <em>absolute</em> mAP values should not drive the running example’s model choice, and what should.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>n→s: <span class="math inline">\(28.6/8.7 \approx 3.3\times\)</span> the compute for <span class="math inline">\(44.9 - 37.3 = 7.6\)</span> mAP. l→x: <span class="math inline">\(257.8/165.2 \approx 1.6\times\)</span> the compute for <span class="math inline">\(53.9 - 52.9 = 1.0\)</span> mAP. The frontier rises steeply at the small end and flattens at the large end — accuracy saturates while cost does not, so each further point of accuracy costs more than the last. The absolute values are COCO benchmarks: eighty everyday classes, a distribution unlike a two-class aerial goose task, so a fine-tuned goose detector’s numbers will differ; only the ordering and shape transfer. The choice should be driven by measurements on the mission’s own validation set and hardware: the smallest family member whose measured accuracy clears the mission’s floor at the mission’s frame rate — starting from nano and scaling up on evidence, not down from the top under schedule pressure.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>A detector benchmarks at a mean latency of 28 ms over a 30-second bench test, and the team declares a 60 ms deadline comfortably met. Give two distinct reasons this conclusion can be wrong in flight even if the measurement was performed correctly as far as it went, and state the benchmarking discipline that catches each.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>First, the mean hides the tail: a distribution with mean 28 ms can carry a 99th percentile above 60 ms, and at 30 FPS a 1-in-100 violation recurs several times every ten seconds, each one a stale position published to the control loop. Discipline: report percentiles (p95/p99) and the maximum, not the mean alone. Second, 30 seconds is too short and too idle: thermal throttling appears minutes into sustained load — the processor cuts clocks as it heats, raising latency — and a bench test without the mission’s competing processes (ROS 2 graph, logging, camera driver, MAVLink bridge) lends the model memory bandwidth and cores the mission will reclaim. Discipline: benchmark for a flight’s duration, on the target, with the full stack running, logging temperature alongside latency. (Warm-up is the symmetric error in the other direction — including the first inferences’ one-time costs overstates latency — excluded by discarding initial iterations.)</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>The running example’s tracker requires 5 consecutive frames of persistence at 30 FPS before confirming a track, and coasts a confirmed track for up to 4 missed frames before retiring it. Compute the decision delay on first sighting and the maximum blindness the coasting rule tolerates, and explain — in mission currency — what each threshold purchases and what raising each further would cost.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Confirmation delay: <span class="math inline">\(5 \times 33.3 \approx 167\)</span> ms between first genuine detection and the deterrence decision — during which a goose at 5 m/s moves about 80 cm. Coasting: <span class="math inline">\(4 \times 33.3 \approx 133\)</span> ms of continuous dropout tolerated before a confirmed track dies. Confirmation purchases immunity to acting on single-frame false positives — a spurious deterrence run costs a flight leg of battery, far more than 167 ms of deliberation. Coasting purchases immunity to aborting a deterrence run over one or two blurred frames — a lost track mid-run silently ends the mission’s core behavior. Raising the confirmation threshold further delays every legitimate response (and a fast-moving goose may exit the frame before confirmation); raising the coasting window further means steering longer on a motion prediction rather than a measurement — the track can drift arbitrarily far from the real animal, and a genuinely departed goose keeps consuming deterrence effort.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>During an evening flight, the detector’s confidence scores sag across the whole flight and recall drops sharply, though the model performed well on the validation set. A teammate proposes fixing it by adding synthetic brightness reduction to the training augmentation. Diagnose the failure mode, evaluate the proposal — including what augmentation can and cannot fix — and name the runtime behavior the system should have exhibited in the meantime.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>This is distribution shift, lighting-change column: dusk imagery is statistically unlike the (presumably daytime) training and validation distribution, so the validation score stopped predicting field performance — and did so silently. Brightness augmentation is a partial, legitimate first step: it simulates small photometric variations around known examples and can recover some robustness cheaply. But dusk is closer to a missing domain than a perturbation — changed color balance, longer exposures adding motion blur, different backgrounds and animal behavior — and augmentation cannot conjure a domain the dataset lacks; the durable fix is targeted collection of evening footage (with the per-condition evaluation table extended to report dusk performance separately, so the gap is visible rather than pooled into a mean). At runtime, the sustained confidence anomaly should have triggered graceful degradation — widened persistence thresholds, a slowed search, holding position, or handing back to the operator — because a perception system that cannot notice its own degradation steers the vehicle on fiction.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="16.11">
+<h2 data-number="16.11" class="anchored" data-anchor-id="try-it"><span class="header-section-number">16.11</span> Try It</h2>
+<p><strong>Part 1 — build the latency budget, then break it.</strong> Take the detector you trained in the previous chapter’s exercise (any YOLOv8n fine-tune serves) and benchmark it honestly on the most constrained hardware you have: time 1,000 inferences with <code>time.perf_counter</code>, discard the first 50, and report mean, p50, p99, and max. Then extend the measurement outward into a full budget: time preprocessing separately, time capture by comparing frame timestamps against arrival times if your camera exposes them, and lay out your own version of <a href="#fig-latency-budget-timeline" class="quarto-xref">Figure&nbsp;<span>16.1</span></a>. Now stress it: run the benchmark again for ten sustained minutes while logging latency per 10-second window (and processor temperature, if exposed) and look for the throttling drift; then run it once more with a competing CPU load (a video encode, a compile) and quantify what contention costs your p99. Finally, sweep the two levers: benchmark the n and s family members at input sizes 640, 416, and 320 — a 3 × 2 grid — and plot your own accuracy-latency frontier from the grid’s validation mAP and measured p99, marking which cells meet a 30 FPS throughput condition on your hardware. Write one sentence naming the cell you would fly and the two numbers that justify it.</p>
+<p><strong>Part 2 — add a tracker and measure what it buys.</strong> Run your detector over two or three minutes of continuous video containing your target class and log raw per-frame detections. First quantify the flicker: count single-frame false positives and 1–3-frame dropouts of genuinely present objects — the noise a state machine wired to raw detections would inherit. Then add tracking: either integrate a standard lightweight tracker (ByteTrack via the Ultralytics <code>model.track()</code> interface is a one-line change) or implement the chapter’s loop yourself — associate by IoU against a constant-velocity prediction, confirm after <span class="math inline">\(N\)</span> frames, coast for <span class="math inline">\(M\)</span>. Measure the transformation: how many false positives survive to confirmed tracks at <span class="math inline">\(N = 5\)</span>; how many dropouts are bridged by coasting at <span class="math inline">\(M = 4\)</span>; how the object count over the clip compares, raw versus tracked, against a hand count. Then find the failure modes: engineer an occlusion (two targets crossing, or one passing behind cover) and observe whether you get an ID switch or a lost track, and at what coasting window the track survives. Close by computing your decision delay <span class="math inline">\(N \Delta t\)</span> and writing two sentences: one defending your <span class="math inline">\(N\)</span> and <span class="math inline">\(M\)</span> in mission currency, one stating which tracking failure mode your consumer — count, alert, or pursuit — is most sensitive to, and why.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#edge-based-target-detection">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="pagination-link" aria-label="Building a Detection Pipeline: Data, Labeling, and Training">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="pagination-link" aria-label="Case Study: Wildlife Detection from the Air">
+        <span class="nav-page-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

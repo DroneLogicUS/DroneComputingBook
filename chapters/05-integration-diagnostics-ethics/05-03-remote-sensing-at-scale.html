@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>27&nbsp; Remote Sensing at Scale: Multispectral Imaging in Agriculture – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" rel="next">
+<link href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html">Part V — Systems Integration, Diagnostics &amp; Ethics</a></li><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">27.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">27.2</span> Key Vocabulary</a></li>
+  <li><a href="#the-measurement-beneath-the-index" id="toc-the-measurement-beneath-the-index" class="nav-link" data-scroll-target="#the-measurement-beneath-the-index"><span class="header-section-number">27.3</span> The Measurement Beneath the Index</a></li>
+  <li><a href="#a-detector-is-not-a-classifier" id="toc-a-detector-is-not-a-classifier" class="nav-link" data-scroll-target="#a-detector-is-not-a-classifier"><span class="header-section-number">27.4</span> A Detector Is Not a Classifier</a></li>
+  <li><a href="#indices-built-for-diagnosis" id="toc-indices-built-for-diagnosis" class="nav-link" data-scroll-target="#indices-built-for-diagnosis"><span class="header-section-number">27.5</span> Indices Built for Diagnosis</a></li>
+  <li><a href="#two-case-studies-from-real-fields" id="toc-two-case-studies-from-real-fields" class="nav-link" data-scroll-target="#two-case-studies-from-real-fields"><span class="header-section-number">27.6</span> Two Case Studies from Real Fields</a></li>
+  <li><a href="#flying-the-survey-twice-coarse-to-targeted-search" id="toc-flying-the-survey-twice-coarse-to-targeted-search" class="nav-link" data-scroll-target="#flying-the-survey-twice-coarse-to-targeted-search"><span class="header-section-number">27.7</span> Flying the Survey Twice: Coarse-to-Targeted Search</a></li>
+  <li><a href="#two-paradigms-one-camera-mount" id="toc-two-paradigms-one-camera-mount" class="nav-link" data-scroll-target="#two-paradigms-one-camera-mount"><span class="header-section-number">27.8</span> Two Paradigms, One Camera Mount</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">27.9</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">27.10</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html">Part V — Systems Integration, Diagnostics &amp; Ethics</a></li><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The previous chapter closed on a debt no log can pay — whether a flight should have happened at all is an account this Part renders in its final chapter — but before it does, an older promissory note from Part I falls due. The Commercial Drone Landscape chapter, surveying the agricultural vertical, introduced the multispectral camera and the normalized difference vegetation index, showed a real NDVI field map, and explained why the measurement is harder than the formula suggests — then explicitly deferred the hard part, promising that this chapter would develop multispectral radiometry, calibration, and index construction in full. This chapter pays that debt, and in paying it does something the book has not done since Part I: it steps outside the running example’s sensing paradigm entirely. Nearly every perception page since Part III has been about finding <em>discrete objects</em> — a goose, a bounding box, a confidence score — in single RGB frames. Agricultural remote sensing is the commercial drone world’s other great sensing paradigm, and it works nothing like that: no object detector, no bounding box, no target class. It is a per-pixel physical measurement, assembled across a whole field, whose “detection” is a spatial anomaly in a continuous index — and whose most interesting modern frontier is squeezing a <em>diagnosis</em>, not just an alarm, out of the spectrum.</p>
+<p>That frontier is where this chapter spends its depth, because the foundation is already laid. The Commercial Drone Landscape chapter established what NDVI is, which five bands a standard agricultural multispectral array carries, why healthy vegetation reflects near-infrared strongly, and how index maps become prescription maps; none of that is repeated here. What Part I’s treatment deliberately left general is the question this chapter makes specific: NDVI’s spatial variation “reveals stress — drought, nutrient deficiency, disease, pest damage,” all lumped together. A depressed index says <em>something</em> is wrong. It does not say <em>what</em>. Telling a fungal infection apart from a dry week is a genuinely different problem — one the plant-pathology remote-sensing literature attacks with purpose-built red-edge indices and per-disease classifiers, with real head-to-head numbers against NDVI — and it comes packaged with an operational question the book is unusually well equipped to answer: how a sensing mission is actually <em>flown</em>, coarse survey first, targeted re-fly on what the survey flags, using precisely the coverage-pattern machinery the Path Planning on the Edge chapter built for the running example’s search grid.</p>
+<section id="learning-objectives" class="level2" data-number="27.1">
+<h2 data-number="27.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">27.1</span> Learning Objectives</h2>
+<ul>
+<li>Carry a multispectral image from raw digital numbers to calibrated surface reflectance — downwelling irradiance sensor, reflectance panel, solar-noon flight window — and explain why vegetation indices are computed from reflectance rather than pixel brightness, completing the radiometry the Commercial Drone Landscape chapter deferred to this chapter.</li>
+<li>Explain why generic NDVI is a good stress <em>detector</em> but a poor stress <em>classifier</em>, and describe the red-edge mechanism — chlorophyll breakdown and cell-structure disruption in fungally colonized tissue — that disease-specific indices exploit and NDVI’s broad red/NIR contrast largely misses.</li>
+<li>Compute NDRE and REDSI from band reflectances, and interpret REDSI’s published head-to-head accuracy against NDVI on wheat yellow rust, including what the validation platform does and does not license you to claim.</li>
+<li>Summarize two real UAV disease-detection case studies — sugar beet Cercospora/powdery mildew and wheat stem rust — with their actual platforms, ground sample distances, classifiers, and per-class accuracies, and present early-detection lead times as a disease-specific range rather than one universal number.</li>
+<li>Design a coarse-to-targeted two-stage crop-scouting survey: parameterize the Path Planning on the Edge chapter’s lawnmower generator for each stage, work the GSD-versus-track-length arithmetic that motivates the split, and state when adaptive sampling beats exhaustive coverage.</li>
+<li>Contrast per-pixel continuous-index sensing with Part III’s per-frame discrete object detection precisely — same sensor category, different information-processing problem — and identify which paradigm, or which hybrid, a given sensing task calls for.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="27.2">
+<h2 data-number="27.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">27.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Radiometric calibration</strong> — the conversion of a camera’s raw digital numbers into surface reflectance: a downwelling irradiance sensor records the illumination striking the scene, a panel of known reflectance imaged on the ground anchors the scale, and the ratio of reflected to incident light becomes a property of the <em>plant</em> rather than of the weather.</li>
+<li><strong>Red edge</strong> — the steep transition in vegetation reflectance between strong chlorophyll absorption in the red and strong leaf-structure scattering in the near-infrared, roughly 700–740 nm; its position and slope shift with chlorophyll content and cell condition, which makes it the recurring diagnostic region for crop disease.</li>
+<li><strong>Spectral signature</strong> (disease-specific sense) — beyond Part I’s general notion of a surface’s reflectance-versus-wavelength shape: the characteristic <em>perturbation</em> a particular stressor imposes on that shape — a fungal infection raising visible and red-edge reflectance while lowering NIR is a different signature from drought’s flatter, NIR-dominated depression, even when both depress NDVI equally.</li>
+<li><strong>NDRE</strong> (Normalized Difference Red Edge) — the normalized-difference index formed from NIR and red-edge reflectance, <span class="math inline">\((\rho_{\text{NIR}} - \rho_{\text{RE}})/(\rho_{\text{NIR}} + \rho_{\text{RE}})\)</span>; identical in form to Part I’s NDVI with the red band swapped for the red-edge band, less prone to saturating over dense canopy and more sensitive to early chlorophyll loss.</li>
+<li><strong>REDSI</strong> (Red Edge Disease Stress Index) — a purpose-built disease index computed from red and two red-edge bands, designed around the specific way wheat yellow rust distorts the red-edge region; the index with the clearest published head-to-head win over NDVI on the same plots.</li>
+<li><strong>Hyperspectral imaging</strong> — imaging in hundreds of contiguous narrow bands (a few nanometres each) rather than a handful of discrete filtered bands, so each pixel carries an essentially continuous spectrum; heavier, costlier, and hungrier for calibration than multispectral, but able to resolve diagnostic wavelengths a five-band filter set was not designed to isolate.</li>
+<li><strong>Coarse-to-targeted search</strong> (two-stage survey) — the crop-scouting flight doctrine in which a first pass covers the whole field at high altitude and coarse GSD to build an index map, anomalous sectors are flagged algorithmically, and a second pass re-flies only the flagged sectors at low altitude and fine GSD to confirm and diagnose.</li>
+<li><strong>Ground sample distance</strong> (GSD) — Part I’s centimetres-per-pixel measure, reappearing here as the two-stage survey’s control variable: the Commercial Drone Landscape chapter’s relation makes it linear in altitude, so each stage’s altitude choice <em>is</em> a resolution choice, and the coarse and targeted stages are two points on the same line.</li>
+</ul>
+</section>
+<section id="the-measurement-beneath-the-index" class="level2" data-number="27.3">
+<h2 data-number="27.3" class="anchored" data-anchor-id="the-measurement-beneath-the-index"><span class="header-section-number">27.3</span> The Measurement Beneath the Index</h2>
+<p>Part I flagged the problem in one sentence — reflectance is a ratio of reflected to incident radiance, and the incident term varies with sun angle, cloud, and haze between one flight line and the next — and this section discharges it, because every index in this chapter is meaningless without it. What a camera pixel records is a digital number proportional to the radiance entering the lens, which is the product of two things: how strongly the surface reflects at that band, and how much light was falling on it at that moment. Only the first factor is about the plant. A cloud shadow crossing the field mid-flight can depress raw NIR brightness by more than a diseased canopy does; a survey stitched from frames taken twenty minutes apart bakes the sun’s motion into the mosaic. An index computed from raw digital numbers is therefore an index of the <em>weather</em> as much as of the crop.</p>
+<p>The field workflow that removes the illumination term has three standard parts, and agricultural multispectral rigs ship with the hardware for the first two. A <strong>downwelling irradiance sensor</strong> — an upward-facing light meter, filtered to the same bands as the camera — rides on top of the aircraft and logs incident illumination for every exposure, so each frame’s radiance can be divided by the illumination that produced it. A <strong>calibrated reflectance panel</strong> — a target of known, spectrally flat reflectance — is imaged on the ground before and after the flight, anchoring the ratio to an absolute scale: if the panel reflects 50 % by manufacture and reads a given digital number, the scale factor from number to reflectance follows for every band. And the <strong>flight window</strong> is scheduled near solar noon on a stable sky, not for convenience but because both corrections are approximations — the irradiance sensor measures illumination at the aircraft, not in the crop’s shadowed lower canopy, and the panel calibration holds only while the atmosphere resembles the moment it was imaged. Photogrammetry software then assembles the calibrated frames into the orthomosaic Part I defined, using generous overlap between frames so that every point on the ground is imaged several times and the stitcher has features to match; the sugar-beet study worked through below flew 80 % front and 70 % side overlap, which is representative <span class="citation" data-cites="koc2025sugarbeet">(<a href="#ref-koc2025sugarbeet" role="doc-biblioref">Koç et al. 2025</a>)</span>.</p>
+<p>Why go to this trouble when the index is a ratio anyway? Normalized-difference indices do cancel <em>some</em> illumination variation — a uniform brightening multiplies numerator and denominator alike — and that partial self-correction is a real reason the form is popular. But the cancellation is only exact if illumination shifts identically in both bands, and it does not: haze scatters blue and red far more than NIR, and canopy shadow is not spectrally neutral. The indices this chapter cares about are also being asked a harder question than Part I’s. Distinguishing a diseased pixel from a merely dry one turns on reflectance differences of a few percentage points in a 35-nanometre-wide band; that signal does not survive an uncalibrated pipeline. Calibration discipline is to this chapter what cross-track error was to the Path Planning on the Edge chapter — the unglamorous budget line the whole guarantee rests on.</p>
+</section>
+<section id="a-detector-is-not-a-classifier" class="level2" data-number="27.4">
+<h2 data-number="27.4" class="anchored" data-anchor-id="a-detector-is-not-a-classifier"><span class="header-section-number">27.4</span> A Detector Is Not a Classifier</h2>
+<p>With calibrated reflectance in hand, Part I’s story can be sharpened into this chapter’s central distinction. NDVI works as a stress detector because nearly every way a plant can suffer eventually erodes the same contrast: less photosynthetically active tissue means less red absorption and less NIR scattering, so the index falls. That convergence is exactly what makes NDVI a poor classifier — drought, nitrogen shortage, a fungal colony, and chewing insects all arrive at the same depressed number by different routes, and by construction the index has thrown away the route. Two bands in, one scalar out: everything the spectrum knew about <em>which</em> stressor is at work was discarded at the moment of the subtraction.</p>
+<p>The information NDVI discards is concentrated in a region NDVI does not sample. Between the red band’s deep chlorophyll absorption and the NIR plateau’s structural scattering lies the <strong>red edge</strong>, the steep shoulder around 700–740 nm where vegetation reflectance climbs by an order of magnitude in a few tens of nanometres. The shoulder’s position and slope are set by the two things a fungal infection attacks first: chlorophyll concentration, which the pathogen degrades as it colonizes leaf tissue, and cell structure, which collapses as mycelium spreads and pustules erupt. Both changes move and flatten the red edge <em>before</em> the broadband red/NIR contrast has fully deteriorated — which is the physiological reason spectral methods can beat a human scout, since the reflectance change precedes the visible pigment loss an eye detects. And the perturbation is not the same for every stressor. A multi-temporal vineyard trial in Portugal’s Vinho Verde region that tracked downy mildew across seven multispectral flights over treated and untreated vines reported the infection signature as <em>increased</em> reflectance in the visible and red-edge bands with a progressive decline in NIR — an opposite-signed, two-part pattern distinguishable from the flatter, NIR-dominated depression of simple water stress <span class="citation" data-cites="agronomy2025downymildew">(<a href="#ref-agronomy2025downymildew" role="doc-biblioref">Unknown (full author list not retrieved) 2025</a>)</span>. Work on potato late blight makes the mechanism finer still: infection measurably shifts the wavelength <em>positions</em> of two spectral landmarks — the red-well point, where red absorption bottoms out, and the red-edge point, where the shoulder’s slope peaks — and a classifier watching those red and red-edge wavelengths reached 89.3 % accuracy at leaf scale three days after inoculation, the same day symptoms first became visible, and 89.1 % at canopy scale two days later <span class="citation" data-cites="fernandez2020lateblight">(<a href="#ref-fernandez2020lateblight" role="doc-biblioref">Fernández et al. 2020</a>)</span>.</p>
+<div id="fig-spectral-signature-disease" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Line chart titled where disease shows in the spectrum, plotting reflectance from zero to zero point six against wavelength from 450 to 900 nanometres. Three curves: a teal healthy-vegetation curve with low visible reflectance, a small green bump near 550 nanometres, a deep red absorption trough near 670, a steep red-edge rise between 700 and 740, and a high near-infrared plateau around zero point five; a red fungal-infection curve with raised visible and red reflectance, a flattened and shifted red-edge shoulder, and a lowered near-infrared plateau around zero point three five; and a dashed amber drought curve that tracks the healthy curve through the visible and keeps a similar red-edge position but descends to a depressed near-infrared plateau. A shaded vertical band highlights the red-edge region from 700 to 740 nanometres. Below the wavelength axis, two teal markers at 665 and 840 nanometres are bracketed and labeled as the only two bands NDVI samples, and three amber markers at 705, 730, and 783 nanometres are labeled as where NDRE and REDSI look. Annotations state that any stressor shrinks the red-to-near-infrared contrast so NDVI falls for all of them alike, that the fungal curve rises in the visible and red edge while falling in the near infrared, an opposite-signed pattern reported for downy mildew, and that the drought curve mainly depresses the near infrared while the visible and red-edge shape survives. A footer states the mechanism: fungal colonization degrades chlorophyll and collapses cell structure, moving and flattening the red-edge shoulder before the broadband contrast fully deteriorates, which is why a red-edge index out-classified NDVI 84.1 percent to 78.8 percent on the same wheat plots.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-spectral-signature-disease-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/spectral-signature-disease.svg" class="img-fluid figure-img" style="width:100.0%" alt="Line chart titled where disease shows in the spectrum, plotting reflectance from zero to zero point six against wavelength from 450 to 900 nanometres. Three curves: a teal healthy-vegetation curve with low visible reflectance, a small green bump near 550 nanometres, a deep red absorption trough near 670, a steep red-edge rise between 700 and 740, and a high near-infrared plateau around zero point five; a red fungal-infection curve with raised visible and red reflectance, a flattened and shifted red-edge shoulder, and a lowered near-infrared plateau around zero point three five; and a dashed amber drought curve that tracks the healthy curve through the visible and keeps a similar red-edge position but descends to a depressed near-infrared plateau. A shaded vertical band highlights the red-edge region from 700 to 740 nanometres. Below the wavelength axis, two teal markers at 665 and 840 nanometres are bracketed and labeled as the only two bands NDVI samples, and three amber markers at 705, 730, and 783 nanometres are labeled as where NDRE and REDSI look. Annotations state that any stressor shrinks the red-to-near-infrared contrast so NDVI falls for all of them alike, that the fungal curve rises in the visible and red edge while falling in the near infrared, an opposite-signed pattern reported for downy mildew, and that the drought curve mainly depresses the near infrared while the visible and red-edge shape survives. A footer states the mechanism: fungal colonization degrades chlorophyll and collapses cell structure, moving and flattening the red-edge shoulder before the broadband contrast fully deteriorates, which is why a red-edge index out-classified NDVI 84.1 percent to 78.8 percent on the same wheat plots.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-spectral-signature-disease-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;27.1: Representative reflectance spectra for healthy, fungally infected, and drought-stressed vegetation, with the bands NDVI samples versus the red-edge region where disease-specific indices look. Both stressors shrink NDVI’s broad red/NIR contrast toward the same depressed value; the shape of the red-edge shoulder is where their signatures separate.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-spectral-signature-disease" class="quarto-xref">Figure&nbsp;<span>27.1</span></a> draws the argument. The two teal markers under the wavelength axis are all NDVI ever sees; every curve in the figure loses contrast between them, which is why the index detects them all and distinguishes none. The amber markers sit on the shoulder, where the curves’ <em>shapes</em> diverge. An index built from those bands is not more sensitive in some vague sense — it is sampling the specific spectral degrees of freedom that carry the disease information. The next section builds two such indices and puts real accuracy numbers behind the claim.</p>
+</section>
+<section id="indices-built-for-diagnosis" class="level2" data-number="27.5">
+<h2 data-number="27.5" class="anchored" data-anchor-id="indices-built-for-diagnosis"><span class="header-section-number">27.5</span> Indices Built for Diagnosis</h2>
+<p>The gentlest step beyond NDVI keeps the normalized-difference form and moves one band. <strong>NDRE</strong> replaces red with red-edge:</p>
+<p><span class="math display">\[
+\text{NDRE} = \frac{\rho_{\text{NIR}} - \rho_{\text{RE}}}{\rho_{\text{NIR}} + \rho_{\text{RE}}},
+\]</span></p>
+<p>computable on any standard five-band agricultural array, since the array carries a red-edge filter precisely for indices like this one. Because red-edge reflectance — unlike deep-red reflectance, which is nearly zero for any healthy canopy — still varies with chlorophyll content in dense vegetation, NDRE keeps discriminating after NDVI has saturated over a closed canopy, and it responds to early chlorosis while the red band is still pinned near total absorption. The same one-band substitution logic produced <strong>GNDVI</strong>, the green-for-red variant introduced for chlorophyll and nitrogen estimation <span class="citation" data-cites="gitelson1996gndvi">(<a href="#ref-gitelson1996gndvi" role="doc-biblioref">Gitelson, Kaufman, and Merzlyak 1996</a>)</span>, which reappears throughout the disease literature because disease-driven chlorophyll loss is exactly what it was built to sense.</p>
+<p>The sharper instrument is an index designed around one disease’s signature. The <strong>Red Edge Disease Stress Index</strong> was constructed from the specific way yellow rust — the fungal disease <em>Puccinia striiformis</em> causes in wheat — distorts the red-edge region, and it uses three bands: red at 665 nm and two red-edge bands near 705 and 783 nm <span class="citation" data-cites="zheng2018redsi">(<a href="#ref-zheng2018redsi" role="doc-biblioref">Zheng et al. 2018</a>)</span>:</p>
+<p><span class="math display">\[
+\text{REDSI} = \frac{(705-665)\,(\rho_{\text{RE3}} - \rho_{R}) \;-\; (783-665)\,(\rho_{\text{RE1}} - \rho_{R})}{2\,\rho_{R}}.
+\]</span></p>
+<p>The construction is a triangle: the numerator measures how far the mid-shoulder reflectance sits from the straight line joining the red trough to the upper shoulder — a direct measurement of the shoulder’s <em>shape</em>, which is what infection deforms. Work it through on representative reflectance values to see the leverage. A healthy wheat pixel might show <span class="math inline">\(\rho_R = 0.05\)</span>, <span class="math inline">\(\rho_{\text{RE1}} = 0.12\)</span>, <span class="math inline">\(\rho_{\text{RE3}} = 0.45\)</span>; a rust-infected one <span class="math inline">\(\rho_R = 0.09\)</span>, <span class="math inline">\(\rho_{\text{RE1}} = 0.14\)</span>, <span class="math inline">\(\rho_{\text{RE3}} = 0.28\)</span> — red up, upper shoulder down, exactly the signature of the previous section:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\text{REDSI}_{\text{healthy}} &amp;= \frac{40(0.45-0.05) - 118(0.12-0.05)}{2(0.05)} \\
+                              &amp;= \frac{16.0 - 8.26}{0.10} \approx 77 \\[4pt]
+\text{REDSI}_{\text{infected}} &amp;= \frac{40(0.28-0.09) - 118(0.14-0.09)}{2(0.09)} \\
+                               &amp;= \frac{7.60 - 5.90}{0.18} \approx 9
+\end{aligned}
+\]</span></p>
+<p>An eight-fold contrast between the two pixels. The same two pixels’ NDVI values, computed with Part I’s formula from <span class="math inline">\(\rho_{\text{NIR}} = 0.50\)</span> and <span class="math inline">\(0.33\)</span> respectively, are 0.82 and 0.57 — a 1.4-fold contrast. The illustrative numbers are chosen for the arithmetic, but the separability advantage they dramatize is the published result: validated head-to-head on the same wheat plots, REDSI identified yellow rust with 84.1 % overall accuracy (kappa 0.76) at canopy scale against NDVI’s 78.8 %, and at regional scale the gap widened sharply — 85.2 % against 66.7 % <span class="citation" data-cites="zheng2018redsi">(<a href="#ref-zheng2018redsi" role="doc-biblioref">Zheng et al. 2018</a>)</span>. Two honest caveats travel with those numbers. The validation flew on Sentinel-2 satellite imagery at 10 m per pixel, not on a drone; the index itself is sensor-agnostic — any platform carrying the three bands can compute it — and a drone’s far finer GSD would be expected to help rather than hurt, but that extrapolation was not tested in the paper. And the standard five-band agricultural array carries only <em>one</em> red-edge filter, so it computes NDRE but not REDSI; the full index needs a sensor with two red-edge bands, such as the dual-camera multispectral rigs the late-blight work used <span class="citation" data-cites="fernandez2020lateblight">(<a href="#ref-fernandez2020lateblight" role="doc-biblioref">Fernández et al. 2020</a>)</span> — a concrete instance of the sensor-selection-follows-the-question doctrine that university extension guidance on agricultural UAV sensing spells out <span class="citation" data-cites="ncsu2021uavsensor">(<a href="#ref-ncsu2021uavsensor" role="doc-biblioref">North Carolina State University Extension 2021</a>)</span>.</p>
+<p>Beyond these, the literature’s toolbox is wide, and a sampling shows the range of spectral degrees of freedom being tapped: the Photochemical Reflectance Index, PRI, built from two narrow visible bands at 531 and 570 nm, tracks xanthophyll pigment changes tied to photosynthetic efficiency; the Disease Water Stress Index couples a shortwave-infrared water-absorption band to the visible/NIR pair, at the price of a SWIR-capable sensor beyond the standard array; and the Chlorophyll Absorption Ratio Index, CARI, combines red, green, and red-edge reflectance while correcting for soil background. None of these is universally best — the wheat stem-rust study below tested fourteen candidate indices and found GNDVI, PRI, a red-edge stress index, and a chlorophyll-green index most effective for that one disease <span class="citation" data-cites="abdulridha2023stemrust">(<a href="#ref-abdulridha2023stemrust" role="doc-biblioref">Abdulridha et al. 2023</a>)</span> — and that is itself the lesson: <em>disease-specific</em> means the index, like the classifier, is fitted to the pathogen.</p>
+</section>
+<section id="two-case-studies-from-real-fields" class="level2" data-number="27.6">
+<h2 data-number="27.6" class="anchored" data-anchor-id="two-case-studies-from-real-fields"><span class="header-section-number">27.6</span> Two Case Studies from Real Fields</h2>
+<p>Numbers from real deployments discipline the enthusiasm, and two well-documented studies bracket the space — one multispectral and operational, one hyperspectral and research-grade.</p>
+<p><strong>Sugar beet, two diseases, one survey.</strong> A recent field trial flew a DJI Phantom 4 Multispectral — a stock quadcopter whose six-sensor head implements the same five-band architecture the Commercial Drone Landscape chapter catalogued, plus RGB — over sugar beet afflicted by two distinct fungal diseases at once: Cercospora leaf spot and powdery mildew <span class="citation" data-cites="koc2025sugarbeet">(<a href="#ref-koc2025sugarbeet" role="doc-biblioref">Koç et al. 2025</a>)</span>. The flight parameters place it firmly in the <em>targeted</em> resolution regime of the next section: 15 m above ground, roughly 0.4 cm GSD, 80 % front and 70 % side overlap. NDVI maps were computed in photogrammetry software, thresholded into severity classes with the Jenks natural-breaks method, and five supervised classifiers were trained per disease. The results carry two teaching points. First, no single algorithm won: K-nearest-neighbors performed best on Cercospora (0.83 accuracy, 0.76 F1) while logistic regression performed best on powdery mildew (0.91 accuracy, 0.93 F1) — disease-specific diagnosis in practice means a separate model per disease on the same spectral data, not one universal disease index. Second, the timing evidence is concrete and honestly bounded: in a 2022 instance, the drone-derived index declined on July 20 while visual field assessment recorded no symptoms until July 24 — a directly observed four-day lead — and the authors separately describe an operational deployment in which drone-based detection ran fifteen days ahead of the farm’s usual scouting cadence, enabling earlier spraying. The four days is a measured comparison; the fifteen is an operational anecdote against habit rather than a controlled day-count, and the two should be quoted as what they are.</p>
+<p><strong>Wheat stem rust, hyperspectral.</strong> At the research-grade end, a 240-band hyperspectral camera (400–900 nm, 2.1 nm spectral resolution) flown on a DJI Matrice 600 Pro hexacopter at 20 m — about 3 cm GSD — surveyed 960 wheat plots for stem rust severity <span class="citation" data-cites="abdulridha2023stemrust">(<a href="#ref-abdulridha2023stemrust" role="doc-biblioref">Abdulridha et al. 2023</a>)</span>. A random-forest classifier reached 85 % overall accuracy across four severity classes and 88 % on the binary healthy-versus-diseased question, and the diagnostic wavelengths the analysis singled out — clustered in the green near 530 nm and the red edge between 690 and 730 nm — are pointedly <em>not</em> the red/NIR pair NDVI uses, independent confirmation of this chapter’s central mechanism. The per-class breakdown deserves more attention than the headline: 84 % on healthy plots, 97 % on moderate infection, 81 % on severe — and only 76 % on <em>mild</em>. The early, low-severity case is simultaneously the hardest to classify and the only one worth the flight, because moderate and severe infection is what the fungicide window has already closed on. Accuracy claims in this field should be read per severity class, never as one flat number.</p>
+<p>How much earlier than a human scout, then? The literature’s honest answer is a range, not a constant, because the physiological lead — reflectance change preceding visible pigment loss — depends on how much cellular disruption must accumulate before that particular disease is eye-visible in that particular crop. At the short end, the potato late-blight work above <em>matched</em> first visible symptoms at leaf scale rather than beating them <span class="citation" data-cites="fernandez2020lateblight">(<a href="#ref-fernandez2020lateblight" role="doc-biblioref">Fernández et al. 2020</a>)</span>. The sugar-beet trial measured four days at field scale <span class="citation" data-cites="koc2025sugarbeet">(<a href="#ref-koc2025sugarbeet" role="doc-biblioref">Koç et al. 2025</a>)</span>. At the long end, a multispectral UAV study of wheat yellow rust in Argentina reported a detection model reaching 60 % accuracy as early as 40 days after sowing — well before rust is conspicuous — climbing to 79 % by flowering, and framed the payoff as preserving an estimated 3–7 % of yield by acting inside the window the early call opens <span class="citation" data-cites="nguyen2023yellowrust">(<a href="#ref-nguyen2023yellowrust" role="doc-biblioref">Nguyen et al. 2023</a>)</span>. One widely circulated figure needs a flag: a claim of “seven days before visible symptoms at ~97 % accuracy” for Septoria leaf blotch in wheat is real, but it comes from a <em>handheld proximal</em> hyperspectral scanner imaging individual leaves, not from any drone platform <span class="citation" data-cites="niu2025septoria">(<a href="#ref-niu2025septoria" role="doc-biblioref">Niu et al. 2025</a>)</span>. The underlying mechanism is the same one that motivates UAV red-edge indices, but the number does not transfer to canopy-scale aerial sensing and should never be quoted as a drone result — a small case study in why Part III’s habit of asking <em>what was actually measured, on what platform, at what scale</em> follows this book’s readers everywhere.</p>
+</section>
+<section id="flying-the-survey-twice-coarse-to-targeted-search" class="level2" data-number="27.7">
+<h2 data-number="27.7" class="anchored" data-anchor-id="flying-the-survey-twice-coarse-to-targeted-search"><span class="header-section-number">27.7</span> Flying the Survey Twice: Coarse-to-Targeted Search</h2>
+<p>Everything above concerns what the pixels mean. The operational question — how a scouting mission is <em>flown</em> — turns out to be one the book has already mostly solved, because field-scale multispectral surveying is systematic-coverage work: the same lawnmower problem, the same boustrophedon answer, the same generator the Path Planning on the Edge chapter wrote for the running example’s search grid. What agriculture adds is a resolution dilemma the goose mission never faced, and a two-stage doctrine that resolves it.</p>
+<p>The dilemma is the Commercial Drone Landscape chapter’s GSD relation meeting the Path Planning chapter’s track-length arithmetic. GSD is linear in altitude; so is swath width; so the total track length needed to cover a fixed area scales <em>inversely</em> with altitude. Diagnosis wants fine GSD — the sugar-beet study’s 0.4 cm per pixel resolves individual leaves — but fine GSD is ruinously expensive over a whole field. Work it through for a 400 m × 400 m field (16 ha) with a multispectral camera whose bands are 1,600 pixels wide and whose GSD works out to 3.2 cm per pixel at 60 m. At 60 m the swath is <span class="math inline">\(1600 \times 0.032 = 51\)</span> m; at the 70 % side overlap photogrammetric stitching wants, the sweep spacing is 15.4 m, and the Path Planning chapter’s generator emits <span class="math inline">\(\lceil 400/15.4 \rceil + 1 = 27\)</span> legs — about 11.2 km of track, 23 minutes at 8 m/s, one flight. Drop to 15 m for a 0.8 cm GSD and everything scales by four: a 12.8 m swath, 3.8 m spacing, 106 legs, about 42.8 km of track — and low flight is also <em>slow</em> flight, because motion blur is measured in pixels: at a 1/500 s shutter, 8 m/s smears 1.6 cm across the exposure, half a pixel at the coarse GSD and two full pixels at the fine one. At a blur-safe 5 m/s the fine-GSD full-field survey costs well over two hours and several battery swaps. Exhaustive coverage at diagnostic resolution does not fit in a flight day.</p>
+<p>The two-stage pattern splits the difference, and it is documented practice, not just a neat idea: an initial pass at survey altitude maps the whole field at coarse GSD; low-index or otherwise anomalous sectors are flagged algorithmically — a threshold, a percentile cut, or the natural-breaks classing the sugar-beet study used; and the aircraft then re-flies <em>only the flagged sectors</em> at low altitude and fine GSD, capturing the per-leaf imagery on which a diagnosis, or a scout’s boots-on-ground visit, can stand. For the worked field: if the coarse map flags one 60 m × 60 m sector — about 2 % of the field — the targeted stage is 17 legs and roughly a kilometre of track, under four minutes at 5 m/s. Stage 1 plus Stage 2 comes to under half an hour where uniform fine coverage cost hours. The platform economics reinforce the split: extension guidance notes that a fixed-wing survey aircraft covers on the order of 200 acres in a 55-minute flight while a multirotor manages half-hour batteries — so the coarse stage suits a fast fixed-wing at altitude, and the targeted stage suits exactly the cheap, maneuverable multirotor this book has been flying all along <span class="citation" data-cites="ncsu2021uavsensor">(<a href="#ref-ncsu2021uavsensor" role="doc-biblioref">North Carolina State University Extension 2021</a>)</span>.</p>
+<div id="fig-coarse-to-targeted-survey" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two-panel diagram titled the two-stage survey: coarse everywhere, fine only where flagged. Left panel, stage one, coarse survey of the whole field: a large green field rectangle 400 by 400 metres overlaid with a teal boustrophedon lawnmower path of six wide legs, annotated 60 metres above ground, 3.2 centimetres per pixel GSD, 51 metre swath, 15.4 metre spacing at 70 percent side overlap, 27 legs, about 11 kilometres of track, about 23 minutes at 8 metres per second. The field carries a faint index-map grid of mostly uniform cells with one cluster of amber and red low-index cells near the upper right, labeled flagged sector, low index, about 60 by 60 metres, roughly 2 percent of the field. An arrow from the flagged sector to the right panel is labeled flag, then re-fly: the same detect-then-investigate pattern the running example uses when a detection preempts its search grid. Right panel, stage two, targeted re-fly of the flagged sector only: a zoomed 60 by 60 metre square with a dense teal lawnmower of many closely spaced legs, annotated 15 metres above ground, 0.8 centimetres per pixel, 12.8 metre swath, 3.8 metre spacing, 17 legs, about 1 kilometre of track, under 4 minutes at 5 metres per second, with a note that this is the resolution regime of the sugar beet case study at 15 metres and that per-leaf imagery supports diagnosis rather than mere detection. A bottom strip titled the arithmetic that forces the split states: GSD and swath are both linear in altitude, so track length over a fixed area scales as one over altitude; flying the whole field at stage-two resolution would cost 106 legs and over 42 kilometres, more than two hours plus battery swaps; two stages cover the field and diagnose the anomaly in under half an hour. A footer adds that both stages are the Path Planning chapter's lawnmower generator with different parameters, and that a reinforcement-learning variant that adaptively concentrates sampling reached 89.8 percent accuracy while sampling only 40 percent of an 80-acre field.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-coarse-to-targeted-survey-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/coarse-to-targeted-survey.svg" class="img-fluid figure-img" style="width:100.0%" alt="Two-panel diagram titled the two-stage survey: coarse everywhere, fine only where flagged. Left panel, stage one, coarse survey of the whole field: a large green field rectangle 400 by 400 metres overlaid with a teal boustrophedon lawnmower path of six wide legs, annotated 60 metres above ground, 3.2 centimetres per pixel GSD, 51 metre swath, 15.4 metre spacing at 70 percent side overlap, 27 legs, about 11 kilometres of track, about 23 minutes at 8 metres per second. The field carries a faint index-map grid of mostly uniform cells with one cluster of amber and red low-index cells near the upper right, labeled flagged sector, low index, about 60 by 60 metres, roughly 2 percent of the field. An arrow from the flagged sector to the right panel is labeled flag, then re-fly: the same detect-then-investigate pattern the running example uses when a detection preempts its search grid. Right panel, stage two, targeted re-fly of the flagged sector only: a zoomed 60 by 60 metre square with a dense teal lawnmower of many closely spaced legs, annotated 15 metres above ground, 0.8 centimetres per pixel, 12.8 metre swath, 3.8 metre spacing, 17 legs, about 1 kilometre of track, under 4 minutes at 5 metres per second, with a note that this is the resolution regime of the sugar beet case study at 15 metres and that per-leaf imagery supports diagnosis rather than mere detection. A bottom strip titled the arithmetic that forces the split states: GSD and swath are both linear in altitude, so track length over a fixed area scales as one over altitude; flying the whole field at stage-two resolution would cost 106 legs and over 42 kilometres, more than two hours plus battery swaps; two stages cover the field and diagnose the anomaly in under half an hour. A footer adds that both stages are the Path Planning chapter's lawnmower generator with different parameters, and that a reinforcement-learning variant that adaptively concentrates sampling reached 89.8 percent accuracy while sampling only 40 percent of an 80-acre field.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-coarse-to-targeted-survey-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;27.2: The coarse-to-targeted two-stage crop-scouting survey: a whole-field coverage pass at high altitude and coarse GSD flags an anomalous low-index sector, and a second lawnmower at low altitude and fine GSD re-flies only that sector — the same generator the Path Planning on the Edge chapter built, called twice with different parameters.
+</figcaption>
+</figure>
+</div>
+<p>Two connections make this more than an agricultural aside. First, both stages are <em>literally</em> the Path Planning chapter’s <code>lawnmower()</code> — a bounding box, a spacing, an altitude — called twice: once with the field polygon and the coarse spacing, once with the flagged sector’s bounding box and the fine spacing. The generator was twenty lines precisely so that it could be re-parameterized like this. Second, the flag-then-re-fly structure is the running example’s own detect-then-investigate pattern wearing different clothes: the Path Planning chapter’s search grid is preempted by a detection and the aircraft goes to look, exactly as the coarse survey’s anomaly summons the targeted stage — except that here the “detection” is a depressed patch in a continuous index map rather than a bounding box from a neural network, a distinction the next section makes precise.</p>
+<p>The research frontier collapses the two flights into one. A reinforcement-learning scouting agent that alternates in real time between an exploration phase — covering large swaths in search of regions that contradict its current map — and denser re-scouting over flagged problem regions, steered by a learned whole-field state estimate, reached 89.8 % field-assessment accuracy while sampling only 40 % of an 80-acre field, with the authors reporting 4.8× lower labor cost than exhaustive scouting; the whole-field state mattered, since an agent reasoning only from recently visited zones managed 80.3 % at the same coverage <span class="citation" data-cites="zhang2020wholefield">(<a href="#ref-zhang2020wholefield" role="doc-biblioref">Zhang et al. 2020</a>)</span>. That is the two-stage doctrine made adaptive and continuous — and it is recognizably a cousin of the coverage-versus-investigate hinge this book built into the running example’s mission logic.</p>
+</section>
+<section id="two-paradigms-one-camera-mount" class="level2" data-number="27.8">
+<h2 data-number="27.8" class="anchored" data-anchor-id="two-paradigms-one-camera-mount"><span class="header-section-number">27.8</span> Two Paradigms, One Camera Mount</h2>
+<p>The chapter’s last obligation is precision about the contrast it has been trading on. Part III’s Building a Detection Pipeline chapter and this chapter both fly a camera over the ground and both end in a georeferenced claim about what is down there. Beneath that resemblance, they are solving different information-processing problems, and an engineer choosing between them should be able to name the differences exactly.</p>
+<div id="tbl-two-paradigms" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-two-paradigms-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;27.1: The two sensing paradigms, made precise: a discrete learned per-frame classification versus a continuous physical per-pixel measurement.
+</figcaption>
+<div aria-describedby="tbl-two-paradigms-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Part III: RGB object detection</th>
+<th>This chapter: multispectral index mapping</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Unit of inference</td>
+<td>One frame at a time, onboard, at frame rate</td>
+<td>One pixel at a time, across a whole orthomosaic</td>
+</tr>
+<tr class="even">
+<td>The computation</td>
+<td>A learned function — millions of trained weights — mapping pixels to boxes and classes</td>
+<td>A fixed arithmetic formula — a handful of band ratios — mapping reflectances to a physical index</td>
+</tr>
+<tr class="odd">
+<td>What “detection” means</td>
+<td>A discrete decision: this box is a goose with confidence 0.87, above threshold</td>
+<td>A spatial anomaly: this patch’s continuous index sits below its surroundings</td>
+</tr>
+<tr class="even">
+<td>Output artifact</td>
+<td>Bounding boxes and classes per frame, streamed live</td>
+<td>A continuous scalar field over the field, assembled after landing</td>
+</tr>
+<tr class="odd">
+<td>Ground truth required</td>
+<td>A labeled dataset — thousands of hand-drawn boxes, the pipeline’s true bottleneck</td>
+<td>Radiometric calibration — a panel, an irradiance sensor, a flight window</td>
+</tr>
+<tr class="even">
+<td>Fails when</td>
+<td>The dataset lacked this case: unseen scale, lighting, or confusable species</td>
+<td>Calibration breaks: cloud shadow, haze, sun angle, a skipped panel shot</td>
+</tr>
+<tr class="odd">
+<td>Where it runs</td>
+<td>The companion computer, subject to Part III’s latency and memory budgets</td>
+<td>A workstation, deadline-free — photogrammetry is the cloud tier’s kind of work</td>
+</tr>
+<tr class="even">
+<td>Answers</td>
+<td>“Is there a <em>thing</em> here, and what kind?”</td>
+<td>“What is the <em>condition</em> of every point here?”</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The deepest row is the ground-truth one, because it names what each paradigm’s accuracy is <em>made of</em>. The detector’s competence is borrowed from its dataset: it knows what a goose looks like because thousands of examples said so, and it fails on what the dataset failed to contain. The index’s competence is borrowed from physics: nobody labeled examples of “stressed”; chlorophyll absorbs red, leaf structure scatters NIR, and the formula is the mechanism written as arithmetic. That is why the index generalizes to a field it has never seen with no retraining — and why it cannot, by itself, say <em>goose</em>: there is no per-pixel physical formula for a species. Each paradigm is the wrong tool for the other’s question.</p>
+<p>The boundary, though, is a place to build, and the strongest recent results live on it. The machine-learning classifiers of both case studies above are learned functions <em>on top of</em> physically calibrated indices — the physics supplies invariant features, the learning supplies the disease-specific decision boundary. A very recent vineyard study went further and composed the paradigms outright: a YOLO object detector — the same family the running example’s Detector node runs — trained not on RGB frames but on imagery augmented with a chlorophyll-absorption index, locating <em>Botrytis</em> infection sites as discrete detections at 91.1 % F1, where the identical architecture on RGB alone managed 68.1 % <span class="citation" data-cites="montalbanfaet2026botrytis">(<a href="#ref-montalbanfaet2026botrytis" role="doc-biblioref">Montalban-Faet et al. 2026</a>)</span>. Read against <a href="#tbl-two-paradigms" class="quarto-xref">Table&nbsp;<span>27.1</span></a>, that is the whole chapter in one experiment: the learned pipeline supplied the “find the discrete thing” machinery, and the physical index supplied 23 points of F1 that no amount of RGB data was going to.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="For More">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>For More
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The index-stack-plus-learning recipe generalizes past classification: one wheat leaf-rust study fed an algorithmically selected subset of UAV-derived vegetation indices into a neural network to predict <em>continuous</em> disease severity (<span class="math inline">\(R^2 \approx 0.78\)</span> on validation), turning the healthy/diseased binary into a regression <span class="citation" data-cites="ju2023leafrust">(<a href="#ref-ju2023leafrust" role="doc-biblioref">Ju et al. 2023</a>)</span>. On the flight-doctrine side, the incremental replanning machinery the Path Planning on the Edge chapter’s For More note introduced (D* Lite and kin) is what a single-flight adaptive scout needs when the “flagged sector” list changes mid-mission; the reinforcement-learning scouting paper is the current reference point for how far that can be pushed <span class="citation" data-cites="zhang2020wholefield">(<a href="#ref-zhang2020wholefield" role="doc-biblioref">Zhang et al. 2020</a>)</span>. And for sensor selection — five-band versus dual-red-edge versus hyperspectral, fixed-wing versus multirotor per stage — the university extension literature is the practical, vendor-neutral starting point <span class="citation" data-cites="ncsu2021uavsensor">(<a href="#ref-ncsu2021uavsensor" role="doc-biblioref">North Carolina State University Extension 2021</a>)</span>.</p>
+</div>
+</div>
+</section>
+<section id="check-your-understanding" class="level2" data-number="27.9">
+<h2 data-number="27.9" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">27.9</span> Check Your Understanding</h2>
+<ol type="1">
+<li>A field’s NDVI map shows a sharply depressed patch. The farm manager asks: “drought or disease?” Explain, in terms of what NDVI computes and what fungal infection does to the reflectance spectrum, why NDVI alone cannot answer — and what additional band measurements would begin to.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>NDVI compresses the spectrum to one scalar per pixel from exactly two samples: red and NIR reflectance. Essentially every stressor — drought, nutrient shortage, fungal colonization, pest damage — erodes the same red/NIR contrast, so all of them converge to the same depressed index; the subtraction throws away the spectral shape that distinguishes the routes. The disease-discriminating information is concentrated in the red-edge region (~700–740 nm), which NDVI does not sample: fungal chlorophyll degradation and cell-structure collapse move and flatten the red-edge shoulder — and some diseases <em>raise</em> visible/red-edge reflectance while lowering NIR, an opposite-signed pattern distinct from drought’s flatter NIR-dominated depression. Measuring one or two red-edge bands (enabling NDRE, or REDSI with two of them) is the minimum addition that starts to separate the hypotheses; a targeted low-altitude re-fly or a scout’s visit confirms.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Compute REDSI and NDRE for a pixel with <span class="math inline">\(\rho_R = 0.07\)</span>, <span class="math inline">\(\rho_{\text{RE1}}(705) = 0.13\)</span>, <span class="math inline">\(\rho_{\text{RE3}}(783) = 0.36\)</span>, and <span class="math inline">\(\rho_{\text{NIR}} = 0.41\)</span> (take <span class="math inline">\(\rho_{\text{RE}} = \rho_{\text{RE1}}\)</span> for NDRE). Then state which standard sensor class can compute each index and why.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>REDSI <span class="math inline">\(= [40(0.36-0.07) - 118(0.13-0.07)]/(2 \times 0.07) = (11.6 - 7.08)/0.14 \approx 32\)</span>. NDRE <span class="math inline">\(= (0.41-0.13)/(0.41+0.13) = 0.28/0.54 \approx 0.52\)</span>. NDRE needs only NIR and one red-edge band, so any standard five-band agricultural array computes it. REDSI needs red plus <em>two</em> red-edge bands (≈705 and ≈783 nm); the standard five-band array carries only one red-edge filter, so REDSI requires a dual-red-edge multispectral rig (or hyperspectral, or the satellite bands it was validated on) — a concrete case of the index driving the sensor purchase.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>In the head-to-head validation, REDSI beat NDVI 84.1 % to 78.8 % at canopy scale and 85.2 % to 66.7 % at regional scale. A colleague concludes: “so a drone flying REDSI detects yellow rust at 85 % accuracy.” Name two distinct corrections that claim needs.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>First, platform: the validation used Sentinel-2 <em>satellite</em> imagery at 10 m per pixel, not a drone. The index is sensor-agnostic and a UAV’s far finer GSD would plausibly do as well or better, but that was not tested — the published accuracy licenses a satellite claim, not a drone claim. Second, scope: 84–85 % is the accuracy for <em>this</em> disease (wheat yellow rust) with an index purpose-built for its red-edge signature, distinguishing it from background on those plots; it is not a general “disease detection accuracy,” and the same construction applied to a different pathogen or crop would need its own validation — as the stem-rust study’s different best-index set shows. (A third, finer point: quote accuracy per severity class where available; mild infection classifies worst and matters most.)</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>The wheat stem-rust study reported per-class accuracies of 84 % (healthy), 76 % (mild), 97 % (moderate), 81 % (severe). Why is the <em>pattern</em> of those numbers — not the 85 % overall figure — the operationally decisive information for a grower deciding whether to buy the survey?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The economic value of the survey is concentrated in exactly one class: mild infection, the stage where fungicide intervention still preserves the crop. Moderate and severe infection are easy to classify (97 %, 81 %) precisely because the spectral perturbation is large — but by then a competent human scout sees it too, and much of the treatment window has closed. Mild is simultaneously the hardest class (76 %, the worst of the four) and the only one the flight is really for. The 85 % overall figure is an average dominated by classes that matter less; a grower should ask “how well does it catch what I can’t yet see?” — and the honest answer is the per-class number, roughly three in four. The general rule: early/low-severity detection performance, not headline accuracy, is the figure of merit for any early-warning sensing system.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>Using the chapter’s worked survey numbers (400 m × 400 m field; swath 51 m and spacing 15.4 m at 60 m altitude; both linear in altitude; 70 % side overlap throughout): compute legs, approximate track, and flight time for (a) one coarse pass at 8 m/s, and (b) a full-field pass at 20 m altitude and 5 m/s. Then (c) give the two-stage total if the coarse pass flags two sectors of 50 m × 50 m each, flown at 20 m and 5 m/s, and state the time ratio of (b) to (c).</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Given: 27 legs, ≈11.2 km, ≈23 min at 8 m/s. (b) At 20 m, swath and spacing scale by <span class="math inline">\(20/60\)</span>: swath 17 m, spacing ≈5.1 m; legs <span class="math inline">\(= \lceil 400/5.1 \rceil + 1 = 80\)</span>; track ≈ <span class="math inline">\(80 \times 400 + 79 \times 5.1 \approx 32.4\)</span> km; at 5 m/s ≈ 6,480 s ≈ 108 min — plus several battery swaps. (c) Each 50 m sector at 5.1 m spacing: <span class="math inline">\(\lceil 50/5.1 \rceil + 1 = 11\)</span> legs ≈ <span class="math inline">\(11 \times 50 + 10 \times 5.1 \approx 0.60\)</span> km, ≈2 min at 5 m/s; two sectors ≈4 min plus transits. Two-stage total ≈ 23 + 4 ≈ 27 min against ≈108 min: a factor of ≈4 — and the two-stage plan still delivers the full fine-GSD imagery over the two sectors that actually matter, while fitting comfortably into a single battery cycle.</li>
+</ol>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>A vendor brochure claims its drone service “detects Septoria leaf blotch seven days before visible symptoms at 97 % accuracy.” Based on this chapter, what should a careful engineer check before repeating that claim, and what is the actual provenance of those figures?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Check what was measured, on what platform, at what scale. The 7-day/97 % pairing traces to a study using a <em>handheld proximal</em> hyperspectral scanner imaging individual leaves — not a drone, not canopy scale, not aerial GSD. The underlying mechanism (spectral change preceding visible symptoms) genuinely motivates UAV red-edge sensing, but lead time and accuracy both degrade moving from a leaf millimetres from a scanner to a canopy tens of metres below a five-band camera — the late-blight work, for instance, went from 3-days-post-inoculation performance at leaf level to 5 at canopy level. Drone-platform lead times documented in this chapter run from roughly matching first visible symptoms, through a measured four-day lead at field scale, to weeks-early detection at reduced accuracy — a disease- and platform-specific range, not a transferable headline number.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="27.10">
+<h2 data-number="27.10" class="anchored" data-anchor-id="try-it"><span class="header-section-number">27.10</span> Try It</h2>
+<p><strong>Part 1 — build both indices and compare their anomaly maps.</strong> Simulate a calibrated five-band orthomosaic as five NumPy arrays (say 400 × 400, one metre per pixel) of reflectance values: start every band from a healthy baseline (visible bands low, red ≈ 0.05, red-edge ≈ 0.15, NIR ≈ 0.48, plus a few percent of spatial noise). Inject two anomalies with different <em>signatures</em>: a fungal patch (raise red and red-edge reflectance, lower NIR — the downy-mildew-style opposite-signed pattern) and a broad drought gradient (depress NIR and, mildly and proportionally, red-edge, leaving the visible shape mostly intact). Compute NDVI (Part I’s formula) and NDRE per pixel, render both as images with a shared color scale, and difference each against its healthy-area median to make anomaly maps. Write down what you see before rationalizing it: both indices should flag both anomalies, but compare the <em>contrast</em> each index draws between the two anomaly types — then compute a third map, the NDVI-to-NDRE ratio or difference, and check whether it separates the fungal patch from the drought gradient better than either index alone. Close with three sentences on what a single-index deliverable would have told the farm manager, and what the pair tells them.</p>
+<p><strong>Part 2 — plan the two-stage survey with the machinery you already own.</strong> Take your Part 1 anomaly map and threshold it (a percentile cut is fine; the ambitious version implements Jenks natural breaks) to flag anomalous pixels, then compute the flagged region’s bounding box. Now reuse the Path Planning on the Edge chapter’s <code>lawnmower()</code> exactly as written: call it once over the full field with the coarse-stage parameters from this chapter’s worked example (compute the spacing from a 51 m swath at 70 % overlap), and once over the flagged bounding box with the targeted-stage parameters (12.8 m swath, same overlap rule). Plot both paths over the anomaly map — coarse in one color, targeted in another — and audit the plan the way that chapter audited everything: total track length and flight time per stage, batteries required at your platform’s endurance, and the time you would have spent flying the whole field at targeted resolution instead. If you flew the running example’s missions in earlier chapters, note how little new code this took: the sensing payload changed everything about the pixels and nothing about the planner.</p>
+<p><strong>Related Lab:</strong> <em>No lab currently maps to this chapter.</em></p>
+<p>The running example will go back to chasing geese in a moment, but it is worth naming what this chapter demonstrated about the system the book has built: the coverage generator, the GSD arithmetic, the detect-then-investigate mission structure, and the discipline of asking what was actually measured all transferred to a sensing problem the running example never posed — which is what it means for engineering machinery to be general. What did <em>not</em> transfer is the part this Part is circling: a crop scout’s drone answers to the farmer whose field it flies, but a system that autonomously pursues wild animals answers to parties who never signed the work order. The account the previous chapter said no telemetry stream records is still owed, and the next chapter renders it.</p>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-abdulridha2023stemrust" class="csl-entry" role="listitem">
+Abdulridha, Jaafar, Alex Min, Matthew N. Rouse, Shahryar Kianian, Volkan Isler, and Ce Yang. 2023. <span>“Evaluation of Stem Rust Disease in Wheat Fields by Drone Hyperspectral Imaging.”</span> <em>Sensors</em> 23 (8): 4154. <a href="https://doi.org/10.3390/s23084154">https://doi.org/10.3390/s23084154</a>.
+</div>
+<div id="ref-fernandez2020lateblight" class="csl-entry" role="listitem">
+Fernández, Claudio Ignacio, Brigitte Leblon, Ata Haddadi, Keri Wang, and Jinfei Wang. 2020. <span>“Potato Late Blight Detection at the Leaf and Canopy Levels Based in the Red and Red-Edge Spectral Regions.”</span> <em>Remote Sensing</em> 12 (8): 1292. <a href="https://doi.org/10.3390/rs12081292">https://doi.org/10.3390/rs12081292</a>.
+</div>
+<div id="ref-gitelson1996gndvi" class="csl-entry" role="listitem">
+Gitelson, Anatoly A., Yoram J. Kaufman, and Mark N. Merzlyak. 1996. <span>“Use of a Green Channel in Remote Sensing of Global Vegetation from <span>EOS-MODIS</span>.”</span> <em>Remote Sensing of Environment</em> 58 (3): 289–98. <a href="https://doi.org/10.1016/S0034-4257(96)00072-7">https://doi.org/10.1016/S0034-4257(96)00072-7</a>.
+</div>
+<div id="ref-ju2023leafrust" class="csl-entry" role="listitem">
+Ju, Chunxia et al. 2023. <span>“Remote Sensing Monitoring of Wheat Leaf Rust Based on <span>UAV</span> Multispectral Imagery and the <span>BPNN</span> Method.”</span> <em>Food and Energy Security</em>. <a href="https://doi.org/10.1002/fes3.477">https://doi.org/10.1002/fes3.477</a>.
+</div>
+<div id="ref-koc2025sugarbeet" class="csl-entry" role="listitem">
+Koç, Mehmet Tuğrul, Rıza Kaya, Kemal Özkan, Merve Ceyhan, Uğur Gürel, and Fatih Yavuz Fidantemiz. 2025. <span>“Early Detection of <span>C</span>ercospora Beticola and Powdery Mildew Diseases in Sugar Beet Using Uncrewed Aerial Vehicle-Based Remote Sensing and Machine Learning.”</span> <em>PeerJ</em> 13: e19530. <a href="https://doi.org/10.7717/peerj.19530">https://doi.org/10.7717/peerj.19530</a>.
+</div>
+<div id="ref-montalbanfaet2026botrytis" class="csl-entry" role="listitem">
+Montalban-Faet, Guillem et al. 2026. <span>“Direct <span>UAV</span>-Based Detection of <span><em>Botrytis Cinerea</em></span> in Vineyards Using Chlorophyll-Absorption Indices and <span>YOLO</span> Deep Learning.”</span> <em>Sensors</em> 26 (2): 374. <a href="https://doi.org/10.3390/s26020374">https://doi.org/10.3390/s26020374</a>.
+</div>
+<div id="ref-nguyen2023yellowrust" class="csl-entry" role="listitem">
+Nguyen, Canh, Vasit Sagan, Juan Skobalski, and Juan Ignacio Severo. 2023. <span>“Early Detection of Wheat Yellow Rust Disease and Its Impact on Terminal Yield with Multi-Spectral <span>UAV</span>-Imagery.”</span> <em>Remote Sensing</em> 15 (13): 3301. <a href="https://doi.org/10.3390/rs15133301">https://doi.org/10.3390/rs15133301</a>.
+</div>
+<div id="ref-niu2025septoria" class="csl-entry" role="listitem">
+Niu, Zhongzhong, Yikai Li, Jorge David Salgado Moncada, William Johnson, Edward B. Lang, Xuan Li, and Jian Jin. 2025. <span>“Proximal Hyperspectral Imaging for Early Detection and Disease Development Prediction of <span>S</span>eptoria Leaf Blotch in Wheat Using Spectral–Temporal Features.”</span> <em>Computers and Electronics in Agriculture</em> 235: 110400.
+</div>
+<div id="ref-ncsu2021uavsensor" class="csl-entry" role="listitem">
+North Carolina State University Extension. 2021. <span>“Precision Agriculture Technology: Choosing a <span>UAV</span> and Sensor for Agricultural Applications.”</span> North Carolina State University Extension; NC State Extension Publications. <a href="https://content.ces.ncsu.edu/precision-agriculture-technology-choosing-a-uav-and-sensor-for-agricultural-applications">https://content.ces.ncsu.edu/precision-agriculture-technology-choosing-a-uav-and-sensor-for-agricultural-applications</a>.
+</div>
+<div id="ref-agronomy2025downymildew" class="csl-entry" role="listitem">
+Unknown (full author list not retrieved). 2025. <span>“Monitoring the Progression of Downy Mildew on Vineyards Using Multi-Temporal Unmanned Aerial Vehicle Multispectral Data.”</span> <em>Agronomy</em> 15 (4): 934. <a href="https://doi.org/10.3390/agronomy15040934">https://doi.org/10.3390/agronomy15040934</a>.
+</div>
+<div id="ref-zhang2020wholefield" class="csl-entry" role="listitem">
+Zhang, Zichen, Jayson Boubin, Christopher Stewart, and Sami Khanal. 2020. <span>“Whole-Field Reinforcement Learning: A Fully Autonomous Aerial Scouting Method for Precision Agriculture.”</span> <em>Sensors</em> 20 (22): 6585. <a href="https://doi.org/10.3390/s20226585">https://doi.org/10.3390/s20226585</a>.
+</div>
+<div id="ref-zheng2018redsi" class="csl-entry" role="listitem">
+Zheng, Qiong, Wenjiang Huang, Ximin Cui, Yue Shi, and Linyi Liu. 2018. <span>“New Spectral Index for Detecting Wheat Yellow Rust Using <span>S</span>entinel-2 Multispectral Imagery.”</span> <em>Sensors</em> 18 (3): 868. <a href="https://doi.org/10.3390/s18030868">https://doi.org/10.3390/s18030868</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="pagination-link" aria-label="Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="pagination-link" aria-label="The Ethics and Ecology of Autonomous Wildlife Management">
+        <span class="nav-page-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

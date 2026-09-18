@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>8&nbsp; Putting It Together: The Autonomous Drone Stack – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" rel="next">
+<link href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html">Part I — Airframes, Regulation &amp; Flight Safety</a></li><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">8.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">8.2</span> Key Vocabulary</a></li>
+  <li><a href="#the-vehicle-part-i-built" id="toc-the-vehicle-part-i-built" class="nav-link" data-scroll-target="#the-vehicle-part-i-built"><span class="header-section-number">8.3</span> The Vehicle Part I Built</a></li>
+  <li><a href="#one-loop-nested-at-three-rates" id="toc-one-loop-nested-at-three-rates" class="nav-link" data-scroll-target="#one-loop-nested-at-three-rates"><span class="header-section-number">8.4</span> One Loop, Nested at Three Rates</a></li>
+  <li><a href="#the-mission-end-to-end" id="toc-the-mission-end-to-end" class="nav-link" data-scroll-target="#the-mission-end-to-end"><span class="header-section-number">8.5</span> The Mission, End to End</a>
+  <ul class="collapse">
+  <li><a href="#before-the-battery-is-connected" id="toc-before-the-battery-is-connected" class="nav-link" data-scroll-target="#before-the-battery-is-connected"><span class="header-section-number">8.5.1</span> Before the battery is connected</a></li>
+  <li><a href="#launch-and-handoff" id="toc-launch-and-handoff" class="nav-link" data-scroll-target="#launch-and-handoff"><span class="header-section-number">8.5.2</span> Launch and handoff</a></li>
+  <li><a href="#search" id="toc-search" class="nav-link" data-scroll-target="#search"><span class="header-section-number">8.5.3</span> Search</a></li>
+  <li><a href="#detection" id="toc-detection" class="nav-link" data-scroll-target="#detection"><span class="header-section-number">8.5.4</span> Detection</a></li>
+  <li><a href="#deterrence" id="toc-deterrence" class="nav-link" data-scroll-target="#deterrence"><span class="header-section-number">8.5.5</span> Deterrence</a></li>
+  <li><a href="#evasion" id="toc-evasion" class="nav-link" data-scroll-target="#evasion"><span class="header-section-number">8.5.6</span> Evasion</a></li>
+  <li><a href="#return-land-and-the-failsafe-that-watches-all-of-it" id="toc-return-land-and-the-failsafe-that-watches-all-of-it" class="nav-link" data-scroll-target="#return-land-and-the-failsafe-that-watches-all-of-it"><span class="header-section-number">8.5.7</span> Return, land, and the failsafe that watches all of it</a></li>
+  </ul></li>
+  <li><a href="#the-software-above-the-wire" id="toc-the-software-above-the-wire" class="nav-link" data-scroll-target="#the-software-above-the-wire"><span class="header-section-number">8.6</span> The Software Above the Wire</a></li>
+  <li><a href="#what-part-i-settled-and-what-comes-next" id="toc-what-part-i-settled-and-what-comes-next" class="nav-link" data-scroll-target="#what-part-i-settled-and-what-comes-next"><span class="header-section-number">8.7</span> What Part I Settled, and What Comes Next</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">8.8</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">8.9</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html">Part I — Airframes, Regulation &amp; Flight Safety</a></li><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Part I has approached the drone six times from six directions, and each approach stopped where the next one began. The Commercial Drone Landscape chapter established what the vehicle is for and why the industry converged on commodity hardware carrying custom software. The Anatomy of a Multirotor chapter sized a specific airframe from a specific mission. The Materials and Power chapter explained what that airframe is made of and what its battery will tolerate. The Sensing the World chapter followed a measurement from a silicon flexure to a fused attitude estimate. The Airspace Law chapter established the legal envelope the finished vehicle must fly inside. And the previous chapter bolted a Linux computer to the airframe and proved, with a MAVLink heartbeat, that the computer and the autopilot can talk.</p>
+<p>What has not happened yet is assembly. Six correct components lying on a bench are not an aircraft, and an aircraft is not a system: the interesting properties of an autonomous vehicle — that it can decide, that it can be trusted, that it fails in bounded ways — are properties of the arrangement, not of any part. This chapter makes that arrangement explicit. It lays out the complete vehicle in one labeled figure, names the single control pattern that repeats at every level of it, walks one mission from the pre-flight briefing to the landing, and sketches — at altitude, leaving the detail to Part V — the software architecture that sequences it.</p>
+<p>The system in question is the <strong>Goose Management System</strong>, the running example the Commercial Drone Landscape chapter introduced as the wildlife-management vertical in miniature: an aircraft that searches a protected area, detects geese with onboard computer vision, deters them, evades any bird that contests the airspace, and returns. That chapter answered its own five questions about the mission in a sentence — the payload is a depth camera and a companion computer, the binding constraint is visual line of sight plus wildlife-disturbance permission, the corrupting physics is illumination and background clutter in the detector, the workflow is a search grid transitioning into a pursuit, and the deliverable is the deterrence itself. Those answers can now be spent rather than merely stated, because every noun in them has been developed in the intervening chapters.</p>
+<section id="learning-objectives" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">8.1</span> Learning Objectives</h2>
+<ul>
+<li>Assemble the components developed separately across Part I into one labeled vehicle, and state what each contributes to a mission rather than merely what it is.</li>
+<li>Explain the sense–think–act loop, identify the three nested rates at which it runs on an autonomous multirotor, and name the hardware that closes each one.</li>
+<li>Trace the running example’s mission end to end — brief, launch, search, detect, deter, evade, return — identifying at each phase which Part I result binds: endurance, thrust margin, sensor accuracy, or regulation.</li>
+<li>Convert the platform’s power and energy numbers into a mission time budget with an explicit reserve, and justify the battery condition at which an autonomous vehicle must abandon its mission and return.</li>
+<li>Distinguish topics from services at the level needed to read an autonomy architecture, and explain why safety monitoring is placed in a process independent of the mission logic.</li>
+<li>State precisely what Part I has settled and what it has deliberately left open, and explain why everything from Part II onward is software running on the companion computer.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">8.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Sense–think–act loop</strong> — the fundamental cycle of any autonomous system: measure the world, compute a decision from the measurement, command actuators that change the world, and measure again. Every layer of an autonomy stack is an instance of it, differing only in rate and in the consequence of missing a deadline.</li>
+<li><strong>Autonomy stack</strong> — the layered software that converts a remotely piloted vehicle into a self-directed one: state estimation and stabilization at the bottom, perception and guidance in the middle, mission sequencing and safety supervision at the top.</li>
+<li><strong>Offboard control</strong> — a flight-controller mode in which the autopilot stops taking direction from a human pilot or a preloaded waypoint list and instead follows a continuous stream of position, velocity, or attitude setpoints supplied by an external computer, reverting to a safe behavior if that stream stops.</li>
+<li><strong>ROS 2 node</strong> (Robot Operating System 2) — an independent operating-system process in the ROS 2 middleware that performs one job and exchanges data with other nodes only through named, typed channels, so that nodes can be developed, tested, restarted, and replaced independently.</li>
+<li><strong>Topic</strong> — a ROS 2 publish–subscribe channel carrying a continuous stream of messages from one publisher to any number of subscribers, with no acknowledgment; the right mechanism when data is always flowing and only the latest value matters.</li>
+<li><strong>Service</strong> — a ROS 2 request–response channel in which a caller asks one node to perform a discrete action and waits for its reply; the right mechanism when an action happens once and the caller must know it succeeded before proceeding.</li>
+<li><strong>Failsafe monitor</strong> — a supervisory process that watches a small set of safety-critical quantities and can override whatever is currently commanding the vehicle. Its defining property is independence: it must not share a failure mode with the logic it supervises.</li>
+<li><strong>Mission time budget</strong> — the usable flight time remaining after a reserve is set aside, allocated in advance across the phases of a mission, and the quantity against which an autonomous vehicle’s decision to continue or return is actually made.</li>
+</ul>
+</section>
+<section id="the-vehicle-part-i-built" class="level2" data-number="8.3">
+<h2 data-number="8.3" class="anchored" data-anchor-id="the-vehicle-part-i-built"><span class="header-section-number">8.3</span> The Vehicle Part I Built</h2>
+<p><a href="#fig-quadrotor-labeled-hardware" class="quarto-xref">Figure&nbsp;<span>8.1</span></a> shows the assembled aircraft from above, with every component Part I selected in the place it physically occupies.</p>
+<div id="fig-quadrotor-labeled-hardware" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Top-view schematic of a quadrotor. Four dashed circles show the propeller sweep discs at the corners, each with a dark motor hub at its centre labeled CW, CCW, CCW, and CW to show the two counter-rotating pairs. Four thick arms run diagonally from a rectangular central body to the motors. Inside the central body, stacked from front to rear, are a blue block labeled companion computer, a teal block labeled flight controller, a grey block labeled four-in-one ESC, and a grey block labeled radios; a dashed rectangle beneath them is labeled battery. A small amber block at the nose is the forward-facing depth camera, with a translucent wedge showing its field of view, and an amber circle on a short mast at the rear is the GPS receiver and compass. A bracket between the companion computer and the flight controller is labeled UART link, three wires, 921 600 baud. A dimension line across the front pair of motors reads 354 millimetres between adjacent motors: 10-inch, 254 millimetre discs with 100 millimetres of tip clearance. Labels around the edge identify the propeller and motor, the carbon-fibre arm, the ESC, the 4S 5200 milliamp-hour battery, the GPS mast, the depth camera, the companion computer, the flight controller, and the telemetry radio and RC receiver.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-quadrotor-labeled-hardware-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/quadrotor-labeled-hardware.svg" class="img-fluid figure-img" style="width:95.0%" alt="Top-view schematic of a quadrotor. Four dashed circles show the propeller sweep discs at the corners, each with a dark motor hub at its centre labeled CW, CCW, CCW, and CW to show the two counter-rotating pairs. Four thick arms run diagonally from a rectangular central body to the motors. Inside the central body, stacked from front to rear, are a blue block labeled companion computer, a teal block labeled flight controller, a grey block labeled four-in-one ESC, and a grey block labeled radios; a dashed rectangle beneath them is labeled battery. A small amber block at the nose is the forward-facing depth camera, with a translucent wedge showing its field of view, and an amber circle on a short mast at the rear is the GPS receiver and compass. A bracket between the companion computer and the flight controller is labeled UART link, three wires, 921 600 baud. A dimension line across the front pair of motors reads 354 millimetres between adjacent motors: 10-inch, 254 millimetre discs with 100 millimetres of tip clearance. Labels around the edge identify the propeller and motor, the carbon-fibre arm, the ESC, the 4S 5200 milliamp-hour battery, the GPS mast, the depth camera, the companion computer, the flight controller, and the telemetry radio and RC receiver.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-quadrotor-labeled-hardware-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8.1: The assembled research quadrotor, viewed from above, with the components developed across Part I in their physical positions: carbon-fibre arms carrying four motor–propeller pairs, a stacked centre section holding the companion computer above the flight controller, the four-in-one electronic speed controller and radios below them, the battery slung underneath through a power module, a forward-facing depth camera at the nose, and the GPS receiver and compass on a mast at the rear.
+</figcaption>
+</figure>
+</div>
+<p>The figure is worth reading against the arithmetic that produced it. The 500 mm wheelbase puts adjacent motors 354 mm apart, which is what allows 10-inch propellers with 100 mm of tip clearance and forbids anything larger; the Anatomy of a Multirotor chapter derived that geometry and then followed it through to 5,425 RPM in hover, 192 W of shaft power, and 252 W of electrical draw at 1.7 kg empty. The arms are carbon because the Materials and Power chapter’s specific-stiffness argument leaves no alternative for a structure whose resonances must stay clear of the 90 Hz and 181 Hz the propellers inject; the camera bracket and the tray under the companion computer are the printed parts that same argument permits. The two counter-rotating pairs marked in the figure are the whole mechanism of yaw control, and their symmetry is why four rotors is the minimum for full attitude control with fixed-pitch blades.</p>
+<p>Three items in the figure exist for the mission rather than for flight, and together they are the 500 g of autonomy payload the sizing calculation carried: the <strong>Jetson Nano companion computer</strong>, the <strong>Intel RealSense D455 depth camera</strong> at the nose, and the mounting hardware that holds them. The previous chapter justified the Jetson against the cheaper, lighter Raspberry Pi with one criterion — a goose has to be recognized by a neural network running on the aircraft, and no CPU-only board runs one at a useful frame rate — and it was explicit that the choice is paid for twice, in the mass that shortens every flight and in the watts that overrun the 12 W avionics allowance the power budget assumed. The bill is exact: adding the payload takes all-up weight from 1.7 kg to 2.2 kg, raises hover draw from 252 W to 365 W by the <span class="math inline">\(m^{3/2}\)</span> scaling, and cuts hover endurance from 14.7 minutes to <strong>10.1 minutes</strong>. Every mission decision in this chapter is made inside those ten minutes.</p>
+<p>The remaining components are there to make the aircraft legal, recoverable, and observable rather than to make it fly. The GPS receiver and compass ride a mast because the magnetometer measures tens of microtesla and the power wiring beneath it carries tens of amperes. The power module between the battery and the distribution board measures pack voltage and current, which is what turns the Materials and Power chapter’s battery arithmetic from a bench exercise into a quantity the autonomy software can act on in flight. The telemetry radio and the RC receiver are the other two of the three command paths the previous chapter enumerated, and both stay live throughout: the RC link is the safety pilot’s override, which is the Airspace Law chapter’s layered-margin logic implemented in hardware rather than in policy.</p>
+</section>
+<section id="one-loop-nested-at-three-rates" class="level2" data-number="8.4">
+<h2 data-number="8.4" class="anchored" data-anchor-id="one-loop-nested-at-three-rates"><span class="header-section-number">8.4</span> One Loop, Nested at Three Rates</h2>
+<p>Underneath the component inventory there is exactly one architectural idea, and <a href="#fig-sense-think-act-loop" class="quarto-xref">Figure&nbsp;<span>8.2</span></a> is all of it. An autonomous system measures the world, decides what the measurement implies for its goal, acts to change the world, and measures again. Everything else is a question of what is being measured, how hard the decision is, and how fast the cycle must close.</p>
+<div id="fig-sense-think-act-loop" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A cycle diagram with three rounded boxes in a row. The first, SENSE, reads measure the world, with the sub-caption inertial, position, and image data. An arrow leads to the second box, THINK, which reads decide what to do, with the sub-caption estimate state, interpret, plan the next move. A second arrow leads to the third box, ACT, which reads change the world, with the sub-caption command the actuators that move the vehicle. A return path runs from the ACT box down, back across the diagram, and up into the SENSE box, labeled: every action changes what the next measurement sees. A closing line reads that missing a deadline in the innermost loop ends the flight, while missing one in the outermost loop only delays a decision.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-sense-think-act-loop-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/sense-think-act-loop.svg" class="img-fluid figure-img" style="width:80.0%" alt="A cycle diagram with three rounded boxes in a row. The first, SENSE, reads measure the world, with the sub-caption inertial, position, and image data. An arrow leads to the second box, THINK, which reads decide what to do, with the sub-caption estimate state, interpret, plan the next move. A second arrow leads to the third box, ACT, which reads change the world, with the sub-caption command the actuators that move the vehicle. A return path runs from the ACT box down, back across the diagram, and up into the SENSE box, labeled: every action changes what the next measurement sees. A closing line reads that missing a deadline in the innermost loop ends the flight, while missing one in the outermost loop only delays a decision.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sense-think-act-loop-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8.2: The sense–think–act cycle: measurements feed a decision, the decision drives an action, and the action changes what the next measurement will see.
+</figcaption>
+</figure>
+</div>
+<p>On this aircraft the loop runs at three rates simultaneously, nested one inside another, and the hardware in <a href="#fig-quadrotor-labeled-hardware" class="quarto-xref">Figure&nbsp;<span>8.1</span></a> is partitioned along exactly those nesting lines.</p>
+<p><strong>The attitude loop, on the flight controller, at kilohertz.</strong> The Pixhawk reads its inertial measurement unit over a dedicated SPI bus — the Sensing the World chapter did the bandwidth arithmetic showing why the fast, lonely sensor gets its own bus while the slow, sociable barometer and magnetometer share I2C — runs the extended Kalman filter that fuses gyroscope, accelerometer, magnetometer, barometer, and GPS into an attitude and position estimate, and resolves the error between commanded and actual attitude into four motor commands. This loop cannot be late. A quadrotor holds no attitude on its own; a stall of a tenth of a second is the end of the flight. That is precisely why it runs on a microcontroller whose scheduler is designed to exclude anything unpredictable, and why nothing else is allowed onto that processor.</p>
+<p><strong>The perception loop, on the companion computer, at camera rate.</strong> Frames arrive from the depth camera at tens of hertz, a neural network decides whether a goose is present, and a target position is published for anything that cares. Missing a frame here costs nothing but a frame; the vehicle is still flying, still stable, still where it was. The deadline is soft, the computation is enormous, and the hardware is chosen accordingly.</p>
+<p><strong>The mission loop, on the companion computer, at roughly one hertz.</strong> Given everything sensed so far, should the vehicle keep searching, close on a target, execute the deterrence maneuver, evade, or go home? A decision deferred by a second at this level is a decision deferred by a second; nothing falls out of the sky.</p>
+<p>The seam between the two computers is the three-wire UART the previous chapter wired and verified, and it is worth being precise about what that seam can and cannot carry, because the bandwidth decides the architecture. At 921,600 baud in the standard 8N1 framing, the link moves about 90 kB/s. A stream of position setpoints — a few dozen bytes at a few tens of hertz — occupies a fraction of a percent of that, so commanding the vehicle across the seam is comfortable. Moving imagery across it is not: a 640 × 480 colour frame is 921,600 raw bytes, and thirty of them per second is roughly 27 MB/s, some three hundred times the link’s capacity. Even aggressively compressed to a few megabits per second, video would still exceed it, and the telemetry radio to the ground is slower again by orders of magnitude. This is the quantitative version of the argument the Commercial Drone Landscape chapter made about cheap onboard compute: perception must run where the pixels already are. The camera talks to the companion computer over USB, the companion computer talks to the flight controller over three wires, and the only things that cross those three wires are decisions.</p>
+</section>
+<section id="the-mission-end-to-end" class="level2" data-number="8.5">
+<h2 data-number="8.5" class="anchored" data-anchor-id="the-mission-end-to-end"><span class="header-section-number">8.5</span> The Mission, End to End</h2>
+<p>With the platform and the loop in place, one flight can be told properly. Each phase below names the Part I result that binds it — the constraint that decides whether the phase is possible at all.</p>
+<section id="before-the-battery-is-connected" class="level3" data-number="8.5.1">
+<h3 data-number="8.5.1" class="anchored" data-anchor-id="before-the-battery-is-connected"><span class="header-section-number">8.5.1</span> Before the battery is connected</h3>
+<p>Nothing has been built yet that removes the human obligations of the Airspace Law chapter. A research flight is non-recreational by definition and therefore a Part 107 operation: a certificated remote pilot in command is present, the aircraft is registered and its actual weight recorded, and the flight is logged. The crew confirms airspace status, checks current NOTAMs and Temporary Flight Restrictions through a briefing source, and captures the evidence. PAVE and I’M SAFE are run and answered out loud. Wildlife-disturbance permission — the second half of the running example’s binding constraint, and the half that has nothing to do with aviation — is in hand. The RC transmitter is on and its override tested before anything is armed.</p>
+<p>None of this is preamble to the engineering. It is the reason the vehicle in <a href="#fig-quadrotor-labeled-hardware" class="quarto-xref">Figure&nbsp;<span>8.1</span></a> is shaped as it is: an aircraft that must stay within visual line of sight is an aircraft whose search area is bounded by what a person can see, and an aircraft under a 400-foot (122 m) ceiling is one whose sensor must resolve a bird from a few tens of metres rather than from any altitude that would be convenient.</p>
+</section>
+<section id="launch-and-handoff" class="level3" data-number="8.5.2">
+<h3 data-number="8.5.2" class="anchored" data-anchor-id="launch-and-handoff"><span class="header-section-number">8.5.2</span> Launch and handoff</h3>
+<p>The vehicle is armed and takes off under the flight controller’s own control, with the safety pilot on the sticks. The barometer records pad pressure at arming as its reference, which is why altitude is reported relative to the launch point and not against a weather-dependent sea-level datum; the same paragraph of the Sensing the World chapter warned that the propellers’ own wash, intensified by ground effect, makes barometric altitude least trustworthy exactly during takeoff and landing, which is why the climb is flown on the fused estimate rather than on pressure alone.</p>
+<p>At a safe altitude the flight controller is switched to <strong>offboard</strong> mode and the companion computer begins publishing setpoints. This is the handoff the whole of Part I has been building toward: from this instant the decisions come from a process rather than from a person. Offboard mode carries its own protection — if the setpoint stream stops for more than a fraction of a second, the autopilot does not coast, it falls back to a safe behavior — and that protection is the first of several places where the system’s safety does not depend on the autonomy software being correct.</p>
+</section>
+<section id="search" class="level3" data-number="8.5.3">
+<h3 data-number="8.5.3" class="anchored" data-anchor-id="search"><span class="header-section-number">8.5.3</span> Search</h3>
+<p>The vehicle flies a search pattern over the protected area. Two Part I results set its shape. Altitude is fixed from below by the pixels-on-target requirement the Commercial Drone Landscape chapter identified for every wildlife survey — a bird must span enough pixels for the detector to classify it, which is the ground-sample-distance relation read backwards — and from above by the 122 m regulatory ceiling and by the range at which the depth camera still returns useful depth. In practice the search leg is flown a few tens of metres above ground: high enough to see a useful swath, low enough to resolve a goose, and nowhere near the legal limit. The pattern’s own geometry, and the question of what an efficient search looks like when the target moves, belong to Part IV.</p>
+<p>The second result is the clock, and it is the tighter of the two. The platform’s 10.1 minutes is a <em>hover</em> figure computed for a new pack in still air; forward flight and maneuvering cost more, and wind costs more again, so it is an optimistic ceiling rather than a plan. Holding back a 25 % reserve leaves about 7.6 minutes of mission, which has to be allocated before takeoff rather than discovered in flight:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Phase</th>
+<th>Allocation</th>
+<th>What sets it</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Climb and transit to the search area</td>
+<td>1.0 min</td>
+<td>Distance from the launch point, bounded by visual line of sight</td>
+</tr>
+<tr class="even">
+<td>Search leg</td>
+<td>3.5 min</td>
+<td>Area to be covered at the chosen altitude and speed</td>
+</tr>
+<tr class="odd">
+<td>Approach and deterrence</td>
+<td>2.0 min</td>
+<td>Time to close on a detection and complete the maneuver</td>
+</tr>
+<tr class="even">
+<td>Return and land</td>
+<td>1.0 min</td>
+<td>Transit back plus a controlled descent</td>
+</tr>
+<tr class="odd">
+<td><strong>Reserve (held, not spent)</strong></td>
+<td><strong>2.6 min</strong></td>
+<td>Wind, a second detection, a diverted landing</td>
+</tr>
+</tbody>
+</table>
+<p>Seven and a half allocated minutes against a ten-minute battery is not a generous budget, and reading it honestly changes the design: the search pattern must be sized to the time available, not the time available discovered after the pattern is chosen. This is the payload–endurance exchange rate of the Anatomy of a Multirotor chapter arriving as a mission constraint. Every gram the autonomy hardware added was paid for here.</p>
+</section>
+<section id="detection" class="level3" data-number="8.5.4">
+<h3 data-number="8.5.4" class="anchored" data-anchor-id="detection"><span class="header-section-number">8.5.4</span> Detection</h3>
+<p>The detector, running on the Jetson, publishes a target position when a goose appears in frame. The depth camera earns its mass at this moment: a monocular camera reports a <em>bearing</em> to a detected object and leaves its range ambiguous, while a depth camera returns range directly, so the target can be placed in the vehicle’s own coordinates without maneuvering to triangulate. How the network is trained, compressed, and run inside the Jetson’s power envelope is the subject of Part III; what matters here is that the estimate is produced onboard, at frame rate, and that everything downstream consumes it as a stream rather than requesting it.</p>
+</section>
+<section id="deterrence" class="level3" data-number="8.5.5">
+<h3 data-number="8.5.5" class="anchored" data-anchor-id="deterrence"><span class="header-section-number">8.5.5</span> Deterrence</h3>
+<p>Once a target is localized, authority over the vehicle’s motion transfers from the search behavior to the deterrence behavior, which closes on the bird and executes the maneuver that moves the flock along. Two constraints bound it. The first is the wildlife-disturbance framing of the Commercial Drone Landscape chapter: the same disturbance that makes deterrence effective is a documented stressor on the animals, which is why the permission exists and why the maneuver is designed to be the least disturbance that works — an engineering requirement, not a courtesy. The second is separation. The vehicle must not contact a bird, and the reason is quantitative: the Anatomy of a Multirotor chapter showed that a quadrotor which loses one of four rotors cannot produce net thrust with zero net moment and simply falls, where a hexacopter would degrade. A quadrotor has no graceful failure to fall back on, so separation distance is monitored continuously and enforced by something other than the behavior that is trying to close the distance.</p>
+</section>
+<section id="evasion" class="level3" data-number="8.5.6">
+<h3 data-number="8.5.6" class="anchored" data-anchor-id="evasion"><span class="header-section-number">8.5.6</span> Evasion</h3>
+<p>If a goose contests the airspace and closes on the aircraft, the vehicle breaks away — and what it can do is set by thrust margin. Loaded to 2.2 kg against roughly 4.0 kgf of static thrust, the aircraft’s thrust-to-weight ratio is about 1.8, so hover consumes 55 % of available thrust and the surplus available for acceleration is</p>
+<p><span class="math display">\[a_{\max} = (\mathrm{TWR} - 1)\,g = (1.8 - 1)(9.81) = 7.8\ \text{m/s}^2.\]</span></p>
+<p>A 5 m evasive climb therefore takes at least <span class="math inline">\(t = \sqrt{2h/a} = \sqrt{2(5)/7.8} = 1.1\ \text{s}\)</span>, arriving at about 8.8 m/s — and that is an optimistic bound, ignoring the time the rotors need to spool up and the drag of a fast vertical climb. The number is worth carrying because it tells the behavior designer what is physically purchasable: an evasion that must complete in half a second is not available on this airframe at this weight, and the remedy is a lighter payload or a larger aircraft, not a cleverer state machine.</p>
+<p>The maneuver also costs the pack its worst moment. Full throttle draws roughly 80 A, a 15 C discharge for the 5.2 Ah pack, and at that current the Materials and Power chapter’s internal-resistance arithmetic becomes operationally visible: a healthy 5 mΩ cell sags 0.40 V, while an aged 15 mΩ cell sags 1.2 V, dropping from the 3.7 V plateau to about 2.5 V under load — well past any naive low-voltage alarm, on a pack that looked entirely healthy in hover at 17 A. A dying pack flies gentle missions convincingly and fails exactly when the vehicle needs to evade.</p>
+</section>
+<section id="return-land-and-the-failsafe-that-watches-all-of-it" class="level3" data-number="8.5.7">
+<h3 data-number="8.5.7" class="anchored" data-anchor-id="return-land-and-the-failsafe-that-watches-all-of-it"><span class="header-section-number">8.5.7</span> Return, land, and the failsafe that watches all of it</h3>
+<p>The mission ends deliberately: the vehicle returns to the launch point and lands, or triggers return-to-launch early. The decision to end early belongs to the failsafe monitor, and the threshold it uses is a direct consequence of the paragraph above. Triggering on measured pack voltage under load is unsound, because sag under load is a function of the pack’s age as much as its charge, and the aged pack’s 1.2 V of sag would fire the alarm in a climb and clear it in a hover. The defensible trigger is <em>consumed capacity</em>, integrated from the current the power module reports, checked against a resting-voltage floor referenced to the 3.5 V-per-cell practical limit — with the reserve in the budget table above as the quantity actually being protected. The monitor watches separation distance on the same footing, and it can override whichever behavior is flying the aircraft.</p>
+<p>On landing, the barometer becomes untrustworthy again in ground effect, the RC pilot is ready to take the vehicle back, and the flight log becomes the input to the diagnostics of Part V. The pack goes into storage charge, at 3.80–3.85 V per cell, before the crew leaves the field.</p>
+</section>
+</section>
+<section id="the-software-above-the-wire" class="level2" data-number="8.6">
+<h2 data-number="8.6" class="anchored" data-anchor-id="the-software-above-the-wire"><span class="header-section-number">8.6</span> The Software Above the Wire</h2>
+<p>The autonomy stack on the companion computer is not one program. It is a set of independent ROS 2 nodes — separate operating-system processes, each with one responsibility — communicating only through named channels. The modularity is a deliberate engineering decision with two payoffs: nodes can be developed, tested, and replaced independently, and a crash in one does not take down the others. The second payoff is the one that matters for safety.</p>
+<p>ROS 2 offers two communication mechanisms, and the choice between them is not stylistic. <strong>Services</strong> are request–response: one node asks another to perform a discrete action — arm the vehicle, enter offboard mode, trigger return-to-launch — and waits for an acknowledgment before proceeding. <strong>Topics</strong> are publish–subscribe: a node publishes a stream of messages — target position, distance remaining, battery state — and any number of nodes subscribe, with no acknowledgment exchanged. The rule of thumb follows from what each contract guarantees. Use a service when the action happens once and the caller must know it succeeded; use a topic when data is always flowing and only the latest value matters. Arming is the archetypal service: a mission that advances without confirming that the vehicle actually armed is a mission that has lost track of reality. Target position is the archetypal topic: it changes every frame, several nodes need it, and a stale value is worse than no value.</p>
+<p>Mapped onto those two mechanisms, the running example’s stack resolves into four functional groups: a <strong>mission sequencer</strong> that holds the state machine and announces which behavior currently has authority; a <strong>vehicle interface</strong> that translates high-level requests into autopilot commands over the link verified in the previous chapter; the <strong>motion behaviors</strong> — search navigation, deterrence, evasion — that generate setpoints when they hold authority; and the <strong>Failsafe node</strong>, which subscribes to battery state and separation distance and can override any of the others. The Failsafe node is the reason the modularity is worth its overhead. If the safety checks lived inside the mission sequencer, then a hung state transition or an unhandled exception in the sequencer would disable the checks at the exact moment the system was misbehaving. As a separate process it shares no failure mode with the logic it supervises, and — as the Sensing the World chapter noted from the other end of the pipeline — it consumes the flight controller’s fused state estimate rather than raw sensor readings, trusting the estimator to have already fought the battles that chapter described.</p>
+<p>That sketch is deliberately shallow. The node-by-node architecture, the message types on each channel, the state machine’s transitions, and what happens when two nodes claim authority at once are the subject of the <strong>Systems Architecture</strong> chapter in Part V, which returns to this same system with the whole book behind it. The purpose here is only to make the shape legible: independent processes, streams for data, calls for decisions, and a supervisor outside the thing it supervises.</p>
+</section>
+<section id="what-part-i-settled-and-what-comes-next" class="level2" data-number="8.7">
+<h2 data-number="8.7" class="anchored" data-anchor-id="what-part-i-settled-and-what-comes-next"><span class="header-section-number">8.7</span> What Part I Settled, and What Comes Next</h2>
+<p>The previous chapter framed the change this Part has been working toward in one line: with a radio transmitter, the drone is a vehicle you <em>drive</em>; with a companion computer, it is a platform you <em>program</em>. Part I has now delivered that platform completely. The airframe is sized and its geometry fixed. The materials are chosen and the battery’s chemistry understood well enough to specify how it is charged, stored, and retired. The sensors are characterized down to their bias and noise, and their fusion into a usable state estimate is no longer a mystery. The regulatory envelope is mapped, and the human procedures that keep an operation inside it are specified. A general-purpose Linux computer sits on the aircraft with a verified channel to the machine that flies it.</p>
+<p>That is the entire physical contribution. Every remaining question in this book is a question about software running on that computer, and the Parts divide along the loop of <a href="#fig-sense-think-act-loop" class="quarto-xref">Figure&nbsp;<span>8.2</span></a>. Part II takes the innermost cycle and makes it quantitative — feedback control, the PX4 autopilot and the MAVLink protocol that carries commands across the wire, the MAVSDK and ROS 2 interfaces through which a program commands flight, and the geofences and failsafes that re-express the Airspace Law chapter’s rules as parameters the firmware enforces rather than habits a pilot maintains. Part III takes the perception cycle: how images become tensors, how a network is trained and then compressed to run inside the Jetson’s power and memory budget, and how inference latency bounds the behaviors the vehicle can support. Part IV takes the outermost cycle: search and coverage patterns, path planning, the behavior architectures that sequence discrete actions, and coordination among several aircraft. Part V puts them back together and asks the harder questions — integration, field diagnosis from telemetry logs, and the ethics of an aircraft that decides for itself.</p>
+<p>The hardware is finished; from here the work is code. The vehicle in <a href="#fig-quadrotor-labeled-hardware" class="quarto-xref">Figure&nbsp;<span>8.1</span></a> will not change again. What changes is how much of its behavior a program, rather than a person, is responsible for.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="8.8">
+<h2 data-number="8.8" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">8.8</span> Check Your Understanding</h2>
+<ol type="1">
+<li>The loaded aircraft achieves 10.1 minutes of hover endurance. A colleague proposes planning a mission that uses 9 minutes of it, arguing that a one-minute reserve is enough since the vehicle lands where it took off. Evaluate the proposal, and state what the 10.1-minute figure does and does not include.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The 10.1 minutes is a <em>hover</em> figure for a new pack in still air, computed from 61.6 Wh of usable energy against 365 W of hover draw. It excludes the extra power of forward flight and maneuvering, excludes wind, and assumes a pack whose internal resistance has not risen with age — all of which push actual endurance down, never up. A one-minute reserve is therefore not a reserve at all: it is smaller than the error in the estimate it is protecting against. The 25 % reserve used in the budget table (about 2.6 minutes) covers the modelling error, an unplanned second detection, and a diverted landing. The general principle is that a reserve protects against the uncertainty in the number it is subtracted from, so a figure known only to within 20 % cannot be planned to within 10 %.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Explain, with arithmetic, why the neural network that detects geese must run on the companion computer rather than on a ground station receiving the video stream.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Because the imagery cannot leave the aircraft fast enough. A 640 × 480 colour frame is <span class="math inline">\(640 \times 480 \times 3 = 921{,}600\)</span> bytes; at 30 frames per second that is roughly 27 MB/s. The wired UART between the companion computer and the flight controller carries about 90 kB/s at 921,600 baud — some three hundred times less — and the telemetry radio to the ground is slower again by orders of magnitude. Even heavily compressed to a few megabits per second, the stream would still exceed the serial link and would be fragile over a range-limited radio. The bandwidth asymmetry decides the architecture: pixels stay where they are produced, and only decisions — target positions, setpoints, mode changes, a few dozen bytes at a time — cross the wire. This is also why the mission does not require a ground link to proceed.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>The aircraft weighs 2.2 kg loaded and has about 4.0 kgf of static thrust. Compute the maximum vertical acceleration available for an evasive climb and the time to gain 4 m of altitude. Then state what would change if 300 g of additional payload were fitted.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Thrust-to-weight is <span class="math inline">\(4.0/2.2 = 1.8\)</span>, so the surplus acceleration is <span class="math inline">\((1.8-1)(9.81) = 7.8\ \text{m/s}^2\)</span> and a 4 m climb takes at least <span class="math inline">\(t = \sqrt{2(4)/7.8} = 1.01\ \text{s}\)</span> — optimistic, since it ignores rotor spool-up and drag. Adding 300 g takes the aircraft to 2.5 kg. Thrust-to-weight falls to <span class="math inline">\(4.0/2.5 = 1.6\)</span>, surplus acceleration to <span class="math inline">\((0.6)(9.81) = 5.9\ \text{m/s}^2\)</span>, and the same climb now takes <span class="math inline">\(\sqrt{8/5.9} = 1.17\ \text{s}\)</span> — 16 % slower. Endurance suffers at the same time: shaft power scales as <span class="math inline">\(m^{3/2}\)</span>, so <span class="math inline">\(192 \times (2.5/1.7)^{3/2} = 343\)</span> W of shaft power gives <span class="math inline">\(343/0.8 + 12 = 440\)</span> W of electrical draw and <span class="math inline">\(61.6/440 = 0.140\)</span> h, about 8.4 minutes, down from 10.1. Two independent constraints degrade together, which is the recurring shape of the payload argument.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>A team proposes triggering return-to-launch whenever measured pack voltage drops below 3.5 V per cell. Explain why this is unsound on this aircraft, and describe a defensible alternative.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Measured voltage under load is depressed by internal resistance, and internal resistance rises with age. A healthy 5 mΩ cell sags 0.40 V at the 80 A of a full-throttle maneuver; an aged 15 mΩ cell sags 1.2 V, taking it from the 3.7 V plateau to about 2.5 V under exactly the load the vehicle experiences during an evasion. The threshold would therefore fire spuriously during every aggressive maneuver on an aged pack and clear again in hover, and would fire at genuinely different states of charge depending on the pack’s age — the trigger would be measuring the wrong thing. The defensible alternative integrates current from the power module to track consumed capacity against the pack’s known usable energy, protects the planned reserve rather than a voltage number, and uses a <em>resting</em> per-cell voltage floor as a cross-check rather than as the primary trigger.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>The vehicle arms through a service call but receives its target position on a topic. Justify each choice, and predict the failure mode if the two mechanisms were swapped.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Arming is a discrete action whose success must be known before anything else proceeds, which is exactly the request–response contract of a service: the caller blocks until the vehicle confirms it is armed. Target position is a continuously changing quantity with several consumers, where only the newest value has any use — the publish–subscribe contract of a topic, which delivers to every subscriber without the publisher knowing who they are. Swapped, an “arm” topic would give the mission sequencer no confirmation, so it would advance to takeoff on the assumption that a message it published had been acted on; and a “target position” service would force each consumer to poll independently, delivering different, stale values to different nodes between requests, and coupling the detector’s rate to its callers’ request patterns.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>The Failsafe node runs as a separate process rather than as a check inside the mission sequencer, and it consumes the flight controller’s fused state estimate rather than raw sensor data. Give the reason for each design decision.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Separation of process is about failure independence. If the safety checks lived inside the mission sequencer, any defect that hung or crashed the sequencer — a logic bug, an unhandled exception, a deadlocked transition — would silence the safety checks at precisely the moment the system was misbehaving, which is when they are needed. As an independent process, the monitor shares no failure mode with the logic it supervises and can still force a hover, a return-to-launch, or an abort. Consuming the fused estimate rather than raw sensor data is about not duplicating a solved problem: the flight controller’s extended Kalman filter already tracks sensor biases, weights each measurement by its current uncertainty, and rejects outliers. A safety monitor that read raw accelerometers would have to re-solve estimation badly, and a monitor that reasons from a worse estimate than the vehicle is flying on is not a safeguard.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="8.9">
+<h2 data-number="8.9" class="anchored" data-anchor-id="try-it"><span class="header-section-number">8.9</span> Try It</h2>
+<p><strong>Part 1 — draw the system from memory, then find what binds it.</strong> Without looking back at <a href="#fig-quadrotor-labeled-hardware" class="quarto-xref">Figure&nbsp;<span>8.1</span></a>, sketch the aircraft from above and label every component you can recall, then annotate each label with the chapter of Part I that chose or sized it and the one number that decision turned on — the wheelbase that capped propeller diameter, the specific stiffness that forced carbon, the frame rate that forced a GPU, the sag under load that forced a current-integrating failsafe. Compare against the figure and note what you omitted; the omissions are usually the components that exist for legality or observability rather than for flight, which is itself worth noticing.</p>
+<p><strong>Part 2 — rebuild the mission time budget for a different mission.</strong> Take the same platform and change one thing: a site twice as far from the launch point, or a search area twice as large, or a payload 200 g heavier. Recompute endurance where the payload changed, using the <span class="math inline">\(m^{3/2}\)</span> power scaling and 80 % motor-and-ESC efficiency with a 12 W avionics allowance, then rebuild the phase allocation table with a reserve you can defend. If the budget does not close — and for at least one of these three changes it will not — identify the cheapest way to make it close, and be specific about what you are trading: a smaller search area, a lower search altitude, a second battery and a landing between legs, a lighter camera, or a larger airframe. Write one paragraph stating which Part I result you are spending to buy the change, and one sentence on what the failsafe threshold must become as a result.</p>
+<p><strong>Related Lab:</strong> <em>No lab currently maps to this chapter.</em></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="pagination-link" aria-label="From Radio to Root Shell: Companion Computers and the UART Link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="pagination-link" aria-label="Closed-Loop Control: PID Theory for Multirotors">
+        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

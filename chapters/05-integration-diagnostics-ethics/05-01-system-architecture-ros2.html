@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>25&nbsp; System Architecture: ROS 2 Nodes, Services, and Topics – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" rel="next">
+<link href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html">Part V — Systems Integration, Diagnostics &amp; Ethics</a></li><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">25.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">25.2</span> Key Vocabulary</a></li>
+  <li><a href="#two-verbs-services-and-topics" id="toc-two-verbs-services-and-topics" class="nav-link" data-scroll-target="#two-verbs-services-and-topics"><span class="header-section-number">25.3</span> Two Verbs: Services and Topics</a></li>
+  <li><a href="#the-node-graph" id="toc-the-node-graph" class="nav-link" data-scroll-target="#the-node-graph"><span class="header-section-number">25.4</span> The Node Graph</a></li>
+  <li><a href="#two-booleans-on-one-topic-valid-and-confirmed" id="toc-two-booleans-on-one-topic-valid-and-confirmed" class="nav-link" data-scroll-target="#two-booleans-on-one-topic-valid-and-confirmed"><span class="header-section-number">25.5</span> Two Booleans on One Topic: <code>valid</code> and <code>confirmed</code></a></li>
+  <li><a href="#one-mission-end-to-end" id="toc-one-mission-end-to-end" class="nav-link" data-scroll-target="#one-mission-end-to-end"><span class="header-section-number">25.6</span> One Mission, End to End</a></li>
+  <li><a href="#two-ways-to-fly-a-search" id="toc-two-ways-to-fly-a-search" class="nav-link" data-scroll-target="#two-ways-to-fly-a-search"><span class="header-section-number">25.7</span> Two Ways to Fly a Search</a></li>
+  <li><a href="#one-failsafe-node-not-n-safety-checks" id="toc-one-failsafe-node-not-n-safety-checks" class="nav-link" data-scroll-target="#one-failsafe-node-not-n-safety-checks"><span class="header-section-number">25.8</span> One Failsafe Node, Not N Safety Checks</a></li>
+  <li><a href="#when-the-readme-disagrees-with-the-code" id="toc-when-the-readme-disagrees-with-the-code" class="nav-link" data-scroll-target="#when-the-readme-disagrees-with-the-code"><span class="header-section-number">25.9</span> When the README Disagrees with the Code</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">25.10</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">25.11</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html">Part V — Systems Integration, Diagnostics &amp; Ethics</a></li><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Part IV closed with a promise: the complete system — every node, every topic, every authority transfer from perception to PX4 — laid out as one architecture and interrogated as one design. This chapter keeps it. Everything the book has built so far arrived one file at a time: the Coordinate Frames chapter read <code>frames.py</code>, the Geofencing and Fail-Safes chapter read <code>failsafe_monitor.py</code> and the mission manager’s <code>_enter_failsafe</code>, the Harassment Pattern Generation chapter read <code>harassment_node.py</code>, and Part III built the detection pipeline that feeds them all. What no chapter has yet done is put the shipped Goose Management System code on the table whole — seven cooperating processes, ten service endpoints, eight mission topics — and ask how the pieces actually talk to each other, in what order, and under whose authority.</p>
+<p>Doing that has a consequence worth stating up front, because it is the most instructive thing about the chapter. Assembling the real system end to end exposes the seams between what shipped and what the book taught while building toward it. The real mission machine has eleven states, not the five of the Finite State Machines chapter. The real search leg is flown by PX4’s own onboard mission executor, not by the Offboard setpoint streaming the Path Planning on the Edge chapter used. And the repository’s own README drifts from its own code in several places. None of these is an error to be papered over; each is an architectural decision (or a documentation decay) with reasons a systems engineer should be able to articulate — and articulating them is precisely the kind of work this Part, on integration and diagnostics, exists to teach. The pedagogical builds were not wrong; they taught mechanics the real system genuinely uses — just not always where a reader might have assumed. This chapter says exactly where.</p>
+<section id="learning-objectives" class="level2" data-number="25.1">
+<h2 data-number="25.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">25.1</span> Learning Objectives</h2>
+<ul>
+<li>Explain the ROS 2 distinction between a Service (request–response, blocking until acknowledged) and a Topic (continuous publish/subscribe streaming), and give one real example of each from the Goose Management System — a flight-controller service such as <code>/goose/fc/arm</code> that returns only after PX4’s own telemetry confirms the change, versus a continuously published topic such as <code>/goose/active_controller</code> or <code>/goose/target</code>.</li>
+<li>Draw the full node graph of the running example — Mission Manager, Flight Controller, Navigation, Harass, Detector, Failsafe, and the Drone itself — labeling each edge as a service or a topic with its real name, rate, and message type.</li>
+<li>Trace one complete mission execution flow through the graph, from the operator’s <code>/goose/start_mission</code> call through the real eleven-state sequence (IDLE → PREFLIGHT → ARMING → START_MISSION → MISSION → ENGAGE_PREP → ENGAGE → HARASS → RESUME → … → DONE or FAILSAFE), stating for each transition whether a service call succeeding or a topic crossing a threshold triggers it.</li>
+<li>Reconcile the shipped system with the book’s pedagogical builds: explain why the real search leg uses PX4’s native AUTO.MISSION mode while the engagement phase uses Offboard streaming, and why the real state machine is more granular than the five-state teaching machine.</li>
+<li>Explain the <code>valid</code>/<code>confirmed</code> distinction in the Detector’s Target message, and why a target must clear a higher bar to <em>start</em> an engagement than to be considered still tracked <em>during</em> one.</li>
+<li>Argue, with the real <code>_enter_failsafe</code> mechanism as evidence, why an independent Failsafe node with override authority improves fault tolerance over folding safety checks into each behavior node individually.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="25.2">
+<h2 data-number="25.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">25.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>ROS 2 node</strong> — one independently running process in a ROS 2 system, owning its own subscriptions, publications, services, timers, and failure modes; the unit of modularity the whole architecture is built from, and the reason a crash in one subsystem does not take down its supervisor.</li>
+<li><strong>Topic (ROS 2)</strong> — a named, typed channel for continuous one-to-many data streaming: publishers send messages at their own rate, subscribers receive whatever arrives, and no reply ever flows back; the right shape for state that is continuously <em>true</em> — position, status, a target estimate.</li>
+<li><strong>Service (ROS 2)</strong> — a named request–response endpoint: a client sends one request, exactly one server processes it and returns a result, and the client can wait on that result; the right shape for actions that must be <em>acknowledged</em> before the mission logic dares proceed — arm, change flight mode, run a preflight check.</li>
+<li><strong>Publish/subscribe</strong> — the decoupled communication pattern behind topics: publishers do not know who is listening and subscribers do not know who is talking, so nodes can be added, restarted, or removed without any other node’s code changing.</li>
+<li><strong>Active controller</strong> — the running example’s arbitration token: a <code>String</code> on <code>/goose/active_controller</code>, written only by the Mission Manager, naming which behavior node (<code>'none'</code>, <code>'navigation'</code>, or <code>'harassment'</code>) currently owns the aircraft’s setpoint stream; every behavior node’s tick begins by checking whether it is the one named.</li>
+<li><strong>Override authority</strong> — the property that one node can revoke another’s control of the vehicle without the revoked node’s cooperation or consent; in this system it is exercised at the token (set to <code>'none'</code>) and at the flight-mode services, and it flows strictly downward as the Geofencing and Fail-Safes chapter’s authority ladder established.</li>
+<li><strong>Mission execution flow</strong> — the end-to-end sequence of states, service calls, and topic-triggered transitions that carries one mission from an operator’s start request to a landed, disarmed aircraft; the system-level artifact a full architecture walkthrough traces from start to finish.</li>
+<li><strong>Confirmed target</strong> — the higher of the Target message’s two truth levels: <code>valid</code> means a detection arrived recently (within a 2.0 s staleness window); <code>confirmed</code> means the full confirmation criteria — enough recent detections, spatially clustered — are also met, and only a confirmed target may begin a new engagement.</li>
+<li><strong>Command verification</strong> — the flight-controller discipline of never reporting a service successful merely because a command was <em>sent</em>: the node polls PX4’s own telemetry until the vehicle’s state actually reflects the change, or times out and reports failure.</li>
+</ul>
+</section>
+<section id="two-verbs-services-and-topics" class="level2" data-number="25.3">
+<h2 data-number="25.3" class="anchored" data-anchor-id="two-verbs-services-and-topics"><span class="header-section-number">25.3</span> Two Verbs: Services and Topics</h2>
+<p>ROS 2 gives a distributed system two verbs, and the running example’s repository opens its own README with the distinction because everything else in the architecture follows from it. A <strong>Service</strong> is a request–response transaction: one node asks another to perform a specific action and waits for confirmation before proceeding. A <strong>Topic</strong> is a continuous stream: a publisher asserts a piece of state at its own cadence, and any number of subscribers consume it without ever replying. The design question for every edge in the node graph is which verb it needs, and the test is simple: <em>does the sender need to know the action happened before it can safely do the next thing?</em></p>
+<p>The system’s own arm sequence is the canonical service. When the Mission Manager reaches its ARMING state, it calls the Flight Controller’s <code>/goose/fc/arm</code> service and <em>blocks its mission logic on the answer</em> — because commanding a takeoff on an aircraft that silently failed to arm is not a degraded mission, it is an incident. And the Flight Controller’s implementation shows why the request–response shape earns its keep end to end: it does not return success when the <code>VehicleCommand</code> is transmitted to PX4. It sends the command, then polls the vehicle’s own status telemetry — up to two seconds per attempt — until PX4’s reported state actually shows the vehicle armed, retrying the whole send-and-poll cycle up to three times before giving up, and only then does the service return success. The module’s docstring states the discipline in seven words: every command is verified against vehicle state. A service, used this way, is not just a function call across processes; it is a <em>contract</em> — “when this returns true, the world has changed, and here is the autopilot’s own telemetry to prove it.”</p>
+<p>The active-controller token is the canonical topic. Which node currently owns the aircraft is not an action to acknowledge; it is a fact that must be continuously <em>true and visible</em> — to nodes that were up before it changed, to nodes that restarted after, to anyone running <code>ros2 topic echo</code> at the field bench. So the Mission Manager publishes the token as a <code>String</code> on <code>/goose/active_controller</code>, re-asserting it at 1 Hz even when nothing changed, the same publish-while-true protocol the Geofencing and Fail-Safes chapter’s watchdog uses on <code>/goose/failsafe</code>. The Detector’s <code>/goose/target</code> stream is the same verb at a faster cadence: a <code>Target</code> message at 10 Hz, whether or not anyone is listening, whether or not a goose exists — because “what does perception currently believe?” is a question whose answer must always be one subscription away. Nothing waits on a topic; nothing acknowledges it. That is not a weakness of topics — it is their specification, and matching each edge of the graph to the right verb is most of what this chapter’s architecture <em>is</em>.</p>
+</section>
+<section id="the-node-graph" class="level2" data-number="25.4">
+<h2 data-number="25.4" class="anchored" data-anchor-id="the-node-graph"><span class="header-section-number">25.4</span> The Node Graph</h2>
+<p>The whole shipped system is seven nodes, and <a href="#fig-ros2-services-topics" class="quarto-xref">Figure&nbsp;<span>25.1</span></a> draws them with every edge labeled by its real name from the repository’s <code>px4_defs.py</code> constants file. The table beneath anchors each node’s one-line responsibility, its real interface, and — because this chapter is the integration view, not a re-derivation — the chapter that already covers its internals.</p>
+<div id="fig-ros2-services-topics" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Node graph diagram titled the Goose Management System as one ROS 2 graph, services command, topics stream. Seven boxes: at top left a grey operator and ground station box; top center a teal Mission Manager box annotated 10 hertz tick, sequences the mission, sole writer of the token; top right an amber Failsafe monitor box annotated 1 hertz independent watchdog with a cross reference to the Geofencing and Fail-Safes chapter. A middle row holds three white behavior and perception boxes: Navigation, annotated 20 hertz approach-point streamer; Harass, annotated orbit generator from the Harassment Pattern Generation chapter; and Detector, annotated 10 hertz Target publisher fed by the Part III vision pipeline via the detections underscore 3d topic. Below center sits a teal Flight Controller box annotated the only node that issues vehicle commands, every command verified against vehicle state, 5 hertz FcStatus publisher; at the bottom a dark Drone box representing PX4 and the physical aircraft publishing fmu out telemetry. Amber service arrows: operator to Mission Manager labeled goose start underscore mission and goose abort; Mission Manager to Flight Controller labeled a bundle of Trigger services goose fc preflight, arm, mode underscore mission, mode underscore offboard, mode underscore hold, rtl, land. Teal topic arrows: Mission Manager to Navigation and Harass labeled goose active underscore controller, a String naming none, navigation, or harassment, republished at 1 hertz; Detector to Mission Manager, Navigation, and Harass labeled goose target, a Target message at 10 hertz carrying valid and confirmed flags; Navigation to Mission Manager labeled goose nav underscore arrived Bool and goose nav underscore distance Float32; Harass to Mission Manager labeled goose harass underscore done Bool; Failsafe to Mission Manager labeled goose failsafe, a String encoding severity colon reason republished while active; Flight Controller to Mission Manager labeled goose fc underscore status, an FcStatus aggregate at 5 hertz including in underscore mission, in underscore loiter, in underscore offboard booleans. Grey arrows connect the Drone's fmu out telemetry to Flight Controller, Detector, Navigation, Harass, and Failsafe, and carry Navigation and Harass setpoint streams, offboard control mode plus trajectory setpoint, gated by the token, and the Flight Controller's verified vehicle commands down to the Drone. A legend distinguishes service, topic, and PX4 bridge edges, and a footer reads: a service edge means the caller waits for proof; a topic edge means the publisher asserts and moves on; the token is the only thing standing between three setpoint authors and one autopilot.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ros2-services-topics-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/ros2-services-topics-architecture.svg" class="img-fluid figure-img" style="width:100.0%" alt="Node graph diagram titled the Goose Management System as one ROS 2 graph, services command, topics stream. Seven boxes: at top left a grey operator and ground station box; top center a teal Mission Manager box annotated 10 hertz tick, sequences the mission, sole writer of the token; top right an amber Failsafe monitor box annotated 1 hertz independent watchdog with a cross reference to the Geofencing and Fail-Safes chapter. A middle row holds three white behavior and perception boxes: Navigation, annotated 20 hertz approach-point streamer; Harass, annotated orbit generator from the Harassment Pattern Generation chapter; and Detector, annotated 10 hertz Target publisher fed by the Part III vision pipeline via the detections underscore 3d topic. Below center sits a teal Flight Controller box annotated the only node that issues vehicle commands, every command verified against vehicle state, 5 hertz FcStatus publisher; at the bottom a dark Drone box representing PX4 and the physical aircraft publishing fmu out telemetry. Amber service arrows: operator to Mission Manager labeled goose start underscore mission and goose abort; Mission Manager to Flight Controller labeled a bundle of Trigger services goose fc preflight, arm, mode underscore mission, mode underscore offboard, mode underscore hold, rtl, land. Teal topic arrows: Mission Manager to Navigation and Harass labeled goose active underscore controller, a String naming none, navigation, or harassment, republished at 1 hertz; Detector to Mission Manager, Navigation, and Harass labeled goose target, a Target message at 10 hertz carrying valid and confirmed flags; Navigation to Mission Manager labeled goose nav underscore arrived Bool and goose nav underscore distance Float32; Harass to Mission Manager labeled goose harass underscore done Bool; Failsafe to Mission Manager labeled goose failsafe, a String encoding severity colon reason republished while active; Flight Controller to Mission Manager labeled goose fc underscore status, an FcStatus aggregate at 5 hertz including in underscore mission, in underscore loiter, in underscore offboard booleans. Grey arrows connect the Drone's fmu out telemetry to Flight Controller, Detector, Navigation, Harass, and Failsafe, and carry Navigation and Harass setpoint streams, offboard control mode plus trajectory setpoint, gated by the token, and the Flight Controller's verified vehicle commands down to the Drone. A legend distinguishes service, topic, and PX4 bridge edges, and a footer reads: a service edge means the caller waits for proof; a topic edge means the publisher asserts and moves on; the token is the only thing standing between three setpoint authors and one autopilot.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ros2-services-topics-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;25.1: The Goose Management System’s full ROS 2 node graph: amber edges are services (request–response, returning only on confirmed completion), teal edges are topics (continuous streams at the labeled rates), and grey edges are PX4’s own uORB-bridge telemetry. The Mission Manager holds mission logic; the Flight Controller alone commands PX4; the behavior nodes act only while the active-controller token names them.
+</figcaption>
+</figure>
+</div>
+<div id="tbl-node-graph" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-node-graph-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;25.1: The seven nodes of the shipped system, their real interfaces, and where each node’s internals are treated in depth.
+</figcaption>
+<div aria-describedby="tbl-node-graph-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Node</th>
+<th>Responsibility</th>
+<th>Services</th>
+<th>Key topics</th>
+<th>Internals covered in</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mission Manager (<code>mission_manager.py</code>)</td>
+<td>Sequences the whole mission; sole writer of the token; owns every state transition</td>
+<td>Offers <code>/goose/start_mission</code>, <code>/goose/abort</code>; holds seven flight-controller service clients (all but <code>disarm</code>)</td>
+<td>Publishes <code>/goose/active_controller</code>; subscribes to <code>/goose/fc_status</code>, <code>/goose/target</code>, <code>/goose/nav_arrived</code>, <code>/goose/harass_done</code>, <code>/goose/failsafe</code></td>
+<td>This chapter; failsafe path in Geofencing and Fail-Safes</td>
+</tr>
+<tr class="even">
+<td>Flight Controller (<code>flight_controller_node.py</code>)</td>
+<td>Sole PX4 command author; executes and reports, never decides</td>
+<td>Offers <code>/goose/fc/preflight</code>, <code>arm</code>, <code>disarm</code>, <code>mode_mission</code>, <code>mode_offboard</code>, <code>mode_hold</code>, <code>rtl</code>, <code>land</code></td>
+<td>Publishes <code>/goose/fc_status</code> (5 Hz); subscribes to PX4’s <code>/fmu/out/*</code> telemetry</td>
+<td>PX4 and the Autopilot Stack (the bridge); this chapter (the service pattern)</td>
+</tr>
+<tr class="odd">
+<td>Navigation (<code>navigation_node.py</code>)</td>
+<td>Flies the approach to a confirmed target at a standoff</td>
+<td>—</td>
+<td>Publishes setpoints (20 Hz, token-gated), <code>/goose/nav_arrived</code>, <code>/goose/nav_distance</code>; subscribes to <code>/goose/target</code>, token</td>
+<td>Path Planning on the Edge (the mechanics); this chapter (the approach role)</td>
+</tr>
+<tr class="even">
+<td>Harass (<code>harassment_node.py</code>)</td>
+<td>Orbits the target on station; reports pattern completion</td>
+<td>—</td>
+<td>Publishes setpoints (token-gated), <code>/goose/harass_done</code>; subscribes to <code>/goose/target</code>, token</td>
+<td>Harassment Pattern Generation</td>
+</tr>
+<tr class="odd">
+<td>Detector (<code>detection_node.py</code>)</td>
+<td>Turns raw 3D detections into a confirmed, world-frame target estimate</td>
+<td>—</td>
+<td>Publishes <code>/goose/target</code> (10 Hz); subscribes to <code>/detections_3d</code>, vehicle attitude and position</td>
+<td>Part III (the vision pipeline); Coordinate Frames (the conversion)</td>
+</tr>
+<tr class="even">
+<td>Failsafe (<code>failsafe_monitor.py</code>)</td>
+<td>Independent mission-rule watchdog; detects, never acts</td>
+<td>—</td>
+<td>Publishes <code>/goose/failsafe</code> (1 Hz while a condition holds)</td>
+<td>Geofencing and Fail-Safes</td>
+</tr>
+<tr class="odd">
+<td>Drone (PX4 + airframe)</td>
+<td>Flies; publishes telemetry; enforces its own native failsafes</td>
+<td>—</td>
+<td>Publishes <code>/fmu/out/*</code>; consumes commands and setpoints on <code>/fmu/in/*</code></td>
+<td>Parts I–II</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>A few integration-level observations the per-node chapters could not make, because they only appear when the graph is whole.</p>
+<p><strong>The Mission Manager is a client of everything and a server of almost nothing.</strong> It offers exactly two services — <code>/goose/start_mission</code> and <code>/goose/abort</code>, the operator’s two buttons — and consumes everything else: five topic subscriptions and seven service clients into the Flight Controller. That asymmetry is the design. The design document behind the shipped code calls this node “the brain… it decides what the drone should be doing and who’s in charge of steering,” and a brain’s interface should be thin: two ways for a human to address it, and one topic (the token) by which it delegates. It runs a 10 Hz decision tick — the production counterpart of the Finite State Machines chapter’s 20 Hz teaching tick — plus the 1 Hz token republish.</p>
+<p><strong>The Flight Controller is the mirror image: a server of everything and a decider of nothing.</strong> Eight <code>Trigger</code> services, one aggregated status topic, and — by its own design document’s emphatic rule — <em>no mission logic</em>: “it executes and reports, never decides.” Everyone who wants the aircraft to do something asks this node; this node asks PX4; and PX4’s telemetry, cached from the <code>/fmu/out/*</code> subscriptions (vehicle status, local position, battery, GPS, home position, land-detected, attitude), is the only evidence it will accept that anything happened. One implementation detail matters at the graph level: the node runs a <code>MultiThreadedExecutor</code> with four threads and a reentrant callback group, so a service call that spends up to several seconds retrying and polling for mode confirmation does not stall the 5 Hz <code>FcStatus</code> publisher — the request–response verb and the streaming verb coexist in one node only because the node was built to service both concurrently. The <code>FcStatus</code> aggregate it publishes distills PX4’s raw <code>nav_state</code> enum into booleans the mission logic can read directly — <code>in_mission</code>, <code>in_loiter</code>, <code>in_offboard</code> — and one of those booleans, as the mission walk below shows, is how the system knows its search is finished.</p>
+<p><strong>The behavior nodes are deliberately interchangeable in shape.</strong> Navigation and Harass have the same silhouette: subscribe to the target and the token, publish Offboard setpoints only while the token names them, and report their one fact upward — <code>/goose/nav_arrived</code> (plus a continuous <code>/goose/nav_distance</code>, the “how far to target” stream) for Navigation, <code>/goose/harass_done</code> for Harass. Neither offers a service; neither is asked to do anything. They are <em>delegated to</em> via the token and <em>report</em> via topics, and the Harassment Pattern Generation chapter’s rule — the node reports and keeps flying until authority is taken from it — is now visible as a property of the whole graph: behavior nodes have no verb for “stop yourself,” on purpose. Navigation’s internals are the Offboard streaming machinery the Path Planning on the Edge chapter taught — stream a setpoint, test arrival against a radius — pointed at a computed approach point (a 3.0 m standoff along the target-to-drone line, at 3.0 m engage altitude, arrival declared inside 2.0 m horizontal and 1.5 m vertical, at 20 Hz) rather than at a lawnmower list.</p>
+<p><strong>The Detector is a translator, not a controller.</strong> Its input is <code>/detections_3d</code> — the <code>Detection3DArray</code> stream from the Part III vision pipeline, already carrying real depth from the RealSense camera — plus the vehicle attitude and position it needs to run <code>frames.optical_to_ned_point()</code>, the Coordinate Frames chapter’s own function, in production, exactly as that chapter said it would be. Its output is one <code>Target</code> message at 10 Hz. It never touches the token, never streams a setpoint, and keeps publishing regardless of who is flying — perception, in this architecture, is a continuous assertion about the world, and control is somebody else’s job. Per frame it keeps only the single highest-confidence detection of the target class above a 0.6 confidence floor, feeding a 64-entry rolling buffer of timestamped world-frame hits; what it does with that buffer is the next section’s subject.</p>
+<p><strong>The Failsafe node detects and the Mission Manager acts</strong> — the split the Geofencing and Fail-Safes chapter built in full. Here it suffices to place the edge: <code>/goose/failsafe</code>, a <code>String</code> encoding <code>SEVERITY:reason</code>, republished at 1 Hz while a condition holds, consumed by exactly one subscriber. Why this is the right topology is the argument of this chapter’s penultimate section.</p>
+</section>
+<section id="two-booleans-on-one-topic-valid-and-confirmed" class="level2" data-number="25.5">
+<h2 data-number="25.5" class="anchored" data-anchor-id="two-booleans-on-one-topic-valid-and-confirmed"><span class="header-section-number">25.5</span> Two Booleans on One Topic: <code>valid</code> and <code>confirmed</code></h2>
+<p>The <code>Target</code> message carries the goose’s estimated NED position — and two separate booleans, and the distinction between them is one of the nicest small designs in the repository. <code>valid</code> means <em>something was detected recently</em>: at least one hit landed in the buffer within the last <code>stale_timeout_s</code> (default 2.0 s). <code>confirmed</code> means the full confirmation criteria are met on top of validity: at least <code>confirm_count</code> (default 5) hits within the last <code>confirm_window_s</code> (default 2.0 s), and the most recent five of them clustered — every one within <code>cluster_radius_m</code> (default 3.0 m) of their own median. The position the message reports is itself a running median of the recent hits, continuously updated as the target moves rather than locked to the first confirmed fix. A single glimpse makes a target <code>valid</code>; only a short, spatially consistent <em>track</em> makes it <code>confirmed</code>.</p>
+<p>The payoff is in who reads which flag. The Mission Manager’s MISSION state checks <code>confirmed</code> to decide whether to begin a new engagement — committing the aircraft to leave its search, switch flight modes, and close on a wild animal is exactly the kind of decision that should require five clustered detections in two seconds, not one hopeful bounding box. But its engagement watchdogs — the shared logic that runs during ENGAGE and HARASS — check <code>valid</code> to decide whether the target has been <em>lost</em>: once an engagement is underway, the question is no longer “are we sure enough to start?” but “is there still anything there at all?”, and demanding re-confirmation every window would end engagements every time the detector’s cluster test hiccupped during a fast, banking approach. A target must clear a high bar to start an engagement and only a low bar to sustain one — hysteresis, the Finite State Machines chapter’s own remedy for chattering guards, implemented here not as two thresholds on one number but as two booleans on one message. And even the low bar has teeth: if <code>valid</code> stays false for more than <code>target_lost_timeout_s</code> (default 5.0 s) mid-engagement, the watchdog fires and the mission resumes its search rather than orbiting an empty point.</p>
+</section>
+<section id="one-mission-end-to-end" class="level2" data-number="25.6">
+<h2 data-number="25.6" class="anchored" data-anchor-id="one-mission-end-to-end"><span class="header-section-number">25.6</span> One Mission, End to End</h2>
+<p>Here is the chapter’s central artifact: one complete mission execution flow, traced through the real <code>mission_manager.py</code>’s state machine with the actual trigger for every transition. The real <code>St</code> enum has eleven states — IDLE, PREFLIGHT, ARMING, START_MISSION, MISSION, ENGAGE_PREP, ENGAGE, HARASS, RESUME, FAILSAFE, DONE — and <a href="#fig-mission-execution-flow" class="quarto-xref">Figure&nbsp;<span>25.2</span></a> draws the flow with each edge labeled by what fires it: a service call succeeding, or a topic crossing a threshold. Those are the only two trigger species in the whole machine, which is itself a lesson — the state machine is exactly as expressive as the communication graph beneath it.</p>
+<div id="fig-mission-execution-flow" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Flow diagram titled one mission, end to end, the real eleven-state machine of mission manager dot py. A top row of five rounded boxes runs left to right: IDLE, PREFLIGHT, ARMING, START underscore MISSION, and MISSION, connected by amber arrows labeled with their triggers: operator calls the goose start underscore mission service; the preflight service returns success, GPS fix with at least eight satellites, battery at least fifty percent, valid local position, home position set; the arm service returns success, confirmed by PX4 telemetry; the mode underscore mission service returns success, PX4 enters AUTO.MISSION. From MISSION a teal arrow exits right to DONE labeled fc underscore status shows in underscore mission seen, then in underscore loiter: grid complete, loiter after mission. A second row shows the engagement loop: MISSION drops via a teal arrow labeled target dot confirmed true on goose target and the 20 second cooldown elapsed, token set to navigation, into ENGAGE underscore PREP; an amber arrow labeled after a 1 second offboard warmup the mode underscore offboard service returns success leads to ENGAGE; a teal arrow labeled goose nav underscore arrived reads true, token set to harassment leads to HARASS; a teal arrow labeled goose harass underscore done reads true, token set to none leads to RESUME; and an amber arrow labeled the mode underscore mission service returns success, a 20 second cooldown starts curves back up into MISSION. A watchdog note attached to ENGAGE and HARASS reads: shared engagement watchdogs divert to RESUME if 90 seconds elapse or the target stays invalid more than 5 seconds. An amber FAILSAFE box sits at the lower right with a dashed border, entered from any state on a goose failsafe message of severity colon reason, or by escalation when RESUME fails three times, reason RTL colon cannot resume mission; inside it the enter failsafe logic parses the severity, sets the token to none, and calls the matching land, rtl, or hold service, standing down entirely on an unrecognized severity. Two shaded background bands label the PX4 flight mode per phase: AUTO.MISSION behind MISSION and RESUME, and OFFBOARD behind ENGAGE underscore PREP, ENGAGE, and HARASS. A footer maps the five pedagogical states of the Finite State Machines chapter onto the real machine: IDLE slash TAKEOFF unfolds into IDLE, PREFLIGHT, ARMING, and START underscore MISSION; SEARCH underscore GRID corresponds to MISSION plus RESUME; HARASS underscore TARGET unfolds into ENGAGE underscore PREP, ENGAGE, and HARASS; LAND slash RETURN-TO-HOME corresponds to FAILSAFE and DONE; and EVADE underscore THREAT has no counterpart in the shipped code, it is the book's own scaffolding on the failsafe mechanism.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mission-execution-flow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/mission-execution-flow-states.svg" class="img-fluid figure-img" style="width:100.0%" alt="Flow diagram titled one mission, end to end, the real eleven-state machine of mission manager dot py. A top row of five rounded boxes runs left to right: IDLE, PREFLIGHT, ARMING, START underscore MISSION, and MISSION, connected by amber arrows labeled with their triggers: operator calls the goose start underscore mission service; the preflight service returns success, GPS fix with at least eight satellites, battery at least fifty percent, valid local position, home position set; the arm service returns success, confirmed by PX4 telemetry; the mode underscore mission service returns success, PX4 enters AUTO.MISSION. From MISSION a teal arrow exits right to DONE labeled fc underscore status shows in underscore mission seen, then in underscore loiter: grid complete, loiter after mission. A second row shows the engagement loop: MISSION drops via a teal arrow labeled target dot confirmed true on goose target and the 20 second cooldown elapsed, token set to navigation, into ENGAGE underscore PREP; an amber arrow labeled after a 1 second offboard warmup the mode underscore offboard service returns success leads to ENGAGE; a teal arrow labeled goose nav underscore arrived reads true, token set to harassment leads to HARASS; a teal arrow labeled goose harass underscore done reads true, token set to none leads to RESUME; and an amber arrow labeled the mode underscore mission service returns success, a 20 second cooldown starts curves back up into MISSION. A watchdog note attached to ENGAGE and HARASS reads: shared engagement watchdogs divert to RESUME if 90 seconds elapse or the target stays invalid more than 5 seconds. An amber FAILSAFE box sits at the lower right with a dashed border, entered from any state on a goose failsafe message of severity colon reason, or by escalation when RESUME fails three times, reason RTL colon cannot resume mission; inside it the enter failsafe logic parses the severity, sets the token to none, and calls the matching land, rtl, or hold service, standing down entirely on an unrecognized severity. Two shaded background bands label the PX4 flight mode per phase: AUTO.MISSION behind MISSION and RESUME, and OFFBOARD behind ENGAGE underscore PREP, ENGAGE, and HARASS. A footer maps the five pedagogical states of the Finite State Machines chapter onto the real machine: IDLE slash TAKEOFF unfolds into IDLE, PREFLIGHT, ARMING, and START underscore MISSION; SEARCH underscore GRID corresponds to MISSION plus RESUME; HARASS underscore TARGET unfolds into ENGAGE underscore PREP, ENGAGE, and HARASS; LAND slash RETURN-TO-HOME corresponds to FAILSAFE and DONE; and EVADE underscore THREAT has no counterpart in the shipped code, it is the book's own scaffolding on the failsafe mechanism.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mission-execution-flow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;25.2: The real mission execution flow: eleven states, each transition triggered by a service call succeeding (amber) or a topic crossing a threshold (teal). Shaded bands show which PX4 flight mode holds during each phase — the autopilot’s native AUTO.MISSION flies the search, and Offboard streaming takes over only for the reactive engagement loop.
+</figcaption>
+</figure>
+</div>
+<p><strong>Startup is a ladder of services.</strong> The machine idles until an operator calls <code>/goose/start_mission</code>. PREFLIGHT then calls the Flight Controller’s <code>preflight</code> service — which checks PX4’s own preflight flags, a GPS fix (fix type ≥ 3, at least 8 satellites by default), a valid local position, battery at or above a 50% launch floor, and a recorded home position — and advances only on success. ARMING calls <code>arm</code> and waits for PX4-confirmed armed state. START_MISSION calls <code>mode_mission</code>, and when PX4’s telemetry confirms the vehicle is in AUTO.MISSION, the machine settles into MISSION. Three states, three service calls, and this is the first place the real machine’s extra granularity over the Finite State Machines chapter’s teaching machine earns its keep: that chapter’s IDLE/TAKEOFF folded “getting airborne” into one box, which was the right pedagogical altitude — but operationally, preflight validation, arming, and the mode switch are <em>three distinct requests with three distinct failure modes</em>, each of which can independently time out or be refused, and each therefore needs its own state so its failure has its own name in the log and its own recovery path. The teaching machine merged what the mission never decides differently between; the production machine splits what fails differently.</p>
+<p><strong>The search is a topic-watch.</strong> In MISSION, PX4’s onboard executor flies the pre-uploaded survey — the companion computer streams nothing (the next section dwells on this). The Mission Manager just watches two streams. On <code>/goose/fc_status</code>, it looks for the end-of-search signature: <code>in_mission</code> has been true at some point and <code>in_loiter</code> has become true — PX4 auto-loiters when an uploaded mission completes, so “mission mode gave way to loiter” <em>is</em> “grid complete,” and the code logs it in exactly those words. That path leads to DONE and the flight’s wind-down. On <code>/goose/target</code>, it watches for <code>confirmed</code> — and when a confirmed target arrives <em>and</em> the post-engagement cooldown window (default 20.0 s) has elapsed, it sets the token to <code>'navigation'</code> and enters ENGAGE_PREP.</p>
+<p><strong>The engagement is a loop of both verbs.</strong> ENGAGE_PREP exists because of a PX4 rule the Mission Scripting chapter established: Offboard mode requires a live setpoint stream <em>before</em> the mode switch. So the state waits out an <code>offboard_warmup_s</code> grace period (default 1.0 s) — Navigation, newly named by the token, is already streaming its approach setpoints — then calls <code>mode_offboard</code>, and on PX4-confirmed success advances to ENGAGE. This split is the second place the real machine is finer-grained than the teaching one: the pedagogical HARASS_TARGET folded “get control in Offboard” and “actively track” into one state, but warming up a setpoint stream and closing on a live target are different jobs with different failure modes, and the shipped code gives each its own box. ENGAGE then watches <code>/goose/nav_arrived</code>; when Navigation reports arrival at the standoff point, the token flips to <code>'harassment'</code> and the machine enters HARASS. HARASS watches <code>/goose/harass_done</code>; when the orbit’s fixed duration elapses (the Harassment Pattern Generation chapter’s time-latch), the machine enters RESUME. Throughout ENGAGE and HARASS, the shared engagement watchdogs run: 90 seconds of total engagement, or 5 seconds of the target being invalid, diverts the machine to RESUME early — bounded commitment, enforced by topic-watching.</p>
+<p><strong>RESUME closes the loop, and its failure path is the escalation.</strong> RESUME sets the token back to <code>'none'</code>, re-calls <code>mode_mission</code> to hand the aircraft back to PX4’s onboard executor mid-survey, and on success starts the 20-second cooldown that keeps a resumed search from instantly re-engaging the same goose it just harassed. If the resume service fails three times running, the machine escalates through the same path any emergency takes: <code>_enter_failsafe('RTL:cannot resume mission')</code> — parse the severity, zero the token, call the matching flight-controller service — the exact function, and the exact severity protocol, the Geofencing and Fail-Safes chapter read in full.</p>
+<p>One box deserves an explicit disclaimer, because the book put it there. The shipped machine has <strong>no EVADE_THREAT state</strong>. The Vector-Based Threat Evasion chapter’s escape machinery, and the five-state machine’s dashed override arrows into it, are the book’s own synthesis — original scaffolding built <em>on top of</em> the real system’s failsafe skeleton, teaching reactive-safety design the shipped code handles more bluntly (its FAILSAFE state is terminal and severity-driven, not a computed-evasion-then-resume state). The real machine’s eleven states are the ground truth of what flies; EVADE_THREAT is what the book added to teach what a richer reactive layer would look like. A reader who greps the repository for it should not be surprised to find nothing — and should now be able to say precisely where it would attach if it were built: a new severity in the <code>SEVERITY:reason</code> protocol, or a new state between the engagement watchdogs and RESUME.</p>
+</section>
+<section id="two-ways-to-fly-a-search" class="level2" data-number="25.7">
+<h2 data-number="25.7" class="anchored" data-anchor-id="two-ways-to-fly-a-search"><span class="header-section-number">25.7</span> Two Ways to Fly a Search</h2>
+<p>Now the discrepancy this chapter most owes the reader. The Path Planning on the Edge chapter generated the lawnmower list and said, in so many words, that it is flown by the Mission Scripting chapter’s state machine — “stream the current waypoint, advance on the acceptance test”: the companion computer streaming each waypoint as an Offboard setpoint, computing arrival itself. The real MISSION state does something else entirely: it calls <code>mode_mission</code>, PX4 enters its native <strong>AUTO.MISSION</strong> flight mode, and the flight controller flies the pre-uploaded survey waypoints <em>entirely onboard</em> — the companion computer streams nothing during the search and could crash outright without the sweep missing a leg. These are genuinely two different mechanisms for flying the same pattern, and the shipped system’s choice is worth understanding as a choice, not an inconsistency.</p>
+<p>The trade is reactivity against robustness, and the real system splits it by mission phase. Offboard streaming puts the companion computer in the control loop at 20 Hz: it can bend the path around anything it sees, mid-leg, this tick — and it inherits the corresponding fragility, because PX4’s dead-man’s switch drops Offboard the moment the stream falters, so a hung process or a saturated CPU during a routine survey leg becomes a flight-mode event. Native AUTO.MISSION inverts both properties: the autopilot flies the uploaded plan with the full robustness of firmware that has flown millions of such missions, utterly indifferent to the companion computer’s health — and utterly unreactive to anything the companion computer perceives mid-leg. For the search phase, that is the right side of the trade. Sweeping a fixed grid is the <em>least</em> reactive thing the mission ever does: the waypoints were computed before takeoff, nothing about a goose sighting changes the current leg’s geometry (it changes which <em>state</em> comes next, a decision the Mission Manager makes by watching topics and switching modes, not by bending setpoints), and the phase occupies most of every flight — so it is exactly where the architecture should minimize what can go wrong. The engagement phase is the opposite pole: an approach point recomputed from a moving animal’s position every 50 ms <em>is</em> reactivity, no pre-uploaded plan can express it, and Offboard streaming is the only mechanism PX4 offers that can. The shipped system uses each mechanism where its strengths are load-bearing: AUTO.MISSION for the long, low-stakes, pre-computable search; Offboard for the short, high-stakes, reactive engagement — and the mode bands in <a href="#fig-mission-execution-flow" class="quarto-xref">Figure&nbsp;<span>25.2</span></a> are that sentence drawn.</p>
+<p>Where does that leave the earlier chapters’ Offboard-streaming search? As the mechanics lesson it always was. The stream-a-setpoint, test-arrival pattern the Mission Scripting and Path Planning chapters built is not discarded by the real architecture — it is <em>relocated</em>: it is precisely what <code>navigation_node.py</code> does in ENGAGE, streaming the approach point at 20 Hz and publishing <code>nav_arrived</code> on its own acceptance test, and what <code>harassment_node.py</code> does in HARASS with orbit breadcrumbs. The book taught the streaming version of the search because the streaming <em>mechanics</em> are what Part IV’s reactive states genuinely run on, and a search grid is the gentlest possible first cargo for them. The real system, free to choose per phase, reserves those mechanics for the phase that cannot work without them — and a reader who now understands both mechanisms, and why each owns the phase it owns, has gotten more from the discrepancy than either version alone could teach.</p>
+</section>
+<section id="one-failsafe-node-not-n-safety-checks" class="level2" data-number="25.8">
+<h2 data-number="25.8" class="anchored" data-anchor-id="one-failsafe-node-not-n-safety-checks"><span class="header-section-number">25.8</span> One Failsafe Node, Not N Safety Checks</h2>
+<p>The third learning objective asks for an argument, so here is the design question stated plainly: the system has three nodes that can command the aircraft’s motion — Navigation, Harass, and (through mode changes) the Mission Manager. Why is safety monitoring <em>none of their</em> jobs? Why one independent Failsafe node, when each behavior node could simply check the battery and the fence before each setpoint?</p>
+<p>Start with what the centralized mechanism actually is, because its smallness is the argument’s first half. The Failsafe node — the Geofencing and Fail-Safes chapter’s <code>failsafe_monitor.py</code>, unchanged — watches telemetry and publishes <code>SEVERITY:reason</code> strings; it holds no mission state and flies nothing. The Mission Manager’s <code>_enter_failsafe</code> does the acting, in three moves that chapter traced: parse the severity prefix, set the active controller to <code>'none'</code> — which silences every behavior node within one message, because their ticks begin by checking the token — and dispatch to the matching flight-controller service (<code>land</code>, <code>rtl</code>, or <code>hold</code>); an unrecognized severity dispatches to <em>nothing</em>, the manager logging that it is standing down because a PX4-native failsafe outranks it. Detection in one node, execution in another, actuation in a third: the entire safety-override machinery of a seven-node system is one string protocol, one token write, and one service call.</p>
+<p>Now price the alternative. Fold safety into each behavior node and the system needs the battery-floor comparison, the fence check, the severity ordering, and the “am I outranked by PX4?” deference implemented in Navigation, <em>and</em> in Harass, <em>and</em> in every behavior node anyone adds later — <span class="math inline">\(N\)</span> implementations of logic whose whole value is being <em>correct</em>, which means <span class="math inline">\(N\)</span> places to get the threshold comparison backwards, <span class="math inline">\(N\)</span> parameter sets to keep synchronized when the field crew tightens the fence radius, and <span class="math inline">\(N\)</span> opportunities for the next contributor’s new node to simply forget. Worse than the duplication is the correlation: a behavior node checking its own safety shares every failure mode with the behavior it is supposed to police — the hung process that is streaming stale setpoints is the same hung process that was supposed to notice the fence, so the check is least alive exactly when it is most needed. And worst is what scattering does to <em>override authority</em>: safety enforced inside each node is safety enforced <em>by consent</em> — it works only if the node executes its own check and acts on it — where safety enforced at the token is enforced <em>by decree</em>: the Mission Manager revokes control at a channel the behavior nodes cannot ignore, because not-being-named is tested before their tick does anything at all. The centralized design means every behavior node gets to be simple — Navigation’s entire safety obligation is one line, <em>check the token</em> — and the system’s fault tolerance concentrates in one small, independent, separately-crashable process whose logic is written once, reviewed once, and parameterized once. The Geofencing and Fail-Safes chapter built the ladder; seen from the whole graph, the ladder is also an economy: one place for override logic to be right beats <span class="math inline">\(N\)</span> places for it to be wrong.</p>
+</section>
+<section id="when-the-readme-disagrees-with-the-code" class="level2" data-number="25.9">
+<h2 data-number="25.9" class="anchored" data-anchor-id="when-the-readme-disagrees-with-the-code"><span class="header-section-number">25.9</span> When the README Disagrees with the Code</h2>
+<p>One more thing surfaces only at integration time, and it opens this Part’s diagnostics theme perfectly: the repository’s own README, whose Services-versus-Topics framing this chapter happily adopted, drifts from the code it describes. The drift is ordinary, instructive, and worth cataloguing, because diffing documentation against implementation is a diagnostic skill every systems engineer needs.</p>
+<p>The README lists the Mission Manager’s services as “Start Mission, End Mission” — the code implements <code>/goose/start_mission</code> and <code>/goose/abort</code>; there is no “end mission” service, and the README’s phrase is best read as a loose description of the abort. It lists a Flight Controller service called “Start Flight” — the real service is <code>preflight</code>, which validates readiness and <em>reports</em>; it commands no flight at all, and the rename matters because a reader who believed the README might think calling it launches the aircraft. Its “Change Flight Mode” is really <code>mode_mission</code> specifically — the other mode changes (<code>mode_offboard</code>, <code>mode_hold</code>, <code>rtl</code>, <code>land</code>) are each their own separate service, as the README’s own list elsewhere admits. The README’s “Navigation Status” and “Distance to Target” are <em>two</em> real topics, not one (<code>/goose/nav_arrived</code> and <code>/goose/nav_distance</code>). Its mission-flow narrative says the Flight Controller “arms the drone and switches to Offboard mode” as step two — which describes the <em>engagement</em> phase; the search phase, as this chapter established, flies in AUTO.MISSION. Even the code comments drift: <code>px4_defs.py</code>’s comment on the active-controller topic says its values are <code>none|detection|harassment</code>, but the values the Mission Manager actually publishes are <code>'none'</code>, <code>'navigation'</code>, and <code>'harassment'</code> — the Detector never takes the token, because perception in this architecture never controls anything. And the design documents drift furthest of all, in the honest direction the Harassment Pattern Generation chapter already flagged for the orbit parameters: the detection design discussion proposed an 80% confidence bar over 3 frames; the shipped defaults are 0.6 over 5 hits in 2 seconds.</p>
+<p>None of this is scandal — it is entropy, the normal decay of prose that nobody’s tests exercise. The lesson is methodological, and this book has practiced it all along without naming it: <em>the code is the authority for what exists; documentation is the authority only for intent.</em> The README’s conceptual framing (services command, topics stream) is accurate and valuable; its inventory is stale. When this chapter states a topic name, a default, or a rate as fact, the fact came from <code>px4_defs.py</code> and the node sources — and when the reader stands up the real graph in the Try It below, <code>ros2 topic list</code> and <code>ros2 service list</code> will arbitrate every claim in this chapter the same way.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="25.10">
+<h2 data-number="25.10" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">25.10</span> Check Your Understanding</h2>
+<ol type="1">
+<li>Classify each of the following as a Service or a Topic in the running example’s architecture, and justify each with the chapter’s test (“does the sender need to know the action happened before safely proceeding?”): (a) arming the vehicle; (b) the Detector’s target estimate; (c) the operator’s abort; (d) the Flight Controller’s aggregated status.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Service — <code>/goose/fc/arm</code>: the Mission Manager must not proceed to takeoff logic until arming is confirmed, so it needs a blocking, acknowledged transaction, and the Flight Controller strengthens the acknowledgement by polling PX4 telemetry before returning success. (b) Topic — <code>/goose/target</code> at 10 Hz: perception is a continuously true assertion about the world with multiple independent consumers (Mission Manager, Navigation, Harass), none of which should reply, and it must keep flowing regardless of who is flying. (c) Service — <code>/goose/abort</code>: an abort demands acknowledged execution; an operator must know it was received and acted on. (d) Topic — <code>/goose/fc_status</code> at 5 Hz: vehicle state is streamed, not requested, so any node (or a late-joining diagnostic tool) can consume it without the Flight Controller knowing or caring who listens.</li>
+</ol>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>During MISSION, a goose walks into frame and the Detector begins landing hits at 5 Hz. Using the shipped defaults — <code>confirm_count</code> = 5 within <code>confirm_window_s</code> = 2.0 s, Target published at 10 Hz, Mission Manager tick at 10 Hz, <code>offboard_warmup_s</code> = 1.0 s — estimate the minimum time from the first detection hit to the <code>mode_offboard</code> service <em>call</em>, assuming the cluster test passes, the cooldown has long expired, and services respond instantly. Which term dominates?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Five hits at 5 Hz span four inter-hit intervals: <span class="math inline">\(4 \times 0.2 = 0.8\)</span> s from first hit to fifth (comfortably inside the 2.0 s window). The Detector’s next 10 Hz publish adds up to 0.1 s; the Mission Manager’s next 10 Hz tick adds up to another 0.1 s before it reads <code>confirmed</code>, flips the token, and enters ENGAGE_PREP. ENGAGE_PREP then waits out the full 1.0 s offboard warmup before calling <code>mode_offboard</code>. Total: roughly <span class="math inline">\(0.8 + 0.1 + 0.1 + 1.0 \approx 2.0\)</span> s. The confirmation accumulation (0.8 s) and the warmup (1.0 s) dominate, and both are deliberate: the first buys false-positive immunity before committing the aircraft, the second satisfies PX4’s requirement that a live setpoint stream precede the Offboard mode switch. The messaging latencies (~0.2 s combined) are noise by comparison — tuning tick rates would buy almost nothing.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>The engagement watchdogs read <code>target.valid</code>, but the MISSION state reads <code>target.confirmed</code>. Predict the two concrete misbehaviors that would appear if a maintainer “simplified” the code to use a single boolean — first if everything read <code>confirmed</code>, then if everything read <code>valid</code>.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Everything reads <code>confirmed</code>: engagements become fragile. During a fast approach the detector’s view geometry changes quickly, and the five-hit cluster test can momentarily fail (hits spread beyond the 3.0 m cluster radius, or fewer than five land in the window) even though the goose is plainly still there; with the watchdog demanding <code>confirmed</code>, such lapses lasting over 5 s would abort healthy engagements, and shorter ones would erode the timeout margin — the aircraft gives up on targets it is still tracking. Everything reads <code>valid</code>: engagements become trigger-happy. A single spurious detection — one misclassified rock — makes the target <code>valid</code> for 2.0 s, and the MISSION state would launch a full engagement (mode switch, approach, orbit) on one frame of evidence, exactly the false-positive commitment the five-clustered-hits bar exists to prevent. The two-boolean design is hysteresis: a high bar to start, a low bar to continue, each read by the decision that needs it.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>The Flight Controller’s <code>mode_mission</code> service sends <code>VEHICLE_CMD_DO_SET_MODE</code>, polls for up to 2 s per attempt until <code>VehicleStatus.nav_state</code> actually reads AUTO_MISSION, and retries the whole cycle up to three times before giving up. A teammate proposes returning success as soon as the command is transmitted, to make the mission “snappier.” Using the RESUME state as your example, explain what specifically breaks.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>RESUME’s job is to hand the aircraft back to PX4’s onboard executor: it zeroes the token (silencing the behavior nodes’ setpoint streams) and calls <code>mode_mission</code>. With send-equals-success, a command PX4 rejects or drops — radio hiccup, mode-transition refusal — still returns true: the Mission Manager believes the search has resumed, starts its 20 s cooldown, and settles into MISSION watching <code>fc_status</code> for completion, while the actual aircraft sits in whatever mode it fell into with <em>nobody</em> streaming setpoints and no state responsible for noticing. The escalation path breaks too: the real code counts three <em>failed</em> resume attempts and then enters failsafe with <code>RTL:cannot resume mission</code> — but a service that cannot fail can never trip that counter, so the safety net for exactly this scenario is unreachable. Command verification is what makes a service’s return value mean something; without it, every state transition triggered by “service succeeded” is triggered by hope.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>The companion computer’s mission process hangs for eight seconds. Compare the outcome if this happens (a) mid-MISSION, during the search sweep, and (b) mid-ENGAGE, during an approach — and connect the difference to the architectural choice of AUTO.MISSION for the search phase.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Mid-MISSION: nothing happens to the flight. PX4’s onboard executor is flying the uploaded survey and neither needs nor notices the companion computer; when the process recovers, <code>fc_status</code> and <code>target</code> are streams it simply resumes consuming, and the mission continues. (b) Mid-ENGAGE: the aircraft is in Offboard mode, fed by Navigation’s 20 Hz setpoint stream. Eight seconds of silence trips PX4’s Offboard timeout — the dead-man’s switch from Part II — and the autopilot’s native failsafe takes the aircraft (per configuration: hold, RTL). That is a <em>safe</em> failure, but it is a flight-mode event with the mission lost. The asymmetry is the argument for the split: the search occupies most of each flight, so flying it in AUTO.MISSION means the system spends most of its airborne time immune to companion-computer failure, and accepts Offboard’s fragility only for the short engagement windows where per-tick reactivity to a moving animal is the entire point and no onboard mode can provide it.</li>
+</ol>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>A new contributor adds a “Herding” behavior node (the Multi-Agent Systems chapter’s herding-vector hold) to the shipped graph. List everything the node must implement to be a well-behaved citizen of this architecture — and everything it does <em>not</em> need to implement, with the design feature that excuses each omission.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Must implement: subscribe to <code>/goose/active_controller</code> and gate every tick on being named (the token contract); subscribe to <code>/goose/target</code> for its herding geometry; stream Offboard setpoints only while named, and keep streaming until authority is taken (never stop itself); publish one completion/progress topic upward (a <code>herding_done</code> in the style of <code>/goose/harass_done</code>) for the Mission Manager to watch; and the Mission Manager needs a new token value plus the state logic to grant and revoke it. Does not need: any safety logic — battery, fence, severity ordering — because the Failsafe node detects and <code>_enter_failsafe</code> revokes at the token, which the new node already honors by construction; any service server — behavior nodes are delegated to via the token, not asked; any PX4 command authority — mode changes stay the Flight Controller’s monopoly; and any knowledge of the other behavior nodes — publish/subscribe decoupling means Navigation and Harass never learn a sibling exists. The short must-list and the long need-not-list are the architecture’s dividend: the token, the failsafe split, and the service monopoly let every new behavior be almost as simple as its geometry.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="25.11">
+<h2 data-number="25.11" class="anchored" data-anchor-id="try-it"><span class="header-section-number">25.11</span> Try It</h2>
+<p><strong>Part 1 — stand the graph up and interrogate it.</strong> Bring up the running example’s node graph against PX4 SITL in Gazebo — the shipped nodes if you have the repository, or your own Part II–IV implementations of each role (the interfaces in <a href="#tbl-node-graph" class="quarto-xref">Table&nbsp;<span>25.1</span></a> are the spec). Before flying anything, audit the architecture with ROS 2’s own introspection: <code>ros2 node list</code> should show seven-ish processes; <code>ros2 service list</code> should show <code>/goose/start_mission</code>, <code>/goose/abort</code>, and the eight <code>/goose/fc/*</code> endpoints; <code>ros2 topic list</code> should show the eight mission topics — and every name should match this chapter’s claims, not the README’s (this is the documentation-diff exercise run live). Then fly one full mission: call <code>/goose/start_mission</code> from the command line with <code>ros2 service call</code>, and keep <code>ros2 topic echo /goose/active_controller</code> and the Mission Manager’s log side by side. The acceptance test is the trace: the log should walk IDLE → PREFLIGHT → ARMING → START_MISSION → MISSION, the token should read <code>none</code> throughout the sweep; script a goose into the detector’s view and watch the full engagement loop — token to <code>navigation</code> at ENGAGE_PREP, <code>mode_offboard</code> succeeding after the warmup, token to <code>harassment</code> on <code>nav_arrived</code>, RESUME re-entering AUTO.MISSION with the token back to <code>none</code>. For every transition in the log, write down which of the two trigger species fired it — a service returning success, or a topic crossing a threshold — and check it against <a href="#fig-mission-execution-flow" class="quarto-xref">Figure&nbsp;<span>25.2</span></a>. Finish with the timeout tour: hide the goose mid-approach and confirm RESUME fires at the 5 s target-lost watchdog; let an engagement run long and confirm the 90 s ceiling; re-present the goose immediately after RESUME and confirm the 20 s cooldown holds the machine in MISSION.</p>
+<p><strong>Part 2 — build the field diagnostic.</strong> Write a small <code>mission_dashboard</code> node — the tool a field crew would actually want — that subscribes to <code>/goose/fc_status</code>, <code>/goose/active_controller</code>, <code>/goose/target</code>, <code>/goose/nav_distance</code>, <code>/goose/harass_done</code>, and <code>/goose/failsafe</code>, and renders one status line per second: current controller token, <code>in_mission</code>/<code>in_loiter</code>/<code>in_offboard</code> flags, target <code>valid</code>/<code>confirmed</code> with its age, distance to target, and any active failsafe string. Two requirements carry the chapter’s lessons. First, <em>staleness is a display state</em>: stamp every message on arrival and render any stream older than three of its own publish periods as <code>STALE</code> in place of its last value — a dashboard that shows dead data as live data is the “wrong with confidence” failure of the Finite State Machines chapter, in miniature. Second, <em>the dashboard must be a pure subscriber</em>: no services called, no setpoints, nothing published — verify with <code>ros2 node info /mission_dashboard</code> that it could not command the aircraft if it wanted to, and note that publish/subscribe decoupling is what let you bolt a whole new observer onto a running system without touching one line of the seven nodes it watches. Then use it: replay Part 1’s mission and confirm the dashboard tells the same story as the logs — and kill the Detector process mid-engagement to watch <code>valid</code> go stale on your display roughly 5 s before the Mission Manager’s watchdog acts on the same silence.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#autonomous-state-machine-control">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+<p>The system is now assembled — and this Part can begin its real work, which is living with it. A graph this size fails in ways no single node’s chapter could show: a topic that streams stale truth, a service that times out only in the field, a log that must be read backwards from an incident. And a system that autonomously pursues wild animals owes an account of itself that no architecture diagram can give. Diagnosing the first and reckoning with the second are where Part V goes from here — with, at last, the whole machine on the bench.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="pagination-link" aria-label="Multi-Agent Systems and Coordination">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="pagination-link" aria-label="Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior">
+        <span class="nav-page-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

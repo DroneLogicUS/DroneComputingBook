@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>4&nbsp; Materials and Power: Structural Choices and LiPo Battery Management – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" rel="next">
+<link href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html">Part I — Airframes, Regulation &amp; Flight Safety</a></li><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">4.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">4.2</span> Key Vocabulary</a></li>
+  <li><a href="#the-materials-problem" id="toc-the-materials-problem" class="nav-link" data-scroll-target="#the-materials-problem"><span class="header-section-number">4.3</span> The Materials Problem</a>
+  <ul class="collapse">
+  <li><a href="#what-the-frame-is-being-asked-to-do" id="toc-what-the-frame-is-being-asked-to-do" class="nav-link" data-scroll-target="#what-the-frame-is-being-asked-to-do"><span class="header-section-number">4.3.1</span> What the frame is being asked to do</a></li>
+  <li><a href="#what-the-stiffness-gap-costs-in-practice" id="toc-what-the-stiffness-gap-costs-in-practice" class="nav-link" data-scroll-target="#what-the-stiffness-gap-costs-in-practice"><span class="header-section-number">4.3.2</span> What the stiffness gap costs in practice</a></li>
+  <li><a href="#how-each-material-fails" id="toc-how-each-material-fails" class="nav-link" data-scroll-target="#how-each-material-fails"><span class="header-section-number">4.3.3</span> How each material fails</a></li>
+  <li><a href="#choosing-a-cost-model-instead-of-a-slogan" id="toc-choosing-a-cost-model-instead-of-a-slogan" class="nav-link" data-scroll-target="#choosing-a-cost-model-instead-of-a-slogan"><span class="header-section-number">4.3.4</span> Choosing: a cost model instead of a slogan</a></li>
+  </ul></li>
+  <li><a href="#the-power-problem-living-with-lithium-polymer" id="toc-the-power-problem-living-with-lithium-polymer" class="nav-link" data-scroll-target="#the-power-problem-living-with-lithium-polymer"><span class="header-section-number">4.4</span> The Power Problem: Living with Lithium Polymer</a>
+  <ul class="collapse">
+  <li><a href="#what-a-lipo-cell-is" id="toc-what-a-lipo-cell-is" class="nav-link" data-scroll-target="#what-a-lipo-cell-is"><span class="header-section-number">4.4.1</span> What a LiPo cell is</a></li>
+  <li><a href="#voltage-and-state-of-charge" id="toc-voltage-and-state-of-charge" class="nav-link" data-scroll-target="#voltage-and-state-of-charge"><span class="header-section-number">4.4.2</span> Voltage and state of charge</a></li>
+  <li><a href="#why-storing-a-cell-full-degrades-it" id="toc-why-storing-a-cell-full-degrades-it" class="nav-link" data-scroll-target="#why-storing-a-cell-full-degrades-it"><span class="header-section-number">4.4.3</span> Why storing a cell full degrades it</a></li>
+  <li><a href="#why-storing-a-cell-empty-destroys-it" id="toc-why-storing-a-cell-empty-destroys-it" class="nav-link" data-scroll-target="#why-storing-a-cell-empty-destroys-it"><span class="header-section-number">4.4.4</span> Why storing a cell empty destroys it</a></li>
+  <li><a href="#the-storage-charge-window-justified" id="toc-the-storage-charge-window-justified" class="nav-link" data-scroll-target="#the-storage-charge-window-justified"><span class="header-section-number">4.4.5</span> The storage-charge window, justified</a></li>
+  <li><a href="#internal-resistance-the-health-gauge" id="toc-internal-resistance-the-health-gauge" class="nav-link" data-scroll-target="#internal-resistance-the-health-gauge"><span class="header-section-number">4.4.6</span> Internal resistance: the health gauge</a></li>
+  </ul></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">4.5</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">4.6</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html">Part I — Airframes, Regulation &amp; Flight Safety</a></li><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Two components of a drone are consumed by the act of flying it. The airframe is consumed in crashes — every development program breaks arms, cracks plates, and strips mounts, and the rate at which it does so is a design parameter, not an embarrassment. The battery is consumed by chemistry — every charge cycle, every deep discharge, and every week spent sitting on a shelf at the wrong state of charge takes an irreversible bite out of its capacity. Both consumables are routinely mismanaged for the same reason: the practical rules (“carbon fiber is stiff but shatters,” “store LiPos at half charge”) circulate widely, while the physics that generates the rules does not, so the rules get applied mechanically and fail exactly at the edge cases the physics would have caught.</p>
+<p>This chapter supplies the physics behind both sets of rules. The first half takes the material comparison sketched at the end of the Anatomy of a Multirotor chapter — plastic, aluminium, carbon fiber, arranged in a suspiciously tidy table of trade-offs — and develops it quantitatively: what specific stiffness and specific strength actually are, why a laminate fails differently from a printed part, and how to decide, with arithmetic rather than folklore, when a frame component should be carbon and when it should come off a 3D printer. The second half opens up the lithium-polymer cell itself: what sets its voltage, what is physically happening inside a cell stored full or stored empty, and why the storage-charge window of 3.80 to 3.85 V per cell is not a superstition but a chemically motivated optimum with margin you can compute.</p>
+<section id="learning-objectives" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">4.1</span> Learning Objectives</h2>
+<ul>
+<li>Compare carbon-fiber composite and 3D-printed thermoplastics (PLA, ABS, nylon) as airframe materials using specific stiffness and specific strength, and compute the mass penalty of matching a carbon part’s bending stiffness in printed plastic.</li>
+<li>Describe the dominant failure mode of each material class — brittle fracture and delamination for carbon laminate, layer separation for printed parts — and derive the print-orientation and design rules that follow.</li>
+<li>Explain, at the level of electrode potentials and side reactions, why a LiPo cell degrades when stored fully charged (electrolyte oxidation, gas generation, swelling) and why it is destroyed by over-discharge (copper current-collector dissolution and subsequent internal shorting).</li>
+<li>Specify a correct storage-charge range in volts per cell and state of charge, and justify it quantitatively from calendar-ageing data and self-discharge arithmetic.</li>
+<li>Use internal resistance as a battery health metric: measure it from voltage sag under a known load, and compute the heating and usable-voltage consequences of its growth as a pack ages.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">4.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Strength-to-weight ratio</strong> (specific strength) — a material’s failure stress divided by its density, in kJ/kg when stress is in MPa and density in g/cm³. It ranks materials for structures whose mass budget, not whose volume, is the binding constraint — which is every airborne structure.</li>
+<li><strong>Specific stiffness</strong> — elastic modulus divided by density, in MJ/kg. For aircraft structure it usually matters more than specific strength, because frames fail their mission by flexing (vibration, resonance, sensor corruption) long before they fail by breaking.</li>
+<li><strong>Layer separation</strong> (delamination) — the characteristic failure mode of fused-filament 3D-printed parts, in which the part splits along the weld planes between deposited layers. Interlayer welds are diffusion bonds formed in the seconds before the plastic cools, and typically reach only 30–70 % of the bulk material’s strength.</li>
+<li><strong>LiPo</strong> (Lithium Polymer battery) — a lithium-ion cell built as a laminated foil pouch with a gel-polymer electrolyte, rather than as a rigid metal cylinder. The pouch format saves case mass and permits very high discharge currents, at the price of no mechanical protection: a LiPo that generates internal gas visibly swells.</li>
+<li><strong>Cell voltage</strong> — the potential difference between a cell’s cathode and anode, itself a function of state of charge: 4.20 V fully charged, 3.7 V nominal, roughly 3.5 V at the practical in-flight floor, and 3.0 V at the damage threshold below which over-discharge chemistry begins.</li>
+<li><strong>State of charge</strong> (SoC) — the fraction of a cell’s rated capacity currently stored, inferred in practice from resting voltage via the cell’s discharge curve.</li>
+<li><strong>Storage charge</strong> — the state of charge at which a LiPo should be kept when not in use for more than a few days: roughly 50–60 % of capacity, corresponding to about 3.80–3.85 V per cell.</li>
+<li><strong>Internal resistance</strong> — the effective series resistance of a cell, typically a few milliohms when new. It sets the voltage sag under load and the internal heating rate, rises irreversibly as the cell ages, and is the single most useful measurable indicator of pack health.</li>
+<li><strong>C rating</strong> — a battery’s rated continuous discharge current expressed as a multiple of its capacity: a 5.2 Ah pack rated 50C may deliver <span class="math inline">\(50 \times 5.2 = 260\)</span> A continuously. Physically it is a claim about internal resistance and heat rejection, not a separate property.</li>
+<li><strong>Thermal runaway</strong> — the self-accelerating failure of a lithium cell in which internal heating drives exothermic decomposition reactions that generate more heat, culminating in venting or fire. It is the hazard that dictates fireproof charging and storage containers.</li>
+</ul>
+</section>
+<section id="the-materials-problem" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="the-materials-problem"><span class="header-section-number">4.3</span> The Materials Problem</h2>
+<section id="what-the-frame-is-being-asked-to-do" class="level3" data-number="4.3.1">
+<h3 data-number="4.3.1" class="anchored" data-anchor-id="what-the-frame-is-being-asked-to-do"><span class="header-section-number">4.3.1</span> What the frame is being asked to do</h3>
+<p>The Anatomy of a Multirotor chapter established the frame’s three jobs — carry the rotor loads into the vehicle’s mass, hold the propeller discs in fixed relative geometry, and keep the airframe’s structural resonances away from the propellers’ 90 Hz and 180 Hz excitation bands so the inertial sensors report vehicle motion rather than frame flex. All three jobs are stiffness jobs before they are strength jobs. A frame that is strong enough not to break but too compliant to hold its geometry produces oscillating attitude estimates, hot motors, and unexplained short flights; a frame that is stiff enough rarely turns out to be the one that breaks in normal flight. Breakage happens in crashes, which is a separate design case with its own logic.</p>
+<p>That framing dictates the two figures of merit. For a component whose mass is contested — and on an aircraft every gram is contested, at the exchange rate the payload-endurance calculation in the previous chapter established — materials are compared per kilogram, not per cubic centimetre. Specific stiffness <span class="math inline">\(E/\rho\)</span> governs the flying structure; specific strength <span class="math inline">\(\sigma/\rho\)</span> governs crash survival and highly loaded fittings.</p>
+<p>The numbers for the materials actually used in small drones:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Material</th>
+<th>Density (g/cm³)</th>
+<th>Modulus <span class="math inline">\(E\)</span> (GPa)</th>
+<th>Tensile strength (MPa)</th>
+<th><span class="math inline">\(E/\rho\)</span> (MJ/kg)</th>
+<th><span class="math inline">\(\sigma/\rho\)</span> (kJ/kg)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Carbon laminate, unidirectional (along fibers)</td>
+<td>1.6</td>
+<td>~135</td>
+<td>~1500</td>
+<td>~84</td>
+<td>~940</td>
+</tr>
+<tr class="even">
+<td>Carbon laminate, quasi-isotropic</td>
+<td>1.6</td>
+<td>~50</td>
+<td>~550</td>
+<td>~31</td>
+<td>~340</td>
+</tr>
+<tr class="odd">
+<td>Aluminium 6061-T6</td>
+<td>2.70</td>
+<td>69</td>
+<td>276 (yield)</td>
+<td>26</td>
+<td>102</td>
+</tr>
+<tr class="even">
+<td>Nylon (printed, PA12)</td>
+<td>1.01</td>
+<td>~1.7</td>
+<td>~50</td>
+<td>~1.7</td>
+<td>~50</td>
+</tr>
+<tr class="odd">
+<td>PLA (printed, in layer plane)</td>
+<td>1.24</td>
+<td>~3.5</td>
+<td>~55</td>
+<td>~2.8</td>
+<td>~44</td>
+</tr>
+<tr class="even">
+<td>ABS (printed, in layer plane)</td>
+<td>1.04</td>
+<td>~2.2</td>
+<td>~40</td>
+<td>~2.1</td>
+<td>~38</td>
+</tr>
+</tbody>
+</table>
+<p>Representative handbook and filament-datasheet values; printed-material figures assume a well-tuned printer and loading <em>within</em> the layer plane. Across the layers, printed strength falls to 30–70 % of these figures — a point developed below, because it is the single most important fact about printed structure.</p>
+<div id="fig-airframe-material-comparison" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two-panel horizontal bar chart comparing six airframe materials. Both panels list, top to bottom, unidirectional carbon laminate with fibers along the load, quasi-isotropic carbon laminate, aluminium 6061-T6, printed PA12 nylon, printed PLA, and printed ABS. The left panel plots specific stiffness in megajoules per kilogram: about 84 for unidirectional carbon, 31 for quasi-isotropic carbon, 26 for aluminium, and only 1.7, 2.8, and 2.1 for nylon, PLA, and ABS, with a note that even quasi-isotropic carbon carries ten times the specific stiffness of printed PLA. The right panel plots specific strength in kilojoules per kilogram: about 940 for unidirectional carbon, 340 for quasi-isotropic carbon, 102 at yield for aluminium, and roughly 50, 44, and 38 for nylon, PLA, and ABS. A footer notes that the printed-material bars assume loading within the layer plane, with strength falling to 30 to 70 percent of the plotted figure across the layers, and that the comparison is per kilogram because airborne structure is mass-constrained.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-airframe-material-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/airframe-material-comparison.svg" class="img-fluid figure-img" style="width:90.0%" alt="Two-panel horizontal bar chart comparing six airframe materials. Both panels list, top to bottom, unidirectional carbon laminate with fibers along the load, quasi-isotropic carbon laminate, aluminium 6061-T6, printed PA12 nylon, printed PLA, and printed ABS. The left panel plots specific stiffness in megajoules per kilogram: about 84 for unidirectional carbon, 31 for quasi-isotropic carbon, 26 for aluminium, and only 1.7, 2.8, and 2.1 for nylon, PLA, and ABS, with a note that even quasi-isotropic carbon carries ten times the specific stiffness of printed PLA. The right panel plots specific strength in kilojoules per kilogram: about 940 for unidirectional carbon, 340 for quasi-isotropic carbon, 102 at yield for aluminium, and roughly 50, 44, and 38 for nylon, PLA, and ABS. A footer notes that the printed-material bars assume loading within the layer plane, with strength falling to 30 to 70 percent of the plotted figure across the layers, and that the comparison is per kilogram because airborne structure is mass-constrained.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-airframe-material-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.1: The materials table drawn to scale. Left: specific stiffness, which governs the flying structure. Right: specific strength, which governs crash survival and fittings. On both axes the gap between carbon laminate and the printed thermoplastics is an order of magnitude, while aluminium sits close to quasi-isotropic carbon — the composite pulls decisively ahead only when its fibers are oriented along the load.
+</figcaption>
+</figure>
+</div>
+<p>Two readings of the table matter, and <a href="#fig-airframe-material-comparison" class="quarto-xref">Figure&nbsp;<span>4.1</span></a> draws both of them to scale. First, the gap between carbon and the printed thermoplastics is not an increment but an order of magnitude: even the pessimistic quasi-isotropic laminate carries ten times the specific stiffness of PLA. Second, aluminium sits close to quasi-isotropic carbon in specific stiffness — the composite’s decisive advantage appears only when the layup is oriented to put fibers along the load, which is exactly what a frame arm (a cantilever in bending, fibers along its length) allows. This is why carbon dominates drone frames rather than aluminium: not because aluminium is bad, but because a tube or plate loaded in a known direction lets the designer spend the fibers where the stress is.</p>
+</section>
+<section id="what-the-stiffness-gap-costs-in-practice" class="level3" data-number="4.3.2">
+<h3 data-number="4.3.2" class="anchored" data-anchor-id="what-the-stiffness-gap-costs-in-practice"><span class="header-section-number">4.3.2</span> What the stiffness gap costs in practice</h3>
+<p>The gap can be converted into mass. Suppose a frame arm must reach a given bending stiffness <span class="math inline">\(EI\)</span> — the product that sets both its deflection under thrust and its resonant frequency. For a solid rectangular section of fixed width, <span class="math inline">\(I \propto t^3\)</span>, so matching a carbon plate’s <span class="math inline">\(EI\)</span> in PLA requires a thickness ratio of</p>
+<p><span class="math display">\[\frac{t_{\text{PLA}}}{t_{\text{CF}}} = \left(\frac{E_{\text{CF}}}{E_{\text{PLA}}}\right)^{1/3} = \left(\frac{50}{3.5}\right)^{1/3} = 2.4,\]</span></p>
+<p>and the mass ratio is that thickness ratio times the density ratio: <span class="math inline">\(2.4 \times (1.24/1.6) = 1.9\)</span>. An equally stiff printed arm is roughly twice the mass — and since hover power scales as mass to the three-halves, the aircraft pays for that in flight time forever. Alternatively, print the arm at the same geometry and accept the stiffness loss: a cantilever’s first resonant frequency scales as <span class="math inline">\(\sqrt{E/\rho}\)</span> at fixed geometry, so the printed arm’s first mode falls by a factor of <span class="math inline">\(\sqrt{31/2.8} \approx 3.3\)</span> — typically from comfortably above the blade-passing excitation to squarely inside the band the propellers excite. Neither option is free; that is why flying primary structure is carbon on essentially every serious airframe.</p>
+</section>
+<section id="how-each-material-fails" class="level3" data-number="4.3.3">
+<h3 data-number="4.3.3" class="anchored" data-anchor-id="how-each-material-fails"><span class="header-section-number">4.3.3</span> How each material fails</h3>
+<p><strong>Carbon laminate fails by fracture and delamination, without warning.</strong> A carbon-epoxy laminate is elastic to failure: it reaches perhaps 1–1.5 % strain and then breaks, releasing all the stored energy at once. There is no yield, no bend, no visible warning. In a crash this means an arm either survives intact or snaps — the material cannot absorb impact energy by deforming plastically the way a metal or a tough polymer does. Carbon also fails unpleasantly: fracture surfaces are sharp, splinters are genuinely hazardous to handle, and cutting or sanding carbon releases conductive dust that should be kept out of lungs and electronics alike. Damage short of fracture is more insidious. An impact can delaminate the plies — separate the layers internally — leaving a part that looks intact, measures the right dimensions, and has lost a large fraction of its stiffness and strength. A tap test (delaminated regions sound dull rather than ringing) or flex comparison against a known-good part is part of any competent post-crash inspection.</p>
+<p>One more property matters on a flying robot: carbon fiber conducts electricity. A carbon plate behaves as a lossy ground plane, and the Anatomy chapter’s warning about antennas follows directly — GNSS, radio-control, and telemetry antennas mounted flush against carbon are detuned and shadowed, which is why receivers ride on standoffs and antenna tubes on real airframes. The conductivity also means a frayed carbon edge can short an exposed pad, and that carbon dust inside an electronics bay is a slow-motion electrical fault.</p>
+<p><strong>Printed parts fail by layer separation, and orientation is destiny.</strong> A fused-filament part is a stack of extruded beads welded to their neighbours by heat and time. Within a layer, the plastic approaches its bulk strength; between layers, the weld is a partial diffusion bond formed in the few seconds before the interface cools below the glass transition, and it typically reaches only 30–70 % of bulk strength. A printed part is therefore an anisotropic laminate with its weak planes set by whichever orientation it was printed in — and unlike a carbon layup, where the designer orients fibers along the load, a careless print orients the <em>weak</em> planes wherever the slicer found convenient. The design rule is mechanical common sense once the mechanism is visible: orient the part so that tensile and bending stresses lie within the layer planes, never across them, and treat any load path that must cross layers as operating at roughly half strength. Fillet every corner, because layer lines plus a sharp corner is a crack-starter kit.</p>
+<div id="fig-material-failure-modes" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Three-panel sketch comparing failure modes. Left panel, carbon laminate: a plied beam snapped cleanly in two under a load arrow, with sharp splinters at the jagged break, captioned elastic to about 1 to 1.5 percent strain then fracture, no yield, no bend, no warning; below it a second beam shows a lens-shaped internal gap between plies after an impact arrow, captioned impact delamination, plies separate inside, looks intact, stiffness gone, taps dull rather than ringing. Middle panel, aluminium: a clamped bar with a permanent kink where a load arrow pushed its free end below the dashed original line, the bend region circled and labeled plastic hinge with permanent set, captioned yields before it breaks, the bend is the warning, absorbs impact energy by deforming plastically. Right panel, printed thermoplastic: a stack of extruded bead rows with the top rows peeling away along a dashed red interlayer weld plane under a load applied across the layers, captioned interlayer welds reach 30 to 70 percent of bulk strength and the part splits along the weld planes. A footer advises matching failure behaviour to the component's job: stiff and brittle for flying structure, tough and compliant for crash structure, with loads kept in the layer plane.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-material-failure-modes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/material-failure-modes.svg" class="img-fluid figure-img" style="width:95.0%" alt="Three-panel sketch comparing failure modes. Left panel, carbon laminate: a plied beam snapped cleanly in two under a load arrow, with sharp splinters at the jagged break, captioned elastic to about 1 to 1.5 percent strain then fracture, no yield, no bend, no warning; below it a second beam shows a lens-shaped internal gap between plies after an impact arrow, captioned impact delamination, plies separate inside, looks intact, stiffness gone, taps dull rather than ringing. Middle panel, aluminium: a clamped bar with a permanent kink where a load arrow pushed its free end below the dashed original line, the bend region circled and labeled plastic hinge with permanent set, captioned yields before it breaks, the bend is the warning, absorbs impact energy by deforming plastically. Right panel, printed thermoplastic: a stack of extruded bead rows with the top rows peeling away along a dashed red interlayer weld plane under a load applied across the layers, captioned interlayer welds reach 30 to 70 percent of bulk strength and the part splits along the weld planes. A footer advises matching failure behaviour to the component's job: stiff and brittle for flying structure, tough and compliant for crash structure, with loads kept in the layer plane.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-material-failure-modes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.2: Three failure modes. A carbon laminate is elastic until it fractures — or delaminates internally after an impact while still looking intact. Aluminium yields: the bend is the warning, and the plastic deformation absorbs energy. A fused-filament part splits along its interlayer weld planes, which reach only 30–70 % of bulk strength.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-material-failure-modes" class="quarto-xref">Figure&nbsp;<span>4.2</span></a> puts the three behaviours side by side: the laminate that snaps or delaminates without warning, the metal that bends visibly before it breaks, and the printed part whose weakest planes sit wherever the slicer put them.</p>
+<p>The three common filaments then differentiate on toughness and temperature. <strong>PLA</strong> prints easily and stiffly but is brittle and, critically, has a glass-transition temperature near 60 °C — a black PLA part on a dashboard, in a parked car, or in direct summer sun will warp under no load at all, which disqualifies it from anything structural that lives outdoors. <strong>ABS</strong> trades printability for a glass transition near 105 °C and much better toughness. <strong>Nylon</strong> is the least stiff of the three but extraordinarily tough — elongation at break over 100 % — which makes it the choice for parts that must survive impact by deforming: landing-gear feet, camera mounts, propeller guards. Carbon-filled nylon splits the difference, roughly doubling stiffness while keeping useful toughness, and has become the default serious filament for printed drone fittings.</p>
+</section>
+<section id="choosing-a-cost-model-instead-of-a-slogan" class="level3" data-number="4.3.4">
+<h3 data-number="4.3.4" class="anchored" data-anchor-id="choosing-a-cost-model-instead-of-a-slogan"><span class="header-section-number">4.3.4</span> Choosing: a cost model instead of a slogan</h3>
+<p>The source material frames the decision as premium-durable versus cheap-replaceable, and the frame is right; it just needs numbers attached. For any crash-exposed component, compare the expected cost per incident, not the purchase price. A carbon arm might cost $15 and survive, say, nine out of ten hard landings; a printed arm costs $0.50 in filament and three hours of unattended printer time and might survive half of them. The printed arm is cheaper per crash <em>if</em> the program can tolerate the downtime and the arm’s mass and stiffness penalties — which, per the arithmetic above, flying structure cannot, but brackets, mounts, and guards can. Hence the hybrid rule that every experienced builder converges on and that this book’s build lab applies directly:</p>
+<ul>
+<li><strong>Flying primary structure</strong> — arms, centre plates: carbon laminate. Stiffness is the mission.</li>
+<li><strong>Fittings and crash structure</strong> — camera mounts, companion-computer trays, landing gear, antenna masts, sensor housings: printed, in ABS or (carbon-)nylon, oriented with the load in the layer plane. Iteration speed is the mission; a bracket that took three hours to print and gets redesigned twice a week is a feature of the development process, not a compromise.</li>
+<li><strong>Threaded and precision interfaces</strong> — motor mounts on larger craft, standoffs: aluminium, because machinability and thread strength in a small volume beat both alternatives.</li>
+</ul>
+<p>Prototyping deserves the last word: a printed <em>version</em> of a carbon part, flown gently, answers fit and packaging questions in a day for pennies, and the carbon part is then cut once, correctly. The materials are not rivals; they are stages of the same workflow.</p>
+</section>
+</section>
+<section id="the-power-problem-living-with-lithium-polymer" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="the-power-problem-living-with-lithium-polymer"><span class="header-section-number">4.4</span> The Power Problem: Living with Lithium Polymer</h2>
+<section id="what-a-lipo-cell-is" class="level3" data-number="4.4.1">
+<h3 data-number="4.4.1" class="anchored" data-anchor-id="what-a-lipo-cell-is"><span class="header-section-number">4.4.1</span> What a LiPo cell is</h3>
+<p>Every pack discussed in this book is a series string of lithium-polymer cells — the “S rating” of the previous chapter. Each cell is a flat laminated-foil pouch containing a layered sandwich: a cathode of lithium metal oxide (lithium cobalt oxide, LiCoO₂, or a nickel-manganese-cobalt blend) coated on aluminium foil; an anode of graphite coated on copper foil; a microporous polymer separator between them; and an organic carbonate electrolyte, gelled into a polymer matrix — the “polymer” in the name. Charging pumps lithium ions out of the metal-oxide lattice, across the separator, and into the graphite, where they intercalate between carbon planes; discharge runs the shuttle in reverse and drives the external circuit. Nothing is consumed in the ideal cycle — the same lithium inventory shuttles back and forth — and everything that permanently degrades the cell is a <em>side</em> reaction that steals lithium, electrolyte, or electrode material from that inventory.</p>
+<p>The pouch construction is why LiPo dominates drones. Without a steel can, the cell reaches pack-level specific energy around 150–200 Wh/kg (the previous chapter’s 0.5 kg, 77 Wh pack sits at 154 Wh/kg, a useful cross-check) and, more importantly, very low internal resistance per unit mass, which is what high-discharge flight loads demand. The same construction is why a degrading LiPo <em>visibly swells</em>: there is no rigid case to hide the gas.</p>
+</section>
+<section id="voltage-and-state-of-charge" class="level3" data-number="4.4.2">
+<h3 data-number="4.4.2" class="anchored" data-anchor-id="voltage-and-state-of-charge"><span class="header-section-number">4.4.2</span> Voltage and state of charge</h3>
+<p>A cell’s voltage is the difference between its two electrode potentials, each set by how much lithium the electrode currently holds. The resting voltage therefore maps to state of charge — the curve of <a href="#fig-lipo-voltage-soc-curve" class="quarto-xref">Figure&nbsp;<span>4.3</span></a>: 4.20 V at 100 %, a long shallow plateau through the middle of the discharge — roughly 3.85 V near 55–60 %, 3.7 V around a quarter — and then a steep knee below about 3.5 V, where the remaining few percent drain away with the voltage falling fast. Three consequences of that curve shape run through all battery practice. First, voltage is a usable fuel gauge only because the mapping is repeatable — but only at <em>rest</em>; under load the reading is depressed by internal resistance, which is why in-flight voltage alarms are set conservatively. Second, the flatness of the plateau means most of the flight happens within a couple of tenths of a volt, so the 20 % speed variation per cell voltage computed in the previous chapter is concentrated at the ends of the flight. Third, the steep knee is why the practical floor is ~3.5 V per cell: below it there is almost no energy left to collect, and the damage threshold at 3.0 V is minutes away at flight loads.</p>
+<div id="fig-lipo-voltage-soc-curve" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Line chart of resting cell voltage in volts against state of charge in percent for a lithium-polymer cell, annotated as valid at rest only because load sag depresses every reading. The curve rises steeply from 3.0 volts at zero percent through a knee near 3.5 volts at a few percent, marked with a dashed line as the practical in-flight floor, passes 3.7 volts at about one-quarter charge, then crosses a long shallow plateau, annotated as where most of the flight lives within a couple of tenths of a volt, before climbing to a dashed full-charge line at 4.20 volts at 100 percent. A shaded green vertical band between 50 and 60 percent state of charge is labeled storage window, 3.80 to 3.85 volts per cell. A shaded red region below 3.0 volts is labeled over-discharge, copper current-collector dissolution, dispose, do not recharge. A footer converts the storage window to pack level: 15.2 to 15.4 volts for 4S and 22.8 to 23.1 volts for 6S.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-lipo-voltage-soc-curve-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/lipo-voltage-soc-curve.svg" class="img-fluid figure-img" style="width:85.0%" alt="Line chart of resting cell voltage in volts against state of charge in percent for a lithium-polymer cell, annotated as valid at rest only because load sag depresses every reading. The curve rises steeply from 3.0 volts at zero percent through a knee near 3.5 volts at a few percent, marked with a dashed line as the practical in-flight floor, passes 3.7 volts at about one-quarter charge, then crosses a long shallow plateau, annotated as where most of the flight lives within a couple of tenths of a volt, before climbing to a dashed full-charge line at 4.20 volts at 100 percent. A shaded green vertical band between 50 and 60 percent state of charge is labeled storage window, 3.80 to 3.85 volts per cell. A shaded red region below 3.0 volts is labeled over-discharge, copper current-collector dissolution, dispose, do not recharge. A footer converts the storage window to pack level: 15.2 to 15.4 volts for 4S and 22.8 to 23.1 volts for 6S.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lipo-voltage-soc-curve-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.3: The resting-voltage fuel gauge. The mapping from state of charge to resting cell voltage, with the thresholds the chapter’s battery rules use: 4.20 V full, the long shallow plateau through the middle, 3.7 V near one-quarter charge, the knee at roughly 3.5 V, the 3.0 V damage threshold — and the 3.80–3.85 V storage window at 50–60 % state of charge sitting between the two failure regimes.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="why-storing-a-cell-full-degrades-it" class="level3" data-number="4.4.3">
+<h3 data-number="4.4.3" class="anchored" data-anchor-id="why-storing-a-cell-full-degrades-it"><span class="header-section-number">4.4.3</span> Why storing a cell full degrades it</h3>
+<p>At full charge the cell is at its maximum chemical stress in both directions at once. The cathode is maximally delithiated — at a cell voltage of 4.20 V it sits near 4.3 V versus lithium, right at the oxidative stability limit of the carbonate electrolyte — and the graphite anode is maximally lithiated, sitting within a tenth of a volt of lithium metal itself and hungry to reduce anything that touches it. Both interfaces therefore run continuous parasitic side reactions: the electrolyte slowly <em>oxidizes</em> at the cathode surface and is slowly <em>reduced</em> into ever-thickening interphase layers at the anode. These reactions consume electrolyte and cyclable lithium (permanent capacity loss), thicken the interface films (rising internal resistance), and — the visible symptom — generate gaseous products, chiefly CO₂ and CO, which inflate the pouch. A “puffed” LiPo is the exhaust of its own electrolyte decomposition, and the puffing is doubly harmful: beyond marking lost capacity, the gas layer physically separates electrode from separator, lengthening the ionic path and raising resistance further.</p>
+<p>Both reaction families are thermally activated and accelerate with state of charge, which is why the damage is a strong function of <em>how full</em> and <em>how warm</em> the cell sits. Typical published calendar-ageing measurements make the point numerically: a cell stored fully charged at room temperature loses on the order of 20 % of its capacity in a year, against roughly 4 % for the same cell stored near half charge — and both figures roughly double for each 10–15 °C of storage temperature. A charged pack left in a hot car combines the worst of both axes. The practical rule — charge shortly before flying, not days ahead — is this chemistry read backwards.</p>
+</section>
+<section id="why-storing-a-cell-empty-destroys-it" class="level3" data-number="4.4.4">
+<h3 data-number="4.4.4" class="anchored" data-anchor-id="why-storing-a-cell-empty-destroys-it"><span class="header-section-number">4.4.4</span> Why storing a cell empty destroys it</h3>
+<p>The empty end fails by a different and nastier mechanism. A cell landed at the ~3.5 V floor holds only a few percent of its capacity, and self-discharge does not stop at zero percent: the same parasitic reactions keep nibbling, and with the discharge curve’s knee already passed, the voltage now falls quickly and keeps falling. Below about 3.0 V per cell the cell enters territory its chemistry cannot tolerate. As the graphite gives up its last lithium, the anode’s potential climbs — and once it climbs to roughly 3.1 V versus lithium, the <em>copper foil the anode is coated on</em> becomes electrochemically unstable and begins to dissolve into the electrolyte as copper ions. This is not a metaphor: the current collector itself corrodes away.</p>
+<p>The damage is twofold and irreversible. Capacity is lost outright, because the interphase layers and dissolution products consume lithium inventory that can never be recovered. Worse, a copper-contaminated cell is <em>dangerous to recharge</em>: charging drives the dissolved copper ions to plate back out as metallic copper wherever the field concentrates — including as filaments through the separator’s pores — creating internal micro-shorts. A micro-shorted cell self-discharges rapidly, heats internally, and is a thermal-runaway candidate sitting on a bench. This is why the correct disposition for a pack found deeply over-discharged after storage is disposal, not a “recovery charge,” whatever the charger’s recovery mode offers: the 3.0 V threshold is not where the battery stops working, it is where recharging it stops being safe. The familiar story of a pack that “stopped functioning after long-term storage” is this mechanism playing out in a drawer: a pack put away nearly empty drifts under 3.0 V within weeks, and every week below the threshold dissolves more copper.</p>
+</section>
+<section id="the-storage-charge-window-justified" class="level3" data-number="4.4.5">
+<h3 data-number="4.4.5" class="anchored" data-anchor-id="the-storage-charge-window-justified"><span class="header-section-number">4.4.5</span> The storage-charge window, justified</h3>
+<p>The two failure modes bracket an optimum. Full storage maximizes parasitic reaction rates; empty storage courts the copper cliff. The window in between — roughly 50–60 % state of charge, a resting voltage of about <strong>3.80–3.85 V per cell</strong> (15.2–15.4 V for a 4S pack, 22.8–23.1 V for 6S; the shaded band in <a href="#fig-lipo-voltage-soc-curve" class="quarto-xref">Figure&nbsp;<span>4.3</span></a>) — is chosen to sit well down from the oxidative stress of the full cathode while banking a large energy margin above the damage threshold. The margin is worth computing, because it is the part of the rule people doubt. Take the book’s 5200 mAh pack, stored at 3.85 V per cell, about 55 % SoC — 2860 mAh in the bank. LiPo self-discharge runs on the order of 1–2 % of rated capacity per month, 52–104 mAh. Merely reaching the <em>20 %</em> mark — still entirely healthy — means losing the difference between the 2860 mAh on hand and 20 % of capacity (1040 mAh), i.e.&nbsp;1820 mAh, which takes <span class="math inline">\(1820/104 \approx 17\)</span> months even at the pessimistic rate; reaching genuine danger takes years. Now run the same arithmetic for a pack tossed in the drawer as it came back from its last flight, resting near 3.5 V with perhaps 5 % — 260 mAh — remaining: at 52–104 mAh per month it is <em>fully</em> empty within a few months and dropping through 3.0 V soon after. The storage rule is not fussiness; it is the difference between a shelf life measured in years and one measured in weeks. Every mainstream hobby charger has a storage mode that charges or discharges the pack to this window automatically; ending a flying day by putting every pack into storage mode is the single highest-value battery habit there is.</p>
+<p>Where the pack sits matters too, because the failure it guards against is thermal. Cool storage slows every parasitic reaction (the same Arrhenius factor working in your favour); dry storage protects the pouch laminate and connectors; and a fire-resistant container — a LiPo bag or steel ammunition box, vented rather than sealed, because containment must not become a pressure vessel — bounds the consequences if a damaged cell does run away. A cell in thermal runaway is its own oxidizer and cannot be starved like an ordinary fire; the container’s job is to keep one pack’s failure from propagating to the shelf above it.</p>
+</section>
+<section id="internal-resistance-the-health-gauge" class="level3" data-number="4.4.6">
+<h3 data-number="4.4.6" class="anchored" data-anchor-id="internal-resistance-the-health-gauge"><span class="header-section-number">4.4.6</span> Internal resistance: the health gauge</h3>
+<p>Everything that ages a cell — interphase growth, electrolyte loss, gas separation, copper contamination — shows up in one measurable number: internal resistance. It is measured from Ohm’s law with the pack as its own instrument: read the resting voltage, apply a known load, read the sag. A healthy modern 5 Ah pouch cell measures a handful of milliohms; call it 5 mΩ. Consider what happens as that triples to 15 mΩ — a typical end-of-life figure — on the aircraft sized in the previous chapter, whose four motors draw 80 A at full throttle.</p>
+<p>At 80 A, the healthy cell sags <span class="math inline">\(80 \times 0.005 = 0.40\)</span> V and dissipates <span class="math inline">\(80^2 \times 0.005 = 32\)</span> W of internal heat; across a 4S pack, 1.6 V and 128 W. Ugly but sustainable for the seconds a full-throttle climb lasts. The aged cell sags <span class="math inline">\(80 \times 0.015 = 1.2\)</span> V — from a 3.7 V plateau down to 2.5 V under load, deep past any voltage alarm — and dissipates 96 W <em>per cell</em>, 384 W per pack — against roughly 800 W actually delivered to the motors (<span class="math inline">\(4 \times 2.5\ \text{V} \times 80\ \text{A}\)</span>), so nearly a third of the chemical power the pack produces is now cooking the pack itself. The symptoms pilots report — the pack that “sags,” triggers failsafes on punch-outs, comes back warm, and shows fine resting voltage — are all this one parameter. In hover the same aircraft draws about 17 A (<span class="math inline">\(252\ \text{W} / 14.8\ \text{V}\)</span>), where even the aged pack sags only 0.26 V per cell, which is why a dying pack flies gentle missions convincingly and fails exactly when full performance is demanded. The C rating now reads as what it always was: a manufacturer’s claim that internal resistance is low enough to sustain a stated current — <span class="math inline">\(50\text{C} \times 5.2\ \text{Ah} = 260\)</span> A for the book’s pack against an 80 A worst case — and the reason that rating erodes with age is that the resistance underneath it grows.</p>
+<p>A battery log — pack serial, cycle count, per-cell internal resistance at each charge, post-flight resting voltages — costs a minute per flight and converts battery management from anecdote to data. Retirement criteria then stop being arguments: a pack leaves service when internal resistance has roughly tripled from new, when any cell puffs visibly or holds a resting voltage persistently out of balance with its siblings, or after any excursion below 3.0 V per cell, regardless of how it seems to perform afterwards.</p>
+<p>Structure and chemistry between them settle what the aircraft can carry and how long it can stay up. They say nothing about what it <em>knows</em> while it is up there — and a frame stiff enough to keep its resonances clear of the rotors was, in the argument above, valuable mainly because of what it does for a sensor. Those sensors are the subject of the next chapter.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="For More">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>For More
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Two variations on the chemistry appear in drone work. <em>LiHV</em> cells shift the charge cutoff from 4.20 to 4.35 V per cell, buying roughly 10 % more energy per gram at the direct cost of intensified high-voltage electrolyte oxidation — the calendar-ageing penalty of this chapter’s “stored full” section, purchased deliberately, cycle after cycle. They suit racing, where packs live hard and die young, and are a poor trade for endurance platforms. In the opposite direction, endurance-oriented builds increasingly use cylindrical Li-ion cells (18650/21700 format), which reach ~250 Wh/kg at cell level — well above pouch LiPo — but with internal resistance too high for aggressive discharge: a fine trade at a survey platform’s steady 2–3C hover draw, a disqualifying one for anything that needs punch. The selection logic is this chapter’s internal-resistance arithmetic with different inputs, which is the point: chemistry choices, like material choices, are the same trade study with the same handful of numbers.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="check-your-understanding" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">4.5</span> Check Your Understanding</h2>
+<ol type="1">
+<li>A colleague proposes 3D-printing replacement frame arms in PLA at the same dimensions as the carbon originals, arguing that PLA is “strong enough” since the arms rarely break in flight. Using <span class="math inline">\(E_{\text{CF}} = 50\)</span> GPa, <span class="math inline">\(E_{\text{PLA}} = 3.5\)</span> GPa, evaluate the proposal on the correct figure of merit.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Strength is the wrong figure of merit — arms are sized by stiffness, for geometry-holding and for keeping structural resonances above the propellers’ excitation. At identical geometry, a cantilever’s first resonant frequency scales as <span class="math inline">\(\sqrt{E/\rho}\)</span>: with <span class="math inline">\(E/\rho\)</span> of 31 MJ/kg for quasi-isotropic carbon against 2.8 MJ/kg for PLA, the printed arm’s first mode drops by a factor of <span class="math inline">\(\sqrt{31/2.8} \approx 3.3\)</span>, likely landing inside the 90–180 Hz band the propellers excite, corrupting the IMU and destabilizing the attitude loop. Matching the carbon arm’s bending stiffness instead requires <span class="math inline">\((50/3.5)^{1/3} = 2.4\)</span> times the thickness, and <span class="math inline">\(2.4 \times (1.24/1.6) \approx 1.9\)</span> times the mass — roughly doubling arm mass on an aircraft whose hover power scales as <span class="math inline">\(m^{3/2}\)</span>. Additionally, PLA’s ~60 °C glass transition disqualifies it outdoors in summer sun. Print the camera bracket; buy the carbon arm.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>A 6S pack will not be flown for three weeks. State the storage voltage for the whole pack, the approximate state of charge it represents, and the two failure mechanisms the storage window is positioned between.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Storage is 3.80–3.85 V per cell, so <span class="math inline">\(6 \times 3.80\)</span> to <span class="math inline">\(6 \times 3.85\)</span> = 22.8–23.1 V for the pack, about 50–60 % state of charge. The window sits below the high-SoC regime — where the near-4.3 V (vs.&nbsp;lithium) cathode continuously oxidizes electrolyte, generating gas (puffing), consuming lithium inventory, and raising internal resistance — and far above the low-SoC cliff, where self-discharge drags the cell below 3.0 V and the anode potential rises high enough (~3.1 V vs.&nbsp;lithium) to dissolve the copper current collector. Three weeks at full charge is survivable but pointlessly costly; three weeks starting from a nearly empty pack could cross the 3.0 V threshold. Storage mode covers both.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Explain why a LiPo cell found at 2.6 V after winter storage should be disposed of rather than recharged, even if a charger’s “recovery mode” will accept it.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Below about 3.0 V, the delithiated graphite anode’s potential climbs to the point (~3.1 V vs.&nbsp;lithium) where the copper foil it is coated on becomes electrochemically unstable and dissolves into the electrolyte as copper ions. Recharging then drives those ions to redeposit as metallic copper, including as filaments through the separator’s pores, creating internal micro-shorts. The cell may accept charge and read a normal voltage, but it will self-discharge abnormally, heat internally, and carries an elevated risk of thermal runaway during charge — precisely when it is on a bench, indoors, possibly unattended. The capacity lost to the excursion is also unrecoverable. Recovery mode can restore the voltage; it cannot un-dissolve the copper.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>A cell rests at 3.75 V; under a 30 A load it reads 3.45 V. Compute its internal resistance and its internal heating at that load. The same cell measured 5 mΩ when new — what does the comparison tell you, and what would you check next?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(R = \Delta V / I = (3.75 - 3.45)/30 = 0.30/30 = 10\ \text{m}\Omega\)</span>; heating is <span class="math inline">\(I^2R = 900 \times 0.010 = 9\)</span> W in this one cell at 30 A. Resistance has doubled from new — meaningful ageing, though short of the tripled-from-new retirement criterion. Next: measure every cell in the pack, not just one, because degradation is rarely uniform — a single outlier cell dominates pack sag and is the first to hit the under-load voltage floor; check per-cell resting voltages for balance drift and the pouch for the onset of swelling; and project the trend from the pack’s log. A pack at 2× resistance still flies, but it should be demoted from performance flights and watched.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>A printed nylon landing-gear leg survives crashes that snap its carbon predecessor, yet this chapter assigns arms to carbon and only fittings to printing. Reconcile the two facts.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The two parts have different jobs. An arm’s job is stiffness in normal flight — holding rotor geometry and keeping resonances above the excitation band — and there carbon’s order-of-magnitude specific-stiffness advantage is decisive; the arm is not supposed to absorb crash energy, and carbon could not do so anyway, being elastic to fracture at ~1 % strain. A landing leg’s job is the opposite: it exists precisely to absorb impact energy, which favours a tough material with large plastic strain — nylon’s elongation beyond 100 % lets it deform and recover or fail cheaply — and its stiffness barely matters. The general rule: match the material’s failure behaviour to the component’s role. Stiff and brittle for structure that must not flex; tough and compliant for structure that must survive abuse; and print the latter with load in the layer plane so layer separation is not the governing failure.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>Using the calendar-ageing figures in this chapter, estimate the capacity remaining after one year for two identical packs: one stored fully charged on a sunny windowsill (averaging ~35 °C), one at storage charge in a cool basement (~15 °C). Assume ~20 %/year loss at 100 % SoC and ~4 %/year at storage charge, both at 25 °C, with rates doubling per 10–15 °C.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The windowsill pack is stored full <em>and</em> roughly 10 °C above the reference, so its ~20 %/year loss roughly doubles to ~40 %: about 60 % of capacity remains, and the pack has likely also puffed and gained resistance — effectively ruined for flight loads. The basement pack is at storage charge <em>and</em> ~10 °C below reference, halving its ~4 %/year to ~2 %: about 98 % remains. The two habits differ by a factor of about twenty in annual degradation, which is the quantitative content of “storage charge, cool, dry.” (Both estimates are order-of-magnitude — the point is the ratio, not the decimals; self-discharge over the year is comfortably covered by the storage-charge margin computed in the chapter.)</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="4.6">
+<h2 data-number="4.6" class="anchored" data-anchor-id="try-it"><span class="header-section-number">4.6</span> Try It</h2>
+<p><strong>Part 1 — a materials decision, defended with numbers.</strong> Pick one crash-exposed component of a drone you have access to (or the book’s 500 mm-class platform): an arm, a camera mount, a leg, an antenna mast. Decide what its actual job is — stiffness, strength, or energy absorption — and choose a material with the table in this chapter, showing the specific-stiffness or specific-strength arithmetic. If you choose a printed part, state the print orientation and justify it from the load path and the layer-separation mechanism; estimate the cost and time per replacement against the carbon alternative, and state the crash rate at which each option wins. If a printer is available, print the part in two orientations — load in-plane and load across layers — and break both by hand: the difference you feel is the 30–70 % interlayer knockdown made tangible.</p>
+<p><strong>Part 2 — a battery standard operating procedure.</strong> Write a one-page battery SOP for a small drone program, and make every rule in it traceable to a mechanism from this chapter. It should specify: the storage window in volts per cell and why (both failure modes, with the self-discharge arithmetic for your pack’s actual capacity); when packs are charged relative to flights; the container and location for storage and charging; per-flight log fields (cycle count, per-cell internal resistance, post-flight resting voltages); and numeric retirement criteria (resistance multiple from new, balance drift, puffing, any sub-3.0 V excursion). Then take a real pack, measure its per-cell internal resistance from voltage sag under a known load, and start the log with an entry. A rule you can defend with a mechanism will survive contact with a busy flight line; a rule that is only a rule will not.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#collaborative-drone-build">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="pagination-link" aria-label="Anatomy of a Multirotor: Frames, Motors, and Propulsion">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="pagination-link" aria-label="Sensing the World: IMUs, Magnetometers, and Barometers">
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>3&nbsp; Anatomy of a Multirotor: Frames, Motors, and Propulsion – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" rel="next">
+<link href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html">Part I — Airframes, Regulation &amp; Flight Safety</a></li><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">3.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">3.2</span> Key Vocabulary</a></li>
+  <li><a href="#choosing-a-configuration" id="toc-choosing-a-configuration" class="nav-link" data-scroll-target="#choosing-a-configuration"><span class="header-section-number">3.3</span> Choosing a Configuration</a>
+  <ul class="collapse">
+  <li><a href="#why-a-wing-beats-a-rotor-for-endurance-and-loses-everywhere-else" id="toc-why-a-wing-beats-a-rotor-for-endurance-and-loses-everywhere-else" class="nav-link" data-scroll-target="#why-a-wing-beats-a-rotor-for-endurance-and-loses-everywhere-else"><span class="header-section-number">3.3.1</span> Why a wing beats a rotor for endurance, and loses everywhere else</a></li>
+  <li><a href="#why-four-rotors-and-what-six-buys" id="toc-why-four-rotors-and-what-six-buys" class="nav-link" data-scroll-target="#why-four-rotors-and-what-six-buys"><span class="header-section-number">3.3.2</span> Why four rotors, and what six buys</a></li>
+  <li><a href="#size-classes" id="toc-size-classes" class="nav-link" data-scroll-target="#size-classes"><span class="header-section-number">3.3.3</span> Size classes</a></li>
+  </ul></li>
+  <li><a href="#anatomy-what-the-parts-do" id="toc-anatomy-what-the-parts-do" class="nav-link" data-scroll-target="#anatomy-what-the-parts-do"><span class="header-section-number">3.4</span> Anatomy: What the Parts Do</a></li>
+  <li><a href="#the-frame" id="toc-the-frame" class="nav-link" data-scroll-target="#the-frame"><span class="header-section-number">3.5</span> The Frame</a>
+  <ul class="collapse">
+  <li><a href="#load-path-and-geometry" id="toc-load-path-and-geometry" class="nav-link" data-scroll-target="#load-path-and-geometry"><span class="header-section-number">3.5.1</span> Load path and geometry</a></li>
+  <li><a href="#stiffness-resonance-and-why-it-matters-to-software" id="toc-stiffness-resonance-and-why-it-matters-to-software" class="nav-link" data-scroll-target="#stiffness-resonance-and-why-it-matters-to-software"><span class="header-section-number">3.5.2</span> Stiffness, resonance, and why it matters to software</a></li>
+  </ul></li>
+  <li><a href="#motors" id="toc-motors" class="nav-link" data-scroll-target="#motors"><span class="header-section-number">3.6</span> Motors</a>
+  <ul class="collapse">
+  <li><a href="#reading-a-motor-designation" id="toc-reading-a-motor-designation" class="nav-link" data-scroll-target="#reading-a-motor-designation"><span class="header-section-number">3.6.1</span> Reading a motor designation</a></li>
+  <li><a href="#worked-example-900kv-on-a-6s-pack" id="toc-worked-example-900kv-on-a-6s-pack" class="nav-link" data-scroll-target="#worked-example-900kv-on-a-6s-pack"><span class="header-section-number">3.6.2</span> Worked example: 900KV on a 6S pack</a></li>
+  </ul></li>
+  <li><a href="#propellers" id="toc-propellers" class="nav-link" data-scroll-target="#propellers"><span class="header-section-number">3.7</span> Propellers</a></li>
+  <li><a href="#putting-it-together-sizing-a-research-quadcopter" id="toc-putting-it-together-sizing-a-research-quadcopter" class="nav-link" data-scroll-target="#putting-it-together-sizing-a-research-quadcopter"><span class="header-section-number">3.8</span> Putting It Together: Sizing a Research Quadcopter</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">3.9</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">3.10</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html">Part I — Airframes, Regulation &amp; Flight Safety</a></li><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>A multirotor is a remarkably austere machine. It has no swashplate, no tail rotor, no control surfaces, no gearbox, and in the common case no moving part at all except the four shafts that spin the propellers. Everything the aircraft does — hover, translate, rotate, arrest a gust — it does by changing four numbers, the angular velocities of four rotors, several hundred times a second. That austerity is the whole reason the configuration took over: it moves the entire problem of flight control out of mechanism and into software, which is cheap to iterate and free to copy.</p>
+<p>The consequence for an engineer is that the hardware questions become sizing questions rather than mechanism-design questions. Nobody designing a quadcopter invents a linkage; they choose a frame span, a motor, a propeller, a speed controller, and a battery, and those five choices are coupled tightly enough that changing any one of them forces the others. This chapter is about that coupling. It works through the configuration decision (why four rotors rather than six or a wing), the frame as a structure that carries load and sets propeller geometry, the brushless motor and what its KV rating actually specifies, and the propeller as the component that converts shaft power into thrust — ending with a complete worked sizing of the airframe the running example flies on. That sizing is what the previous chapter’s closing argument demands: value migrates up the stack into software only where the hardware underneath is well enough understood to be selected competently, and selecting it competently is arithmetic, not intuition.</p>
+<section id="learning-objectives" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">3.1</span> Learning Objectives</h2>
+<ul>
+<li>Compare quadcopter, hexacopter, and fixed-wing configurations quantitatively by hover or cruise power, payload fraction, maneuverability, and tolerance to a motor failure, and select a configuration from stated mission requirements.</li>
+<li>Explain the load path through a multirotor frame, and compute the propeller diameter a given frame wheelbase can physically accommodate.</li>
+<li>Interpret a brushless motor designation such as 2812 900KV, derive the no-load speed from the battery voltage, and use the back-electromotive-force model to explain why the loaded speed is always lower.</li>
+<li>Apply momentum theory to estimate hover power and endurance from all-up weight and rotor disc area, and propagate an added payload through to the resulting loss of flight time.</li>
+<li>Justify a complete propulsion configuration — motor KV, propeller diameter and pitch, electronic speed controller current rating, and battery cell count — against a stated payload, endurance, and speed requirement.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">3.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Airframe</strong> — the structural assembly of a drone: frame plates, arms, motor mounts, standoffs, and landing gear, excluding propulsion, avionics, and payload. Its job is to hold every other component in fixed relative position while transmitting rotor thrust to the vehicle’s centre of mass without deflecting enough to disturb the inertial sensors.</li>
+<li><strong>Brushless motor</strong> — a synchronous permanent-magnet machine in which commutation is performed electronically rather than by mechanical brushes. In the outrunner form used on multirotors, the permanent magnets are bonded to a rotating outer bell and the copper windings sit on a stationary inner stator.</li>
+<li><strong>Stator diameter</strong> and <strong>stator height</strong> — the two millimetre dimensions in a motor designation such as 2812 (28 mm diameter, 12 mm height). Together they set the volume of iron and copper, and therefore the torque the motor can produce continuously without overheating.</li>
+<li><strong>KV rating</strong> — the motor’s speed constant, in revolutions per minute per volt of back-electromotive force, measured with no load on the shaft. It is a property of the winding, not of the battery, and it fixes the trade between speed and torque for a given amount of motor.</li>
+<li><strong>Back-electromotive force</strong> (back-EMF) — the voltage a spinning motor generates in opposition to the applied voltage, proportional to shaft speed. Its constant is the reciprocal of the KV rating, and its existence is why a loaded motor never reaches its no-load speed.</li>
+<li><strong>ESC</strong> (Electronic Speed Controller) — the power-electronic stage between battery and motor. It switches a set of MOSFETs to synthesize the three-phase waveform that spins the rotor, and it regulates the effective voltage applied to the motor in response to a throttle command from the flight controller.</li>
+<li><strong>Pitch</strong> (propeller) — the axial distance a propeller would advance in one revolution if it moved through a solid medium without slip, quoted in inches alongside the diameter. Pitch sets the aggressiveness of the blade’s angle of attack and therefore the airspeed at which the propeller stops producing useful thrust.</li>
+<li><strong>Disc loading</strong> — thrust per unit rotor disc area, in newtons per square metre. It is the single strongest predictor of hover efficiency: low disc loading means a large mass of air accelerated gently, which is cheap, and high disc loading means a small mass of air accelerated hard, which is expensive.</li>
+<li><strong>Figure of merit</strong> (FM) — the ratio of the ideal induced hover power predicted by momentum theory to the actual shaft power a real rotor requires, typically 0.4 to 0.6 for small multirotor propellers and 0.7 or better for a full-size helicopter rotor.</li>
+<li><strong>Thrust-to-weight ratio</strong> (TWR) — total static thrust at full throttle divided by all-up weight. Values below about 2 leave inadequate control authority; 2 to 3 suits stable survey work; 8 and above characterizes racing aircraft.</li>
+<li><strong>All-up weight</strong> (AUW) — the mass of the complete aircraft as flown: airframe, propulsion, avionics, battery, and payload. Every performance figure in this chapter is a function of it.</li>
+<li><strong>Wheelbase</strong> — the motor-shaft-to-motor-shaft distance across the frame’s longest diagonal, in millimetres, and the number that names most commercial frames. It bounds the propeller diameter the aircraft can swing.</li>
+<li><strong>S rating</strong> — the number of lithium-polymer cells wired in series in a battery pack, each contributing 3.7 V nominal, 4.2 V fully charged, and about 3.5 V at the practical discharge floor.</li>
+</ul>
+</section>
+<section id="choosing-a-configuration" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="choosing-a-configuration"><span class="header-section-number">3.3</span> Choosing a Configuration</h2>
+<p>The deck-level comparison of quadcopter, hexacopter, and fixed-wing aircraft is usually presented as a table of adjectives — simplest, more complex, less efficient. Those adjectives are all downstream of two pieces of physics, and it is worth deriving them.</p>
+<section id="why-a-wing-beats-a-rotor-for-endurance-and-loses-everywhere-else" class="level3" data-number="3.3.1">
+<h3 data-number="3.3.1" class="anchored" data-anchor-id="why-a-wing-beats-a-rotor-for-endurance-and-loses-everywhere-else"><span class="header-section-number">3.3.1</span> Why a wing beats a rotor for endurance, and loses everywhere else</h3>
+<p>A rotorcraft in hover supports its weight by throwing air downward. Momentum theory gives the minimum power this can possibly cost. If a rotor of disc area <span class="math inline">\(A\)</span> produces thrust <span class="math inline">\(T\)</span> by accelerating air to an induced velocity <span class="math inline">\(v_i\)</span> in the far wake, mass conservation and momentum balance give</p>
+<p><span class="math display">\[
+\begin{aligned}
+v_i &amp;= \sqrt{\frac{T}{2\rho A}}, \\
+P_{\text{ideal}} &amp;= T v_i = \frac{T^{3/2}}{\sqrt{2\rho A}},
+\end{aligned}
+\]</span></p>
+<p>with <span class="math inline">\(\rho\)</span> the air density. Two features of that expression govern all multirotor design. First, hover power grows as thrust to the three-halves power, so mass is punished superlinearly. Second, power falls as the square root of disc area, so for a fixed thrust the cheapest possible rotor is the largest one that will fit.</p>
+<p>A fixed-wing aircraft never pays this bill, because it borrows its lift from forward motion. In steady cruise the thrust required is weight divided by the lift-to-drag ratio, <span class="math inline">\(T = W/(L/D)\)</span>, and the propulsive power is <span class="math inline">\(Tv\)</span>. For a 1.7 kg airframe with a modest <span class="math inline">\(L/D\)</span> of 10 cruising at 15 m/s,</p>
+<p><span class="math display">\[
+\begin{aligned}
+T &amp;= \frac{(1.7)(9.81)}{10} = 1.67\ \text{N}, \\
+P &amp;= (1.67)(15) = 25\ \text{W}.
+\end{aligned}
+\]</span></p>
+<p>Twenty-five watts of propulsive power to keep 1.7 kg airborne. The equivalent quadcopter, sized later in this chapter, needs roughly 190 W of shaft power to hold the same mass motionless. Carried through the same propeller, motor, ESC, and avionics losses used later — about 0.65 propeller efficiency, 0.8 combined motor-and-ESC efficiency, and a 12 W avionics allowance — the wing draws roughly 60 W from the battery against the quadcopter’s 250 W, so the same 62 Wh of usable pack energy buys about an hour aloft and some 55 km of ground track instead of a quarter of an hour over one spot. That factor of four is not an engineering deficiency to be optimized away; it is the definition of the trade. Wings buy endurance and range by giving up the ability to stop. Rotors buy the ability to stop — to hover over one nest, one insulator, one crack in a bridge soffit — and pay for it in watts.</p>
+</section>
+<section id="why-four-rotors-and-what-six-buys" class="level3" data-number="3.3.2">
+<h3 data-number="3.3.2" class="anchored" data-anchor-id="why-four-rotors-and-what-six-buys"><span class="header-section-number">3.3.2</span> Why four rotors, and what six buys</h3>
+<p>Within rotorcraft, the number of rotors is a second, subtler decision. Four is the minimum that gives full attitude control with fixed-pitch propellers: two counter-rotating pairs, so that differential thrust produces roll and pitch moments while differential drag torque between the pairs produces yaw, and all four together produce collective thrust. Four independent actuators, four controlled degrees of freedom, no redundancy anywhere.</p>
+<div id="fig-quadcopter-vs-hexacopter" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Side-by-side labeled top-down diagrams of a quadcopter and a hexacopter. On the left, four dashed rotor discs sit at the ends of an X frame, each with a curved rotation arrow and a CW or CCW label showing that diagonal rotors spin the same way, above text stating that differential thrust produces roll and pitch while differential drag torque produces yaw. On the right, six rotor discs ring a central hub with rotation directions alternating around the ring to form three counter-rotating pairs. Beneath each layout, matched comparison lines give total disc area, 0.203 versus 0.304 square metres for four versus six 10-inch propellers, induced hover power, 1.00 baseline versus 0.82 times for an 18 percent saving, and the outcome of losing one rotor: with four going to three the quadcopter cannot balance thrust and torque and falls, while with six going to five each surviving rotor carries 1.2 times its share and the aircraft surrenders yaw, degrades, and lands.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-quadcopter-vs-hexacopter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/quadcopter-vs-hexacopter.svg" class="img-fluid figure-img" style="width:90.0%" alt="Side-by-side labeled top-down diagrams of a quadcopter and a hexacopter. On the left, four dashed rotor discs sit at the ends of an X frame, each with a curved rotation arrow and a CW or CCW label showing that diagonal rotors spin the same way, above text stating that differential thrust produces roll and pitch while differential drag torque produces yaw. On the right, six rotor discs ring a central hub with rotation directions alternating around the ring to form three counter-rotating pairs. Beneath each layout, matched comparison lines give total disc area, 0.203 versus 0.304 square metres for four versus six 10-inch propellers, induced hover power, 1.00 baseline versus 0.82 times for an 18 percent saving, and the outcome of losing one rotor: with four going to three the quadcopter cannot balance thrust and torque and falls, while with six going to five each surviving rotor carries 1.2 times its share and the aircraft surrenders yaw, degrades, and lands.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-quadcopter-vs-hexacopter-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.1: Four rotors against six. On the quadcopter, diagonal rotors form the two counter-rotating pairs: differential thrust between one side and the other tilts the aircraft in roll or pitch, while differential drag torque between the CW and CCW pairs yaws it. The hexacopter runs the same logic across three alternating pairs, and six 10-inch discs on the same span carry 1.5 times the disc area — and one rotor’s worth of redundancy the quadcopter lacks.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-quadcopter-vs-hexacopter" class="quarto-xref">Figure&nbsp;<span>3.1</span></a> sets the two layouts side by side, and everything the rest of this section quantifies — disc area, induced power, and what a rotor failure leaves behind — is already visible in the geometry.</p>
+<p>Six rotors offer two distinct advantages, one obvious and one not. The obvious one is thrust: more motors mean more lift, which is why heavy-lift and cinematography platforms are hexacopters and octocopters. The less obvious one is that six rotors on the same frame span give more total disc area than four. For a hexacopter carrying six 10-inch propellers, total disc area is <span class="math inline">\(6 \times 0.0507 = 0.304\ \text{m}^2\)</span> against <span class="math inline">\(4 \times 0.0507 = 0.203\ \text{m}^2\)</span> for the quad. Since induced power scales as <span class="math inline">\(A^{-1/2}\)</span>, the hexacopter needs</p>
+<p><span class="math display">\[\sqrt{\frac{0.203}{0.304}} = 0.82\]</span></p>
+<p>of the quadcopter’s induced power for the same total thrust — an 18 % saving. That saving is real but fragile: two extra motors, two extra speed controllers, two extra arms, and the wiring for both typically add 15 to 25 % to the empty weight, and since hover power scales as <span class="math inline">\(W^{3/2}\)</span>, the added mass usually consumes the aerodynamic gain. Hexacopters are chosen for lift capacity and redundancy, not for efficiency, and a designer who claims otherwise has not done the mass accounting.</p>
+<p>Redundancy is the argument that actually justifies the extra rotors, and it deserves precision, because it is routinely overstated. Losing one rotor of six leaves five that must collectively produce the same thrust, so each rises to <span class="math inline">\(6/5 = 1.2\)</span> times its previous share — easily within the margin of a platform designed to a thrust-to-weight ratio of 2. But sufficient thrust is not the same as retained controllability. In the common star layout, with all six arms equally spaced and alternating rotation directions, the loss of one rotor leaves a control allocation that cannot simultaneously satisfy roll, pitch, yaw, and thrust demands. Practical fault-tolerant controllers therefore surrender yaw: the aircraft is allowed to rotate continuously about its vertical axis while attitude and position are held, which is survivable and lands the vehicle but is not normal flight. A quadcopter has no equivalent option — losing one of four rotors makes it impossible to produce nonzero collective thrust with zero net moment, and the aircraft falls unless it enters a deliberately spinning relaxed-hover mode that few production autopilots implement. The honest statement is that a hexacopter degrades and a quadcopter fails, which matters enormously when the aircraft flies over people or carries something expensive, and matters very little for a research vehicle flown over an empty field.</p>
+</section>
+<section id="size-classes" class="level3" data-number="3.3.3">
+<h3 data-number="3.3.3" class="anchored" data-anchor-id="size-classes"><span class="header-section-number">3.3.3</span> Size classes</h3>
+<p>Multirotors organize naturally into classes by propeller size, and every other parameter follows from it. Sub-100-gram indoor aircraft use 1- to 3-inch ducted propellers; 5-inch aircraft in the 500–800 g range are the racing and freestyle class; 7- to 10-inch aircraft at 1–3 kg are the long-range and light-mapping class; 12- to 32-inch aircraft from 5 to 50 kg are the heavy-lift class that carries survey LiDAR and spray tanks; and above 40 inches the vehicles are cargo aircraft with regulatory profiles closer to crewed aviation than to hobby flight. Reading that progression through the momentum-theory result explains why it exists: disc area rises as the square of diameter, so the larger classes are not merely bigger but fundamentally more efficient per kilogram lifted, which is what makes long endurance with real payload possible at all. The research platforms in this book sit in the 7- to 10-inch class, which is the smallest class with enough surplus lift to carry a companion computer and a depth camera while remaining well under regulatory weight thresholds.</p>
+</section>
+</section>
+<section id="anatomy-what-the-parts-do" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="anatomy-what-the-parts-do"><span class="header-section-number">3.4</span> Anatomy: What the Parts Do</h2>
+<p>Strip a research quadcopter to its components and the inventory is short: a frame, four motors, four propellers, four speed-controller channels, a flight controller with its inertial sensors, a satellite-navigation receiver and magnetometer, a radio receiver, a telemetry link, a battery, a power-distribution board with a voltage and current sensor, and whatever payload justifies the flight. On a research aircraft one more component appears — a companion computer running the autonomy software — and it is the only part of the list that is not present on a hobby aircraft.</p>
+<div id="fig-quadcopter-frame" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A small carbon-fibre quadcopter frame photographed from above at an angle, with four brushless motors mounted at the ends of its arms, an electronics stack sandwiched between the top and bottom plates, wiring running along the arms, and a cloverleaf video transmitter antenna projecting upward.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-quadcopter-frame-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/photos/quadcopter-frame-with-components.jpg" class="img-fluid figure-img" style="width:80.0%" alt="A small carbon-fibre quadcopter frame photographed from above at an angle, with four brushless motors mounted at the ends of its arms, an electronics stack sandwiched between the top and bottom plates, wiring running along the arms, and a cloverleaf video transmitter antenna projecting upward.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-quadcopter-frame-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.2: A 200 mm-class quadcopter frame with its propulsion and video components installed, showing the carbon-fibre arms, the stacked centre plates, and the motor mounts at the arm ends.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-quadcopter-frame" class="quarto-xref">Figure&nbsp;<span>3.2</span></a> shows the arrangement on a compact racing airframe, which is a useful teaching object precisely because nothing is hidden: the arms, the motor mounts, the sandwiched electronics stack, and the wiring runs are all visible at once. A larger survey platform packages the same functional blocks behind covers and inside booms, but the block diagram is identical.</p>
+<p>The power chain runs battery <span class="math inline">\(\rightarrow\)</span> power distribution <span class="math inline">\(\rightarrow\)</span> ESC <span class="math inline">\(\rightarrow\)</span> motor <span class="math inline">\(\rightarrow\)</span> propeller <span class="math inline">\(\rightarrow\)</span> air, and every stage of it dissipates a fraction of what it receives. The signal chain runs sensors <span class="math inline">\(\rightarrow\)</span> flight controller <span class="math inline">\(\rightarrow\)</span> ESC, closing an attitude loop at several hundred hertz. The two chains meet at the ESC, which is the only component that is simultaneously a power converter and a digital peripheral. Understanding a drone’s performance means tracking energy along the first chain; understanding its behaviour means tracking information along the second. The remainder of this chapter follows the first chain; the Sensing the World chapter takes up the second, and Part II develops it in full.</p>
+</section>
+<section id="the-frame" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="the-frame"><span class="header-section-number">3.5</span> The Frame</h2>
+<p>The frame does three things, in descending order of how often they are appreciated: it transmits rotor thrust into the vehicle’s mass, it fixes the geometry of the propeller discs relative to one another, and it isolates the inertial sensors from vibration.</p>
+<section id="load-path-and-geometry" class="level3" data-number="3.5.1">
+<h3 data-number="3.5.1" class="anchored" data-anchor-id="load-path-and-geometry"><span class="header-section-number">3.5.1</span> Load path and geometry</h3>
+<p>The load path is a cantilever problem. Each motor applies an upward force at the tip of an arm, and the arm carries that force as a bending moment into the centre plates, where the two plates and their standoffs form a shallow box section that redistributes the four arm loads into the mass of the battery and payload hanging below. This is why the centre section is built as two plates rather than one: a single plate resists bending only through its own thickness, whereas two plates separated by standoffs resist it through the separation, in exactly the way an I-beam’s flanges do. The arms carry bending; the plates carry the resulting couple.</p>
+<p>Frame plan-forms have names — X, H, hybrid-X, and box — and the differences are functional. The <strong>X</strong> layout places four arms symmetrically about the centre, which makes the inertia tensor nearly symmetric in roll and pitch and gives identical response about both axes; it is the default for general-purpose and research aircraft. The <strong>H</strong> layout separates two longitudinal booms joined by cross-members, giving a long central bay for a battery or camera and a deliberately asymmetric inertia — quicker in roll than in pitch — which suits camera platforms that want a stable pitch axis. <strong>Hybrid-X</strong> stretches an X frame lengthwise so the rear propellers stay out of a forward-facing camera’s field of view. <strong>Box</strong> frames add a second deck above the propeller plane for impact protection at the cost of weight and drag. The choice is a control-and-packaging decision, not an aesthetic one.</p>
+<p>Frame span sets propeller size, and the arithmetic is worth doing explicitly because it is the constraint that most often bites during a build. A frame’s advertised wheelbase is the motor-to-motor distance across the longest diagonal. On a symmetric X frame the four motors sit at the corners of a square whose diagonal is the wheelbase, so the distance between <em>adjacent</em> motors — the pair whose propellers can collide — is the square’s side:</p>
+<p><span class="math display">\[s = \frac{d}{\sqrt{2}}.\]</span></p>
+<p>For the 500 mm wheelbase of the class of frame used later in this chapter, <span class="math inline">\(s = 500/1.414 = 354\ \text{mm}\)</span>. A 10-inch propeller is 254 mm across, leaving <span class="math inline">\(354 - 254 = 100\ \text{mm}\)</span> of tip-to-tip clearance, which is ample. A 13-inch propeller is 330 mm across and leaves only 24 mm, close enough that the tip vortex shed by one disc washes into its neighbour and both lose thrust while gaining noise. A 14-inch propeller is 356 mm across — wider than the motor spacing itself, so the discs physically intersect and the configuration is impossible at any clearance. The frame, in other words, quietly caps the aircraft’s maximum efficiency, because it caps disc area.</p>
+</section>
+<section id="stiffness-resonance-and-why-it-matters-to-software" class="level3" data-number="3.5.2">
+<h3 data-number="3.5.2" class="anchored" data-anchor-id="stiffness-resonance-and-why-it-matters-to-software"><span class="header-section-number">3.5.2</span> Stiffness, resonance, and why it matters to software</h3>
+<p>The third job, vibration isolation, is where frame design touches autonomy. Every propeller injects excitation at its rotational frequency and at the blade-passing frequency, which for a two-bladed propeller is twice the rotational rate. The hover condition worked below spins the rotors at about 5,400 RPM, or 90 Hz, with a blade-passing component at 181 Hz. An inertial measurement unit rigidly attached to a frame whose first bending mode lies near either of those frequencies will report the frame’s resonance as though it were vehicle motion, and the attitude controller will faithfully attempt to correct it — which is how a well-tuned aircraft on a floppy frame produces hot motors, an oscillating attitude estimate, and a mysteriously short flight time.</p>
+<p>The engineering responses are all structural or filtering: raise the frame’s first natural frequency by making the arms stiffer relative to their mass, isolate the flight controller on damping mounts so the mechanical path is a low-pass filter, and apply notch filters in the autopilot keyed to measured motor RPM. The first response is a materials problem, and it is why carbon-fibre composite dominates: what matters for a cantilever’s resonant frequency is specific stiffness, the ratio of elastic modulus to density, and a unidirectional carbon laminate exceeds aluminium on that ratio by a wide margin while a 3D-printed thermoplastic falls far below it.</p>
+<p>Reading the classic material comparison — plastic (PLA or ABS) medium weight, low strength, low stiffness, cheap, easy to make; aluminium heavy, strong, stiff, moderate cost and difficulty; carbon fibre very light, very strong, very stiff, expensive, difficult — the columns line up too neatly to be a coincidence, and they are not: each material is a different point on the same trade between specific stiffness and manufacturability. The Materials and Power chapter that follows this one develops that trade properly, including layup direction, failure modes under impact, and the electrical-conductivity problem that makes carbon fibre an awkward neighbour for antennas. For present purposes the operational summary is enough: prototype in printed plastic where iteration speed dominates and loads are low, build flying structure in carbon fibre, and use aluminium for local fittings such as motor mounts and standoffs, where machinability and thread strength matter more than mass.</p>
+</section>
+</section>
+<section id="motors" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="motors"><span class="header-section-number">3.6</span> Motors</h2>
+<p>Almost every flying multirotor uses a brushless outrunner. The stationary inner stator carries three sets of copper windings on a laminated iron core; the rotating outer bell carries permanent magnets. Energizing the windings in sequence pulls the magnets around, and because the windings are the stationary part, they can be cooled and driven without any sliding contact. Brushed motors are cheaper and simpler and survive only on toys, because brushes wear, arc, and cap efficiency well below what the same mass of brushless machine achieves.</p>
+<p>The commutation sequence is the ESC’s job, and it requires knowing where the rotor is. Some motors report position with Hall-effect sensors; most drone motors omit them and infer position from the back-EMF waveform on the undriven phase, which is why a sensorless drone motor stutters at startup — there is no back-EMF until it is already turning.</p>
+<section id="reading-a-motor-designation" class="level3" data-number="3.6.1">
+<h3 data-number="3.6.1" class="anchored" data-anchor-id="reading-a-motor-designation"><span class="header-section-number">3.6.1</span> Reading a motor designation</h3>
+<p>A label such as <strong>2812 900KV</strong> encodes three numbers. The first two digits, 28, are the stator diameter in millimetres. The next two, 12, are the stator height. Together they specify the volume of the magnetic circuit and therefore the continuous torque available before the copper overheats: a 2812 has substantially more iron and copper than the 2207 typical of a 5-inch racing aircraft, and vastly more than the 0802 of an indoor micro. The third number, 900KV, is the speed constant.</p>
+<div id="fig-brushless-motor-cross-section" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Labeled cutaway drawing of a brushless outrunner motor. A vertical shaft runs through two bearings inside a central mounting tube. Around the tube sits the stator, drawn as laminated iron teeth with copper winding bundles in the slots. An outer bell encloses the stator from above and the sides, with permanent magnets marked N and S bonded to its inner walls and a narrow air gap between magnets and stator. Dimension arrows mark the stator diameter as the 28 in a 2812 designation and the stator stack height as the 12, and a footer line decodes 2812 900KV.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-brushless-motor-cross-section-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/brushless-motor-cross-section.svg" class="img-fluid figure-img" style="width:85.0%" alt="Labeled cutaway drawing of a brushless outrunner motor. A vertical shaft runs through two bearings inside a central mounting tube. Around the tube sits the stator, drawn as laminated iron teeth with copper winding bundles in the slots. An outer bell encloses the stator from above and the sides, with permanent magnets marked N and S bonded to its inner walls and a narrow air gap between magnets and stator. Dimension arrows mark the stator diameter as the 28 in a 2812 designation and the stator stack height as the 12, and a footer line decodes 2812 900KV.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-brushless-motor-cross-section-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.3: What a motor designation labels. The size digits measure the stationary stator — a 2812 has a 28 mm stator diameter and a 12 mm lamination-stack height — while the permanent magnets ride on the rotating outer bell, separated from the stator by the air gap, and the shaft turns with the bell on two bearings. The KV figure describes the winding wound onto that stator, not any dimension of it.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-brushless-motor-cross-section" class="quarto-xref">Figure&nbsp;<span>3.3</span></a> locates all three numbers on the machine itself: the first two describe the stationary stack of iron and copper, and the third describes the winding wound onto it.</p>
+<p><strong>KV is not a power rating and it is not a quality rating.</strong> It is a winding property: the number of turns per phase determines how much back-EMF the machine generates per unit of rotational speed, and KV is the reciprocal of that constant expressed in convenient units. Rewinding a given stator with fewer turns of thicker wire raises KV and lowers torque per amp in exact proportion. Two motors with the same stator and different KV values contain the same iron and produce very nearly the same <em>power</em>; they simply divide it differently between speed and torque.</p>
+<p>That reciprocal relationship is quantitative. If <span class="math inline">\(K_V\)</span> is given in RPM per volt, the torque constant in SI units is</p>
+<p><span class="math display">\[K_t = \frac{60}{2\pi K_V}\ \ \left[\frac{\text{N}\cdot\text{m}}{\text{A}}\right],\]</span></p>
+<p>which for the 900KV motor is <span class="math inline">\(K_t = 60/(2\pi \cdot 900) = 0.0106\ \text{N}\cdot\text{m/A}\)</span>. A 450KV motor built on the same stator would deliver 0.0212 N·m/A — twice the torque per amp, at half the speed per volt.</p>
+</section>
+<section id="worked-example-900kv-on-a-6s-pack" class="level3" data-number="3.6.2">
+<h3 data-number="3.6.2" class="anchored" data-anchor-id="worked-example-900kv-on-a-6s-pack"><span class="header-section-number">3.6.2</span> Worked example: 900KV on a 6S pack</h3>
+<p>Take the 2812 900KV motor and a six-cell lithium-polymer battery, and follow the calculation all the way through.</p>
+<p><strong>Step 1 — battery voltage.</strong> A 6S pack is six cells in series. Nominal cell voltage is 3.7 V, so the pack is quoted at <span class="math inline">\(6 \times 3.7 = 22.2\ \text{V}\)</span>. Fully charged it sits at <span class="math inline">\(6 \times 4.2 = 25.2\ \text{V}\)</span>, and at the practical discharge floor of 3.5 V per cell it delivers <span class="math inline">\(6 \times 3.5 = 21.0\ \text{V}\)</span>. “6S” therefore names a voltage <em>range</em> of about 21 to 25 V, and the nominal figure is a convention for comparison, not a measurement.</p>
+<p><strong>Step 2 — no-load speed.</strong> By definition, KV is the shaft speed per volt of back-EMF with nothing on the shaft:</p>
+<p><span class="math display">\[
+\begin{aligned}
+N_0 &amp;= K_V \cdot V = 900\ \frac{\text{RPM}}{\text{V}} \times 22.2\ \text{V} \\
+    &amp;= 19{,}980\ \text{RPM} \approx 20{,}000\ \text{RPM}.
+\end{aligned}
+\]</span></p>
+<p>On a freshly charged pack the same motor spins at <span class="math inline">\(900 \times 25.2 = 22{,}680\)</span> RPM, and on a nearly exhausted one at <span class="math inline">\(900 \times 21.0 = 18{,}900\)</span> RPM. A 20 % speed variation across a single flight is built into the chemistry, and it is one reason flight controllers close a loop on measured attitude rather than commanding motor speeds open-loop.</p>
+<p><strong>Step 3 — what happens under load.</strong> The no-load figure is never reached in flight, for two separate reasons that are often conflated. The first is the motor’s own resistance. In steady state the applied terminal voltage splits between back-EMF and the resistive drop, <span class="math inline">\(V = E + IR\)</span>, and the shaft speed tracks the back-EMF alone, <span class="math inline">\(N = K_V E = K_V(V - IR)\)</span>. Suppose the propeller loads this motor to 12 A and the effective winding resistance is <span class="math inline">\(R = 0.08\ \Omega\)</span>. Then the drop is <span class="math inline">\(IR = 0.96\)</span> V, the back-EMF is <span class="math inline">\(E = 22.2 - 0.96 = 21.24\)</span> V, and</p>
+<p><span class="math display">\[N = 900 \times 21.24 = 19{,}116\ \text{RPM},\]</span></p>
+<p>about 4 % below no-load. Shaft power is the back-EMF power, <span class="math inline">\(P_{\text{shaft}} = EI = 21.24 \times 12 = 255\ \text{W}\)</span>, against an electrical input of <span class="math inline">\(VI = 22.2 \times 12 = 266\ \text{W}\)</span>; the missing <span class="math inline">\(I^2R = 144 \times 0.08 = 11.5\ \text{W}\)</span> is heat in the copper. This first-order model omits iron and windage losses, so its implied efficiency is optimistic — measured peak efficiency for a motor of this class is nearer 80–85 % — but the structure is right, and it shows that resistive droop alone is a small effect.</p>
+<p>The second and much larger reason is throttle. The ESC does not apply the full pack voltage except at maximum throttle; at partial throttle it applies a reduced effective voltage, and the motor settles wherever the torque it produces equals the torque the propeller absorbs. That equilibrium is the intersection of two curves — a motor curve, torque falling linearly with speed, and a propeller curve, absorbed torque rising as roughly the square of speed. A 10-inch propeller in hover, computed in the next section, holds a motor near 5,400 RPM, nowhere near any no-load figure. The no-load speed is a ceiling, useful for checking that a motor and battery are compatible at all, not a prediction of flight behaviour.</p>
+<p><strong>Step 4 — sanity-check the propeller against that speed.</strong> Nearly 20,000 RPM is <span class="math inline">\(\omega = 19{,}980 \times 2\pi/60 = 2092\ \text{rad/s}\)</span>. On a 5-inch propeller (radius 0.0635 m) the blade tip travels at <span class="math inline">\(2092 \times 0.0635 = 133\ \text{m/s}\)</span>, Mach 0.39 at sea level — fast, noisy, and acceptable. Put a 10-inch propeller (radius 0.127 m) on the same motor and the tip speed becomes <span class="math inline">\(2092 \times 0.127 = 266\ \text{m/s}\)</span>, Mach 0.78, where compressibility destroys the blade section’s lift-to-drag ratio and the noise becomes intolerable. The motor would never actually reach that speed, because the torque a 10-inch propeller absorbs at high RPM far exceeds what this winding can supply, so in practice it would stall the motor thermally instead. This is the whole content of the familiar rule that high KV pairs with small propellers and low KV with large ones: KV must be chosen so that the speed the battery can drive is the speed the propeller wants.</p>
+<p>The design consequence runs in the other direction too. Suppose a 10-inch propeller must turn at a hover speed of 5,400 RPM on a 4S pack (14.8 V nominal). A motor of <span class="math inline">\(5{,}400/14.8 \approx 365\)</span> KV would reach that speed only at full throttle, leaving no authority to climb or to reject a gust. Hover should instead sit near 40 to 50 % of the available throttle range, which means choosing a KV roughly twice as high — 730 to 900 KV, exactly the familiar rating for this propeller class. An 880KV motor confirms the arithmetic: at 5,400 RPM its back-EMF is <span class="math inline">\(5{,}400/880 = 6.1\)</span> V, so the ESC is applying about 41 % of the pack voltage and the remaining 59 % is headroom. Move the same aircraft to a 6S pack and the equivalent motor is a <span class="math inline">\(900 \times 14.8/22.2 = 600\)</span> KV unit, which draws two-thirds the current for the same mechanical power. Since copper loss goes as <span class="math inline">\(I^2R\)</span>, that is a <span class="math inline">\((2/3)^2 = 0.44\)</span> factor — a 56 % reduction in resistive heating — which is precisely why larger and more serious aircraft run higher pack voltages. Voltage is free; current is expensive, in copper, in connector mass, and in ESC silicon.</p>
+</section>
+</section>
+<section id="propellers" class="level2" data-number="3.7">
+<h2 data-number="3.7" class="anchored" data-anchor-id="propellers"><span class="header-section-number">3.7</span> Propellers</h2>
+<p>The propeller is a rotating wing, and its two headline numbers are diameter and pitch, both quoted in inches. A designation such as <strong>10 × 4.5</strong> means a 254 mm diameter and a 4.5-inch geometric pitch; a three-number form such as <strong>5 × 5 × 3</strong> adds the blade count, here three blades. <a href="#fig-propeller-geometry" class="quarto-xref">Figure&nbsp;<span>3.4</span></a> lays the three numbers out on the geometry itself.</p>
+<div id="fig-propeller-geometry" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Three-panel labeled diagram of propeller geometry. Left panel: a top-down view of a two-blade propeller inside a dashed circle marking the swept disc, with a dimension arrow across the disc labeled diameter, the 10, tip-to-tip span of 10 inches or 254 millimetres. Top-right panel: a dashed cylinder with a helical line completing one full turn, with a dimension arrow marking the axial advance of that turn labeled pitch, the 4.5, axial advance in one full revolution assuming no slip. Bottom-right panel: small top-down drawings of a two-blade propeller labeled 10 by 4.5, two blades implied, and a three-blade propeller labeled 5 by 5 by 3, third number three blades.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-propeller-geometry-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/propeller-geometry.svg" class="img-fluid figure-img" style="width:85.0%" alt="Three-panel labeled diagram of propeller geometry. Left panel: a top-down view of a two-blade propeller inside a dashed circle marking the swept disc, with a dimension arrow across the disc labeled diameter, the 10, tip-to-tip span of 10 inches or 254 millimetres. Top-right panel: a dashed cylinder with a helical line completing one full turn, with a dimension arrow marking the axial advance of that turn labeled pitch, the 4.5, axial advance in one full revolution assuming no slip. Bottom-right panel: small top-down drawings of a two-blade propeller labeled 10 by 4.5, two blades implied, and a three-blade propeller labeled 5 by 5 by 3, third number three blades.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-propeller-geometry-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.4: What a propeller designation labels. Diameter is the tip-to-tip span of the swept disc; pitch is the axial distance the blade’s helical path would advance in one revolution through a solid medium, with no slip; and a third number, when present, gives the blade count.
+</figcaption>
+</figure>
+</div>
+<p>Diameter determines how much air the disc can act on, and by the momentum result above it is the dominant efficiency lever. Pitch is the theoretical axial advance per revolution — the distance the propeller would screw forward through a solid — and it sets the blade’s built-in angle of attack and thus the airspeed at which the blade stops working. Multiply pitch by rotational speed and the result is <em>pitch speed</em>, a hard theoretical ceiling on forward flight:</p>
+<p><span class="math display">\[v_{\text{pitch}} = \text{pitch} \times N.\]</span></p>
+<p>A 4.5-inch (0.1143 m) pitch at 9,000 RPM (150 rev/s) gives <span class="math inline">\(0.1143 \times 150 = 17.1\ \text{m/s}\)</span>, about 62 km/h; real aircraft achieve 60 to 70 % of pitch speed, because the blade needs a positive angle of attack to make thrust at all and reaches zero thrust before the theoretical limit. The dimensionless form of the same statement is the advance ratio <span class="math inline">\(J = v/(nD)\)</span>, which for that propeller at 15 m/s is <span class="math inline">\(J = 15/(150 \times 0.254) = 0.39\)</span>, uncomfortably close to the pitch-to-diameter ratio <span class="math inline">\(4.5/10 = 0.45\)</span> at which thrust vanishes.</p>
+<p>Blade count is the third lever. More blades add thrust in a given diameter but at worse efficiency, because each blade flies in its predecessor’s wake. Racing aircraft, which are propeller-diameter-limited by their frames and care about response rather than endurance, use three or more blades; endurance aircraft use two.</p>
+<p>For quantitative work, thrust and shaft power come from empirically measured non-dimensional coefficients:</p>
+<p><span class="math display">\[T = C_T \rho n^2 D^4, \qquad P = C_P \rho n^3 D^5,\]</span></p>
+<p>with <span class="math inline">\(n\)</span> in revolutions per second and <span class="math inline">\(D\)</span> in metres. Both coefficients are specific to a propeller and rise strongly with pitch-to-diameter ratio: a 10 × 4.5 survey propeller (<span class="math inline">\(P/D = 0.45\)</span>) has <span class="math inline">\(C_T\)</span> near 0.10, while an aggressive 5 × 5 racing tri-blade (<span class="math inline">\(P/D = 1.0\)</span>) may be two to three times higher. They are measured on a thrust stand, not derived, and manufacturers publish them alongside thrust tables — which is why component selection for a real aircraft is a table-lookup exercise anchored by the scaling laws rather than a pure calculation.</p>
+<p>Those scaling laws are nonetheless the ones to internalize. At fixed RPM, thrust scales as <span class="math inline">\(D^4\)</span> and power as <span class="math inline">\(D^5\)</span>; at fixed thrust, induced power scales as <span class="math inline">\(D^{-1}\)</span>. Doubling propeller diameter therefore halves the power needed to hover — the single most effective efficiency change available to a designer, and the reason every endurance-driven design pushes propellers to the largest size the frame, the regulations, and the transport case will allow.</p>
+</section>
+<section id="putting-it-together-sizing-a-research-quadcopter" class="level2" data-number="3.8">
+<h2 data-number="3.8" class="anchored" data-anchor-id="putting-it-together-sizing-a-research-quadcopter"><span class="header-section-number">3.8</span> Putting It Together: Sizing a Research Quadcopter</h2>
+<p>The components only make sense together, so consider the platform the running example actually flies: a 500 mm-wheelbase quadcopter of the Holybro X500 V2 class, carrying a Pixhawk 6C flight controller, a companion computer, and a depth camera. That configuration is examined as a system in the Systems Architecture chapter in Part V; here the question is narrower — do the numbers work?</p>
+<p><strong>Mission requirements.</strong> Hover-capable, because the mission is to loiter over and pursue a target on the ground rather than to cover a corridor; 12 to 15 minutes of usable flight time; roughly 500 g of autonomy payload; and a total mass low enough to stay far below the 25 kg regulatory threshold that the Commercial Drone Landscape chapter identified as the dividing line for small uncrewed aircraft.</p>
+<p><strong>Configuration.</strong> Hover rules out a fixed wing despite the roughly fourfold endurance advantage computed at the start of this chapter. The redundancy argument for six rotors does not apply over an unpopulated test area, and the added mass, wiring, and cost would degrade every other figure. A quadcopter it is — chosen deliberately, over the hexacopter and fixed-wing alternatives, because maneuverability and simplicity are what the mission needs.</p>
+<p><strong>Mass budget.</strong> Frame, motors, ESCs, and wiring come to roughly 1.2 kg for a platform of this class; a 4S 5200 mAh lithium-polymer pack adds about 0.5 kg; autonomy payload adds 0.5 kg. Take the aircraft first without payload, at <span class="math inline">\(m = 1.7\)</span> kg, and add the payload afterwards to see what it costs.</p>
+<p><strong>Propeller and disc loading.</strong> The frame accommodates 10-inch propellers with 100 mm of tip clearance, as computed earlier, so <span class="math inline">\(D = 0.254\)</span> m and the disc area per rotor is <span class="math inline">\(A = \pi (0.127)^2 = 0.0507\ \text{m}^2\)</span>. Hover thrust per rotor is</p>
+<p><span class="math display">\[T = \frac{mg}{4} = \frac{(1.7)(9.81)}{4} = 4.17\ \text{N},\]</span></p>
+<p>a disc loading of <span class="math inline">\(4.17/0.0507 = 82\ \text{N/m}^2\)</span>, which is typical for this class. The figure matters because induced velocity, and therefore the power spent, grows as its square root: a rotor lifting the same weight over ten times the disc area would move the air an order of magnitude more gently and spend <span class="math inline">\(1/\sqrt{10} = 0.32\)</span> — about a third — of the power. Small multirotors have poor endurance because they are forced by their own size into high disc loading.</p>
+<p><strong>Ideal hover power.</strong> From momentum theory, with <span class="math inline">\(\rho = 1.225\ \text{kg/m}^3\)</span>,</p>
+<p><span class="math display">\[
+\begin{aligned}
+v_i &amp;= \sqrt{\frac{4.17}{2(1.225)(0.0507)}} = \sqrt{33.6} = 5.80\ \text{m/s}, \\
+P_{\text{ideal}} &amp;= (4.17)(5.80) = 24.2\ \text{W}
+\end{aligned}
+\]</span></p>
+<p>per rotor, or 96.7 W for the aircraft. That is the aerodynamic floor: no propeller of this diameter, however well designed, can hover this mass for less, because the number counts only the kinetic energy left in the wake and ignores every real loss.</p>
+<p><strong>Real shaft power.</strong> Invert the thrust coefficient to find the rotational speed the hover thrust demands. With <span class="math inline">\(C_T = 0.10\)</span> and <span class="math inline">\(D^4 = 4.16 \times 10^{-3}\ \text{m}^4\)</span>,</p>
+<p><span class="math display">\[
+\begin{aligned}
+n &amp;= \sqrt{\frac{T}{C_T \rho D^4}} = \sqrt{\frac{4.17}{(0.10)(1.225)(4.16\times10^{-3})}} \\
+  &amp;= \sqrt{8180} = 90.4\ \text{rev/s} = 5{,}425\ \text{RPM},
+\end{aligned}
+\]</span></p>
+<p>which is the 90 Hz excitation frequency quoted in the frame-vibration discussion above. Shaft power at that speed, with <span class="math inline">\(C_P = 0.05\)</span> and <span class="math inline">\(D^5 = 1.057\times10^{-3}\ \text{m}^5\)</span>, is</p>
+<p><span class="math display">\[P = (0.05)(1.225)(90.4)^3(1.057\times10^{-3}) = 47.9\ \text{W}\]</span></p>
+<p>per rotor, 192 W for the aircraft. The implied figure of merit is <span class="math inline">\(24.2/47.9 = 0.51\)</span>, squarely in the expected range for a small propeller and a useful check that the coefficients and the momentum estimate are mutually consistent.</p>
+<p><strong>Electrical power and endurance.</strong> Motor and ESC efficiency together are about 80 % at this operating point, giving <span class="math inline">\(192/0.80 = 240\ \text{W}\)</span> of electrical draw, plus roughly 12 W for the flight controller, receiver, telemetry radio, and companion computer — call it 252 W. A 4S 5200 mAh pack stores <span class="math inline">\(14.8 \times 5.2 = 77\ \text{Wh}\)</span>, of which about 80 % should be used if the cells are to survive many cycles, so 61.6 Wh is available. Hover endurance is</p>
+<p><span class="math display">\[t = \frac{61.6\ \text{Wh}}{252\ \text{W}} = 0.244\ \text{h} = 14.7\ \text{min}.\]</span></p>
+<p>That figure matches published flight times for platforms of this class, which is the point of doing the calculation: a first-principles estimate that lands within a minute or two of the manufacturer’s number confirms that the model captures what matters, and can therefore be trusted when the configuration changes.</p>
+<p><strong>The payload penalty.</strong> Now add the 500 g autonomy payload, taking the aircraft to 2.2 kg. Shaft power scales as <span class="math inline">\(m^{3/2}\)</span> at fixed disc area, so</p>
+<p><span class="math display">\[P' = 192 \times \left(\frac{2.2}{1.7}\right)^{3/2} = 192 \times 1.47 = 282\ \text{W},\]</span></p>
+<p>electrical draw becomes <span class="math inline">\(282/0.80 + 12 = 365\ \text{W}\)</span>, and endurance falls to <span class="math inline">\(61.6/365 = 0.169\ \text{h} = 10.1\ \text{min}\)</span>. A 29 % increase in mass costs 31 % of the flight time. This is the payload-versus-endurance curve in one line of arithmetic, and it is why every gram on a research aircraft is contested: the companion computer’s heatsink, the length of the camera cable, and the choice between two connectors all appear eventually as seconds of loiter time.</p>
+<p><strong>Motor, ESC, and battery selection.</strong> Motors of the 2216-class turning a 10 × 4.5 propeller on 4S are rated at roughly 1.0 kgf of static thrust at about 20 A each, so the four together give about 4.0 kgf against a 2.2 kg loaded aircraft — a thrust-to-weight ratio of 1.8, marginal, and against the 1.7 kg unloaded aircraft a ratio of 2.35, adequate. Hover consumes only <span class="math inline">\(0.425/1.0 \approx 43\ \%\)</span> of available thrust unloaded, which leaves genuine control authority for gust rejection and aggressive attitude commands; a ratio near 1.8 with payload is the point at which a designer should be looking at either larger motors or a lighter payload before adding anything else. Full-throttle current is about 20 A per motor, so 30 A ESCs give a comfortable margin, and a 4-in-1 ESC board is preferred because it halves the wiring mass and puts all four current paths on one plane with one battery connection. Peak battery draw is <span class="math inline">\(4 \times 20 = 80\ \text{A}\)</span>, which for a 5.2 Ah pack is a discharge rate of <span class="math inline">\(80/5.2 = 15\ \text{C}\)</span> — well inside the 50 C rating typical of packs in this size, so the battery is chosen for its energy rather than its power.</p>
+<p><strong>What the numbers decided.</strong> Every choice above traces to the mission statement: hover capability forced a rotorcraft, the endurance requirement forced the largest propeller the frame would carry, propeller diameter and pack voltage jointly forced the motor KV, motor current forced the ESC rating, and the payload mass — the only part of the aircraft that exists for the mission rather than for flight — consumed a third of the endurance. That is mission-driven design in its actual form: not a slogan, but a chain of arithmetic in which each link constrains the next.</p>
+<p>Two links in that chain were taken on trust. The arms were assumed stiff enough to hold the rotor discs where the geometry says they are, and the pack was assumed to deliver the energy printed on its label. Neither assumption is aerodynamic — the first belongs to materials and the second to chemistry — and both fail in ways that show up as bad flights rather than as bad numbers. They are where the next chapter begins.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="For More">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>For More
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The momentum-theory model used here is the simplest of a family. Blade-element momentum theory divides the blade into radial elements, applies two-dimensional aerofoil data to each, and integrates, which predicts how thrust and power vary with pitch distribution, blade planform, and Reynolds number rather than taking <span class="math inline">\(C_T\)</span> and <span class="math inline">\(C_P\)</span> as measured constants. It is the right tool for asking whether a propeller is well designed rather than merely how a given propeller performs. Readers pursuing endurance optimization should also study the Reynolds-number problem specific to small propellers: at 10-inch scale the blade sections operate near <span class="math inline">\(\mathrm{Re} \sim 10^5\)</span>, where laminar separation bubbles dominate and standard aerofoil data taken at <span class="math inline">\(\mathrm{Re} \sim 10^6\)</span> substantially overpredicts performance. This is the single largest source of error when scaling published propeller data down to small aircraft.</p>
+</div>
+</div>
+</section>
+<section id="check-your-understanding" class="level2" data-number="3.9">
+<h2 data-number="3.9" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">3.9</span> Check Your Understanding</h2>
+<ol type="1">
+<li>A motor is labelled 2207 2400KV and is run on a 4S lithium-polymer pack. What is its no-load speed at nominal voltage, at full charge, and at the discharge floor? What do the digits 2207 tell you that the KV rating does not?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>A 4S pack is 14.8 V nominal, 16.8 V fully charged (<span class="math inline">\(4 \times 4.2\)</span>), and 14.0 V at a 3.5 V-per-cell floor. No-load speeds are <span class="math inline">\(2400 \times 14.8 = 35{,}520\)</span> RPM, <span class="math inline">\(2400 \times 16.8 = 40{,}320\)</span> RPM, and <span class="math inline">\(2400 \times 14.0 = 33{,}600\)</span> RPM respectively. The digits 2207 give the stator’s physical size — 22 mm diameter, 7 mm height — which sets how much iron and copper carry the magnetic circuit and therefore the continuous torque available before thermal limits bite. KV describes only how the winding trades speed against torque; it says nothing about how much of either the motor can sustain. Two motors can share a KV rating and differ by a factor of three in continuous power.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Explain why a 900KV motor and a 10-inch propeller is a poor pairing, using a quantitative argument rather than the rule of thumb.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Take the pairing on a 6S pack. No-load speed is <span class="math inline">\(900 \times 22.2 = 19{,}980\)</span> RPM, or 2092 rad/s. On a 10-inch propeller (radius 0.127 m) the tip speed would be <span class="math inline">\(2092 \times 0.127 = 266\)</span> m/s, Mach 0.78, where compressibility collapses the blade section’s lift-to-drag ratio. The motor never actually gets there, which is the real failure mode: absorbed propeller power scales as <span class="math inline">\(n^3 D^5\)</span>, so a 10-inch disc demands enormously more torque at any given speed than the winding of a 900KV motor — whose torque constant is only 0.0106 N·m/A — can supply without drawing currents that overheat the copper. The motor settles at a low speed, at high current, at poor efficiency, and gets hot. Correct pairings hold tip speed and absorbed torque in range simultaneously: 900KV suits 5-inch propellers, while a 10-inch propeller wants roughly 800–900KV on 4S or about 600KV on 6S.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>A survey quadcopter has a 450 mm wheelbase. What is the largest propeller diameter it can physically swing, and what practical diameter would you actually fit?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Adjacent motors on a symmetric X frame are separated by <span class="math inline">\(s = d/\sqrt{2} = 450/1.414 = 318\)</span> mm. Propeller discs intersect once the diameter exceeds that spacing, so 318 mm (12.5 inches) is the absolute geometric limit and would leave the tips touching. In practice one wants tens of millimetres of clearance so that adjacent tip vortices do not interact and so that flexing arms cannot bring discs together in flight: a 9-inch propeller (229 mm) leaves 89 mm of clearance and a 10-inch (254 mm) leaves 64 mm, either of which is sensible; 11 inches (279 mm) leaves 39 mm and is aggressive. Fit 10-inch propellers.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>An aircraft of 1.4 kg all-up weight hovers on four 8-inch propellers. Estimate its ideal induced hover power, and state how that figure would change if the same mass were carried on four 10-inch propellers.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Thrust per rotor is <span class="math inline">\(T = (1.4)(9.81)/4 = 3.43\)</span> N. An 8-inch propeller has radius 0.1016 m and disc area <span class="math inline">\(A = \pi(0.1016)^2 = 0.0324\ \text{m}^2\)</span>. Then <span class="math inline">\(v_i = \sqrt{3.43/(2 \times 1.225 \times 0.0324)} = \sqrt{43.2} = 6.57\)</span> m/s and <span class="math inline">\(P_{\text{ideal}} = 3.43 \times 6.57 = 22.5\)</span> W per rotor, or 90 W total. On 10-inch propellers (<span class="math inline">\(A = 0.0507\ \text{m}^2\)</span>), induced power scales as <span class="math inline">\(A^{-1/2}\)</span>, so the total falls by a factor of <span class="math inline">\(\sqrt{0.0324/0.0507} = 0.80\)</span> to about 72 W — a 20 % saving for a 25 % increase in diameter, consistent with <span class="math inline">\(P \propto 1/D\)</span> at fixed thrust. The saving is only realizable if the frame can accommodate the larger discs and if the motors are re-selected to a lower KV; swapping propellers alone would overload the existing motors.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>A hexacopter and a quadcopter each weigh 4 kg all-up and carry 10-inch propellers. State the induced-power advantage of the hexacopter, then explain why hexacopters are nonetheless not chosen for efficiency.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Total disc area is <span class="math inline">\(6 \times 0.0507 = 0.304\ \text{m}^2\)</span> against <span class="math inline">\(4 \times 0.0507 = 0.203\ \text{m}^2\)</span>. Induced power for a fixed total thrust scales as the inverse square root of total disc area, so the hexacopter needs <span class="math inline">\(\sqrt{0.203/0.304} = 0.82\)</span> of the quadcopter’s induced power, an 18 % saving. But two extra motors, ESCs, arms, and wiring runs typically add 15–25 % to empty weight, and hover power scales as <span class="math inline">\(W^{3/2}\)</span>: a 20 % mass increase alone costs <span class="math inline">\(1.20^{1.5} = 1.31\)</span>, a 31 % power penalty that more than erases the aerodynamic gain. Hexacopters are selected for lift capacity and for graceful degradation after a rotor failure — where the remaining five each take <span class="math inline">\(6/5 = 1.2\)</span> times their previous thrust share, though controllability is retained only by surrendering yaw control — not for efficiency.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>The sized aircraft above draws 252 W in hover and achieves 14.7 minutes from a 77 Wh pack at 80 % usable capacity (61.6 Wh). A colleague proposes doubling battery capacity to double flight time. Evaluate the proposal.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>It does not work, because the battery is part of the mass that must be lifted. Doubling to a 4S 10400 mAh pack adds about 0.5 kg, taking all-up weight from 1.7 to 2.2 kg. Shaft power rises by <span class="math inline">\((2.2/1.7)^{3/2} = 1.47\)</span> to 282 W, so electrical draw becomes <span class="math inline">\(282/0.80 + 12 = 365\)</span> W. Usable energy doubles to 123 Wh, giving <span class="math inline">\(123/365 = 0.337\ \text{h} = 20.2\)</span> minutes — a 37 % improvement, not 100 %. Continuing to add cells yields progressively less, and eventually nothing, since each increment of energy arrives attached to an increment of mass that consumes part of it; the optimum for a given airframe and chemistry falls at a battery mass fraction that is typically a third to a half of all-up weight. Real endurance gains come from larger propellers, lighter structure, or a different configuration entirely — which is the argument for a fixed wing when the mission does not require hover.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="3.10">
+<h2 data-number="3.10" class="anchored" data-anchor-id="try-it"><span class="header-section-number">3.10</span> Try It</h2>
+<p>Specify a complete propulsion system for a mission of your own choosing, and defend every number in it.</p>
+<p>Begin by writing one sentence stating what the aircraft must do, then convert it into four quantities: payload mass, required endurance, required cruise or loiter speed, and the maximum dimension that fits your transport case. Choose a configuration from those four figures and justify it explicitly against the two alternatives you rejected — if you choose a quadcopter, say what the hexacopter’s redundancy would have bought and why the mission does not need it; if you choose a fixed wing, say what you give up by not being able to hover.</p>
+<p>Then size the system in the order the physics dictates. Pick the largest propeller diameter your frame span allows, computing adjacent-motor spacing as wheelbase divided by <span class="math inline">\(\sqrt{2}\)</span> and leaving real tip clearance. Estimate all-up weight, compute hover thrust per rotor, and use momentum theory to get ideal induced power. Assume a figure of merit between 0.45 and 0.55 to convert that to shaft power, then a combined motor-and-ESC efficiency of about 0.8 to get electrical draw, and add an avionics allowance. Choose a pack voltage — justify 4S against 6S using the <span class="math inline">\(I^2R\)</span> argument — and size its capacity for your endurance target, remembering that only about 80 % is usable. Select KV so that the propeller’s hover speed sits comfortably below no-load speed at your pack voltage, size the ESCs from full-throttle current with margin, and check thrust-to-weight against the 2:1 minimum.</p>
+<p>Finally, run the sensitivity that separates a design from a wish. Add 200 g to your payload and recompute endurance using the <span class="math inline">\(m^{3/2}\)</span> scaling. If the loss is tolerable, your design has margin; if it is not, identify which single change — a larger propeller, a lighter frame material, a different configuration — recovers the most flight time per gram or per dollar. That question, not the initial specification, is where real design begins.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#collaborative-drone-build">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="pagination-link" aria-label="The Commercial Drone Landscape">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="pagination-link" aria-label="Materials and Power: Structural Choices and LiPo Battery Management">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

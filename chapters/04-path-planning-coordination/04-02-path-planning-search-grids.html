@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>19&nbsp; Path Planning on the Edge: Search Grids and Coverage Algorithms – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" rel="next">
+<link href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</a></li><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">19.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">19.2</span> Key Vocabulary</a></li>
+  <li><a href="#the-spacing-comes-from-the-sensor" id="toc-the-spacing-comes-from-the-sensor" class="nav-link" data-scroll-target="#the-spacing-comes-from-the-sensor"><span class="header-section-number">19.3</span> The Spacing Comes from the Sensor</a></li>
+  <li><a href="#the-generator-two-parameters-in-a-mission-out" id="toc-the-generator-two-parameters-in-a-mission-out" class="nav-link" data-scroll-target="#the-generator-two-parameters-in-a-mission-out"><span class="header-section-number">19.4</span> The Generator: Two Parameters In, a Mission Out</a></li>
+  <li><a href="#cross-track-error-is-a-coverage-budget" id="toc-cross-track-error-is-a-coverage-budget" class="nav-link" data-scroll-target="#cross-track-error-is-a-coverage-budget"><span class="header-section-number">19.5</span> Cross-Track Error Is a Coverage Budget</a></li>
+  <li><a href="#a-different-question-a-and-point-to-point-planning" id="toc-a-different-question-a-and-point-to-point-planning" class="nav-link" data-scroll-target="#a-different-question-a-and-point-to-point-planning"><span class="header-section-number">19.6</span> A Different Question: A* and Point-to-Point Planning</a></li>
+  <li><a href="#two-planners-one-mission" id="toc-two-planners-one-mission" class="nav-link" data-scroll-target="#two-planners-one-mission"><span class="header-section-number">19.7</span> Two Planners, One Mission</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">19.8</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">19.9</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</a></li><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The Coordinate Frames chapter closed by handing this Part a stream of imperfect world-frame targets and asking what a planner does with them. Before that question can be answered, there is an older debt to pay. Back in Part II, the Mission Scripting chapter flew a lawnmower survey that had been <em>clicked out by hand</em> on QGroundControl’s map — and admitted, in the same breath, that the pattern was not an aesthetic choice but a computable one: the row pitch is a sensor parameter, and “the entire pattern can be computed from the field polygon and the sensor footprint.” This chapter performs that computation. It is the first planning algorithm of the book, and deliberately the simplest: a function that takes a bounding box and a sweep spacing and returns the ordered NED waypoint list the Mission Scripting chapter’s state machine already knows how to fly.</p>
+<p>The chapter then does something the hand-drawn version never had to: it asks what the algorithm is <em>for</em>, and when it is the wrong tool. A lawnmower path answers one specific question — <em>how does a drone with a finite sensor footprint guarantee it has seen every point of an area?</em> — and it answers it without a map, without obstacles, and in microseconds of arithmetic. The other canonical planning question — <em>how do I get from here to there, past things in the way?</em> — belongs to a different family entirely: graph search, whose standard-bearer is A*. The running example needs both. Searching an open field for geese is a coverage problem; closing on a detected goose, re-routing when the world changes, and threading obstacles are point-to-point problems. Knowing which question is being asked, before reaching for an algorithm, is most of what “path planning” means in practice — and both algorithms here are chosen for the same reason the rest of the stack was: they run comfortably on the low-power companion computers of Part I, where planning shares a processor with inference and telemetry.</p>
+<section id="learning-objectives" class="level2" data-number="19.1">
+<h2 data-number="19.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">19.1</span> Learning Objectives</h2>
+<ul>
+<li>Derive a sweep-line spacing from sensor geometry — altitude, field of view, and required overlap — and explain why the Mission Scripting chapter’s hand-drawn 6.5 m row pitch is the number this arithmetic produces.</li>
+<li>Implement the lawnmower (parallel-sweep) path generator: given a bounding box and a maximum spacing, compute the leg count, the exact spacing, and the ordered boustrophedon waypoint list.</li>
+<li>Define cross-track error, compute the per-leg error budget that keeps adjacent swaths overlapping, and explain why minimizing it is a coverage guarantee rather than a cosmetic preference.</li>
+<li>Describe A* search on an occupancy grid — the roles of <span class="math inline">\(g\)</span>, <span class="math inline">\(h\)</span>, and <span class="math inline">\(f = g + h\)</span> — and state the admissibility condition under which it returns a shortest path.</li>
+<li>Decide, for a given mission phase, whether the planning question is area coverage or point-to-point navigation, and select and parameterize the appropriate algorithm — including when dynamic re-routing forces the choice to be revisited in flight.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="19.2">
+<h2 data-number="19.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">19.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Coverage algorithm</strong> — a path planner whose goal is not to reach a point but to pass a sensor’s footprint over <em>every</em> point of a region; its output is judged by completeness of coverage, not by path length to a destination.</li>
+<li><strong>Lawnmower search pattern</strong> (parallel sweep, boustrophedon) — the canonical coverage path: long parallel legs spaced at most one sensor swath apart, joined by short row steps, flown in alternating directions so each leg begins where the last one ended.</li>
+<li><strong>Search bounding box</strong> — the axis-aligned rectangle <span class="math inline">\([x_{\min}, x_{\max}] \times [y_{\min}, y_{\max}]\)</span>, expressed here in local NED coordinates, that defines the region a search must cover; together with the spacing, the complete parameterization of a lawnmower path.</li>
+<li><strong>Swath width</strong> (<span class="math inline">\(w\)</span>) — the width of ground a downward-looking sensor images along one leg, set by altitude and field of view; the physical quantity the sweep spacing must not exceed.</li>
+<li><strong>Sweep spacing</strong> (<span class="math inline">\(s\)</span>) — the perpendicular distance between adjacent legs; chosen as the swath width derated by a deliberate overlap fraction, so that imperfect flying still leaves no unseen strip.</li>
+<li><strong>Cross-track error</strong> (<span class="math inline">\(e_{ct}\)</span>) — the perpendicular distance from the vehicle’s actual position to the straight line of its current leg; the along-track coordinate measures progress, the cross-track coordinate measures straying.</li>
+<li><strong>A* search</strong> — best-first graph search that expands nodes in order of <span class="math inline">\(f(n) = g(n) + h(n)\)</span>, the cost incurred so far plus a heuristic estimate of the cost remaining; with an admissible heuristic it returns a minimum-cost path.</li>
+<li><strong>Admissible heuristic</strong> — a heuristic that never overestimates the true remaining cost (straight-line distance is the standard example for spatial planning); the property that upgrades A* from “usually good” to provably optimal.</li>
+<li><strong>Dynamic re-routing</strong> — re-planning in flight when the world model changes — a new obstacle, a moved target, an updated cost map — either by re-running the planner or by incremental methods that repair the previous solution instead of discarding it.</li>
+</ul>
+</section>
+<section id="the-spacing-comes-from-the-sensor" class="level2" data-number="19.3">
+<h2 data-number="19.3" class="anchored" data-anchor-id="the-spacing-comes-from-the-sensor"><span class="header-section-number">19.3</span> The Spacing Comes from the Sensor</h2>
+<p>Every parameter of a lawnmower path except one is geometry the operator already owns: the bounding box is the field to be searched, the altitude is fixed by the mission (5.5 m for the running example’s survey, comfortably under the regulatory ceiling), and the leg length falls out of the box. The one genuinely new number is the sweep spacing, and it comes from the camera.</p>
+<p>A camera looking straight down from altitude <span class="math inline">\(h\)</span> with a horizontal field of view <span class="math inline">\(\theta_{\text{fov}}\)</span> images a strip of ground — the <strong>swath</strong> — whose width is a single line of trigonometry: half the swath subtends half the field of view, so</p>
+<p><span class="math display">\[
+w = 2\,h \tan\!\left(\frac{\theta_{\text{fov}}}{2}\right).
+\]</span></p>
+<p>The running example’s depth camera was estimated in the Coordinate Frames chapter to have roughly a 90° horizontal field of view. At the survey altitude:</p>
+<p><span class="math display">\[
+w = 2 \times 5.5 \times \tan 45^\circ = 11.0\ \text{m}.
+\]</span></p>
+<p>Flying adjacent legs exactly 11 m apart would tile the field with zero margin: any imperfection — a metre of GNSS scatter, a gust, a goose at the seam between swaths imaged too obliquely to detect — opens an unseen strip. The standard remedy is to derate the spacing by an overlap fraction <span class="math inline">\(\beta\)</span>:</p>
+<p><span class="math display">\[
+s = w\,(1 - \beta),
+\]</span></p>
+<p>and <span class="math inline">\(\beta = 0.4\)</span> — a common choice when detection reliability at the swath edges is doubtful — gives <span class="math inline">\(s = 11.0 \times 0.6 = 6.6\)</span> m. Here the book’s threads tie together pleasingly: the real hand-drawn survey that the Mission Scripting chapter dissected had a row pitch of roughly 6.5 m, drawn by eye on a map. The eye was right, and now it is clear <em>why</em> it was right: 6.5 m is what a 90° camera at 5.5 m altitude with 40 % overlap requires. The hand and the arithmetic agree — but only the arithmetic scales, transfers to a new altitude, and can run on board.</p>
+<p>Two caveats keep the model honest. First, the formula assumes a nadir-pointing camera; the running example’s camera is pitched 45° forward (the extrinsic the Coordinate Frames chapter calibrated), which projects a trapezoidal footprint ahead of the aircraft rather than a rectangle below it. The conservative practice is to use the footprint’s <em>narrowest</em> cross-track extent as <span class="math inline">\(w\)</span>, and the nadir formula is a serviceable stand-in at survey altitudes. Second, the formula is the reason the search flies at <strong>constant altitude</strong>: <span class="math inline">\(w\)</span> scales linearly with <span class="math inline">\(h\)</span>, so an altitude that wanders makes the swath width wander with it, and a spacing chosen for 5.5 m silently loses its overlap margin at 4 m. Constant altitude is not a stylistic requirement — it is what holds <span class="math inline">\(w\)</span>, and therefore the coverage guarantee, still.</p>
+</section>
+<section id="the-generator-two-parameters-in-a-mission-out" class="level2" data-number="19.4">
+<h2 data-number="19.4" class="anchored" data-anchor-id="the-generator-two-parameters-in-a-mission-out"><span class="header-section-number">19.4</span> The Generator: Two Parameters In, a Mission Out</h2>
+<p>With <span class="math inline">\(s\)</span> in hand, generating the path is a short exercise in careful bookkeeping. The region is an axis-aligned bounding box in local NED — <span class="math inline">\([x_{\min}, x_{\max}]\)</span> north–south, <span class="math inline">\([y_{\min}, y_{\max}]\)</span> east–west — and the legs will run north–south (the long axis), stepping east between legs. Three decisions make the algorithm correct rather than merely plausible:</p>
+<ol type="1">
+<li><strong>Round the leg count up, never the spacing.</strong> The box width <span class="math inline">\(W = y_{\max} - y_{\min}\)</span> is rarely an exact multiple of <span class="math inline">\(s\)</span>. Taking <span class="math inline">\(n = \lceil W / s_{\max} \rceil + 1\)</span> legs and then recomputing the actual step as <span class="math inline">\(W / (n - 1)\)</span> shrinks the spacing to fit — the step can only come out <em>at or below</em> the maximum the sensor allows, so rounding can tighten coverage but never loosen it.</li>
+<li><strong>Alternate leg directions.</strong> Even-indexed legs fly south-to-north, odd-indexed legs north-to-south. Each leg then begins where the previous one ended, and the row step between legs needs no waypoint of its own — it is simply the flight from one leg’s last waypoint to the next leg’s first.</li>
+<li><strong>Emit waypoints, not trajectories.</strong> The output is an ordered list of <span class="math inline">\((N, E, D)\)</span> triples — exactly the data structure the Mission Scripting chapter’s NAVIGATE state consumes, streaming each waypoint as an Offboard setpoint and advancing on the acceptance-radius arrival test. The planner plans; the machinery that flies is already built.</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lawnmower(x_min, x_max, y_min, y_max, s_max, altitude):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Parallel-sweep (lawnmower) coverage path over a NED bounding box.</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">    Legs run north-south (along x); the sweep steps east (along y).</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns an ordered list of (north, east, down) waypoints.</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    width <span class="op">=</span> y_max <span class="op">-</span> y_min</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    n_legs <span class="op">=</span> <span class="bu">max</span>(<span class="dv">2</span>, math.ceil(width <span class="op">/</span> s_max) <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    step <span class="op">=</span> width <span class="op">/</span> (n_legs <span class="op">-</span> <span class="dv">1</span>)      <span class="co"># actual spacing: &lt;= s_max by construction</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    z <span class="op">=</span> <span class="op">-</span>altitude                    <span class="co"># NED: down is positive, so up is negative</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    waypoints <span class="op">=</span> []</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_legs):</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        y <span class="op">=</span> y_min <span class="op">+</span> i <span class="op">*</span> step</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> i <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span>:               <span class="co"># even legs: fly south -&gt; north</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>            waypoints.append((x_min, y, z))</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>            waypoints.append((x_max, y, z))</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:                        <span class="co"># odd legs: fly north -&gt; south</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>            waypoints.append((x_max, y, z))</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>            waypoints.append((x_min, y, z))</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> waypoints</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Twenty lines, no dependencies beyond <code>ceil</code>, and a run time measured in microseconds — a planner that could re-run every second on the smallest computer in Part I’s inventory without anyone noticing. <a href="#fig-lawnmower-generator" class="quarto-xref">Figure&nbsp;<span>19.1</span></a> traces a worked call: a fresh illustrative search area, a 60 m × 33 m box north-east of the launch point, at the survey’s 5.5 m altitude with <span class="math inline">\(s_{\max} = 6.6\)</span> m.</p>
+<div id="fig-lawnmower-generator" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Map-view diagram titled the lawnmower generator: a bounding box, a spacing, and nothing else. An amber rectangle labeled with corner coordinates x min y min, x max y min, x min y max, x max y max represents the bounding box, 60 metres tall north-south and 33 metres wide east-west, with a compass showing north as plus x upward and east as plus y rightward. Inside, a teal boustrophedon path of six vertical legs connected at alternating ends, with twelve numbered waypoint circles: waypoint 1 at bottom left, 2 at top left, stepping east leg by leg to waypoint 12 at bottom right; arrows on the legs alternate up, down, up, down. Two adjacent legs carry light shaded bands showing the 11 metre camera swath each leg images, with a darker band where the two swaths overlap. Dimension arrows label the step of 6.6 metres between legs, the swath w of 11 metres, and the overlap w minus step of 4.4 metres described as the margin cross-track error may spend. A side panel titled the generator's arithmetic lists: inputs box, s max 6.6 metres, altitude 5.5 metres; n equals ceiling of W over s max plus 1 equals ceiling of 33 over 6.6 plus 1 equals 6 legs; step equals W over n minus 1 equals 6.6 metres; output 2n equals 12 waypoints all at z equals minus 5.5 metres; track equals n L plus n minus 1 times step equals 393 metres. Side notes explain that even legs fly north and odd legs fly south so each leg starts where the previous ended and the row step comes free, and that the first and last legs ride the box edges so half their swath falls outside the box, conservative over-coverage rather than a bug. A footer notes there is no geofence, home position, or mission items yet, that this is pure geometry emitted as an ordered NED waypoint list, and that the Mission Scripting chapter's setpoint streaming and acceptance-radius arrival test turn it into a flown mission.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-lawnmower-generator-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/lawnmower-generator.svg" class="img-fluid figure-img" style="width:100.0%" alt="Map-view diagram titled the lawnmower generator: a bounding box, a spacing, and nothing else. An amber rectangle labeled with corner coordinates x min y min, x max y min, x min y max, x max y max represents the bounding box, 60 metres tall north-south and 33 metres wide east-west, with a compass showing north as plus x upward and east as plus y rightward. Inside, a teal boustrophedon path of six vertical legs connected at alternating ends, with twelve numbered waypoint circles: waypoint 1 at bottom left, 2 at top left, stepping east leg by leg to waypoint 12 at bottom right; arrows on the legs alternate up, down, up, down. Two adjacent legs carry light shaded bands showing the 11 metre camera swath each leg images, with a darker band where the two swaths overlap. Dimension arrows label the step of 6.6 metres between legs, the swath w of 11 metres, and the overlap w minus step of 4.4 metres described as the margin cross-track error may spend. A side panel titled the generator's arithmetic lists: inputs box, s max 6.6 metres, altitude 5.5 metres; n equals ceiling of W over s max plus 1 equals ceiling of 33 over 6.6 plus 1 equals 6 legs; step equals W over n minus 1 equals 6.6 metres; output 2n equals 12 waypoints all at z equals minus 5.5 metres; track equals n L plus n minus 1 times step equals 393 metres. Side notes explain that even legs fly north and odd legs fly south so each leg starts where the previous ended and the row step comes free, and that the first and last legs ride the box edges so half their swath falls outside the box, conservative over-coverage rather than a bug. A footer notes there is no geofence, home position, or mission items yet, that this is pure geometry emitted as an ordered NED waypoint list, and that the Mission Scripting chapter's setpoint streaming and acceptance-radius arrival test turn it into a flown mission.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lawnmower-generator-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;19.1: The lawnmower generator’s output for a 60 m × 33 m bounding box with 6.6 m sweep spacing: six alternating legs, twelve waypoints, and the swath-overlap geometry that justifies the spacing.
+</figcaption>
+</figure>
+</div>
+<p>Follow the arithmetic through. <span class="math inline">\(W = 33\)</span> m and <span class="math inline">\(s_{\max} = 6.6\)</span> m give <span class="math inline">\(n = \lceil 5.0 \rceil + 1 = 6\)</span> legs, and the recomputed step is <span class="math inline">\(33 / 5 = 6.6\)</span> m exactly. Six legs of 60 m and five row steps of 6.6 m make the total track</p>
+<p><span class="math display">\[
+d = nL + (n-1)\,s = 6(60) + 5(6.6) = 393\ \text{m},
+\]</span></p>
+<p>and the track length immediately audits the schedule, the same trick the Mission Scripting chapter played on its plan file. At that survey’s camera-friendly 1.5 m/s:</p>
+<p><span class="math display">\[
+t = \frac{393}{1.5} = 262\ \text{s} \approx 4.4\ \text{min},
+\]</span></p>
+<p>which <em>busts</em> the 3.5-minute search-leg allocation in Part I’s mission time budget. At 2.0 m/s the same path takes 197 s ≈ 3.3 min and fits. This is the kind of trade a generator surfaces before anything flies: spacing is quantized (the <span class="math inline">\(\lceil\cdot\rceil\)</span> means widening <span class="math inline">\(s_{\max}\)</span> only drops a whole leg at discrete thresholds — here, not until <span class="math inline">\(s_{\max} \ge 8.25\)</span> m, a 25 % overlap), while speed is continuous, so speed is usually the first lever pulled. Whether the detector still performs at 2.0 m/s of motion blur is a question for the frame-rate and latency budgets of Part III — planning decisions ripple into perception, and the budget arithmetic is where the ripple shows up.</p>
+<p>The computed version also settles an audit the hand could not. The Mission Scripting chapter’s real survey put four legs at 6.5 m pitch — spanning about 19.5 m — inside a fenced field nearly 39 m across. Run the generator on that fence and it asks for seven legs, not four: the hand-drawn mission swept roughly half its field, a shortfall invisible on the map view and instant in the arithmetic. Nothing about the flight was wrong; the <em>coverage claim</em> was, and only the computation noticed.</p>
+<p>Two practical notes complete the generator. Real search areas are rarely aligned with north: the standard treatment is to rotate the region’s corner coordinates <em>into</em> an axis-aligned frame, generate the path there, and rotate the waypoints back — a single 2D rotation matrix each way, machinery the Coordinate Frames chapter made routine. And the bounding box must sit strictly inside the geofence polygon of the Geofencing and Fail-Safes chapter, with margin for the cross-track error the next section budgets — a generated path that grazes the fence line is a generated failsafe trigger.</p>
+</section>
+<section id="cross-track-error-is-a-coverage-budget" class="level2" data-number="19.5">
+<h2 data-number="19.5" class="anchored" data-anchor-id="cross-track-error-is-a-coverage-budget"><span class="header-section-number">19.5</span> Cross-Track Error Is a Coverage Budget</h2>
+<p>The generator’s output is a guarantee written in pencil: <em>if</em> the aircraft flies each leg where the arithmetic put it, every point of the box passes under the camera. The quantity that measures “where the arithmetic put it” is <strong>cross-track error</strong>. For the leg from waypoint <span class="math inline">\(A\)</span> to waypoint <span class="math inline">\(B\)</span>, define the unit tangent and normal</p>
+<p><span class="math display">\[
+\hat{t} = \frac{B - A}{\lVert B - A \rVert},
+\qquad
+e_{ct} = (p - A) \cdot \hat{n},
+\]</span></p>
+<p>where <span class="math inline">\(p\)</span> is the vehicle’s estimated position and <span class="math inline">\(\hat{n}\)</span> is <span class="math inline">\(\hat{t}\)</span> rotated 90° in the horizontal plane. The projection onto <span class="math inline">\(\hat{t}\)</span> is the along-track coordinate — how far down the leg the vehicle has progressed; the projection onto <span class="math inline">\(\hat{n}\)</span> is the cross-track coordinate — how far it has strayed off the line. A signed <span class="math inline">\(e_{ct}\)</span> (positive right of track, negative left) is more useful than a distance, because its sign says which way to steer back.</p>
+<div id="fig-cross-track-error" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two-panel diagram titled cross-track error, and how it eats the coverage margin. Left panel, definition on one leg: a dashed vertical line from waypoint A at the bottom to waypoint B at the top represents the planned leg with unit tangent t hat; a teal curve bows to the right of it, labeled actual flown path p of t, pushed by an amber wind arrow; at the widest point a double-headed amber arrow from the planned line to the actual path is labeled e sub ct equals the dot product of p minus A with the unit normal n hat, the perpendicular distance from the vehicle to the leg line. A note explains the along-track coordinate measures progress down the leg while the cross-track coordinate measures straying. Right panel, consequence on adjacent legs: two dashed planned leg centrelines at spacing s of 6.6 metres, each surrounded by an 11 metre wide light teal swath band, but the actual flown legs, drawn solid teal, have drifted in opposite directions, leg i to the west and leg i plus 1 to the east, with drift dimensions e sub i and e sub i plus 1 marked; between the drifted swaths a highlighted amber strip labeled coverage gap, never seen. Captions state that a gap opens when the drifts oppose by more than the overlap, e sub i plus 1 minus e sub i greater than w minus s equals 4.4 metres, and that the worst case splits the budget evenly at 2.2 metres of allowable stray per leg. A footer reads: minimizing cross-track error is not aesthetics; the coverage guarantee is only as strong as the tracking that flies the legs where the arithmetic put them.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-cross-track-error-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/cross-track-error-coverage.svg" class="img-fluid figure-img" style="width:100.0%" alt="Two-panel diagram titled cross-track error, and how it eats the coverage margin. Left panel, definition on one leg: a dashed vertical line from waypoint A at the bottom to waypoint B at the top represents the planned leg with unit tangent t hat; a teal curve bows to the right of it, labeled actual flown path p of t, pushed by an amber wind arrow; at the widest point a double-headed amber arrow from the planned line to the actual path is labeled e sub ct equals the dot product of p minus A with the unit normal n hat, the perpendicular distance from the vehicle to the leg line. A note explains the along-track coordinate measures progress down the leg while the cross-track coordinate measures straying. Right panel, consequence on adjacent legs: two dashed planned leg centrelines at spacing s of 6.6 metres, each surrounded by an 11 metre wide light teal swath band, but the actual flown legs, drawn solid teal, have drifted in opposite directions, leg i to the west and leg i plus 1 to the east, with drift dimensions e sub i and e sub i plus 1 marked; between the drifted swaths a highlighted amber strip labeled coverage gap, never seen. Captions state that a gap opens when the drifts oppose by more than the overlap, e sub i plus 1 minus e sub i greater than w minus s equals 4.4 metres, and that the worst case splits the budget evenly at 2.2 metres of allowable stray per leg. A footer reads: minimizing cross-track error is not aesthetics; the coverage guarantee is only as strong as the tracking that flies the legs where the arithmetic put them.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cross-track-error-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;19.2: Cross-track error defined on a single leg, and its consequence across adjacent legs: opposing drifts larger than the swath overlap open a strip of ground the camera never sees.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-cross-track-error" class="quarto-xref">Figure&nbsp;<span>19.2</span></a> shows why this number owns a line in the mission requirements rather than a footnote. The swath of a leg flown with error <span class="math inline">\(e_i\)</span> is displaced by <span class="math inline">\(e_i\)</span>; adjacent swaths, planned to overlap by <span class="math inline">\(w - s\)</span>, stop overlapping when the two legs drift <em>apart</em> by more than that margin:</p>
+<p><span class="math display">\[
+e_{i+1} - e_i &gt; w - s \quad\Longrightarrow\quad \text{a strip between legs is never imaged.}
+\]</span></p>
+<p>For the worked numbers, <span class="math inline">\(w - s = 11.0 - 6.6 = 4.4\)</span> m, and the worst case — adjacent legs drifting in opposite directions — splits the budget evenly: each leg may stray at most <span class="math inline">\((w - s)/2 = 2.2\)</span> m before the coverage claim fails. Now the budget can be spent, item by item, and the items are all familiar. The position estimate itself carries metre-scale GNSS scatter — the same scatter that set the floor under the Mission Scripting chapter’s acceptance radius — and the vehicle can only hold the line as well as it knows where the line is. Steady wind adds a systematic offset: the position controller flies crabbed into the wind, converging to the leg with some residual bias rather than tracking it exactly. And the acceptance radius contributes at the leg <em>ends</em>: with the 1.5 m radius that chapter chose, each corner is cut up to 1.5 m before the turn begins, shaving the swath short at the box’s north and south edges. Metre-scale error against a 2.2 m budget is not comfortable — it is roughly half the budget spent before the wind blows — which is precisely why the requirement is phrased <em>minimize</em> cross-track error, and why the overlap fraction <span class="math inline">\(\beta\)</span> exists at all: <span class="math inline">\(\beta\)</span> is the coverage guarantee’s insurance policy, priced in extra legs and minutes of battery.</p>
+<p>One subtlety separates good leg-tracking from naive waypoint-chasing. A controller that simply steers at the next waypoint from wherever it currently is will happily fly a diagonal back to the corner after a gust — correct arrival, wrong swath, since the diagonal’s camera footprint is not the planned leg’s. Tracking the <em>line</em> — feeding the controller a setpoint that advances along the leg while nulling <span class="math inline">\(e_{ct}\)</span> — keeps the flown swath congruent with the planned one. The cascaded position controller of Part II does this well when the streamed setpoints march down the leg at the commanded ground speed rather than jumping to the far corner in one step; the distinction costs a few lines in the NAVIGATE state and buys back most of the wind’s share of the budget.</p>
+</section>
+<section id="a-different-question-a-and-point-to-point-planning" class="level2" data-number="19.6">
+<h2 data-number="19.6" class="anchored" data-anchor-id="a-different-question-a-and-point-to-point-planning"><span class="header-section-number">19.6</span> A Different Question: A* and Point-to-Point Planning</h2>
+<p>The lawnmower generator never looked at a map, because its problem statement contains no obstacles: an open field, a box, a sensor. The moment the question changes from <em>see everything</em> to <em>reach that point</em> — fly to the detected goose behind the treeline, return home around the buildings, re-route when the fence’s safe corridor closes — coverage machinery has nothing to offer, and the problem becomes search on a graph.</p>
+<p>The standard discretization is an <strong>occupancy grid</strong>: the world chopped into cells, each marked free or occupied, with free cells connected to their neighbors (8-connectivity, with diagonal moves costing <span class="math inline">\(\sqrt{2}\)</span> times a cell). A path is a walk through free cells from start to goal; the shortest such walk is the object of interest. Breadth-first search would find it by expanding uniformly in all directions; Dijkstra’s algorithm generalizes to weighted cells but shares the blindness. <strong>A*</strong> adds the one idea that makes graph search practical on small computers: expand next the node that <em>looks</em> cheapest overall, where “looks” combines the cost already paid with an optimistic estimate of the cost remaining,</p>
+<p><span class="math display">\[
+f(n) = g(n) + h(n),
+\]</span></p>
+<p>with <span class="math inline">\(g(n)\)</span> the accumulated cost from the start and <span class="math inline">\(h(n)\)</span> the heuristic — for spatial planning, the straight-line (Euclidean) distance to the goal. The estimate is <strong>admissible</strong>: a straight line ignores every obstacle, so it can only under-estimate the true remaining cost, never over-estimate it. Admissibility is the load-bearing property — it guarantees that when the goal is first selected for expansion, no cheaper path to it remains undiscovered, so the path returned is optimal.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math, heapq</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> a_star(grid, start, goal):</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Shortest path on an occupancy grid; returns a list of cells or None."""</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> h(c):</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> math.hypot(c[<span class="dv">0</span>] <span class="op">-</span> goal[<span class="dv">0</span>], c[<span class="dv">1</span>] <span class="op">-</span> goal[<span class="dv">1</span>])</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    open_heap <span class="op">=</span> [(h(start), start)]        <span class="co"># priority queue ordered by f</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    g <span class="op">=</span> {start: <span class="fl">0.0</span>}</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    parent <span class="op">=</span> {}</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    closed <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> open_heap:</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        _, current <span class="op">=</span> heapq.heappop(open_heap)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> current <span class="kw">in</span> closed:</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span>                       <span class="co"># stale queue entry; already done</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> current <span class="op">==</span> goal:</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>            path <span class="op">=</span> [goal]</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">while</span> path[<span class="op">-</span><span class="dv">1</span>] <span class="op">!=</span> start:</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>                path.append(parent[path[<span class="op">-</span><span class="dv">1</span>]])</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> path[::<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        closed.add(current)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> nbr, step_cost <span class="kw">in</span> free_neighbors(grid, current):</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>            tentative <span class="op">=</span> g[current] <span class="op">+</span> step_cost</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> tentative <span class="op">&lt;</span> g.get(nbr, math.inf):</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>                g[nbr] <span class="op">=</span> tentative</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>                parent[nbr] <span class="op">=</span> current</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>                heapq.heappush(open_heap, (tentative <span class="op">+</span> h(nbr), nbr))</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">None</span>                            <span class="co"># goal unreachable</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The structure to notice: a priority heap ordered by <span class="math inline">\(f\)</span>, a <code>g</code> table recording the best known cost to each cell, and relaxation — a neighbor is re-queued whenever a cheaper route to it appears. <a href="#fig-a-star-grid" class="quarto-xref">Figure&nbsp;<span>19.3</span></a> shows the algorithm’s signature behavior on a small grid with a wall between start and goal: the expansion does not flood outward uniformly (that would be Dijkstra) but leans toward the goal, spilling around the obstacle only as far as the heuristic’s optimism is contradicted by the wall.</p>
+<div id="fig-a-star-grid" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Diagram titled A* on an occupancy grid: expand the cheapest promising cell first. A 14 by 9 grid of cells with a dark vertical wall of obstacle cells at column seven spanning the top seven rows, leaving a gap near the bottom. A teal circle labeled S sits at the left middle and an amber circle labeled G at the right middle, on opposite sides of the wall. Fifty cells are shaded light teal, marking every cell the search expanded before reaching the goal; the shading clusters between S and the wall and dips toward the gap, rather than spreading evenly in all directions. A bold teal polyline traces the returned 12-cell path from S diagonally down to the gap, under the wall, and diagonally back up to G. A dashed amber line from a path cell to G illustrates the heuristic h, the straight-line distance, which passes through the wall because the heuristic ignores obstacles and therefore never overestimates. A side panel titled per-cell bookkeeping defines g of n as cost from S so far, h of n as straight-line distance to G, and f of n equals g of n plus h of n, noting that because h never overestimates, the first path to reach G is the shortest one. A legend identifies expanded cells, 50 of 119 free cells, the final path of 12 cells, obstacle cells, and the dashed heuristic line. The footer reads: the lawnmower answers how do I see every point of an area; A* answers how do I reach one point past what is in the way — different questions, different algorithms, one mission; the figure's expansion and path were computed by the chapter's own A* implementation.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-a-star-grid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/a-star-occupancy-grid.svg" class="img-fluid figure-img" style="width:100.0%" alt="Diagram titled A* on an occupancy grid: expand the cheapest promising cell first. A 14 by 9 grid of cells with a dark vertical wall of obstacle cells at column seven spanning the top seven rows, leaving a gap near the bottom. A teal circle labeled S sits at the left middle and an amber circle labeled G at the right middle, on opposite sides of the wall. Fifty cells are shaded light teal, marking every cell the search expanded before reaching the goal; the shading clusters between S and the wall and dips toward the gap, rather than spreading evenly in all directions. A bold teal polyline traces the returned 12-cell path from S diagonally down to the gap, under the wall, and diagonally back up to G. A dashed amber line from a path cell to G illustrates the heuristic h, the straight-line distance, which passes through the wall because the heuristic ignores obstacles and therefore never overestimates. A side panel titled per-cell bookkeeping defines g of n as cost from S so far, h of n as straight-line distance to G, and f of n equals g of n plus h of n, noting that because h never overestimates, the first path to reach G is the shortest one. A legend identifies expanded cells, 50 of 119 free cells, the final path of 12 cells, obstacle cells, and the dashed heuristic line. The footer reads: the lawnmower answers how do I see every point of an area; A* answers how do I reach one point past what is in the way — different questions, different algorithms, one mission; the figure's expansion and path were computed by the chapter's own A* implementation.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-a-star-grid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;19.3: A* on a 14 × 9 occupancy grid with an obstacle wall: the expanded region leans toward the goal rather than flooding uniformly, and the returned path threads the gap. The expansion and path shown were computed by running the algorithm above.
+</figcaption>
+</figure>
+</div>
+<p>What does this cost on a companion computer? Less than intuition suggests, at mission scales. A 100 m × 100 m working area at 0.5 m resolution is a 200 × 200 grid — 40,000 cells — and a full A* query over it completes in single-digit milliseconds in interpreted Python, far faster compiled; even a 3D grid with twenty altitude layers stays under a million nodes. The genuine constraints on the edge are different ones. Memory scales with the map, not the path, so resolution is chosen to fit the vehicle, not the cartographer’s ambition. And the <em>rate</em> of planning matters more than the cost of one plan: a world that changes — a goose that moves, an obstacle that appears in the depth camera — invalidates the current path and demands <strong>dynamic re-routing</strong>. The blunt approach, re-running A* from the vehicle’s current cell, is often affordable at these grid sizes and is the right first implementation. When it is not affordable — larger maps, faster replan rates — the practical toolkit is a family of A* variations: <em>weighted A*</em>, which multiplies the heuristic by <span class="math inline">\(\varepsilon &gt; 1\)</span> to expand far fewer nodes at the price of a path at most <span class="math inline">\(\varepsilon\)</span> times optimal (a bargain when <span class="math inline">\(\varepsilon = 1.5\)</span> halves the compute); and <em>incremental</em> planners in the D* Lite family, which repair the previous search when a handful of edge costs change instead of starting from nothing — the standard answer when re-routing runs inside a control loop.</p>
+</section>
+<section id="two-planners-one-mission" class="level2" data-number="19.7">
+<h2 data-number="19.7" class="anchored" data-anchor-id="two-planners-one-mission"><span class="header-section-number">19.7</span> Two Planners, One Mission</h2>
+<p>Set side by side, the two algorithms are less rivals than answers to different questions, and the running example’s mission asks both in sequence:</p>
+<div id="tbl-coverage-vs-astar" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-coverage-vs-astar-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;19.1: Coverage search versus point-to-point search: the same word “planning,” two different problems.
+</figcaption>
+<div aria-describedby="tbl-coverage-vs-astar-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Lawnmower coverage</th>
+<th>A* graph search</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Question answered</td>
+<td>“Have I seen every point of the area?”</td>
+<td>“What is the shortest way to that point?”</td>
+</tr>
+<tr class="even">
+<td>World model required</td>
+<td>None — a bounding box and a sensor footprint</td>
+<td>An occupancy grid or graph with costs</td>
+</tr>
+<tr class="odd">
+<td>Obstacles</td>
+<td>Assumed absent (open field)</td>
+<td>The entire point</td>
+</tr>
+<tr class="even">
+<td>Output</td>
+<td>Fixed waypoint list, known length in advance</td>
+<td>Path dependent on the map; length known only after search</td>
+</tr>
+<tr class="odd">
+<td>Guarantee</td>
+<td>Complete coverage, if cross-track error stays within the overlap margin</td>
+<td>Minimum-cost path, if the heuristic is admissible</td>
+</tr>
+<tr class="even">
+<td>Compute cost</td>
+<td>Microseconds, independent of world size</td>
+<td>Milliseconds and up, scales with map size and clutter</td>
+</tr>
+<tr class="odd">
+<td>Mission phase</td>
+<td>Systematic search for a target</td>
+<td>Transit, approach, and re-routing around obstructions</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The handoff between them is the mission’s hinge, and it is worth being precise about the mechanics. The lawnmower list is flown by the Mission Scripting chapter’s state machine — stream the current waypoint, advance on the acceptance test — inside a state the Finite State Machines and Behavior Trees chapter will name SEARCH_GRID. The search-phase requirement is that a detection <em>immediately</em> preempts the sweep: the machine abandons the current leg mid-flight and transitions to pursuit, exactly the event-driven preemption the state-machine formalism was built for. Two design consequences follow for the planner. First, because the path is <em>data</em> — a list and an index — abandoning it costs nothing and resuming it costs one integer: store the index, chase the goose, and re-enter the list at the stored leg when the pursuit resolves, rather than re-sweeping ground already covered. Second, the pursuit target arrives from the perception stack as a NED position — the very stream of imperfect world-frame targets the Coordinate Frames chapter delivered — and whether the pursuit needs A* at all depends on the world between drone and goose: over the open field, the answer is usually a straight line and no planner; near the treeline or a geofence boundary, it is a grid query. The next chapters take up what happens after arrival — the deterrence patterns flown at the target, and the state machinery that sequences search, pursuit, and escape into one mission.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="For More">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>For More
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The lawnmower over a rectangle is the base case of a richer theory. <em>Boustrophedon cellular decomposition</em> extends complete coverage to regions with obstacles: the free space is sliced into obstacle-free cells by sweeping a line across the region and splitting wherever an obstacle interrupts it; each cell gets its own lawnmower, and the cells are visited in an order that minimizes transit — a traveling-salesman flavored sequencing problem. Energy-aware variants choose leg <em>orientation</em> as well: legs aligned with the prevailing wind trade fewer turns against asymmetric headwind/tailwind legs, a measurable difference in battery on large fields. On the graph-search side, the D* Lite algorithm mentioned for re-routing maintains its search rooted at the <em>goal</em>, so that when the vehicle moves or costs change, most of the computed structure survives — the reason it became the standard for planetary rovers and remains the default answer when A* must run inside a tight replanning loop.</p>
+</div>
+</div>
+</section>
+<section id="check-your-understanding" class="level2" data-number="19.8">
+<h2 data-number="19.8" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">19.8</span> Check Your Understanding</h2>
+<ol type="1">
+<li>A drone searches at 8 m altitude with a nadir camera whose horizontal field of view is 90°, and the mission requires 30 % swath overlap. Compute the swath width and the sweep spacing, then the number of legs the generator emits for a bounding box 50 m wide.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Swath: <span class="math inline">\(w = 2 \times 8 \times \tan 45^\circ = 16\)</span> m. Spacing: <span class="math inline">\(s = 16 \times (1 - 0.3) = 11.2\)</span> m. Legs: <span class="math inline">\(n = \lceil 50 / 11.2 \rceil + 1 = \lceil 4.46 \rceil + 1 = 6\)</span>, and the recomputed step is <span class="math inline">\(50 / 5 = 10\)</span> m — tighter than the 11.2 m maximum, as the ceiling guarantees. The generator never widens the spacing to fit the box; it adds a leg and shrinks the step.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Trace <code>lawnmower(0, 100, 0, 20, 7.0, 6.0)</code> by hand: how many legs and waypoints result, what is the actual step, in which direction does the third leg (index 2) fly, and what is the final waypoint?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(W = 20\)</span>, so <span class="math inline">\(n = \lceil 20/7 \rceil + 1 = 3 + 1 = 4\)</span> legs and <span class="math inline">\(8\)</span> waypoints, with step <span class="math inline">\(20/3 \approx 6.67\)</span> m. Leg index 2 is even, so it flies south-to-north (<span class="math inline">\(x\)</span> from 0 to 100) at <span class="math inline">\(y \approx 13.33\)</span> m. The last leg (index 3, odd) flies north-to-south at <span class="math inline">\(y = 20\)</span>, so the final waypoint is <span class="math inline">\((0, 20, -6.0)\)</span> — northing 0, easting 20 m, 6 m above the launch altitude in NED’s negative-down convention.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>A survey flies <span class="math inline">\(w = 11\)</span> m swaths at <span class="math inline">\(s = 8\)</span> m spacing. GNSS scatter alone contributes about 1 m of cross-track error per leg. How much <em>additional</em> systematic drift (wind bias) per leg can the coverage guarantee absorb in the worst case, and what are the two remedies when the answer is judged too thin?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The overlap margin is <span class="math inline">\(w - s = 3\)</span> m, and the worst case is adjacent legs drifting oppositely, so each leg’s total budget is <span class="math inline">\((w-s)/2 = 1.5\)</span> m. With 1 m already spent on GNSS scatter, only about 0.5 m per leg remains for systematic wind bias — thin, since steady crosswind residuals can exceed that. The remedies pull opposite levers: tighten the spacing (more overlap, more legs, more time and battery) or reduce the error itself (track the leg line rather than chase corners, feed the controller setpoints that march along the leg, accept the time cost of flying slower in wind).</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>A* with the Euclidean heuristic returns an optimal path. A colleague proposes doubling the heuristic — using <span class="math inline">\(h'(n) = 2\,h(n)\)</span> — because it makes the planner visibly faster on the companion computer. What property is lost, what is the worst case for the returned path, and why might the trade still be accepted on a drone?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Doubling breaks admissibility: <span class="math inline">\(h'\)</span> can now overestimate the true remaining cost, so the goal can be expanded while a cheaper route is still unexplored, and optimality is lost. This is weighted A* with <span class="math inline">\(\varepsilon = 2\)</span>; the returned path is at most <span class="math inline">\(2\times\)</span> the optimal cost (bounded suboptimality), and in open maps typically far closer. The trade is often right on a drone because the planner shares a small processor with inference and telemetry, and a path 10–20 % long that arrives in a fifth of the compute — and therefore replans at a higher rate as the world changes — beats a perfect path delivered late.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>For each task, name the appropriate planner — lawnmower coverage, A*, or neither — and justify in one sentence: (a) sweep a 70 m × 40 m open field to find any geese present; (b) fly from the field’s corner to a detected goose on the far side of a treeline; (c) fly from hover directly to a detected goose 15 m away over open grass.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Lawnmower coverage: the question is “see everything,” there are no obstacles, and the box-plus-spacing parameterization guarantees completeness. (b) A<em>: the question is point-to-point and the treeline is an obstacle, so a shortest path must be searched on a map that represents it. (c) Neither: with a straight, obstacle-free line to a known NED target, the answer is the straight line itself — streaming setpoints toward the target — and invoking a planner adds latency and code for nothing. Choosing </em>no algorithm* when the question doesn’t require one is also a planning decision.</li>
+</ol>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>Mid-sweep on leg 3 of 6, the detector reports a goose and the mission preempts the search. Ten minutes later the pursuit resolves and the search must continue. Compare the cost and the coverage consequences of (a) restarting the lawnmower from leg 0, (b) resuming at the stored index on leg 3, and (c) regenerating a fresh bounding box over only the unswept remainder.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Restarting re-flies roughly half the track — minutes of battery the time budget almost certainly cannot spare — for ground already covered; its only virtue is that staleness of the earlier sweep is refreshed. (b) Resuming at the stored index costs one integer of state and a transit back to the abandoned leg; coverage of the remainder is exactly as planned, and the only gap risk is the partial leg 3, which should be resumed at its start (or at the recorded abandon point) rather than skipped. (c) Regenerating over the unswept sub-box costs one more generator call — microseconds — and produces the cleanest plan when the pursuit ended far from leg 3, trading a slightly different leg layout for a shorter transit. In practice (b) and (c) are the real candidates, and the choice turns on where the pursuit left the vehicle; (a) is defensible only if enough time has passed that geese may have re-landed on swept ground.</li>
+</ol>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="19.9">
+<h2 data-number="19.9" class="anchored" data-anchor-id="try-it"><span class="header-section-number">19.9</span> Try It</h2>
+<p><strong>Part 1 — build the generator and audit it.</strong> Implement <code>lawnmower()</code> exactly as specified — bounding box, maximum spacing, altitude in, ordered NED waypoint list out — plus a <code>swath(altitude, fov_deg, overlap)</code> helper that computes <span class="math inline">\(s_{\max}\)</span> from sensor geometry. Reproduce the chapter’s worked example (60 × 33 m box, 90° field of view, 5.5 m altitude, 40 % overlap) and confirm 6 legs, 12 waypoints, a 6.6 m step, and 393 m of track; then write a <code>track_length()</code> function and a time audit at 1.5 and 2.0 m/s. Plot the path (matplotlib, equal axes, north up) with the swath of each leg drawn as a translucent band — the plot makes coverage gaps visible by eye. Then feed the waypoint list into the Mission Scripting chapter’s state-machine node in SITL and fly it in Offboard mode: the NAVIGATE state needs no changes at all, which is the point — the planner and the executor meet at a list. Finally, log cross-track error each tick (the signed-distance formula of this chapter, against the current leg) and, after landing, plot its histogram; compare the spread against your overlap margin <span class="math inline">\((w-s)/2\)</span> and state whether your coverage claim survived the flight.</p>
+<p><strong>Part 2 — A* on a grid, then make it dynamic.</strong> Implement <code>a_star()</code> on a 2D occupancy grid with 8-connectivity and diagonal cost <span class="math inline">\(\sqrt{2}\)</span>, and verify optimality on hand-checkable cases: an empty grid (path length must equal the octile distance) and this chapter’s 14 × 9 wall-with-gap grid (the figure’s 12-cell path). Instrument the node-expansion count and compare three heuristics on a 200 × 200 grid with random obstacles: <span class="math inline">\(h = 0\)</span> (Dijkstra), Euclidean, and <span class="math inline">\(2\times\)</span> Euclidean — report expansions and path cost for each, and confirm the weighted variant’s path is never worse than twice optimal. Then make it dynamic: after finding a path, mark a random free cell on that path as an obstacle and re-plan from a point midway along the path. Measure re-plan time, and write three sentences on whether full re-planning is affordable at this grid size and replan rate on your target hardware — and at what map size or rate you would reach for an incremental planner instead.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#autonomous-state-machine-control">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="pagination-link" aria-label="Coordinate Frames: From Camera to World">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="pagination-link" aria-label="Vector-Based Threat Evasion: The Math of Escape">
+        <span class="nav-page-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

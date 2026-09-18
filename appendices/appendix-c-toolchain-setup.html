@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Appendix C — Appendix C: Toolchain Setup Guide – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../appendices/appendix-d-image-credits.html" rel="next">
+<link href="../appendices/appendix-b-labs.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../appendices/appendix-a-glossary.html">Appendices</a></li><li class="breadcrumb-item"><a href="../appendices/appendix-c-toolchain-setup.html"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#getting-the-px4-source-all-platforms" id="toc-getting-the-px4-source-all-platforms" class="nav-link active" data-scroll-target="#getting-the-px4-source-all-platforms"><span class="header-section-number">C.1</span> Getting the PX4 source (all platforms)</a></li>
+  <li><a href="#macos" id="toc-macos" class="nav-link" data-scroll-target="#macos"><span class="header-section-number">C.2</span> macOS</a>
+  <ul class="collapse">
+  <li><a href="#core-tools" id="toc-core-tools" class="nav-link" data-scroll-target="#core-tools"><span class="header-section-number">C.2.1</span> Core tools</a></li>
+  <li><a href="#clone-the-source-on-the-host" id="toc-clone-the-source-on-the-host" class="nav-link" data-scroll-target="#clone-the-source-on-the-host"><span class="header-section-number">C.2.2</span> Clone the source on the host</a></li>
+  <li><a href="#x11-forwarding" id="toc-x11-forwarding" class="nav-link" data-scroll-target="#x11-forwarding"><span class="header-section-number">C.2.3</span> X11 forwarding</a></li>
+  <li><a href="#build-and-run-sitl-in-the-dev-container" id="toc-build-and-run-sitl-in-the-dev-container" class="nav-link" data-scroll-target="#build-and-run-sitl-in-the-dev-container"><span class="header-section-number">C.2.4</span> Build and run SITL in the dev container</a></li>
+  <li><a href="#if-the-gazebo-window-does-not-appear" id="toc-if-the-gazebo-window-does-not-appear" class="nav-link" data-scroll-target="#if-the-gazebo-window-does-not-appear"><span class="header-section-number">C.2.5</span> If the Gazebo window does not appear</a></li>
+  <li><a href="#qgroundcontrol-on-macos" id="toc-qgroundcontrol-on-macos" class="nav-link" data-scroll-target="#qgroundcontrol-on-macos"><span class="header-section-number">C.2.6</span> QGroundControl on macOS</a></li>
+  <li><a href="#vnc-fallback-only-if-x11-forwarding-fails" id="toc-vnc-fallback-only-if-x11-forwarding-fails" class="nav-link" data-scroll-target="#vnc-fallback-only-if-x11-forwarding-fails"><span class="header-section-number">C.2.7</span> VNC fallback (only if X11 forwarding fails)</a></li>
+  <li><a href="#macos-quick-reference" id="toc-macos-quick-reference" class="nav-link" data-scroll-target="#macos-quick-reference"><span class="header-section-number">C.2.8</span> macOS quick reference</a></li>
+  </ul></li>
+  <li><a href="#windows-wsl-2-ubuntu-22.04" id="toc-windows-wsl-2-ubuntu-22.04" class="nav-link" data-scroll-target="#windows-wsl-2-ubuntu-22.04"><span class="header-section-number">C.3</span> Windows (WSL 2 + Ubuntu 22.04)</a>
+  <ul class="collapse">
+  <li><a href="#install-wsl-with-ubuntu-22.04" id="toc-install-wsl-with-ubuntu-22.04" class="nav-link" data-scroll-target="#install-wsl-with-ubuntu-22.04"><span class="header-section-number">C.3.1</span> Install WSL with Ubuntu 22.04</a></li>
+  <li><a href="#install-and-build-px4-v1.16.2" id="toc-install-and-build-px4-v1.16.2" class="nav-link" data-scroll-target="#install-and-build-px4-v1.16.2"><span class="header-section-number">C.3.2</span> Install and build PX4 v1.16.2</a></li>
+  <li><a href="#qgroundcontrol-on-wsl" id="toc-qgroundcontrol-on-wsl" class="nav-link" data-scroll-target="#qgroundcontrol-on-wsl"><span class="header-section-number">C.3.3</span> QGroundControl on WSL</a></li>
+  </ul></li>
+  <li><a href="#native-ubuntu-22.04" id="toc-native-ubuntu-22.04" class="nav-link" data-scroll-target="#native-ubuntu-22.04"><span class="header-section-number">C.4</span> Native Ubuntu 22.04</a>
+  <ul class="collapse">
+  <li><a href="#prepare-the-system" id="toc-prepare-the-system" class="nav-link" data-scroll-target="#prepare-the-system"><span class="header-section-number">C.4.1</span> Prepare the system</a></li>
+  <li><a href="#install-and-build-px4-v1.16.2-1" id="toc-install-and-build-px4-v1.16.2-1" class="nav-link" data-scroll-target="#install-and-build-px4-v1.16.2-1"><span class="header-section-number">C.4.2</span> Install and build PX4 v1.16.2</a></li>
+  <li><a href="#qgroundcontrol-on-ubuntu" id="toc-qgroundcontrol-on-ubuntu" class="nav-link" data-scroll-target="#qgroundcontrol-on-ubuntu"><span class="header-section-number">C.4.3</span> QGroundControl on Ubuntu</a></li>
+  <li><a href="#verification-checklist" id="toc-verification-checklist" class="nav-link" data-scroll-target="#verification-checklist"><span class="header-section-number">C.4.4</span> Verification checklist</a></li>
+  <li><a href="#resulting-directory-structure" id="toc-resulting-directory-structure" class="nav-link" data-scroll-target="#resulting-directory-structure"><span class="header-section-number">C.4.5</span> Resulting directory structure</a></li>
+  </ul></li>
+  <li><a href="#clearing-pre-arm-failures-and-taking-off-all-platforms" id="toc-clearing-pre-arm-failures-and-taking-off-all-platforms" class="nav-link" data-scroll-target="#clearing-pre-arm-failures-and-taking-off-all-platforms"><span class="header-section-number">C.5</span> Clearing pre-arm failures and taking off (all platforms)</a>
+  <ul class="collapse">
+  <li><a href="#ekf2-missing-data" id="toc-ekf2-missing-data" class="nav-link" data-scroll-target="#ekf2-missing-data"><span class="header-section-number">C.5.1</span> “ekf2 missing data”</a></li>
+  <li><a href="#no-connection-to-the-ground-control-station" id="toc-no-connection-to-the-ground-control-station" class="nav-link" data-scroll-target="#no-connection-to-the-ground-control-station"><span class="header-section-number">C.5.2</span> “No connection to the ground control station”</a></li>
+  <li><a href="#take-off" id="toc-take-off" class="nav-link" data-scroll-target="#take-off"><span class="header-section-number">C.5.3</span> Take off</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../appendices/appendix-a-glossary.html">Appendices</a></li><li class="breadcrumb-item"><a href="../appendices/appendix-c-toolchain-setup.html"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Appendix C — Appendix C: Toolchain Setup Guide</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>This appendix is a procedural reference for installing the simulation toolchain used throughout the book: <strong>PX4 Autopilot v1.16.2</strong> (built from source and run as software-in-the-loop, SITL, with the Gazebo simulator) and <strong>QGroundControl (QGC)</strong>, the ground control station. Three host environments are covered:</p>
+<ul>
+<li><strong>macOS</strong> — a Docker-container build with the Gazebo window forwarded to the Mac via XQuartz (plus a VNC fallback if X11 forwarding will not cooperate).</li>
+<li><strong>Windows</strong> — the Windows Subsystem for Linux (WSL 2) with Ubuntu 22.04, building natively inside the WSL distro, with WSLg rendering the GUI windows on the Windows desktop.</li>
+<li><strong>Native Ubuntu 22.04</strong> — the same native build path as WSL, without the WSL-specific setup.</li>
+</ul>
+<p>Every path pins the same PX4 release (<code>v1.16.2</code>), builds the same SITL target (<code>make px4_sitl gz_x500</code>), and ends at the same place: a <code>pxh&gt;</code> console, a Gazebo window showing an X500 quadcopter, and QGC connected over UDP port 14550. Because the endpoint is identical, the pre-arm troubleshooting and takeoff procedure is written once, in the shared section at the end, rather than repeated per operating system.</p>
+<p><strong>ROS 2</strong> is not installed here. The chapters that use ROS 2 assume a standard installation from the official ROS 2 documentation (the apt package repositories for your distribution, plus <code>rosdep</code> for dependency resolution); that upstream guide is authoritative and kept current, so this appendix does not duplicate it.</p>
+<section id="getting-the-px4-source-all-platforms" class="level2" data-number="C.1">
+<h2 data-number="C.1" class="anchored" data-anchor-id="getting-the-px4-source-all-platforms"><span class="header-section-number">C.1</span> Getting the PX4 source (all platforms)</h2>
+<p>Every path builds the same source tree, cloned from GitHub and pinned to the <code>v1.16.2</code> tag with all submodules initialized:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/PX4/PX4-Autopilot.git <span class="at">--recursive</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> PX4-Autopilot</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout v1.16.2</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> submodule update <span class="at">--init</span> <span class="at">--recursive</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Where you run this differs by platform:</p>
+<ul>
+<li><strong>macOS:</strong> run it on the Mac host. The source tree is then mounted into the build container, so build artifacts persist on your machine between container runs.</li>
+<li><strong>Windows (WSL):</strong> run it inside the Ubuntu 22.04 WSL shell, in your WSL home directory.</li>
+<li><strong>Native Ubuntu:</strong> run it in your home directory.</li>
+</ul>
+<p>The <code>git submodule update --init --recursive</code> step after checkout matters: the tag checkout can leave submodules pointing at the wrong revisions, and a build from mismatched submodules fails in confusing ways.</p>
+</section>
+<section id="macos" class="level2" data-number="C.2">
+<h2 data-number="C.2" class="anchored" data-anchor-id="macos"><span class="header-section-number">C.2</span> macOS</h2>
+<p>On macOS, PX4 is built inside the official PX4 development container (<code>px4io/px4-dev-simulation-jammy</code>, an Ubuntu 22.04 image with the toolchain preinstalled), while QGC runs natively on the Mac. The Gazebo window escapes the container through X11 forwarding to XQuartz.</p>
+<section id="core-tools" class="level3" data-number="C.2.1">
+<h3 data-number="C.2.1" class="anchored" data-anchor-id="core-tools"><span class="header-section-number">C.2.1</span> Core tools</h3>
+<p>Install Homebrew if it is not already present:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> <span class="at">--version</span>   <span class="co"># check first</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/bin/bash</span> <span class="at">-c</span> <span class="st">"</span><span class="va">$(</span><span class="ex">curl</span> <span class="at">-fsSL</span> https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh<span class="va">)</span><span class="st">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Then install Docker Desktop, XQuartz, and git:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install <span class="at">--cask</span> docker</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install <span class="at">--cask</span> xquartz</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install git</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Open Docker Desktop and let it finish initializing (the whale icon appears in the menu bar), then verify:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">open</span> /Applications/Docker.app</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> <span class="at">--version</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>XQuartz needs one configuration change, and it is the step most people miss:</p>
+<ol type="1">
+<li>Launch XQuartz: <code>open -a XQuartz</code></li>
+<li>Go to <strong>XQuartz → Settings (Preferences) → Security</strong></li>
+<li>Tick <strong>“Allow connections from network clients”</strong></li>
+<li>Quit and restart XQuartz for the change to take effect (a full logout/restart is the surest way).</li>
+</ol>
+</section>
+<section id="clone-the-source-on-the-host" class="level3" data-number="C.2.2">
+<h3 data-number="C.2.2" class="anchored" data-anchor-id="clone-the-source-on-the-host"><span class="header-section-number">C.2.2</span> Clone the source on the host</h3>
+<p>Run the clone sequence from <em>Getting the PX4 source</em> above on the Mac itself, in your home directory. The next step mounts <code>~/PX4-Autopilot</code> into the container.</p>
+</section>
+<section id="x11-forwarding" class="level3" data-number="C.2.3">
+<h3 data-number="C.2.3" class="anchored" data-anchor-id="x11-forwarding"><span class="header-section-number">C.2.3</span> X11 forwarding</h3>
+<p>Each session, with XQuartz running, allow the local connection:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">xhost</span> +localhost</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>If <code>xhost</code> is not found, make sure XQuartz is running and that <code>/opt/X11/bin</code> is on your <code>PATH</code> (open a fresh terminal after installing XQuartz).</p>
+</section>
+<section id="build-and-run-sitl-in-the-dev-container" class="level3" data-number="C.2.4">
+<h3 data-number="C.2.4" class="anchored" data-anchor-id="build-and-run-sitl-in-the-dev-container"><span class="header-section-number">C.2.4</span> Build and run SITL in the dev container</h3>
+<p>Start the container with the source mounted, the display forwarded, and the MAVLink UDP ports published:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> <span class="dt">\</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-e</span> DISPLAY=host.docker.internal:0 <span class="dt">\</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> /tmp/.X11-unix:/tmp/.X11-unix <span class="dt">\</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> ~/PX4-Autopilot:/home/user/PX4-Autopilot <span class="dt">\</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-p</span> 14550:14550/udp <span class="dt">\</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">-p</span> 14540:14540/udp <span class="dt">\</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">--workdir</span> /home/user/PX4-Autopilot <span class="dt">\</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  px4io/px4-dev-simulation-jammy:latest <span class="dt">\</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  bash</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Flags explained:</p>
+<ul>
+<li><code>-e DISPLAY=host.docker.internal:0</code> — points the container at XQuartz on the Mac.</li>
+<li><code>-v /tmp/.X11-unix:/tmp/.X11-unix</code> — mounts the X11 socket.</li>
+<li><code>-v ~/PX4-Autopilot:/home/user/PX4-Autopilot</code> — mounts your source tree, so build artifacts persist on the host.</li>
+<li><code>-p 14550:14550/udp</code> — forwards the port QGC uses to reach the sim (needed later).</li>
+<li><code>--workdir</code> — drops you straight into the source directory.</li>
+</ul>
+<p>This opens a bash shell inside the container — not the <code>pxh&gt;</code> prompt yet. If the build later complains about missing dependencies, run the in-tree setup script once inside the container, then re-open the shell:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> ./Tools/setup/ubuntu.sh</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Inside the container shell, build and run:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> px4_sitl gz_x500</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The first build takes several minutes. When it finishes, Gazebo launches (its window appears on the Mac via XQuartz) and you land at the <code>pxh&gt;</code> prompt:</p>
+<pre><code>INFO  [px4] Startup script returned successfully
+pxh&gt;</code></pre>
+<p>Startup warnings such as <code>Preflight Fail: No connection to the GCS</code> and brief timestamp errors are normal at this point and resolve on their own or via the shared troubleshooting section below.</p>
+</section>
+<section id="if-the-gazebo-window-does-not-appear" class="level3" data-number="C.2.5">
+<h3 data-number="C.2.5" class="anchored" data-anchor-id="if-the-gazebo-window-does-not-appear"><span class="header-section-number">C.2.5</span> If the Gazebo window does not appear</h3>
+<ul>
+<li>Confirm XQuartz is running and “Allow connections from network clients” is ticked.</li>
+<li>Re-run <code>xhost +localhost</code> on the Mac, then restart the container.</li>
+<li>Give Gazebo 10–15 seconds after PX4 boots to start rendering.</li>
+<li>If you still get an X11/display error, use the VNC fallback below.</li>
+</ul>
+</section>
+<section id="qgroundcontrol-on-macos" class="level3" data-number="C.2.6">
+<h3 data-number="C.2.6" class="anchored" data-anchor-id="qgroundcontrol-on-macos"><span class="header-section-number">C.2.6</span> QGroundControl on macOS</h3>
+<p>Unlike the simulator, which runs inside the Linux container, QGC installs natively on macOS. It reaches the sim through the <code>-p 14550:14550/udp</code> port mapping in the <code>docker run</code> command — make sure that flag is present.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install <span class="at">--cask</span> qgroundcontrol</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">open</span> /Applications/QGroundControl.app</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>QGC auto-connects to the running SITL instance on UDP port 14550, and the “No connection to the ground control station” pre-arm failure clears. Start QGC after the sim is up, or leave it running and it will pick up the connection when the sim starts. On first launch, macOS Gatekeeper may warn about an unidentified developer; allow it via <strong>System Settings → Privacy &amp; Security</strong>, or install the official <code>.dmg</code> from <a href="https://qgroundcontrol.com/">qgroundcontrol.com</a> if you prefer not to use Homebrew.</p>
+</section>
+<section id="vnc-fallback-only-if-x11-forwarding-fails" class="level3" data-number="C.2.7">
+<h3 data-number="C.2.7" class="anchored" data-anchor-id="vnc-fallback-only-if-x11-forwarding-fails"><span class="header-section-number">C.2.7</span> VNC fallback (only if X11 forwarding fails)</h3>
+<p>This method is laggier, with less responsive mouse control, but it avoids X11 entirely: the container runs a virtual display (Xvfb) and a VNC server, and the Mac connects with the built-in Screen Sharing client.</p>
+<p>Create a build directory and Dockerfile that extend the dev image:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> ~/px4-vnc</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> <span class="op">&lt;&lt;'EOF'</span> <span class="op">&gt;</span> ~/px4-vnc/Dockerfile</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="st">FROM px4io/px4-dev-simulation-jammy:latest</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="st">USER root</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="st">RUN apt-get update &amp;&amp; apt-get install -y \</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="st">    xvfb \</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="st">    x11vnc \</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="st">    &amp;&amp; rm -rf /var/lib/apt/lists/*</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="st">COPY start.sh /start.sh</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="st">RUN chmod +x /start.sh</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="st">ENTRYPOINT []</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="st">CMD ["/start.sh"]</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Create the startup script — it launches the virtual display and VNC server, then drops into a build shell in the mounted source tree:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> <span class="op">&lt;&lt;'EOF'</span> <span class="op">&gt;</span> ~/px4-vnc/start.sh</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="st">#!/bin/bash</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="st"># Start virtual display</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="st">Xvfb :1 -screen 0 1280x720x24 &amp;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="st">sleep 2</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="st">export DISPLAY=:1</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="st"># Create VNC password and start VNC server on port 5900</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="st">mkdir -p ~/.vnc</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="st">x11vnc -storepasswd 1234 ~/.vnc/passwd</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="st">x11vnc -display :1 -forever -rfbauth ~/.vnc/passwd -rfbport 5900 &amp;</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="st">sleep 1</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="st"># Drop into a shell in the mounted PX4 source tree</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="st">cd /home/user/PX4-Autopilot</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="st">exec bash</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Build the image once, then run it with the source mounted:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/px4-vnc</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-t</span> px4-build-vnc .</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> <span class="dt">\</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> ~/PX4-Autopilot:/home/user/PX4-Autopilot <span class="dt">\</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">-p</span> 14550:14550/udp <span class="dt">\</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">-p</span> 14540:14540/udp <span class="dt">\</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">-p</span> 5900:5900 <span class="dt">\</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  px4-build-vnc</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Inside the container shell, build and run SITL as before (<code>make px4_sitl gz_x500</code>). Then, in a new terminal tab on the Mac, connect to the Gazebo GUI via Screen Sharing:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">open</span> vnc://localhost:5900</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The password is <code>1234</code>. If the view is black or grey, give Gazebo 10–15 seconds to start rendering. Pre-arm fixes and takeoff are identical to the shared section below.</p>
+</section>
+<section id="macos-quick-reference" class="level3" data-number="C.2.8">
+<h3 data-number="C.2.8" class="anchored" data-anchor-id="macos-quick-reference"><span class="header-section-number">C.2.8</span> macOS quick reference</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># One-time per session: allow local X11 connections (XQuartz must be running)</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">xhost</span> +localhost</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Start the dev container with source + display mounted</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> <span class="dt">\</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">-e</span> DISPLAY=host.docker.internal:0 <span class="dt">\</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> /tmp/.X11-unix:/tmp/.X11-unix <span class="dt">\</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> ~/PX4-Autopilot:/home/user/PX4-Autopilot <span class="dt">\</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">-p</span> 14550:14550/udp <span class="at">-p</span> 14540:14540/udp <span class="dt">\</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">--workdir</span> /home/user/PX4-Autopilot <span class="dt">\</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  px4io/px4-dev-simulation-jammy:latest bash</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Inside the container: build + run</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> px4_sitl gz_x500</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="windows-wsl-2-ubuntu-22.04" class="level2" data-number="C.3">
+<h2 data-number="C.3" class="anchored" data-anchor-id="windows-wsl-2-ubuntu-22.04"><span class="header-section-number">C.3</span> Windows (WSL 2 + Ubuntu 22.04)</h2>
+<p>On Windows, everything — PX4 and QGC — runs inside a WSL 2 Ubuntu 22.04 distro. WSLg (WSL’s built-in GUI support) renders the Gazebo and QGC windows on the Windows desktop with no X server setup.</p>
+<section id="install-wsl-with-ubuntu-22.04" class="level3" data-number="C.3.1">
+<h3 data-number="C.3.1" class="anchored" data-anchor-id="install-wsl-with-ubuntu-22.04"><span class="header-section-number">C.3.1</span> Install WSL with Ubuntu 22.04</h3>
+<ol type="1">
+<li><p>Open <strong>PowerShell as Administrator</strong> and install:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>wsl <span class="op">--</span>install <span class="op">-</span>d Ubuntu-22<span class="op">.</span><span class="dv">04</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>Restart if prompted, then set your UNIX username and password when Ubuntu first launches.</p></li>
+<li><p>Update the system inside the Ubuntu shell:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> apt upgrade <span class="at">-y</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>Ensure you are on WSL 2 with WSLg (needed for the Gazebo GUI). In PowerShell:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>wsl <span class="op">--</span>set-version Ubuntu-22<span class="op">.</span><span class="dv">04</span> <span class="dv">2</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="dt">wsl</span> <span class="op">--</span>update</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ol>
+<p><strong>Launching the right Ubuntu.</strong> If you have more than one distro installed, the bare <code>ubuntu</code> command may open the wrong one (for example, 20.04). To check and fix:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>wsl <span class="op">-</span>l <span class="op">-</span>v                       <span class="co"># list distros + versions; * marks default</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>wsl <span class="op">-</span>d Ubuntu-22<span class="op">.</span><span class="dv">04</span>             <span class="co"># launch 22.04 specifically</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>wsl <span class="op">--</span>set-default Ubuntu-22<span class="op">.</span><span class="dv">04</span>  <span class="co"># make 22.04 the default for plain `wsl`</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>If <code>Ubuntu-22.04</code> is not listed, it did not install — rerun <code>wsl --install -d Ubuntu-22.04</code>.</p>
+</section>
+<section id="install-and-build-px4-v1.16.2" class="level3" data-number="C.3.2">
+<h3 data-number="C.3.2" class="anchored" data-anchor-id="install-and-build-px4-v1.16.2"><span class="header-section-number">C.3.2</span> Install and build PX4 v1.16.2</h3>
+<p>Inside the Ubuntu 22.04 shell, install git and run the clone sequence from <em>Getting the PX4 source</em> above:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install <span class="at">-y</span> git</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Then run the Ubuntu setup script, which installs the toolchain and Gazebo dependencies:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/PX4-Autopilot</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> ./Tools/setup/ubuntu.sh</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Close and reopen the WSL terminal (or run <code>source ~/.bashrc</code>), then build and run SITL to verify:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/PX4-Autopilot</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> px4_sitl gz_x500</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A Gazebo Sim window should open on the Windows desktop with an X500 quadcopter.</p>
+</section>
+<section id="qgroundcontrol-on-wsl" class="level3" data-number="C.3.3">
+<h3 data-number="C.3.3" class="anchored" data-anchor-id="qgroundcontrol-on-wsl"><span class="header-section-number">C.3.3</span> QGroundControl on WSL</h3>
+<p>PX4 needs a ground control station connection before it will arm. On WSL, install QGC inside the WSL distro using the official AppImage — WSLg renders its window on the Windows desktop:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://d176tv9ibo4jno.cloudfront.net/builds/master/QGroundControl-x86_64.AppImage</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x QGroundControl-x86_64.AppImage</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="ex">./QGroundControl-x86_64.AppImage</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>(If you download the AppImage with a Windows browser instead, the <a href="https://qgroundcontrol.com/">official QGroundControl downloads page</a> has the current builds. Windows Explorer can reach your WSL home directory via <code>\\wsl.localhost\&lt;distro-name&gt;\home\&lt;your-username&gt;</code> — for example, run <code>explorer.exe \\wsl.localhost\Ubuntu-22.04\home\&lt;your-username&gt;</code> from PowerShell — and you can copy the AppImage there before making it executable.)</p>
+<p>QGC auto-connects to the running SITL instance on UDP port 14550, and the GCS pre-arm failure clears.</p>
+<p>Notes:</p>
+<ul>
+<li><p>Run QGC alongside the SITL sim — start it after the sim is up, or leave it running and it will pick up the connection when the sim starts.</p></li>
+<li><p>If the AppImage fails with a FUSE error, run it in extracted mode or install FUSE:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./QGroundControl-x86_64.AppImage</span> <span class="at">--appimage-extract-and-run</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># or:</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install <span class="at">-y</span> libfuse2</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>If the window does not appear, confirm WSLg is working (<code>echo $DISPLAY</code> should return something like <code>:0</code>) and that you are on WSL 2 with <code>wsl --update</code> applied.</p></li>
+<li><p>If QGC renders badly under WSL’s GPU passthrough, a small launcher script that forces software rendering is a reliable workaround:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> <span class="op">&gt;</span> ~/launch-qgc.sh <span class="op">&lt;&lt; 'EOF'</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="st">#!/bin/bash</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="st">export LIBGL_ALWAYS_SOFTWARE=1</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="st">export GALLIUM_DRIVER=llvmpipe</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="st">exec ~/QGroundControl-x86_64.AppImage "$@"</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x ~/launch-qgc.sh</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="ex">./launch-qgc.sh</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ul>
+</section>
+</section>
+<section id="native-ubuntu-22.04" class="level2" data-number="C.4">
+<h2 data-number="C.4" class="anchored" data-anchor-id="native-ubuntu-22.04"><span class="header-section-number">C.4</span> Native Ubuntu 22.04</h2>
+<p>On native Ubuntu 22.04 the procedure is the WSL procedure minus the WSL setup: everything runs directly on the host.</p>
+<section id="prepare-the-system" class="level3" data-number="C.4.1">
+<h3 data-number="C.4.1" class="anchored" data-anchor-id="prepare-the-system"><span class="header-section-number">C.4.1</span> Prepare the system</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> apt upgrade <span class="at">-y</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install <span class="at">-y</span> git wget curl</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> <span class="at">--version</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="install-and-build-px4-v1.16.2-1" class="level3" data-number="C.4.2">
+<h3 data-number="C.4.2" class="anchored" data-anchor-id="install-and-build-px4-v1.16.2-1"><span class="header-section-number">C.4.2</span> Install and build PX4 v1.16.2</h3>
+<p>Run the clone sequence from <em>Getting the PX4 source</em> above in your home directory, then install the dependencies and reload the shell:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/PX4-Autopilot</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> ./Tools/setup/ubuntu.sh</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> ~/.bashrc</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Launch SITL with the default (blank) simulation world:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/PX4-Autopilot</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> px4_sitl gz_x500</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Or launch with the Baylands world instead:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="va">PX4_GZ_WORLD</span><span class="op">=</span>baylands <span class="fu">make</span> px4_sitl gz_x500</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="qgroundcontrol-on-ubuntu" class="level3" data-number="C.4.3">
+<h3 data-number="C.4.3" class="anchored" data-anchor-id="qgroundcontrol-on-ubuntu"><span class="header-section-number">C.4.3</span> QGroundControl on Ubuntu</h3>
+<p>Same AppImage as on WSL, downloaded from the official build server:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://d176tv9ibo4jno.cloudfront.net/builds/master/QGroundControl-x86_64.AppImage</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x QGroundControl-x86_64.AppImage</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="ex">./QGroundControl-x86_64.AppImage</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The FUSE-error fallback (<code>--appimage-extract-and-run</code> or <code>sudo apt install -y libfuse2</code>) and the software-rendering launcher script from the Windows section apply unchanged on native Ubuntu if you hit the same symptoms.</p>
+</section>
+<section id="verification-checklist" class="level3" data-number="C.4.4">
+<h3 data-number="C.4.4" class="anchored" data-anchor-id="verification-checklist"><span class="header-section-number">C.4.4</span> Verification checklist</h3>
+<ul class="task-list">
+<li><label><input type="checkbox">System updated (<code>apt update &amp;&amp; apt upgrade</code>)</label></li>
+<li><label><input type="checkbox">Git installed</label></li>
+<li><label><input type="checkbox">PX4 cloned</label></li>
+<li><label><input type="checkbox">Checked out <code>v1.16.2</code></label></li>
+<li><label><input type="checkbox">Submodules initialized</label></li>
+<li><label><input type="checkbox">Dependencies installed (<code>Tools/setup/ubuntu.sh</code>)</label></li>
+<li><label><input type="checkbox">PX4 SITL launches successfully</label></li>
+<li><label><input type="checkbox">QGroundControl starts successfully</label></li>
+<li><label><input type="checkbox">QGroundControl connects to PX4 SITL</label></li>
+</ul>
+</section>
+<section id="resulting-directory-structure" class="level3" data-number="C.4.5">
+<h3 data-number="C.4.5" class="anchored" data-anchor-id="resulting-directory-structure"><span class="header-section-number">C.4.5</span> Resulting directory structure</h3>
+<pre class="text"><code>~
+├── PX4-Autopilot/
+├── QGroundControl-x86_64.AppImage
+└── launch-qgc.sh</code></pre>
+</section>
+</section>
+<section id="clearing-pre-arm-failures-and-taking-off-all-platforms" class="level2" data-number="C.5">
+<h2 data-number="C.5" class="anchored" data-anchor-id="clearing-pre-arm-failures-and-taking-off-all-platforms"><span class="header-section-number">C.5</span> Clearing pre-arm failures and taking off (all platforms)</h2>
+<p>Whichever host you built on, you end at the same <code>pxh&gt;</code> console, and the same two pre-arm failures are the common blockers. Both fixes are entered at the <code>pxh&gt;</code> prompt.</p>
+<section id="ekf2-missing-data" class="level3" data-number="C.5.1">
+<h3 data-number="C.5.1" class="anchored" data-anchor-id="ekf2-missing-data"><span class="header-section-number">C.5.1</span> “ekf2 missing data”</h3>
+<p>PX4’s EKF2 module (an extended-Kalman-filter state estimator) needs a few seconds to converge — this usually clears on its own within ~10–30 s. If it does not:</p>
+<ul>
+<li>If software rendering is dragging the simulation’s real-time factor down, convergence simply takes longer — wait it out.</li>
+<li>Check the real-time factor in the Gazebo GUI. Heavy <code>.dae</code> meshes can drop it badly and starve EKF2 — simplify meshes or reduce texture sizes if it is well under ~0.5.</li>
+</ul>
+</section>
+<section id="no-connection-to-the-ground-control-station" class="level3" data-number="C.5.2">
+<h3 data-number="C.5.2" class="anchored" data-anchor-id="no-connection-to-the-ground-control-station"><span class="header-section-number">C.5.2</span> “No connection to the ground control station”</h3>
+<p>The clean fix is to start QGC (previous sections) — the failure clears on its own once the GCS link is up. For a headless run, the check can instead be relaxed from the <code>pxh&gt;</code> prompt:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="ex">param</span> set NAV_DLL_ACT 0</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="ex">param</span> set COM_RCL_EXCEPT 4</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="ex">param</span> set COM_RC_IN_MODE 1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>These parameters disable the data-link-loss failsafe action and the RC-loss/RC-input checks. They are simulation-only relaxations: restore the defaults (<code>param reset NAV_DLL_ACT</code>, and likewise for the others) before reusing a parameter set anywhere near real hardware.</p>
+</section>
+<section id="take-off" class="level3" data-number="C.5.3">
+<h3 data-number="C.5.3" class="anchored" data-anchor-id="take-off"><span class="header-section-number">C.5.3</span> Take off</h3>
+<p>Once the checks are green, the console reports “ready to take off” (you may have to press Enter in the terminal running the sim to see a fresh prompt). Then:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="ex">commander</span> takeoff</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The drone takes off, hovers, and lands — visible both in the terminal logs and in the Gazebo 3D window. From here, QGC’s map view, telemetry panes, and flight commands are live against the simulated vehicle.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../appendices/appendix-b-labs.html" class="pagination-link" aria-label="Appendix B: Lab Assignments">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../appendices/appendix-d-image-credits.html" class="pagination-link" aria-label="Appendix D: Image Credits">
+        <span class="nav-page-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

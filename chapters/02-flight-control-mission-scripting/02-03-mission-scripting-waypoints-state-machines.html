@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>11&nbsp; Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" rel="next">
+<link href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html">Part II — Flight Control &amp; Mission Scripting</a></li><li class="breadcrumb-item"><a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">11.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">11.2</span> Key Vocabulary</a></li>
+  <li><a href="#the-workbench-three-processes-on-one-desk" id="toc-the-workbench-three-processes-on-one-desk" class="nav-link" data-scroll-target="#the-workbench-three-processes-on-one-desk"><span class="header-section-number">11.3</span> The Workbench: Three Processes on One Desk</a></li>
+  <li><a href="#the-mission-as-data-waypoints-and-mission-items" id="toc-the-mission-as-data-waypoints-and-mission-items" class="nav-link" data-scroll-target="#the-mission-as-data-waypoints-and-mission-items"><span class="header-section-number">11.4</span> The Mission as Data: Waypoints and Mission Items</a></li>
+  <li><a href="#reading-a-real-plan-file" id="toc-reading-a-real-plan-file" class="nav-link" data-scroll-target="#reading-a-real-plan-file"><span class="header-section-number">11.5</span> Reading a Real Plan File</a>
+  <ul class="collapse">
+  <li><a href="#the-geometry-hiding-in-the-sixth-decimal-place" id="toc-the-geometry-hiding-in-the-sixth-decimal-place" class="nav-link" data-scroll-target="#the-geometry-hiding-in-the-sixth-decimal-place"><span class="header-section-number">11.5.1</span> The geometry hiding in the sixth decimal place</a></li>
+  </ul></li>
+  <li><a href="#arrival-from-stopwatch-to-acceptance-radius" id="toc-arrival-from-stopwatch-to-acceptance-radius" class="nav-link" data-scroll-target="#arrival-from-stopwatch-to-acceptance-radius"><span class="header-section-number">11.6</span> Arrival: From Stopwatch to Acceptance Radius</a></li>
+  <li><a href="#mission-logic-as-a-state-machine" id="toc-mission-logic-as-a-state-machine" class="nav-link" data-scroll-target="#mission-logic-as-a-state-machine"><span class="header-section-number">11.7</span> Mission Logic as a State Machine</a></li>
+  <li><a href="#proving-it-in-sitl" id="toc-proving-it-in-sitl" class="nav-link" data-scroll-target="#proving-it-in-sitl"><span class="header-section-number">11.8</span> Proving It in SITL</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">11.9</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">11.10</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html">Part II — Flight Control &amp; Mission Scripting</a></li><li class="breadcrumb-item"><a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The previous chapter ended with a working mission node and two honest confessions about it. The node flew its square on a timer, advancing to the next corner when a stopwatch expired rather than when the vehicle arrived — a scheme that works exactly until the first gust of wind makes the schedule and the aircraft disagree. And the whole program had, so far, flown nowhere: the chapter closed by <em>declaring</em> the simulate-then-fly rule and deferring the simulator itself. This chapter pays both debts. It stands up the software-in-the-loop environment — PX4, Gazebo, and QGroundControl running together on one desk — and then rebuilds mission logic properly: waypoints as data with a real arrival test instead of a stopwatch, and the mission itself as an explicit state machine instead of a thicket of boolean flags. Along the way it does something the abstract treatment cannot: it opens a real mission file — a QGroundControl <code>.plan</code>, JSON from end to end, whose coordinates trace an actual lawnmower search over a grass field at 39.68° N, 75.75° W — and reads every field, because the day a mission goes wrong, the plan file is the flight’s source code and someone has to be able to read it.</p>
+<p>The chapter’s through-line is a single idea wearing three outfits. A waypoint mission is a <em>list</em>; executing it means asking, over and over, “am I there yet, and what do I do next?” — and that question can be answered by the firmware’s own navigator (upload the list, let PX4 fly it), or by mission code streaming setpoints in Offboard mode (the running example’s way), or by a simulator exercising either path with no aircraft at risk. List, arrival test, state machine: everything else is detail.</p>
+<section id="learning-objectives" class="level2" data-number="11.1">
+<h2 data-number="11.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">11.1</span> Learning Objectives</h2>
+<ul>
+<li>Stand up a PX4 software-in-the-loop environment — the SITL firmware process, the Gazebo physics simulator, and QGroundControl — and explain what each of the three processes contributes and how they find each other.</li>
+<li>Explain how a waypoint mission is structured as an ordered list of mission items — each a command with a coordinate frame and parameters — and distinguish navigation items from action items.</li>
+<li>Read a real QGroundControl <code>.plan</code> file and decode every load-bearing field: the geofence polygon, the planned home position, the mission item commands, frames, and altitude modes.</li>
+<li>Convert latitude/longitude differences into metres, and use the conversion to recover a mission’s geometry — leg lengths, row pitch, total track — and check its duration against a time budget.</li>
+<li>Replace time-based waypoint advancement with an arrival test built on an acceptance radius, and predict the failure modes of a radius chosen too small or too large.</li>
+<li>Restructure mission logic as an explicit finite state machine — states, guards, and transitions — and justify why event-driven transitions, with failsafe checks evaluated first, scale where linear scripts and flag variables do not.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="11.2">
+<h2 data-number="11.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">11.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Waypoint</strong> — a single target position in a mission: latitude, longitude, and altitude, plus per-point details such as hold time and acceptance radius; the atomic unit of a flight plan.</li>
+<li><strong>Mission item</strong> — one entry in a mission’s ordered list: a MAVLink command identifier, a coordinate frame, and up to seven parameters. Every waypoint is a mission item, but not every mission item is a waypoint — speed changes and camera triggers ride the same list.</li>
+<li><strong>Home position</strong> — the reference location the autopilot records at arming: the origin of relative altitudes and the destination of Return-to-Launch. It is set where the vehicle <em>actually</em> armed, which is not always where the plan assumed it would.</li>
+<li><strong>RTL</strong> (Return-to-Launch) — the autonomous recovery behavior that climbs to a safe altitude, flies back to the home position, descends, and lands; both a mission’s normal ending and the standard failsafe response.</li>
+<li><strong>Acceptance radius</strong> — the distance threshold of the arrival test: a waypoint counts as reached when the estimated position comes within this radius of it, at which point the navigator advances to the next item.</li>
+<li><strong>SITL</strong> (Software-in-the-Loop) — the practice, introduced in the previous chapter and made operational here, of running the unmodified autopilot firmware as a desktop process against simulated physics, so mission logic can be exercised and crashed for free.</li>
+<li><strong>Gazebo</strong> — the physics simulator paired with PX4 SITL: it integrates the vehicle’s rigid-body dynamics, models propeller thrust and (optionally) wind, and synthesizes the IMU, GPS, magnetometer, and barometer streams the firmware expects.</li>
+<li><strong>QGroundControl</strong> (QGC) — the PX4-ecosystem ground control station, already met as a parameter editor; in this chapter it is the mission planning tool — the map on which waypoints are placed and the program that uploads the resulting plan to the vehicle, real or simulated.</li>
+<li><strong>Geofence</strong> — a boundary polygon (or circle) the vehicle must respect, stored alongside the mission; crossing it triggers a configured failsafe such as RTL. Introduced here as a <code>.plan</code> ingredient; the Geofencing and Fail-Safes chapter treats it fully.</li>
+<li><strong>Finite state machine</strong> (FSM) — a program structure consisting of a set of discrete states, exactly one active at a time, and transitions between them that fire when guard conditions become true; the standard shape of mission logic.</li>
+</ul>
+</section>
+<section id="the-workbench-three-processes-on-one-desk" class="level2" data-number="11.3">
+<h2 data-number="11.3" class="anchored" data-anchor-id="the-workbench-three-processes-on-one-desk"><span class="header-section-number">11.3</span> The Workbench: Three Processes on One Desk</h2>
+<p>The previous chapter argued <em>why</em> SITL — the identical firmware, only the plant swapped — and left the <em>how</em> for here. The how turns out to be one command. From a PX4 source checkout:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> px4_sitl gz_x500</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>builds the firmware for the host machine and launches it, and what appears on the desk is the entire architecture of the previous chapter with every aircraft part replaced by a process. The first process is <strong>PX4 itself</strong> — the same estimator, cascade, modes, and failsafes, compiled for the laptop, announcing itself with a <code>pxh&gt;</code> shell prompt into which commands like <code>commander takeoff</code> can be typed directly. The second is <strong>Gazebo</strong>, launched alongside, simulating a quadrotor (the <code>x500</code> model, a research airframe of the same class as the running example’s) in a rendered world: it consumes the firmware’s motor commands, integrates the physics, and feeds back synthetic IMU, GPS, magnetometer, and barometer streams — the same sensor suite Part I installed, now generated by arithmetic. The third is <strong>QGroundControl</strong>, started as an ordinary application; it discovers the simulated vehicle automatically, because PX4 SITL broadcasts MAVLink over a local UDP port exactly where QGC expects a vehicle to appear, and within seconds the ground station shows a drone sitting on simulated grass, EKF happy, “Ready to Fly.” The wiring diagram of Part I has become a process diagram: UDP sockets where the UART and telemetry radio were, and nothing else different. ROS 2 nodes join the same way — the Micro XRCE-DDS agent connects to the simulated firmware over UDP rather than a serial device, and every topic of the previous chapter flows as before.</p>
+<p>Two habits make the workbench productive rather than merely impressive. First, treat the simulated vehicle <em>as a vehicle</em>: arm it from QGC, watch the EKF initialize, upload missions to it, and let it refuse things — a premature Offboard request fails in SITL for exactly the reason it would fail in the field, and learning to read those refusals on the bench is the cheap version of learning them outdoors. Second, break things on purpose. Command the classic underground setpoint, kill the setpoint stream mid-flight and watch the dead-man’s switch catch it, fly at the geofence and watch the failsafe fire. A simulator that is only ever shown working code teaches nothing; its entire economic argument — a crash costs a restart — is an argument for crashing it often.</p>
+</section>
+<section id="the-mission-as-data-waypoints-and-mission-items" class="level2" data-number="11.4">
+<h2 data-number="11.4" class="anchored" data-anchor-id="the-mission-as-data-waypoints-and-mission-items"><span class="header-section-number">11.4</span> The Mission as Data: Waypoints and Mission Items</h2>
+<p>With the workbench up, the first thing to fly is the oldest and most robust form of autonomy: the <strong>waypoint mission</strong>. Its premise is that a useful flight can be specified entirely as <em>data</em> — an ordered list of positions with associated actions — handed to the autopilot, and executed by the firmware’s own navigator with no companion computer involved at all. This is the second of the three command paths from the previous chapter (QGroundControl’s path) doing its real job: the operator draws the mission on QGC’s map, QGC uploads the list over MAVLink, the flight controller stores it, and from that moment the plan lives <em>on the vehicle</em>. Switch to Mission mode and PX4 flies the list — takeoff, each waypoint in order, the closing action — feeding target positions to the same cascaded loops as always. The ground station can disconnect mid-flight and nothing changes, which is precisely the robustness argument for onboard missions: the plan does not depend on any link staying alive.</p>
+<p>The unit of the list is the <strong>mission item</strong>, and its anatomy is MAVLink’s command anatomy from the previous chapter reused: a command identifier, a coordinate frame, and up to seven parameters. Navigation items carry a position — <code>NAV_TAKEOFF</code> (command 22) climbs to a given altitude, <code>NAV_WAYPOINT</code> (command 16) flies to a latitude/longitude/altitude, <code>NAV_LAND</code> (21) and <code>NAV_RETURN_TO_LAUNCH</code> (20) end the flight — while action items carry none: <code>DO_CHANGE_SPEED</code> (178) alters cruise speed from that point in the list onward, camera commands start and stop capture, and the navigator executes them in sequence between position targets. Two reference points anchor the whole structure. The <strong>home position</strong> is recorded at the moment of arming — not planned, <em>recorded</em> — and serves as both the origin for relative altitudes and the destination for <strong>RTL</strong>, the return behavior that climbs to a configured safe altitude, flies home, and lands. A mission that ends in an RTL item is a round trip by construction. <a href="#fig-sample-waypoint-mission" class="quarto-xref">Figure&nbsp;<span>11.1</span></a> assembles the pieces into the pattern that matters most for the running example: the lawnmower sweep.</p>
+<div id="fig-sample-waypoint-mission" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Map-view diagram of a waypoint mission. A dashed amber quadrilateral labeled geofence inclusion polygon encloses a field, with a note that the mission must stay inside it. At lower left, a circle labeled H marks the home position, recorded where the vehicle armed and the point RTL returns to, with a note that NAV_TAKEOFF climbs straight up to mission altitude first. Solid teal arrows connect five numbered waypoints in a lawnmower pattern: north up the first leg, a row step east, south down the second leg, another row step east to waypoint five. A dashed circle around waypoint two is labeled acceptance radius, the distance within which the waypoint counts as reached before the navigator advances. A dimension arrow labels the row pitch between legs as set by the sensor footprint, covered in Part IV. A dashed grey arrow curves from the last waypoint back to home, labeled NAV_RETURN_TO_LAUNCH, fly home at a safe altitude, descend, land, disarm. A footer notes this boustrophedon sweep is the pattern the running example flies to search for geese, drawn by hand here and generated by algorithm in Part IV.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-sample-waypoint-mission-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/sample-waypoint-mission.svg" class="img-fluid figure-img" style="width:90.0%" alt="Map-view diagram of a waypoint mission. A dashed amber quadrilateral labeled geofence inclusion polygon encloses a field, with a note that the mission must stay inside it. At lower left, a circle labeled H marks the home position, recorded where the vehicle armed and the point RTL returns to, with a note that NAV_TAKEOFF climbs straight up to mission altitude first. Solid teal arrows connect five numbered waypoints in a lawnmower pattern: north up the first leg, a row step east, south down the second leg, another row step east to waypoint five. A dashed circle around waypoint two is labeled acceptance radius, the distance within which the waypoint counts as reached before the navigator advances. A dimension arrow labels the row pitch between legs as set by the sensor footprint, covered in Part IV. A dashed grey arrow curves from the last waypoint back to home, labeled NAV_RETURN_TO_LAUNCH, fly home at a safe altitude, descend, land, disarm. A footer notes this boustrophedon sweep is the pattern the running example flies to search for geese, drawn by hand here and generated by algorithm in Part IV.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sample-waypoint-mission-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11.1: A simple waypoint mission over a fenced field: takeoff at the home position, a five-waypoint lawnmower sweep flown as north–south legs joined by row steps, an acceptance radius around each waypoint defining arrival, and a Return-to-Launch item closing the loop — all of it inside a geofence polygon the next chapter arms.
+</figcaption>
+</figure>
+</div>
+<p>The lawnmower (formally <em>boustrophedon</em> — “as the ox plows”) earns a moment of respect before it is flown, because it is not an arbitrary shape. A drone searching an area with a downward-looking sensor sees a swath of finite width; parallel legs spaced at most one swath apart, joined by short row steps, are the minimal-overlap way to guarantee the whole area passes under the sensor. The row pitch in the figure is therefore not an aesthetic choice but a sensor parameter — camera field of view times altitude, derated for required overlap — and the entire pattern can be <em>computed</em> from the field polygon and the sensor footprint rather than clicked out by hand. That computation, and what happens to it when the target moves, is the business of the Path Planning on the Edge chapter in Part IV; here the pattern is drawn manually in QGC, which is exactly how a first search mission should be built.</p>
+</section>
+<section id="reading-a-real-plan-file" class="level2" data-number="11.5">
+<h2 data-number="11.5" class="anchored" data-anchor-id="reading-a-real-plan-file"><span class="header-section-number">11.5</span> Reading a Real Plan File</h2>
+<p>QGroundControl saves a drawn mission as a <code>.plan</code> file — plain JSON — and reading one repays the effort the way reading a hex dump of a MAVLink packet would not: every field is legible, and every field teaches something. The file examined here is a real one: a lawnmower survey of a grass field in Newark, Delaware, drawn in QGC and flown in simulation, its coordinates clustered around 39.680° N, 75.752° W. Abridged to its skeleton:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"fileType"</span><span class="fu">:</span> <span class="st">"Plan"</span><span class="fu">,</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"geoFence"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"polygons"</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"inclusion"</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"polygon"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>                <span class="ot">[</span><span class="fl">39.68034009</span><span class="ot">,</span> <span class="fl">-75.75245036</span><span class="ot">],</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>                <span class="ot">[</span><span class="fl">39.68036725</span><span class="ot">,</span> <span class="fl">-75.75206443</span><span class="ot">],</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                <span class="ot">[</span><span class="fl">39.67992608</span><span class="ot">,</span> <span class="fl">-75.75200019</span><span class="ot">],</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                <span class="ot">[</span><span class="fl">39.67990044</span><span class="ot">,</span> <span class="fl">-75.75236953</span><span class="ot">]</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>            <span class="ot">]</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">]</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"mission"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"cruiseSpeed"</span><span class="fu">:</span> <span class="dv">15</span><span class="fu">,</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"hoverSpeed"</span><span class="fu">:</span> <span class="fl">1.5</span><span class="fu">,</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"firmwareType"</span><span class="fu">:</span> <span class="dv">12</span><span class="fu">,</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"vehicleType"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"globalPlanAltitudeMode"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"items"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>            <span class="fu">{</span> <span class="dt">"command"</span><span class="fu">:</span> <span class="dv">178</span><span class="fu">,</span> <span class="dt">"frame"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>              <span class="dt">"params"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">,</span> <span class="fl">1.5</span><span class="ot">,</span> <span class="dv">-1</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">]</span> <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>            <span class="fu">{</span> <span class="dt">"command"</span><span class="fu">:</span> <span class="dv">22</span><span class="fu">,</span> <span class="dt">"frame"</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">,</span> <span class="dt">"Altitude"</span><span class="fu">:</span> <span class="fl">5.5</span><span class="fu">,</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>              <span class="dt">"params"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">0</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">,</span> <span class="kw">null</span><span class="ot">,</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>                         <span class="fl">39.67992584</span><span class="ot">,</span> <span class="fl">-75.75214500</span><span class="ot">,</span> <span class="fl">5.5</span><span class="ot">]</span> <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>            <span class="fu">{</span> <span class="dt">"command"</span><span class="fu">:</span> <span class="dv">16</span><span class="fu">,</span> <span class="dt">"frame"</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">,</span> <span class="dt">"Altitude"</span><span class="fu">:</span> <span class="fl">5.5</span><span class="fu">,</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>              <span class="dt">"params"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">0</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">,</span> <span class="kw">null</span><span class="ot">,</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>                         <span class="fl">39.67991219</span><span class="ot">,</span> <span class="fl">-75.75234666</span><span class="ot">,</span> <span class="fl">5.5</span><span class="ot">]</span> <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>            <span class="fu">{</span> <span class="dt">"comment"</span><span class="fu">:</span> <span class="st">"... eleven more NAV_WAYPOINT items ..."</span> <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>            <span class="fu">{</span> <span class="dt">"command"</span><span class="fu">:</span> <span class="dv">20</span><span class="fu">,</span> <span class="dt">"frame"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>              <span class="dt">"params"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">0</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">,</span> <span class="dv">0</span><span class="ot">]</span> <span class="fu">}</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"plannedHomePosition"</span><span class="fu">:</span> <span class="ot">[</span><span class="fl">39.67992611</span><span class="ot">,</span> <span class="fl">-75.75214484</span><span class="ot">,</span> <span class="dv">42</span><span class="ot">]</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"rallyPoints"</span><span class="fu">:</span> <span class="fu">{</span> <span class="dt">"points"</span><span class="fu">:</span> <span class="ot">[]</span> <span class="fu">}</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Top to bottom. The <strong>geofence block</strong> stores one <em>inclusion</em> polygon — four vertices, each a latitude/longitude pair, defining the region the vehicle must stay inside (an <em>exclusion</em> polygon would mark a region to stay out of). The fence is data here and law later: uploading it arms nothing by itself, but the next chapter will wire it to a failsafe so that crossing the boundary triggers RTL automatically. The <strong>mission block</strong> opens with context QGC and the firmware both consume: <code>firmwareType: 12</code> identifies the PX4 dialect (the MAVLink autopilot enumeration from two chapters ago, appearing in a file on disk), <code>vehicleType: 2</code> a multirotor, and <code>globalPlanAltitudeMode: 1</code> declares that the plan’s altitudes are <em>relative to home</em> rather than absolute above sea level — the same launch-point-relative convention the barometer discussion of Part I arrived at, now a mission-wide setting. The <code>hoverSpeed</code> of 1.5 m/s is the planning speed for a multirotor; <code>cruiseSpeed</code> is the fixed-wing counterpart, present but idle.</p>
+<p>Then the list. The first item, command 178 (<code>DO_CHANGE_SPEED</code>), is an action item: its <code>frame: 2</code> (<code>MAV_FRAME_MISSION</code>) is the tell that no coordinate is attached, and its parameters read “speed type 1 — ground speed — to 1.5 m/s, throttle unchanged.” A deliberate, camera-friendly walking pace. The full file’s next item (elided above) is command 2500, <code>VIDEO_START_CAPTURE</code> — start recording, another action item, because a survey that isn’t recorded didn’t happen. Command 22 (<code>NAV_TAKEOFF</code>) then climbs to 5.5 m; its <code>frame: 3</code> is <code>MAV_FRAME_GLOBAL_RELATIVE_ALT</code> — latitude and longitude in degrees, altitude in metres <em>above home</em> — and its last three parameters carry the coordinate itself. Twelve command-16 waypoints follow, every one at exactly 5.5 m relative altitude, and command 20 (<code>NAV_RETURN_TO_LAUNCH</code>) closes the list. Finally <code>plannedHomePosition</code> — the launch point the <em>planner assumed</em>, with its third element, 42, being the field’s ground elevation in metres above sea level. The name is a quiet warning: the real home position is recorded at arming, wherever that actually happens, and every relative altitude and the RTL destination bind to the recorded one. Launch from the wrong corner of the field and the whole mission shifts with you.</p>
+<section id="the-geometry-hiding-in-the-sixth-decimal-place" class="level3" data-number="11.5.1">
+<h3 data-number="11.5.1" class="anchored" data-anchor-id="the-geometry-hiding-in-the-sixth-decimal-place"><span class="header-section-number">11.5.1</span> The geometry hiding in the sixth decimal place</h3>
+<p>The coordinates look like noise — a wall of 39.680-something — until they are converted to metres, and the conversion is worth internalizing because it turns every GPS log and plan file into geometry on sight. A degree of latitude is essentially constant at 111.3 km. A degree of longitude shrinks with the cosine of latitude, since meridians converge toward the poles:</p>
+<p><span class="math display">\[
+\begin{aligned}
+1^\circ \text{ latitude} &amp;\approx 111{,}320 \text{ m} \\
+1^\circ \text{ longitude at } 39.68^\circ\,\text{N} &amp;\approx 111{,}320 \times \cos 39.68^\circ \approx 85{,}700 \text{ m}
+\end{aligned}
+\]</span></p>
+<p>A convenient mental unit follows: at this latitude, the fifth decimal place of a coordinate — 0.00001° — is about 1.1 m of latitude or 0.86 m of longitude. The sixth decimal place is a decimetre. Now the file becomes a map. The fence polygon spans 0.00044° of latitude and 0.00045° of longitude:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\text{fence, north--south} &amp;\approx 0.00044 \times 111{,}320 \approx 49 \text{ m} \\
+\text{fence, east--west} &amp;\approx 0.00045 \times 85{,}700 \approx 39 \text{ m}
+\end{aligned}
+\]</span></p>
+<p>— a field about half a football pitch in size. The first three waypoints share nearly one longitude while their latitude climbs by 0.000417°: a <strong>north–south leg</strong> of <span class="math inline">\(0.000417 \times 111{,}320 \approx 46.4\)</span> m, with 7.3 m of westward drift along it (the operator’s hand was not perfectly steady on the map), for a leg length of <span class="math inline">\(\sqrt{46.4^2 + 7.3^2} \approx 47\)</span> m. Between legs, the longitude steps east by about 0.000075°, a <strong>row pitch</strong> of roughly 6.5 m. Twelve waypoints resolve into four such legs — a 3½-pass lawnmower over the fenced field, the exact pattern of <a href="#fig-sample-waypoint-mission" class="quarto-xref">Figure&nbsp;<span>11.1</span></a> with real numbers attached.</p>
+<p>The numbers even audit the mission’s schedule. Summing the track — a 17 m transit from the takeoff point to the first corner, four legs near 47 m, three row steps, and the RTL hop home — gives roughly 230 m of path. At the commanded 1.5 m/s ground speed:</p>
+<p><span class="math display">\[
+t \approx \frac{230 \text{ m}}{1.5 \text{ m/s}} \approx 153 \text{ s} \approx 2.6 \text{ min},
+\]</span></p>
+<p>call it three minutes once the takeoff climb and landing descent are added. Part I’s mission time budget allocated 3.5 minutes to the running example’s search leg; this real, hand-drawn plan fits that allocation with margin, and the fact that a JSON file plus two conversion constants can <em>prove</em> it before anything flies is the entire case for treating missions as data. (The altitude passes its own audit trivially: 5.5 m over a 42 m-elevation field is nowhere near the 122 m ceiling — though note the ceiling is measured above ground, not above sea level, a distinction the relative-altitude mode conveniently respects.)</p>
+</section>
+</section>
+<section id="arrival-from-stopwatch-to-acceptance-radius" class="level2" data-number="11.6">
+<h2 data-number="11.6" class="anchored" data-anchor-id="arrival-from-stopwatch-to-acceptance-radius"><span class="header-section-number">11.6</span> Arrival: From Stopwatch to Acceptance Radius</h2>
+<p>The firmware’s navigator, flying that plan in Mission mode, does something the previous chapter’s Offboard node never did: it decides it has <em>reached</em> each waypoint before moving to the next. The test is geometric. Around every waypoint stands an invisible sphere — the <strong>acceptance radius</strong>, exposed in PX4 as the parameter <code>NAV_ACC_RAD</code> — and the waypoint is complete when the EKF’s position estimate enters it:</p>
+<p><span class="math display">\[
+\lVert \hat{\mathbf{p}} - \mathbf{p}_{\text{wp}} \rVert &lt; r_{\text{acc}}.
+\]</span></p>
+<p>That one inequality is the difference between a schedule and a navigation. The stopwatch scheme advances whether or not the vehicle arrived; the acceptance test advances <em>because</em> it arrived, and automatically absorbs everything that makes flight times unpredictable — headwinds that stretch a leg, the gentle cornering the position controller applies, a conservative speed setting. The radius itself is a genuine tuning choice with failure modes on both sides. Too large, and the vehicle “arrives” early and cuts corners: with a 10 m radius on a lawnmower whose rows are 6.5 m apart, legs blur together and coverage develops holes. Too small, and the test may never pass: the position estimate carries metre-scale GNSS scatter, and asking the vehicle to hit a 30 cm sphere through metre-scale noise produces the signature failure of an aircraft loitering beside a waypoint it cannot satisfy, mission stalled, battery draining. The radius should comfortably exceed the position estimate’s expected error and comfortably undercut the mission’s geometry — for the field above, one to two metres sits well inside both bounds.</p>
+<p>The same test is exactly what the Offboard node from the previous chapter was missing, and retrofitting it is two lines: subscribe to <code>/fmu/out/vehicle_local_position</code> (the node already does, for its warm-up gate) and replace the hold-time check with the inequality. But bolting one more condition onto that node’s growing pile of boolean flags — <code>armed_sent</code>, <code>land_sent</code>, <code>first_pos_tick</code> — points at a deeper problem worth solving properly. The flags <em>are</em> a state machine, written in the least maintainable possible notation. Time to write it in the right one.</p>
+</section>
+<section id="mission-logic-as-a-state-machine" class="level2" data-number="11.7">
+<h2 data-number="11.7" class="anchored" data-anchor-id="mission-logic-as-a-state-machine"><span class="header-section-number">11.7</span> Mission Logic as a State Machine</h2>
+<p>A <strong>finite state machine</strong> is the standard shape of mission logic across robotics, and its appeal is austerity: the program is in exactly one <strong>state</strong> at any moment; each state has one job; <strong>transitions</strong> between states fire when their <strong>guard conditions</strong> — tests on observed data, not on elapsed time — become true. Nothing about the formalism is exotic; its value is what it forbids. A linear script encodes “what happens next” in the program counter, which cannot jump backward when the world misbehaves; a pile of flags encodes the current situation across four booleans whose sixteen combinations include several the author never intended. An FSM makes the situation a single enumerated value, makes every legal situation-change a drawn arrow, and makes everything not drawn illegal by construction. <a href="#fig-mission-state-machine" class="quarto-xref">Figure&nbsp;<span>11.2</span></a> draws the mission node’s.</p>
+<div id="fig-mission-state-machine" class="quarto-float quarto-figure quarto-figure-center anchored" alt="State machine diagram. A start dot leads to a box labeled IDLE, on ground, disarmed, stream warm-up setpoints, request Offboard and arm. An arrow labeled stream established and arm acknowledged leads to TAKEOFF, which streams the climb setpoint every tick. An arrow guarded by altitude reached, absolute z error under half a metre, leads to NAVIGATE, which streams waypoint i of N every tick and tests arrival against the EKF position. A self-loop on NAVIGATE is labeled arrived, position error under the acceptance radius, and i less than N, incrementing i. An arrow guarded by arrived and i equals N leads to LAND, where NAV_LAND is sent once and the node falls silent because PX4 owns the descent. An arrow guarded by PX4 reports landed and disarmed leads to DONE, log and shut down cleanly. Below, an amber box labeled FAILSAFE slash RTL receives dashed arrows from TAKEOFF and NAVIGATE labeled failsafe event from any flying state, geofence breach, low battery, link loss, the next chapter's subject; in it, authority is handed back to PX4 to climb, return home, and land while the mission node stops streaming and only observes. A dashed arrow labeled landed at home connects it to DONE. A footer reads: every 10 hertz tick, in order, check failsafe events first, evaluate the active state's exit guard, perform the active state's one action; the dashed transitions outrank everything, safety preempts progress.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mission-state-machine-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/mission-state-machine.svg" class="img-fluid figure-img" style="width:100.0%" alt="State machine diagram. A start dot leads to a box labeled IDLE, on ground, disarmed, stream warm-up setpoints, request Offboard and arm. An arrow labeled stream established and arm acknowledged leads to TAKEOFF, which streams the climb setpoint every tick. An arrow guarded by altitude reached, absolute z error under half a metre, leads to NAVIGATE, which streams waypoint i of N every tick and tests arrival against the EKF position. A self-loop on NAVIGATE is labeled arrived, position error under the acceptance radius, and i less than N, incrementing i. An arrow guarded by arrived and i equals N leads to LAND, where NAV_LAND is sent once and the node falls silent because PX4 owns the descent. An arrow guarded by PX4 reports landed and disarmed leads to DONE, log and shut down cleanly. Below, an amber box labeled FAILSAFE slash RTL receives dashed arrows from TAKEOFF and NAVIGATE labeled failsafe event from any flying state, geofence breach, low battery, link loss, the next chapter's subject; in it, authority is handed back to PX4 to climb, return home, and land while the mission node stops streaming and only observes. A dashed arrow labeled landed at home connects it to DONE. A footer reads: every 10 hertz tick, in order, check failsafe events first, evaluate the active state's exit guard, perform the active state's one action; the dashed transitions outrank everything, safety preempts progress.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mission-state-machine-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11.2: The Offboard mission rebuilt as a finite state machine: IDLE, TAKEOFF, NAVIGATE, LAND, and DONE in normal sequence, each transition guarded by a test on estimated state, with the NAVIGATE state looping over the waypoint list via its arrival test, and a failsafe transition that preempts any flying state into RTL.
+</figcaption>
+</figure>
+</div>
+<p>The machine keeps the previous chapter’s skeleton — a 10 Hz timer, one action per tick, the setpoint stream never pausing while the node holds Offboard authority — and reorganizes everything else. In code, the flags collapse into one enum and the branch pile becomes a dispatch:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> MissionState(Enum):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    IDLE <span class="op">=</span> auto()<span class="op">;</span> TAKEOFF <span class="op">=</span> auto()<span class="op">;</span> NAVIGATE <span class="op">=</span> auto()</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    LAND <span class="op">=</span> auto()<span class="op">;</span> DONE <span class="op">=</span> auto()<span class="op">;</span> FAILSAFE <span class="op">=</span> auto()</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>ACCEPT_RADIUS <span class="op">=</span> <span class="fl">1.5</span>   <span class="co"># m — comfortably above GNSS scatter,</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                      <span class="co"># comfortably below the 6.5 m row pitch</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> arrived(<span class="va">self</span>, target):</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    dx <span class="op">=</span> <span class="va">self</span>.pos.x <span class="op">-</span> target[<span class="dv">0</span>]</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    dy <span class="op">=</span> <span class="va">self</span>.pos.y <span class="op">-</span> target[<span class="dv">1</span>]</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    dz <span class="op">=</span> <span class="va">self</span>.pos.z <span class="op">-</span> target[<span class="dv">2</span>]</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (dx<span class="op">*</span>dx <span class="op">+</span> dy<span class="op">*</span>dy <span class="op">+</span> dz<span class="op">*</span>dz) <span class="op">**</span> <span class="fl">0.5</span> <span class="op">&lt;</span> ACCEPT_RADIUS</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> loop(<span class="va">self</span>):                        <span class="co"># the 10 Hz tick</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="va">self</span>.failsafe_event():          <span class="co"># 1. safety outranks progress</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.state <span class="op">=</span> MissionState.FAILSAFE</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">match</span> <span class="va">self</span>.state:                  <span class="co"># 2. one state, one job</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">case</span> MissionState.IDLE:</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.publish_setpoint(<span class="op">*</span>WAYPOINTS[<span class="dv">0</span>])</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.stream_warm() <span class="kw">and</span> <span class="va">self</span>.arm_offboard_acked():</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.state <span class="op">=</span> MissionState.TAKEOFF</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">case</span> MissionState.TAKEOFF:</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.publish_setpoint(<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="op">-</span><span class="fl">5.0</span>)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="bu">abs</span>(<span class="va">self</span>.pos.z <span class="op">-</span> (<span class="op">-</span><span class="fl">5.0</span>)) <span class="op">&lt;</span> <span class="fl">0.5</span>:</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.state <span class="op">=</span> MissionState.NAVIGATE</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">case</span> MissionState.NAVIGATE:</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>            wp <span class="op">=</span> WAYPOINTS[<span class="va">self</span>.i]</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.publish_setpoint(<span class="op">*</span>wp)</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.arrived(wp):</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.i <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="va">self</span>.i <span class="op">==</span> <span class="bu">len</span>(WAYPOINTS):</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>                    <span class="va">self</span>.send_cmd(CMD_NAV_LAND)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>                    <span class="va">self</span>.state <span class="op">=</span> MissionState.LAND</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">case</span> MissionState.LAND:</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.landed_and_disarmed():</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.state <span class="op">=</span> MissionState.DONE</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">case</span> MissionState.FAILSAFE:</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>            <span class="cf">pass</span>                       <span class="co"># stream stopped: PX4 flies RTL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Three design decisions carry the weight. First, <strong>guards test estimated state, never elapsed time</strong>: the TAKEOFF exit asks whether the vehicle is actually at altitude (within half a metre — takeoff tolerates a looser test than the mission’s own acceptance radius, since the only question is “safe to translate?”), and NAVIGATE advances on the acceptance test. Wind can now stretch any phase indefinitely without breaking the logic; the schedule became a consequence of flight instead of a controller of it. Second, <strong>the failsafe check runs before the state dispatch, every tick</strong>. Whatever the machine is busy doing, one question outranks it, and putting that question first in the tick makes the priority structural rather than aspirational. What events feed <code>failsafe_event()</code> — the geofence breach, the low-battery threshold, the lost link — is the next chapter’s subject; the slot they plug into is built here. Third, the machine inherits the previous chapter’s silence discipline: LAND and FAILSAFE stop streaming setpoints, because both states hand the aircraft back to PX4’s own logic, and a node that stops proving it wants control is a node that cannot accidentally retake it.</p>
+<p>The payoff is not this small mission — the flag version flew the square too. The payoff is what the structure absorbs without deforming. Add a <code>DETECT</code> event from a perception node and a <code>PURSUE</code> state, and the lawnmower search becomes the running example’s search-then-deter behavior; add an <code>EVADE</code> state guarded by a proximity test, and the machine expresses the whole reactive repertoire of Part IV — every addition a new box and its arrows, every existing box untouched. The Systems Architecture chapter of Part V will draw the full machine that runs the Goose Management System; the reader will recognize it, because it is this figure with more boxes.</p>
+</section>
+<section id="proving-it-in-sitl" class="level2" data-number="11.8">
+<h2 data-number="11.8" class="anchored" data-anchor-id="proving-it-in-sitl"><span class="header-section-number">11.8</span> Proving It in SITL</h2>
+<p>Everything in this chapter converges on the workbench, and the closing exercise runs the full circuit in simulation twice — once per command path. First the <strong>mission-mode</strong> pass: draw the lawnmower in QGC over any convenient field (or load the <code>.plan</code> structure examined above), upload it to the SITL vehicle, arm, and switch to Mission mode. Watch the firmware’s navigator do everything this chapter described — the takeoff climb, the acceptance-radius arrivals visible as the vehicle rounds each waypoint without stopping, the speed change taking effect, the RTL climb-return-land. Then the <strong>Offboard</strong> pass: run the state-machine node against the same simulated vehicle and watch it fly the same geometry under its own arrival logic. The two passes look almost identical from Gazebo’s camera, and the difference is the point: in the first, the intelligence is in the firmware and the plan is data; in the second, the intelligence is the node and can therefore <em>change its mind mid-flight</em> — which is why the running example, whose mission depends on what the camera sees, is built on the second path even though the first is simpler and more robust for surveys.</p>
+<p>Simulation is also where the chapter’s tuning claims should be tortured rather than trusted. Set <code>ACCEPT_RADIUS</code> to 0.2 m and watch the NAVIGATE state stall beside a waypoint while simulated GNSS noise keeps the inequality false — the mission equivalent of an integrator that never settles. Set it to 10 m and watch the lawnmower’s rows smear into a shapeless loop. Kill the node mid-NAVIGATE and watch PX4’s dead-man’s switch drop the vehicle out of Offboard into a failsafe, exactly as promised two chapters running. Each experiment costs a restart; each buys an intuition that would cost an airframe outdoors. One deliberate gap remains, and it is the seam to the next chapter: the geofence polygon has been drawn, uploaded, and <em>ignored</em> — nothing yet happens when the simulated vehicle wanders across it. Arming that boundary, and the battery, link-loss, and RTL failsafes beside it, turns the fence from a line in a JSON file into the thing that brings the aircraft home when everything else has gone wrong — the safety half of mission scripting, and the business of the Geofencing and Fail-Safes chapter.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="11.9">
+<h2 data-number="11.9" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">11.9</span> Check Your Understanding</h2>
+<ol type="1">
+<li>A mission item in a <code>.plan</code> file reads: <code>"command": 16, "frame": 3, "params": [0, 0, 0, null, 39.68013, -75.75239, 5.5]</code>. Decode the item: what command is this, what does frame 3 mean, where is the target, and what altitude will the vehicle fly there — relative to what reference?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Command 16 is <code>NAV_WAYPOINT</code>: fly to a position. Frame 3 is <code>MAV_FRAME_GLOBAL_RELATIVE_ALT</code>: the coordinate is global latitude/longitude in degrees with altitude in metres <em>relative to the home position</em>, not above sea level. The target is 39.68013° N, 75.75239° W, and the vehicle will fly there at 5.5 m above home — where “home” is the position the autopilot recorded at arming, not the plan’s <code>plannedHomePosition</code>. (The first three params are hold time, acceptance radius override, and pass-through radius; zeros mean “use defaults,” and the null is an unused yaw field.)</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Two teams fly the same lawnmower survey. Team A uploads the mission and flies it in Mission mode; Team B streams the waypoints from a companion-computer node in Offboard mode. Mid-flight, the telemetry link to the ground station drops for both, and Team B’s node process crashes. What happens to each aircraft, and what does the comparison say about when each command path is the right choice?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Team A’s aircraft continues the mission unaffected: the plan was uploaded and lives on the flight controller, and the firmware’s navigator needs no link to execute it (the link-loss failsafe may be configured to continue-mission for exactly this case). Team B’s aircraft loses its setpoint stream; within about half a second PX4’s dead-man’s switch detects the stall, exits Offboard, and executes a failsafe such as RTL — a controlled recovery, not a continuation. The comparison is the decision rule: for a fixed, pre-plannable flight (a survey), Mission mode is more robust because the intelligence is in the firmware and the plan is data. Offboard earns its fragility only when the mission must change in response to live data — as the running example’s must — because only mission code can change its mind mid-flight.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Two consecutive waypoints in the worked plan sit at (39.67991219, −75.75234666) and (39.68032916, −75.75243136). Using 111,320 m per degree of latitude and 85,700 m per degree of longitude at this latitude, compute the leg length between them. Then estimate how long the leg takes at the plan’s commanded 1.5 m/s ground speed.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Latitude difference: <span class="math inline">\(0.00041697^\circ \times 111{,}320 \approx 46.4\)</span> m north. Longitude difference: <span class="math inline">\(0.0000847^\circ \times 85{,}700 \approx 7.3\)</span> m west. Leg length <span class="math inline">\(\sqrt{46.4^2 + 7.3^2} \approx 47\)</span> m. At 1.5 m/s the leg takes about <span class="math inline">\(47 / 1.5 \approx 31\)</span> s. (The general skill: at mid-northern latitudes, read the fifth decimal place of a coordinate as roughly a metre — 1.1 m of latitude, 0.86 m of longitude — and any plan file or GPS log becomes geometry by inspection.)</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>A student’s mission node stalls: the vehicle hovers a metre from waypoint 3 indefinitely, mission never advancing, until the battery failsafe finally lands it. Another student’s vehicle “completes” the same lawnmower suspiciously fast, but the recorded coverage has gaps between rows. Diagnose both, and state the two bounds that a well-chosen acceptance radius must respect.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The first student’s acceptance radius is too small relative to the position estimate’s noise: GNSS scatter of a metre or more keeps <span class="math inline">\(\lVert \hat{\mathbf{p}} - \mathbf{p}_{\text{wp}} \rVert\)</span> from ever dropping below the threshold, so the arrival guard never fires — the vehicle orbits a test it cannot pass. The second student’s radius is too large relative to the mission’s geometry: the vehicle “arrives” several metres early at each waypoint and cuts the corners, so legs shorten and inter-row coverage opens gaps (with a radius comparable to the row pitch, adjacent legs blur together). The bounds: the radius must comfortably exceed the expected position-estimation error (or arrival never triggers) and comfortably undercut the smallest geometric feature of the mission, such as the row pitch (or the pattern deforms). For metre-scale GNSS noise and a 6.5 m pitch, one to two metres satisfies both.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>In the state machine of this chapter, the failsafe check is evaluated <em>before</em> the state dispatch on every tick, rather than as a transition drawn from each individual state’s logic. Give the engineering argument for this ordering, and explain what property of the flag-based implementation from the previous chapter it repairs.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Evaluating the failsafe first makes safety preemption structural: no matter which state is active — including states added years later by someone who never read the original code — the failsafe question is asked and answered before any state’s own logic runs, so no code path can shadow it. Encoding it per-state would require every current and future state to remember to include the check, converting a guarantee into a convention. The flag implementation had the related defect that the “current situation” was distributed across several booleans whose combinations included unintended ones (e.g., branch-ordering bugs where a landing check could be bypassed); the FSM makes the situation a single enumerated value and makes every legal change of situation an explicit, drawn transition — everything not drawn is impossible by construction.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>The plan file contains both a <code>plannedHomePosition</code> and, implicitly, the home position the autopilot will record at arming. A field crew loads the plan but launches from the opposite corner of the field, 40 m from where the plan was drawn. Which parts of the mission shift with the actual launch point, which parts do not, and what is the operational lesson?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The recorded home position — set at arming — becomes the reference for everything home-relative: the takeoff climb happens wherever the vehicle actually is, all relative altitudes are measured above the actual launch elevation, and RTL returns to the actual launch point, 40 m from where the plan’s author assumed. The waypoints themselves do <em>not</em> shift: they are absolute latitude/longitude coordinates, so the lawnmower is flown over the intended ground regardless of launch point (only the transit to the first waypoint changes). The geofence polygon likewise stays fixed to the earth. The lesson: <code>plannedHomePosition</code> is a planning convenience, not a command — verify before arming that the actual launch point is inside the geofence, that the transit to waypoint one is clear, and that the RTL destination (where the vehicle really sits) is where you want an emergency return to end.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="11.10">
+<h2 data-number="11.10" class="anchored" data-anchor-id="try-it"><span class="header-section-number">11.10</span> Try It</h2>
+<p><strong>Part 1 — fly both command paths on the workbench.</strong> Stand up SITL (<code>make px4_sitl gz_x500</code>, plus QGroundControl) and reproduce this chapter’s closing circuit. Draw a lawnmower of at least four waypoints over any field on QGC’s map at 5–10 m altitude, add a takeoff item, a <code>DO_CHANGE_SPEED</code> to 2 m/s, and a closing RTL; save the <code>.plan</code>, then open it in a text editor and find every field this chapter decoded — commands 22, 16, 178, 20, the frames, the altitude mode, the planned home. Upload and fly it in Mission mode, watching arrivals round the corners. Then convert your own waypoints to metres with the two conversion constants, predict the mission duration, and check the prediction against the simulator’s clock. Finally, port the same waypoint list (converted to local NED coordinates about the home point) into the state-machine node and fly it again in Offboard mode. One mission, two intelligences.</p>
+<p><strong>Part 2 — break the arrival test, then armor the machine.</strong> Extend the dry-run harness from the previous chapter’s Try It to the FSM version: feed the node a scripted position stream (a point moving at 1.5 m/s along the plan plus Gaussian noise of <span class="math inline">\(\sigma = 1\)</span> m per axis) and verify every transition fires in order. Now lower <code>ACCEPT_RADIUS</code> until the NAVIGATE state stalls, and record the failure threshold — it should land near where the noise magnitude predicts. Restore a sane radius, then add one state of your own: a <code>HOLD</code> state entered from NAVIGATE when a simulated <code>detection</code> flag goes true, which loiters at the current position for five seconds before resuming the list at the same index. Confirm you touched no existing state’s logic to do it — then write two sentences on why the flag-based version of the same change would have been riskier. You have just rehearsed, in miniature, how the running example’s search behavior will absorb Part III’s detector.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#sitl-simulation-and-geofencing">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="pagination-link" aria-label="PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="pagination-link" aria-label="Geofencing and Fail-Safes: Designing for the Unexpected">
+        <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

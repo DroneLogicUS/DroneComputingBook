@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>28&nbsp; The Ethics and Ecology of Autonomous Wildlife Management – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" rel="next">
+<link href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html">Part V — Systems Integration, Diagnostics &amp; Ethics</a></li><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">28.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">28.2</span> Key Vocabulary</a></li>
+  <li><a href="#what-the-disturbance-literature-actually-says" id="toc-what-the-disturbance-literature-actually-says" class="nav-link" data-scroll-target="#what-the-disturbance-literature-actually-says"><span class="header-section-number">28.3</span> What the Disturbance Literature Actually Says</a></li>
+  <li><a href="#the-case-of-the-three-metre-orbit" id="toc-the-case-of-the-three-metre-orbit" class="nav-link" data-scroll-target="#the-case-of-the-three-metre-orbit"><span class="header-section-number">28.4</span> The Case of the Three-Metre Orbit</a></li>
+  <li><a href="#a-rubric-instead-of-a-shrug-the-five-domains" id="toc-a-rubric-instead-of-a-shrug-the-five-domains" class="nav-link" data-scroll-target="#a-rubric-instead-of-a-shrug-the-five-domains"><span class="header-section-number">28.5</span> A Rubric Instead of a Shrug: The Five Domains</a></li>
+  <li><a href="#legal-is-not-the-same-as-right" id="toc-legal-is-not-the-same-as-right" class="nav-link" data-scroll-target="#legal-is-not-the-same-as-right"><span class="header-section-number">28.6</span> Legal Is Not the Same as Right</a></li>
+  <li><a href="#the-escalation-trap" id="toc-the-escalation-trap" class="nav-link" data-scroll-target="#the-escalation-trap"><span class="header-section-number">28.7</span> The Escalation Trap</a></li>
+  <li><a href="#the-other-parties-in-the-frame" id="toc-the-other-parties-in-the-frame" class="nav-link" data-scroll-target="#the-other-parties-in-the-frame"><span class="header-section-number">28.8</span> The Other Parties in the Frame</a></li>
+  <li><a href="#design-principles-that-survive-the-review" id="toc-design-principles-that-survive-the-review" class="nav-link" data-scroll-target="#design-principles-that-survive-the-review"><span class="header-section-number">28.9</span> Design Principles That Survive the Review</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">28.10</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">28.11</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html">Part V — Systems Integration, Diagnostics &amp; Ethics</a></li><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The account falls due here. Two chapters ago, the post-flight diagnostics chapter conceded that its entire apparatus — the ULog, the replay, the evidence-first culture — answers every question about a flight except whether the flight should have happened; the previous chapter, returning from the crop fields, closed by renewing the debt: a system that autonomously pursues wild animals answers to parties who never signed the work order. And the debt is older than Part V. The Harassment Pattern Generation chapter built the deterrent patterns and then said plainly that bounding a harm is not the same as justifying it, deferring the justification — when deterrence is warranted, what repeated disturbance costs, who decides, by what standard — to this chapter. The Real-Time Inference chapter flagged its own version before the system ever flew — responsible AI as a set of design requirements that bind earliest — and promised the full treatment here. This chapter pays all three notes, and it does so the way the rest of the book has tried to do everything: with the real literature, the real numbers, and the real system — including one number in the running example’s own shipped code that this chapter will spend a great deal of time looking at, because it is the most instructive engineering-ethics artifact the book has.</p>
+<p>The subject deserves a plain statement before any framework dresses it up. The Goose Management System exists to frighten wild animals on purpose. Every other chapter could treat that fact as a mission parameter; this one treats it as a question. The review this book has leaned on for wildlife–drone interactions throughout — a systematic screening of over 1,600 publications down to 74 quantified studies of how drones disturb animals — ends its abstract by posing the problem to this book’s exact audience: can we design drones that minimize disturbance to animals while still complying with the legislation that governs transparent drone operation <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>? The authors pose it as an open engineering question, not a solved one, and that is the honest register for this chapter too. It will not end in a clean verdict. It will end with the tension named accurately, a structured way to reason about it, and a short list of design principles that a reader building such a system can actually apply.</p>
+<section id="learning-objectives" class="level2" data-number="28.1">
+<h2 data-number="28.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">28.1</span> Learning Objectives</h2>
+<ul>
+<li>Summarize the systematic-review evidence on how drone altitude, horizontal proximity, approach angle, speed, and repeated exposure drive wildlife stress responses — and explain why a literature written to <em>avoid</em> disturbance can neither validate nor simply indict a mission whose purpose is to cause it.</li>
+<li>Apply that evidence, together with measured Canada-goose flight-initiation distances, to critique the running example’s shipped harassment parameters — the 3 m orbit default against the same project’s own 8–15 m design band and its own flagged 3–4 m danger zone — and argue why the gap is an ethics finding, not merely a tuning bug.</li>
+<li>Evaluate a deterrence mission with the Five Domains animal-welfare model instead of ad hoc judgment, and explain why the laboratory-research “Three Rs” framework fits a deterrence mission poorly.</li>
+<li>Distinguish what is legal from what is right for this system specifically: why non-contact goose hazing is broadly permit-free under U.S. wildlife law, how the Endangered Species Act’s definition of “harass” describes the mission almost verbatim, and what the dual-permission regulatory model adds that Part 107 cannot.</li>
+<li>Explain the habituation–escalation dynamic — why a deterrent engineered to stay effective is under structural pressure to become more aggressive over time — and summarize the published argument that continuing to escalate a partially failing non-lethal deterrent can be the more harmful choice.</li>
+<li>Extend the responsibility analysis to the humans in the frame, delivering the privacy-by-design and bias-auditing obligations flagged in Part III, including why a species-confusion audit of the detector is simultaneously a welfare audit and a legal-exposure audit.</li>
+<li>State, and ground in cited evidence, concrete design principles for an autonomous deterrence system: an FID-anchored minimum approach distance, a tiered descent protocol, behavioral monitoring that overrides fixed timers, escape-route preservation, and per-flock exposure caps.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="28.2">
+<h2 data-number="28.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">28.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Wildlife disturbance</strong> — any change a drone induces in an animal’s behavior or physiology — vigilance, alarm calling, interrupted feeding, flight, elevated heart rate — whether or not the operator observes it; the quantity the drone-impact literature measures, and the quantity a deterrence mission deliberately produces within bounds.</li>
+<li><strong>Stress response</strong> — the behavioral and physiological cascade a perceived threat triggers, from head-up vigilance through alarm to panicked flight; critically, the physiological component can be large while the behavioral component is invisible — animals have shown significant cardiac responses to drones without moving at all <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>.</li>
+<li><strong>Alert distance</strong> — the separation at which an animal first shows detectable vigilance toward an approaching threat; always larger than the flight-initiation distance, and the earliest externally observable sign that a stress response has begun.</li>
+<li><strong>Flight-initiation distance</strong> (FID) — the Harassment Pattern Generation chapter’s behavioral threshold, reappearing here as a welfare boundary: the separation at which the animal abandons what it was doing and flees. Operating far inside FID does not make a deterrent more effective; it converts controlled movement into panic.</li>
+<li><strong>Minimum approach distance</strong> — the hard floor on separation between aircraft and animal, held outside the collision-and-panic envelope and enforced by the trajectory generator as a constraint; its <em>value</em> must be anchored to measured species-specific response data, not to convenience.</li>
+<li><strong>Escape-route preservation</strong> — the design rule, taught with the herding corridor in Part IV, that a deterrent must always leave the animals one open, unpressured direction; pressure with no exit produces scatter and injury risk rather than dispersal.</li>
+<li><strong>Cumulative stress</strong> — stress that accumulates across repeated exposures rather than resetting between them; the review evidence indicates repeated drone exposure carries cumulative physiological cost, while the long-term consequences remain the field’s largest acknowledged unknown <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>.</li>
+<li><strong>Habituation</strong> (behavioral) — the Part IV term, now carrying its ethical edge: as a flock learns a stimulus is harmless, the system’s effectiveness decays, and the cheapest engineering responses — closer, longer, more aggressive — all spend the animal’s welfare to buy the metric back.</li>
+<li><strong>Five Domains model</strong> — a structured animal-welfare assessment framework spanning nutrition, physical environment, health, and behavior, all feeding a fifth, integrative domain of mental state; developed to replace checklist-style welfare thinking with an account of what the animal actually experiences <span class="citation" data-cites="mellor2016fivedomains">(<a href="#ref-mellor2016fivedomains" role="doc-biblioref">Mellor 2016</a>)</span>.</li>
+<li><strong>Tiered descent protocol</strong> — the review literature’s recommended engagement pattern: begin at a distance the animal tolerates and close only as observed behavior permits, rather than committing to a single fixed close-range geometry <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>.</li>
+<li><strong>Dual-permission model</strong> — a regulatory structure, used in several conservation jurisdictions, requiring two separate approvals before a drone flies near wildlife: an aviation authority’s operational permit <em>and</em> a wildlife-management agency’s conservation-specific approval; the aviation permit alone — the Part 107 layer — says nothing about the animals.</li>
+<li><strong>Escalation pressure</strong> — the structural pull on any deterrence program to intensify its stimulus as effectiveness fades; not a character flaw of the operators but a predictable system dynamic, and one the wildlife-management literature treats as an ethically live decision point rather than a routine tuning step.</li>
+</ul>
+</section>
+<section id="what-the-disturbance-literature-actually-says" class="level2" data-number="28.3">
+<h2 data-number="28.3" class="anchored" data-anchor-id="what-the-disturbance-literature-actually-says"><span class="header-section-number">28.3</span> What the Disturbance Literature Actually Says</h2>
+<p>The book’s anchor source on wildlife–drone interaction deserves to be read closely here, because its findings are the measuring stick everything else in this chapter is held against. The review synthesizes 74 quantified studies across aquatic, avian, and terrestrial species — seals, elephants, penguins, kangaroos, dolphins, and, importantly for the running example, geese — and its operational findings organize cleanly along the axes an engineer can actually control <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>.</p>
+<p><strong>Altitude is a primary factor.</strong> The review’s headline operational recommendation is that maintaining altitudes of 40–80 m reduces stress, particularly for large mammals and birds. The pattern beneath the number is consistent across its studies: stationary birds showed minimal reaction to drones staying above 40 m; Adélie penguins reacted at 50 m and gentoo penguins at 30 m, with vigilance most pronounced at 10–20 m; most seabird species in one multi-species study showed significant stress at 10 m but little at 50 m. Responses intensify sharply as the last few tens of metres close.</p>
+<p><strong>Horizontal proximity matters at least as much.</strong> The review treats approach distance as its own axis, distinct from altitude, and its numbers are of the same order: roughly 30–50 m to minimize avoidance behavior in large mammals, and 50–80 m for birds, especially near nesting or breeding sites. These figures echo what Part IV already reported from the primary studies: no observable disturbance to waterfowl only above roughly 40 m <span class="citation" data-cites="mcevoy2016evaluation">(<a href="#ref-mcevoy2016evaluation" role="doc-biblioref">McEvoy, Hall, and McDonald 2016</a>)</span>, 75 m or more over nesting snow geese <span class="citation" data-cites="barnas2018snowgeese">(<a href="#ref-barnas2018snowgeese" role="doc-biblioref">Barnas et al. 2018</a>)</span>, and about 100 m survey altitude for non-disturbing goose observation <span class="citation" data-cites="bechhansen2019geese">(<a href="#ref-bechhansen2019geese" role="doc-biblioref">Bech-Hansen et al. 2019</a>)</span>. A more recent, larger empirical study — 561 birds across 22 species — went so far as to recommend a round-number code of practice: no approach within about 100 m <span class="citation" data-cites="weston2020codeofpractice">(<a href="#ref-weston2020codeofpractice" role="doc-biblioref">Weston et al. 2020</a>)</span>.</p>
+<p><strong>Geometry matters independently of distance.</strong> Animals cannot look directly above themselves, and the review finds direct or overhead approaches provoke stronger responses than lateral or oblique ones — a drone descending from above, or banking sharply over a flock, reads as a stooping raptor. This is the same finding Part IV built the pattern taxonomy on <span class="citation" data-cites="vas2015approaching mulero-pazmany2017systematic">(<a href="#ref-vas2015approaching" role="doc-biblioref">Vas et al. 2015</a>; <a href="#ref-mulero-pazmany2017systematic" role="doc-biblioref">Mulero-Pázmány et al. 2017</a>)</span>, and the review sharpens it with a striking data point: drones could approach waterfowl within 4 m <em>without significant disturbance</em> — provided the approach was a careful lateral pass, never from overhead. Distance and geometry trade against each other; the gentlest documented close approaches are single, slow, oblique passes, not sustained presence.</p>
+<p><strong>Speed and duration bound the dose.</strong> Speeds below 5 m/s are recommended near groups or juveniles. And on repeated exposure the review is direct: the evidence indicates that repeated drone exposure causes cumulative stress, that sessions should be limited to necessary time — flight sessions of no more than 10–15 minutes are the typical recommendation — and that brief exposures let animals return to normal behavior sooner. It is equally direct about what is <em>not</em> known: the long-term consequences of chronic, repeated exposure are the field’s biggest open gap. Nobody has measured what a season of automated daily harassment does to a resident flock, because no one has run that experiment.</p>
+<p>Then comes the sentence a chapter like this one cannot walk past. In its ethics section, the review states its normative position without hedging: responsible drone use must abide by rules that optimize wildlife welfare, and <em>disturbance beyond some point, and any physical harm caused to animals, are totally unacceptable regardless of the perceived conservation value or data-collection aim of the study</em> <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>. Note the sentence’s full reach — it does not stop at physical harm; it draws the unacceptability line somewhere inside disturbance itself. Read strictly, that sentence and the Goose Management System cannot both be comfortable. The review is written for research and monitoring drones, where disturbance is an unwanted side effect of data collection and the entire engineering problem is suppressing it. The running example inverts the premise: disturbance is not its side effect but its product. Every recommendation above was derived to answer “how do we fly without the animals reacting?” — and a deterrence mission must operate <em>inside</em> the reaction envelope, because being reacted to is the point. Part IV made this inversion argument once already, to explain why the survey literature’s standoff numbers could neither validate nor indict a close-range deterrent design. This chapter has to hold both halves of that argument honestly. The inversion means the 40–100 m figures are not a rulebook the running example is guilty of breaking. It does <em>not</em> mean the literature has nothing to say. The physiological findings — what proximity, geometry, and repetition do to an animal’s stress state — describe the animal, not the mission, and they transfer entirely. A deterrence system is exempt from the survey literature’s <em>objectives</em>. It is not exempt from its <em>biology</em>.</p>
+</section>
+<section id="the-case-of-the-three-metre-orbit" class="level2" data-number="28.4">
+<h2 data-number="28.4" class="anchored" data-anchor-id="the-case-of-the-three-metre-orbit"><span class="header-section-number">28.4</span> The Case of the Three-Metre Orbit</h2>
+<p>Now the number. The Harassment Pattern Generation chapter taught the orbit pattern with a design band of 8–15 m radius, and disclosed, candidly but as a simulation-versus-field sizing note, that the shipped <code>harassment_node.py</code> defaults to <code>orbit_radius_m = 3.0</code>. This chapter re-opens that disclosure, because the full record is worse than a mismatch between a default and a recommendation, and it deserves to be laid out plainly, item by item, from the running example’s own artifacts.</p>
+<p>The running example’s design documentation — the same document that specified the 8–15 m orbit band Part IV taught — does not merely prefer larger radii. Discussing how closely the navigation behavior should ever approach the birds, it prescribes a horizontal keep-out buffer of roughly 5–8 m, and then flags the region inside it in as many words: <em>“If you get closer than 3–4 meters, you risk a bird-strike (which damages the drone and harms the wildlife) or causes the geese to scatter in panic instead of moving controllably.”</em> Two pages later, specifying the harasser behavior itself, the same document recommends starting “outside the goose’s likely flush distance… a common practical starting point for hazing drones is roughly 8–15 m radius,” explicitly noting that a bigger radius is safer and the parameter should be field-tuned. The shipped code defaults to exactly 3.0 m: inside the document’s own flagged bird-strike-and-panic zone, three to five times tighter than the same document’s own recommendation, with no recorded rationale for the override.</p>
+<p>And the radius is not the only discrepancy — it is one of three, and every one of them points the same direction. The design documentation says to hold the drone <em>slightly above the goose’s cruising altitude, not level with it</em> — a deliberate vertical offset, consistent with the approach-angle literature’s finding that geometry modulates threat. The shipped <code>orbit_altitude_m</code> is a fixed 3.0 m above ground, derived from nothing about the target’s actual height; the “slightly above, not level” intent simply is not implemented. The documentation specifies that the harasser’s termination criterion is <em>behavioral</em> — the engagement ends when the goose has left, with time and attempt limits as backstops (its own suggested caps: ten revolutions or five minutes). The shipped node implements only the backstop: <code>elapsed &gt;= orbit_duration_s</code>, fifteen seconds, with the goose’s actual response read nowhere in the file. The one termination mode the design document called out as what makes a harasser a harasser — did the animal actually move? — is the one that did not ship. Three specified safety-relevant behaviors; three shipped simplifications; all three spending margin the design had explicitly reserved.</p>
+<p>How bad is 3 m, concretely? The design document’s 3–4 m threshold is, it must be said, the project’s own engineering judgment — no source in the published literature supplies a validated “bird-strike distance,” and this book will not launder an internal estimate into an empirical fact. But independent data brackets the number from both sides, and none of it is comforting. On the collision side: a Canada goose spans up to about 1.85 m of open wing, so a 3 m orbit radius is less than two wingspans from the bird’s center — a bird that flares, lunges, or startles into flight can close a metre in a fraction of a second, the flock-center estimate carries the half-metre-scale uncertainty priced in the Coordinate Frames chapter, and the aircraft tracks its setpoints imperfectly in wind. Three error sources, each a large fraction of a metre, sharing roughly a metre of true clearance. On the stress side, the most directly on-species data available comes from a controlled study of Canada geese responding to an approaching vehicle: geese showed alert responses at mean distances of roughly 88–120 m and took flight at measured flight-initiation distances of 38.6 m (tangential approach) to 70.9 m (direct approach), with 80 % of directly approached geese choosing flight over walking <span class="citation" data-cites="blackwell2019goosevehicle">(<a href="#ref-blackwell2019goosevehicle" role="doc-biblioref">Blackwell et al. 2019</a>)</span>. A ground vehicle is not a drone, and the study’s absolute numbers should not be quoted as drone FIDs — but as a same-species baseline for where a Canada goose decides an approaching object is a threat worth fleeing, the comparison is stark: even the <em>lowest</em> measured FID, under the least alarming geometry tested, is thirteen times the shipped orbit radius. The closest documented drone approach that did <em>not</em> disturb birds — 4 m, in the study the review cites — was a single, careful, slow lateral pass under favorable conditions <span class="citation" data-cites="vas2015approaching afridi2025wildlife">(<a href="#ref-vas2015approaching" role="doc-biblioref">Vas et al. 2015</a>; <a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>; the shipped configuration holds station at 3 m <em>continuously</em>, circling, for the full engagement. And the tight radius degrades the geometry too: at 3 m radius and 3 m altitude the drone sits at an elevation angle of</p>
+<p><span class="math display">\[
+\beta = \arctan\!\left(\frac{h}{R}\right) = \arctan\!\left(\frac{3.0}{3.0}\right) = 45^{\circ}
+\]</span></p>
+<p>above the bird’s horizon — halfway to the overhead position the approach-angle literature identifies as maximally threatening — where the design band’s geometry (<span class="math inline">\(R = 12\)</span> m, <span class="math inline">\(h = 6\)</span> m) puts it at a distinctly lateral <span class="math inline">\(27^{\circ}\)</span>. The tight orbit is not just closer; it is closer <em>and</em> steeper, the two aggravating factors compounding. <a href="#fig-deterrence-distance-scale" class="quarto-xref">Figure&nbsp;<span>28.1</span></a> puts every number in this section on one linear scale, and the picture makes the argument faster than the paragraph does: the shipped radius is not near the bottom of the debated range. It is an order of magnitude below the entire conversation.</p>
+<div id="fig-deterrence-distance-scale" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Distance-scale diagram titled the three-metre orbit, drawn to scale. A horizontal linear axis runs from zero to 125 metres. Three labeled lanes sit above the axis. The top lane, measured Canada goose responses to an approaching vehicle, shows a teal band from 38.6 to 70.9 metres labeled flight-initiation distance, geese take flight, tangential to direct approach, and a lighter teal band from 88.4 to 120.5 metres labeled alert distance, vigilance begins. The middle lane, disturbance-avoidance literature, written to avoid reactions, shows grey markers at 40 metres labeled multirotor altitude with no observable waterfowl disturbance, a band from 50 to 80 metres labeled review recommendation for horizontal distance to birds, and a marker at 100 metres labeled proposed code of practice, no approach within 100 metres, plus a small grey marker at 4 metres labeled closest documented non-disturbing approach, a single slow lateral pass, not sustained. The bottom lane, the running example's own numbers, shows a red hatched zone from 0 to 4 metres labeled the design documentation's flagged zone, bird-strike or panic-scatter risk, a bold red line at 3.0 metres labeled shipped orbit radius default, an amber band from 5 to 8 metres labeled keep-out buffer, and an amber band from 8 to 15 metres labeled designed orbit band. Below the axis, an inset panel magnifies zero to 16 metres, showing a goose silhouette with wingspan bracket labeled up to about 1.85 metres, roughly the first wingspan and a half of separation, the red line at 3.0 metres nearly touching the hatched danger zone, the 5 to 8 metre keep-out buffer, and the 8 to 15 metre design band, annotated: at 3 metres radius and 3 metres altitude the drone also sits at 45 degrees elevation, halfway to the overhead geometry birds find most threatening. A footer states that the flight-initiation distances are from a vehicle-approach study, not a drone study, cited as a same-species baseline, and that even the lowest measured value is thirteen times the shipped radius.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-deterrence-distance-scale-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/deterrence-distance-scale.svg" class="img-fluid figure-img" style="width:100.0%" alt="Distance-scale diagram titled the three-metre orbit, drawn to scale. A horizontal linear axis runs from zero to 125 metres. Three labeled lanes sit above the axis. The top lane, measured Canada goose responses to an approaching vehicle, shows a teal band from 38.6 to 70.9 metres labeled flight-initiation distance, geese take flight, tangential to direct approach, and a lighter teal band from 88.4 to 120.5 metres labeled alert distance, vigilance begins. The middle lane, disturbance-avoidance literature, written to avoid reactions, shows grey markers at 40 metres labeled multirotor altitude with no observable waterfowl disturbance, a band from 50 to 80 metres labeled review recommendation for horizontal distance to birds, and a marker at 100 metres labeled proposed code of practice, no approach within 100 metres, plus a small grey marker at 4 metres labeled closest documented non-disturbing approach, a single slow lateral pass, not sustained. The bottom lane, the running example's own numbers, shows a red hatched zone from 0 to 4 metres labeled the design documentation's flagged zone, bird-strike or panic-scatter risk, a bold red line at 3.0 metres labeled shipped orbit radius default, an amber band from 5 to 8 metres labeled keep-out buffer, and an amber band from 8 to 15 metres labeled designed orbit band. Below the axis, an inset panel magnifies zero to 16 metres, showing a goose silhouette with wingspan bracket labeled up to about 1.85 metres, roughly the first wingspan and a half of separation, the red line at 3.0 metres nearly touching the hatched danger zone, the 5 to 8 metre keep-out buffer, and the 8 to 15 metre design band, annotated: at 3 metres radius and 3 metres altitude the drone also sits at 45 degrees elevation, halfway to the overhead geometry birds find most threatening. A footer states that the flight-initiation distances are from a vehicle-approach study, not a drone study, cited as a same-species baseline, and that even the lowest measured value is thirteen times the shipped radius.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-deterrence-distance-scale-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;28.1: Every distance in this chapter’s argument, drawn to one linear scale: the shipped 3 m orbit radius sits inside the design documentation’s own flagged danger zone, an order of magnitude below measured Canada-goose flight-initiation distances and the disturbance-avoidance literature’s recommendations. The inset magnifies the first 16 m, where the entire shipped-versus-designed discrepancy lives.
+</figcaption>
+</figure>
+</div>
+<p>Part IV offered the standard defense, and it should be weighed rather than repeated: the defaults are sized for the simulation world the node was validated in, where the goose is a scripted asset and nothing has a heartbeat, and a field deployment would set the parameters into the design band through the ROS 2 parameter system built for exactly that purpose. Every word of that is true, and it is not enough. Defaults are what ship. Decades of deployed-systems experience — and this book’s own Part II — say that the path of least resistance becomes the fielded configuration, which is precisely why the fail-safe doctrine puts systems in their <em>safe</em> state by default and requires deliberate action to leave it. The harassment node inverts that doctrine: its default is the configuration its own design documentation flags as dangerous, and reaching the safe configuration requires someone to remember, understand, and act. A parameter file is not a safety argument. And there is a subtler cost: because the node reads the goose’s behavior nowhere, the system cannot even <em>notice</em> the consequences its design document predicted. If a 3 m orbit produces exactly the panic scatter the documentation warned of, the node completes its fifteen seconds, publishes done, and logs a success. The discrepancy is not only that the system may cause the failure mode its designers named — it is that the system, as shipped, is structurally incapable of finding out.</p>
+<p>One more honest note, because this chapter’s credibility depends on it: no published study measures flight-initiation or injury outcomes for an orbiting multirotor at single-digit ranges from geese, and the harassment-pattern literature’s central gap — no validated minimum approach distance exists for a deliberate deterrence mission — cuts in every direction. The literature’s silence does not convict the 3 m default. But silence is not a defense either, and this is the crux: when the external literature is silent, the only anchor a project has is its own documented engineering judgment — and here the project’s own judgment <em>did</em> supply an answer, twice, in the same document, and the shipped code overrode it without explanation. That, precisely, is the ethics finding. Not that an engineer chose a number the literature cannot check, but that the system’s single most welfare-relevant parameter ended up inside its own project’s flagged danger zone through what the artifacts suggest was nothing more deliberate than a default nobody revisited.</p>
+</section>
+<section id="a-rubric-instead-of-a-shrug-the-five-domains" class="level2" data-number="28.5">
+<h2 data-number="28.5" class="anchored" data-anchor-id="a-rubric-instead-of-a-shrug-the-five-domains"><span class="header-section-number">28.5</span> A Rubric Instead of a Shrug: The Five Domains</h2>
+<p>The instinctive vocabulary for what the previous section found — “too close,” “risky,” “not great for the goose” — is not analysis, and a chapter that stopped there would be doing the ad hoc hand-wringing it promised to avoid. Animal-welfare science has a structured instrument for exactly this evaluation. The <strong>Five Domains model</strong>, developed and refined since the 1990s as the successor to the older “Five Freedoms” checklist, assesses an animal’s welfare across four physical domains — (1) nutrition, (2) physical environment, (3) health, (4) behavior — whose states feed a fifth, integrative domain: (5) the animal’s mental state, the affective experience that is welfare’s actual currency <span class="citation" data-cites="mellor2016fivedomains">(<a href="#ref-mellor2016fivedomains" role="doc-biblioref">Mellor 2016</a>)</span>. The model’s design insight is that the first four domains are what an engineer can observe and influence, while the fifth is what ethically matters; running a design through the domains one at a time turns “is this cruel?” into five smaller, answerable questions. Run the harassment mission through it.</p>
+<p><strong>Nutrition.</strong> Every engagement interrupts foraging, and geese manage tight daily energy budgets — the review’s discussion of threat-sensitive foraging notes that disturbance costs compound for animals already near energy deficit <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>. A fifteen-second orbit costs little; the relevant dose is the <em>season’s</em> interruptions, which is why per-flock engagement counting (an aggregate no current node computes) belongs in the system’s telemetry, not just its ethics chapter.</p>
+<p><strong>Physical environment.</strong> Displacement from chosen ground is not a side effect of this mission; it is the mission. The Five Domains lens does not forbid that — wildlife management displaces animals routinely — but it insists the displacement be <em>to somewhere</em>: the herding corridor’s open exit, toward viable habitat, is what separates relocation from mere eviction. Part IV’s escape-route preservation rule is, in this framework, a Domain 2 obligation.</p>
+<p><strong>Health.</strong> This is where the 3 m default fails outright: collision risk on the order of a wingspan, panicked flight into structures or each other, and the physiological load that does not announce itself — the review documents significant cardiac stress responses in animals that showed no visible behavioral change at all <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>. An operator watching a calm-looking flock through the running example’s own camera has no evidence the geese are experiencing the encounter calmly.</p>
+<p><strong>Behavior.</strong> The model asks whether the animal can express its normal behavioral repertoire — here, whether it can execute a controlled, oriented escape. And this is the domain where the design documentation’s own language turns out to be welfare science without the citation: geese that “scatter in panic instead of moving controllably” are geese denied exactly this domain. <em>Controlled pressure</em> and <em>panic</em> are not rhetorical opposites; they are adjacent regions on Domain 4’s spectrum, and the orbit radius is the parameter that selects between them.</p>
+<p><strong>Mental state.</strong> The integration: is the cumulative experience a brief, tolerable “moved along,” or a repeated fear experience from a threat that returns daily and cannot be predicted or appeased? The honest answer is that the field does not know — chronic-exposure effects are the review’s declared biggest gap — and a system designed today should therefore log what a future answer will need: engagement counts, response intensities, return times, per flock, per season.</p>
+<p>Two framework notes complete the toolkit. First, the review itself reaches for the <strong>Three Rs</strong> — replacement, reduction, refinement — the ethical framework governing laboratory animal research <span class="citation" data-cites="fenwick2009threers afridi2025wildlife">(<a href="#ref-fenwick2009threers" role="doc-biblioref">Fenwick, Griffin, and Gauthier 2009</a>; <a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>. For research drones the mapping works: replace a live approach with a pre-recorded cue, reduce flights, refine procedures to minimize stress. For a deterrence mission it fails structurally, and the chapter should say so rather than force it: a harassment mission cannot be “refined” toward not disturbing the animal, because non-disturbance is mission <em>failure</em>, not welfare success. The Three Rs assume the animal’s distress is orthogonal to the objective; here it is the objective. Second, for the decision this framework cannot make — whether to run the mission at all — wildlife management has its own purpose-built process: a practical ethics-assessment framework developed specifically to let wildlife managers weigh ethical considerations alongside biological and social evidence in a concrete management decision <span class="citation" data-cites="smith2024ethicsframework">(<a href="#ref-smith2024ethicsframework" role="doc-biblioref">Smith et al. 2024</a>)</span>. The Five Domains model evaluates the <em>animal’s</em> side of a design; the management framework structures the <em>institutional</em> decision. A serious deployment of the Goose Management System would run through both — and the Try It at the end of this chapter has the reader do exactly that in miniature.</p>
+</section>
+<section id="legal-is-not-the-same-as-right" class="level2" data-number="28.6">
+<h2 data-number="28.6" class="anchored" data-anchor-id="legal-is-not-the-same-as-right"><span class="header-section-number">28.6</span> Legal Is Not the Same as Right</h2>
+<p>The Airspace Law chapter drew this book’s regulatory floor: Part 107, the compliance chain, the principle that an organization’s own rules must exceed the FAA minimum because the FAA manages <em>airspace</em> hazards, not <em>your</em> hazards. This section extends that principle to its sharpest case, because for wildlife the gap between the legal floor and the ethical question is not a margin — it is a chasm, and the running example sits in the middle of it.</p>
+<p>Start with the striking fact: the harassment mission, as designed and even as shipped, is very probably <em>entirely legal</em>. The Migratory Bird Treaty Act — the century-old federal statute protecting Canada geese among a thousand other species — prohibits “take”: killing, capturing, hunting, selling, transporting. Non-contact harassment that stresses a bird, or even nearly collides with it, is not take so long as no bird is actually injured. And below the federal layer, state wildlife agencies consistently advise that scaring, repelling, or herding Canada geese — with dogs, noise, visual deterrents, and by extension drones — requires no permit at all, provided the birds are not touched, injured, or killed. A drone orbiting a goose at three metres, inside its own design team’s flagged bird-strike zone, is breaking no wildlife law on the available evidence. Whatever is wrong with the 3 m default, a regulator is not coming to fix it. Part 107 governs the aircraft; nothing in the running example’s compliance chain so much as mentions the animal.</p>
+<p>Now the comparison that gives the distinction teeth. U.S. wildlife law <em>does</em> contain a precise legal definition of harassment — in the Endangered Species Act’s implementing regulations. Under 50 CFR § 17.3, to “harass” a protected animal is to commit <em>“an intentional or negligent act or omission which creates the likelihood of injury to wildlife by annoying it to such an extent as to significantly disrupt normal behavioral patterns which include, but are not limited to, breeding, feeding, or sheltering.”</em> Read that against the running example. An intentional act: the mission state machine literally has a state named HARASS_TARGET. Likelihood of injury: a 3 m orbit inside a flagged bird-strike zone. Significant disruption of feeding and sheltering: that is the mission’s success criterion. The Goose Management System’s core behavior is, nearly word for word, the thing this regulation defines as a federal wildlife crime — with one decisive difference: the definition applies only to species listed as threatened or endangered, and the Canada goose, abundant to the point of nuisance, is not listed. Fly the identical <code>harassment_node.py</code> profile, at the identical radius, against a whooping crane or a piping plover, and the same fifteen seconds of flight plausibly becomes a federal offense. Against a goose it is a Tuesday.</p>
+<p>Sit with what that asymmetry means. Nothing about the <em>act</em> changes between those two flights — the same aircraft, the same orbit, the same stress inflicted on a bird of roughly the same neurology. What changes is a listing status, a decision made on population-conservation grounds: there are too few whooping cranes for any to be expendable, and more than enough geese. The law is tracking species scarcity, which is a perfectly rational thing for conservation law to track — and is simply not the same quantity as the humaneness of the act, which does not vary with the population count of the animal experiencing it. “It’s legal” therefore answers a question this chapter is not asking. The legal system has deliberately declined to regulate the welfare of individual non-listed wild animals against non-contact harassment; the ethics of doing it are exactly as open as they were before the statute book was consulted.</p>
+<p>Other jurisdictions have built regulatory structure closer to the ethical question, and the review documents the pattern: a <strong>dual-permission model</strong>, in which flying a drone near wildlife requires both the aviation authority’s operational permit <em>and</em> a separate, conservation-specific approval from the wildlife agency responsible for the area and species — the review’s worked example, a Kenyan conservancy, requires national aviation clearance plus approvals from three separate wildlife and research bodies before any conservation drone flies <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>. The structural insight travels even where the requirement does not: the aviation gate and the wildlife gate ask different questions, and passing the first says nothing about the second. An organization deploying the Goose Management System under U.S. law faces only the aviation gate — which is an argument for building the second gate <em>institutionally</em>, exactly as the Airspace Law chapter argued organizations must build rules stricter than the FAA’s: a written wildlife-impact review, run through a framework like the previous section’s, signed by someone accountable for the animals the way the RPIC is accountable for the aircraft. The law supplies no such person. The design review must.</p>
+</section>
+<section id="the-escalation-trap" class="level2" data-number="28.7">
+<h2 data-number="28.7" class="anchored" data-anchor-id="the-escalation-trap"><span class="header-section-number">28.7</span> The Escalation Trap</h2>
+<p>There is a dynamic buried in this system’s future that is easy to miss at design time and hard to escape later, and it begins with an uncomfortable empirical finding. A study built to test the core assumption of drone-based deterrence — do birds actually perceive drones as threats? — flew three platforms at red-winged blackbirds: a predator-shaped drone, a fixed-wing, and an ordinary multirotor of exactly the running example’s kind. The multirotor largely failed to elicit flight responses at all, from either overhead or head-on approaches, while the predator-shaped platform triggered alarm earlier, provoked an order of magnitude more alarm-calling, and disrupted behavior several times longer; the authors’ conclusion was that drones used as frightening devices need <em>added</em> threat stimuli to work <span class="citation" data-cites="egan2020riskperception">(<a href="#ref-egan2020riskperception" role="doc-biblioref">Egan et al. 2020</a>)</span>. Part IV reported the complementary result: a falcon-shaped drone flown in predator-like pursuit deterred flocks powerfully and showed no habituation across three months, precisely because it behaved like something birds cannot afford to ignore <span class="citation" data-cites="storms2022robotfalcon">(<a href="#ref-storms2022robotfalcon" role="doc-biblioref">Storms et al. 2022</a>)</span>.</p>
+<p>Put those together and a design pressure appears. An ordinary quadcopter is, by the evidence, not naturally very frightening — and whatever fear it does inspire, habituation erodes. A deterrence program whose effectiveness is decaying has to respond somehow, and the option space forks. One branch is <em>stimulus design</em>: predator morphology, pursuit and dive behaviors, varied patterns, acoustic cues — the RobotFalcon line, which the evidence shows can sustain effectiveness for months without reducing standoff distance at all. It is also the expensive branch: new airframes, new behaviors, new validation. The other branch is <em>proximity</em>: fly closer, orbit longer, move faster. It requires editing four parameters, and every increment trades the animal’s safety margin for the effectiveness metric. Seen through this lens, the shipped 3 m radius stops looking like an isolated mistake and starts looking like an instance of a pattern: proximity reached for as the cheap substitute for the harder work of making the stimulus itself more convincing. Nothing in the artifacts proves that is how the default came to be — but the pressure is structural, it will bear on every team that fields such a system, and a program that has not named it will mistake each small escalation for tuning.</p>
+<p>The wildlife-management literature has begun to treat that escalation as an ethical decision in its own right, and from two instructive directions. The first is a defense of deterrence, made honestly. The closest real-world analog to the Goose Management System found anywhere in this book’s research — a six-year program hazing grizzly bears with drones — reported drones as the most effective tool tested (91 % success against 57 % for dogs) and documented the program’s cost frankly: bears’ fear responses <em>rose</em> over the years, fleeing behavior climbing from around 10 % to over 80 %. The author’s ethical argument is explicitly utilitarian: the stress hazing inflicts is justified because the alternative for a habituated bear — relocation or lethal removal — is worse <span class="citation" data-cites="sarmento2025dronesbears">(<a href="#ref-sarmento2025dronesbears" role="doc-biblioref">Sarmento 2025</a>)</span>. That argument deserves respect, and the reader should notice it is the argument the Goose Management System’s operators would make too: some stress now beats a shot bird near a runway later. Notice also what the argument requires to be valid: the harm avoided must be real and the harm inflicted genuinely minimized — a test the 3 m default fails on its own terms, since flying inside the bird-strike zone <em>adds</em> risk without adding necessity.</p>
+<p>The second direction is the warning. A recent analysis of urban coyote management makes an argument that transfers here almost without translation: once a non-lethal deterrent begins to fail through habituation, continuing to lean on it can become <em>more</em> harmful than the alternatives — the animal absorbs persistent additional stress from an intervention that no longer changes outcomes, and the underlying conflict marches toward severe intervention anyway <span class="citation" data-cites="murray2026coyote">(<a href="#ref-murray2026coyote" role="doc-biblioref">Murray, Foucault, and Patton 2026</a>)</span>. Deterrence programs, in other words, do not fail gracefully by default; they fail by inflicting escalating cost on the animal while the metric quietly stops responding. Even the encouraging data has this shading: the clearest published precedent for a mission <em>designed</em> to provoke avoidance — drones and sirens moving white rhinoceros away from poaching-risk areas — found the technique effective but observed reaction distances declining with repeated exposure even as flight responses persisted <span class="citation" data-cites="penny2019rhino">(<a href="#ref-penny2019rhino" role="doc-biblioref">Penny et al. 2019</a>)</span>. Effectiveness curves in this field bend down. The design question is not whether the Goose Management System’s dispersal metrics will eventually sag — Part IV’s honest reading of the hazing literature already conceded that even good systems achieve partial success <span class="citation" data-cites="egan2023dispersal">(<a href="#ref-egan2023dispersal" role="doc-biblioref">Egan et al. 2023</a>)</span> — but what the system’s operators are institutionally primed to do when they sag. If the answer is “shrink the radius, lengthen the duration,” the escalation trap is already sprung. The countermeasure is procedural and cheap to install at design time: treat the deterrence parameters like the safety-critical constants they are, changeable only through a review that asks the Five Domains questions — and write down, in advance, the effectiveness threshold below which the right response is not escalation but reassessment of whether this deterrent, or any deterrent, is still the humane tool.</p>
+</section>
+<section id="the-other-parties-in-the-frame" class="level2" data-number="28.8">
+<h2 data-number="28.8" class="anchored" data-anchor-id="the-other-parties-in-the-frame"><span class="header-section-number">28.8</span> The Other Parties in the Frame</h2>
+<p>The Real-Time Inference chapter promised this chapter would finish what its closing note started, and the animals are not the only ones owed the payment. A protected area is rarely empty of people — parks have joggers, ponds have birdwatchers — and the running example is, among other things, a camera that patrols a public place on a schedule, feeding a detector, a tracker, and an archive.</p>
+<p><strong>Privacy is a design property, not a disposition.</strong> Part III observed that on-device inference carries a privacy dividend — raw imagery need never leave the aircraft — and warned the dividend is not automatic. Concretely, it is earned through decisions this book’s readers now own: the telemetry stream carries derived data (detections, positions, track IDs) rather than frames; imagery retained for diagnostics — and the Post-Flight Diagnostics chapter made an evidence-first culture of retaining things — gets a written retention clock and a deletion that actually runs; access to the flight archive is controlled and logged, because a season of georeferenced footage of a public park is a surveillance record whether or not anyone intended to build one; and the system has a designed answer, not a shrug, for the human who walks through the frame — the honest minimum is that people are not detected as targets, not tracked, and not retained beyond the frames diagnostics genuinely requires.</p>
+<p><strong>Bias auditing here is species auditing — and it is a welfare and legal control, not only an accuracy one.</strong> Part III taught the per-condition evaluation table as the defense against a model that is strong on average and blind at dusk. This chapter adds the row that matters most: <em>per-species confusion</em>. The running example’s detector runs deliberately down-threshold, trading precision for recall, which Part III defended for a search mission — a missed goose costs coverage; a false alarm costs a wasted flight leg. But this chapter has now priced the false alarm properly: a misclassified bird does not receive a wasted flight leg, it receives a 3 m harassment orbit. A heron, a duck, a gull mistaken for a goose gets the full treatment; and should a protected or listed species ever stand where the detector expects a goose, the previous section’s legal analysis stops being hypothetical — the same orbit that is lawful against a goose is the regulatory definition of harassment against a listed bird, and “the classifier was 91 % accurate” is not a defense a wildlife agency is obliged to accept. The engineering consequence is concrete and cheap: the validation suite owes a confusion matrix over plausible non-target species, the confidence threshold for <em>initiating harassment</em> should sit far above the threshold for merely <em>investigating</em>, and the mission logs should record what the system believed it was harassing, so that the audit is possible after the fact. Accountability completes the set: Part I gave the aircraft a named accountable human in the RPIC; the previous section argued the animals need the same. Between them, the logging and review machinery this Part built is what makes accountability more than a sentiment — the ULog does not say whether the flight should have happened, but it is exactly what the person answering that question needs.</p>
+</section>
+<section id="design-principles-that-survive-the-review" class="level2" data-number="28.9">
+<h2 data-number="28.9" class="anchored" data-anchor-id="design-principles-that-survive-the-review"><span class="header-section-number">28.9</span> Design Principles That Survive the Review</h2>
+<p>Criticism that ends in criticism is cheap. This chapter closes its argument the way an engineering book should — with the design that would pass the review it has just conducted. Five principles, each grounded in evidence this chapter or Part IV has already laid out, each implementable with machinery the running example already owns.</p>
+<p><strong>1. Anchor the minimum approach distance to measured response data, outside the panic envelope.</strong> The floor’s <em>existence</em> was Part IV’s principle; its <em>value</em> is this chapter’s. Until deterrence-specific trials exist, the defensible anchor is the species’ measured response geometry: far enough in to provoke a response — inside alert distance, approaching FID — and far enough out that the response remains oriented locomotion rather than panic, with the collision envelope cleared by margin. For Canada geese, the same-species evidence (FID 38.6–70.9 m to a vehicle <span class="citation" data-cites="blackwell2019goosevehicle">(<a href="#ref-blackwell2019goosevehicle" role="doc-biblioref">Blackwell et al. 2019</a>)</span>; drone-platform reactions concentrated inside a few tens of metres <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>) makes the design documentation’s own 8–15 m band look like what it claimed to be — a reasonable, conservative-for-the-purpose starting point — and makes 3 m indefensible. The graduation path from default to evidence is the one Part IV named: FID-derivation methodology, run under deterrence conditions on the target population <span class="citation" data-cites="velilla2025bestpractice">(<a href="#ref-velilla2025bestpractice" role="doc-biblioref">Velilla et al. 2025</a>)</span>, with the precautionary principle governing until then <span class="citation" data-cites="hodgson2016bestpractice">(<a href="#ref-hodgson2016bestpractice" role="doc-biblioref">Hodgson and Koh 2016</a>)</span>.</p>
+<p><strong>2. Descend in tiers; let the animal set the floor.</strong> The review’s tiered descent protocol — begin high, close only as tolerated by observed behavior <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span> — inverts cleanly for deterrence: begin at the band’s <em>outer</em> edge, where the stimulus is mildest, and tighten only if the flock demonstrably ignores it, never past the floor. Part IV’s escalation ladder (orbit, then swoop, then herd) is already this protocol in embryo; the missing piece is making <em>radius</em> part of the ladder instead of a constant.</p>
+<p><strong>3. Behavior terminates the engagement; the timer is only the backstop.</strong> The review’s adaptive-management recommendation is blunt: signs of strong response should immediately produce increased distance or suspension <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>. The design documentation specified behavioral termination; the code shipped a timer. The fix costs a subscription the node already has: the tracker publishes the flock’s position every tick, the Geofencing chapter’s point-in-polygon test knows the protected-area boundary, and Part IV’s Try It already sketched the “dispersed-in-fact” signal. A flock that has flushed and is leaving needs zero additional seconds of 3 m orbit — continuing to circle a panicked bird is pure cost, no mission value. Success should end the engagement; so should the <em>wrong kind</em> of success, scatter.</p>
+<p><strong>4. Preserve the escape route, always.</strong> Taught in Part IV as effectiveness engineering — pressure with no exit produces scatter, not dispersal — and re-derived in this chapter as a Domain 2/Domain 4 welfare obligation. The same corridor serves both masters, which is this book’s recurring good news: the humane design and the effective design keep turning out to be the same design.</p>
+<p><strong>5. Cap the dose, and count it per flock, per season.</strong> Fifteen seconds per engagement is, genuinely, the shipped design’s best feature — brief exposure is exactly what the session-limit literature recommends <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>. What no node counts is the aggregate: engagements per flock per day, per season, alongside response intensity and return time. Cumulative stress is real, chronic effects are unmeasured, and the habituation curve is the escalation trap’s tripwire — the aggregate log is simultaneously the welfare record, the effectiveness record, and the early warning. It is also, per the escalation section, where the pre-committed threshold lives: the number below which the program reviews itself instead of tightening the orbit.</p>
+<p>None of this resolves the chapter’s central tension, and it would be dishonest to pretend it does. A system built to all five principles still exists to frighten wild animals, on a schedule, with software; the review’s flat statement that harm to animals is unacceptable regardless of aim still sits uncomfortably beside it, defended only by a utilitarian argument <span class="citation" data-cites="sarmento2025dronesbears">(<a href="#ref-sarmento2025dronesbears" role="doc-biblioref">Sarmento 2025</a>)</span> whose empirical premises — the harm avoided is real, the alternative is worse, the stress inflicted is truly minimized — are obligations, not assumptions, and at least one of which the shipped system currently fails. What the principles buy is narrower and worth stating exactly: a system that satisfies them is one whose operators <em>know what it is doing to the animals</em>, have bounded it deliberately, and will notice when the bounds are wrong. The shipped 3 m default is the portrait of the alternative — not cruelty, nothing so dramatic; just a parameter nobody looked at hard enough, defaulting quietly to the inside of its own danger zone. Most ethical failures in engineering look like that.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="For More">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>For More
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The Five Domains model’s primary statement, including its extension toward <em>positive</em> welfare states — an animal’s opportunities for good experiences, not merely protection from bad ones — is Mellor’s 2016 update <span class="citation" data-cites="mellor2016fivedomains">(<a href="#ref-mellor2016fivedomains" role="doc-biblioref">Mellor 2016</a>)</span>; readers who want the wildlife-management decision process in full should go to the practical ethics-assessment framework developed for exactly these decisions <span class="citation" data-cites="smith2024ethicsframework">(<a href="#ref-smith2024ethicsframework" role="doc-biblioref">Smith et al. 2024</a>)</span>. On the empirical side, the proposed 100 m code of practice <span class="citation" data-cites="weston2020codeofpractice">(<a href="#ref-weston2020codeofpractice" role="doc-biblioref">Weston et al. 2020</a>)</span> and the colonial-breeding-bird FID-derivation study <span class="citation" data-cites="velilla2025bestpractice">(<a href="#ref-velilla2025bestpractice" role="doc-biblioref">Velilla et al. 2025</a>)</span> are the two best models for how a deterrence program would eventually derive its distances from data rather than defaults. And the rhino-deterrence study <span class="citation" data-cites="penny2019rhino">(<a href="#ref-penny2019rhino" role="doc-biblioref">Penny et al. 2019</a>)</span> rewards a full read as the nearest published relative of the Goose Management System: a mission designed to move animals on purpose, instrumented well enough to watch its own effectiveness change over time.</p>
+</div>
+</div>
+</section>
+<section id="check-your-understanding" class="level2" data-number="28.10">
+<h2 data-number="28.10" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">28.10</span> Check Your Understanding</h2>
+<ol type="1">
+<li>The shipped orbit radius is 3.0 m. Using the measured Canada-goose responses to an approaching vehicle — flight-initiation distances of 38.6 m (tangential) to 70.9 m (direct), alert distances of roughly 88–120 m — compute how many times inside the <em>lowest</em> measured FID the shipped orbit operates, and state the two caveats that must accompany the comparison and the conclusion that survives both.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(38.6 / 3.0 \approx 13\)</span>: the shipped orbit holds station roughly thirteen times closer than the distance at which geese fled the <em>least</em> alarming approach geometry tested, and more than twenty times closer than the direct-approach FID. Caveats: the stimulus was a ground vehicle, not a drone, so the absolute values are not drone FIDs <span class="citation" data-cites="blackwell2019goosevehicle">(<a href="#ref-blackwell2019goosevehicle" role="doc-biblioref">Blackwell et al. 2019</a>)</span>; and a deterrence mission legitimately operates <em>inside</em> FID, since provoking a response is its purpose. What survives: operating slightly inside FID provokes controlled flight, and the closest documented <em>non-disturbing</em> drone approach anywhere in the literature was a single slow lateral pass at 4 m — a sustained, circling presence at 3 m is not “slightly inside” anything. It is an order of magnitude past every measured threshold, deep in the region the running example’s own design documentation labels bird-strike and panic-scatter territory, with roughly a wingspan and a half of true clearance.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>The anchor review states that excessive disturbance, and any physical harm to animals, are “totally unacceptable regardless of the perceived conservation value or data collection aim” <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span> — yet the Goose Management System’s purpose is to inflict stress. Does the statement simply condemn the system? Reconstruct the strongest form of both positions, using the bear-hazing program’s published argument, and identify the empirical conditions on which the defense depends.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Read literally, the statement comes close to condemnation: it draws its unacceptability line inside disturbance itself, not merely at physical harm. But the statement is written for research drones, where disturbance is a side effect of data collection and can in principle be engineered toward zero, so “any avoidable disturbance is too much” is a coherent rule. A deterrence mission occupies different ethical ground: disturbance is its product, so the review’s rule cannot govern it unmodified — what survives the translation is the absolute prohibition on physical harm (implemented by the safety floor) and the obligation to keep the inflicted disturbance to the minimum the mission’s justification actually requires. The strongest defense is the explicitly utilitarian argument published by the grizzly-hazing program: deliberately inflicted, bounded stress is justified when the counterfactual for the animal is worse — habituated wildlife near human infrastructure ends up relocated or killed <span class="citation" data-cites="sarmento2025dronesbears">(<a href="#ref-sarmento2025dronesbears" role="doc-biblioref">Sarmento 2025</a>)</span>. That defense is conditional on empirical premises: the avoided harm is real (the geese genuinely face worse outcomes unmanaged), the alternative methods are genuinely inferior, and the inflicted stress is actually minimized. The shipped 3 m default fails the third premise on its own terms — it adds collision and panic risk without adding necessity — which shows the defense’s structure: a utilitarian license for deterrence is also a standing obligation to run the mission at the gentlest configuration that works.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Run the shipped configuration — 3 m radius, 3 m fixed altitude, 15 s timer, no behavioral read-back — through the Five Domains model, identifying for each domain one specific way the configuration threatens it or one way the design protects it. Which domain does the design documentation’s phrase “scatter in panic instead of moving controllably” belong to, and why is that mapping useful?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Nutrition: each engagement interrupts foraging — the brief 15 s bound is protective per engagement, but nothing counts cumulative interruptions per flock. Physical environment: displacement is intentional; welfare turns on displacement <em>toward</em> the open corridor and viable habitat (escape-route preservation) rather than mere eviction. Health: the 3 m radius is the direct threat — collision within roughly a wingspan and a half, injury during panicked flight, plus physiological stress that may be invisible behaviorally (documented cardiac responses without movement). Behavior: the tight, steep (45° elevation) orbit risks denying the goose an oriented, controlled escape — and “scatter in panic instead of moving controllably” is precisely a Domain 4 statement: panic versus controlled pressure are regions on the behavioral-expression spectrum, not rhetoric. The mapping is useful because it shows the design documentation already contained the welfare science without naming it — and because it makes the orbit radius legible as the parameter that <em>selects</em> between the two regions. Mental state: the integrative unknown — repeated, unpredictable fear versus tolerable “moving along”; chronic effects are unmeasured, which obligates the system to log what a future answer needs <span class="citation" data-cites="mellor2016fivedomains afridi2025wildlife">(<a href="#ref-mellor2016fivedomains" role="doc-biblioref">Mellor 2016</a>; <a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>The identical <code>harassment_node.py</code> flight profile is flown twice: once against a Canada goose, once — through a detector misclassification — against a whooping crane. Compare the legal status of the two flights, name the regulatory text that separates them, and explain what the asymmetry demonstrates about the relationship between legality and ethics. What engineering control does this analysis motivate?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Against the goose: almost certainly legal — the MBTA prohibits “take” (killing, capturing, transporting), not non-contact stress, and state agencies broadly treat non-contact hazing of Canada geese as permit-free. Against the whooping crane: plausibly a federal offense, because 50 CFR § 17.3 defines “harass” for ESA-listed species as an intentional or negligent act creating the likelihood of injury by annoying the animal enough to significantly disrupt normal behavioral patterns including feeding and sheltering — a near-verbatim description of the harassment mission. The act is identical in both flights; only the target’s listing status differs. The asymmetry demonstrates that legality here tracks species scarcity — a population-level conservation judgment — not the humaneness of the act, which is unchanged; “it’s legal” therefore does not answer the ethical question, it merely reports that the law declined to ask it. Engineering control: species-confusion auditing of the detector (per-species confusion matrix in validation), a much higher confidence threshold for initiating harassment than for investigating, and logging what the system believed it was engaging — because a misclassification does not just waste a flight leg, it delivers the harassment to the wrong animal, and possibly to one the law does protect.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>Two seasons in, the flock’s dispersal rate has fallen by half. A teammate proposes the “obvious” fix: reduce <code>orbit_radius_m</code> to 2 m and double <code>orbit_duration_s</code>. Using the evidence on drone threat perception and the published escalation argument, explain why this is the predictable <em>bad</em> branch of a known fork, describe the alternative branch, and state the procedural safeguard that should have existed before the metrics sagged.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The proposal is the proximity branch of the escalation fork. The evidence says an ordinary multirotor is not inherently very threatening to birds — deterrence studies conclude drones need <em>added</em> threat stimuli to work as frightening devices <span class="citation" data-cites="egan2020riskperception">(<a href="#ref-egan2020riskperception" role="doc-biblioref">Egan et al. 2020</a>)</span> — so a program whose effect is decaying faces a choice: invest in stimulus design (predator-like morphology and pursuit behavior, varied patterns — the approach that sustained effectiveness for months with no habituation and no reduction in standoff <span class="citation" data-cites="storms2022robotfalcon">(<a href="#ref-storms2022robotfalcon" role="doc-biblioref">Storms et al. 2022</a>)</span>), or fly closer, which is cheap to implement and spends the animal’s safety margin to buy back the metric. The escalation literature warns that leaning harder on a partially failing non-lethal deterrent can be ethically counterproductive: the animals absorb persistent additional stress from an intervention that no longer resolves the conflict <span class="citation" data-cites="murray2026coyote">(<a href="#ref-murray2026coyote" role="doc-biblioref">Murray, Foucault, and Patton 2026</a>)</span>. Safeguard: deterrence parameters treated as safety-critical constants, changeable only through a welfare review, plus a pre-committed effectiveness threshold — written down before deployment — below which the program’s response is reassessment (different stimulus, different method, or acceptance that deterrence is failing) rather than automatic intensification.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>At the shipped geometry (<span class="math inline">\(R = 3\)</span> m, <span class="math inline">\(h = 3\)</span> m) compute the drone’s elevation angle above the goose’s horizon; recompute for the design band’s <span class="math inline">\(R = 12\)</span> m, <span class="math inline">\(h = 6\)</span> m. Connect the two numbers to the approach-angle findings, and explain why the tight radius is doubly aggravating rather than singly.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(\beta = \arctan(h/R)\)</span>. Shipped: <span class="math inline">\(\arctan(3/3) = 45°\)</span>. Design band: <span class="math inline">\(\arctan(6/12) \approx 26.6°\)</span>. Birds respond most strongly to overhead and steeply descending geometries — they cannot look directly above themselves, and steep approaches resemble a stooping raptor — while lateral and oblique presentations are the least stressful for a given distance <span class="citation" data-cites="vas2015approaching afridi2025wildlife">(<a href="#ref-vas2015approaching" role="doc-biblioref">Vas et al. 2015</a>; <a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>. The shipped orbit therefore compounds two aggravations: it is closer (higher stimulus intensity, smaller collision margin) <em>and</em> steeper (a more threatening geometry, halfway to the zenith), whereas the design band’s wider, relatively lower orbit reads as lateral presence. Since the orbit also sweeps every compass bearing each lap, the elevation angle is the one geometric variable the radius and altitude choices control — and the shipped values chose the worse region of it.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="28.11">
+<h2 data-number="28.11" class="anchored" data-anchor-id="try-it"><span class="header-section-number">28.11</span> Try It</h2>
+<p><strong>Part 1 — redesign the parameter set to survive the review.</strong> Draft a revised harassment configuration — <code>orbit_radius_m</code>, <code>orbit_altitude_m</code>, <code>orbit_speed_ms</code>, an engagement termination rule, and a per-flock daily exposure cap — that you can defend line by line. For each value, write two or three sentences connecting it to a specific finding from this chapter: the radius to the measured goose FID range <span class="citation" data-cites="blackwell2019goosevehicle">(<a href="#ref-blackwell2019goosevehicle" role="doc-biblioref">Blackwell et al. 2019</a>)</span> and the design band’s rationale; the altitude to the elevation-angle arithmetic and the approach-angle literature <span class="citation" data-cites="vas2015approaching">(<a href="#ref-vas2015approaching" role="doc-biblioref">Vas et al. 2015</a>)</span>; the speed to the review’s group-proximity recommendation <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>; the termination rule to the behavioral-override principle (specify the actual signal: the tracked flock position against the protected-area polygon, plus a scatter test — track count suddenly multiplying — that also ends the engagement); the exposure cap to the cumulative-stress and session-limit findings. Then run your configuration through the Five Domains as a table — one row per domain, one column each for “threat” and “mitigation” — and mark honestly which cells rest on measured evidence and which on engineering judgment awaiting field data. If you built Part IV’s SITL orbit, finish concretely: change the defaults in your own node, implement the behavioral termination alongside the timer, and confirm in the logs which one ends each scripted engagement.</p>
+<p><strong>Part 2 — write the second permission.</strong> The dual-permission model requires an approval no U.S. authority will ask the running example for; write it anyway, as the Airspace Law chapter had you write a waiver safety case. Draft a one-to-two-page application to a hypothetical wildlife authority for a season of autonomous goose deterrence over a named protected area. Structure it the way the ethics-assessment literature structures a management decision <span class="citation" data-cites="smith2024ethicsframework">(<a href="#ref-smith2024ethicsframework" role="doc-biblioref">Smith et al. 2024</a>)</span>: the problem and the harm of <em>not</em> acting (be honest about its magnitude); the alternatives considered and why deterrence beats them; the welfare analysis (your Part 1 table); the operating constraints you commit to, each one verifiable from logs — minimum approach distance, behavioral termination, exposure caps, species-confirmation threshold before any engagement, escape-corridor requirement; the monitoring you will report — engagements per flock, response intensity, return times, and the habituation curve; and the pre-committed threshold at which you will suspend operations and reassess rather than escalate. Trade drafts with a partner and review each other’s the way the chapter reviewed the shipped code: for every claimed safeguard, ask where it lives — in a document, or in the software’s defaults — and remember which of those two the running example actually shipped.</p>
+<p><strong>Related Lab:</strong> <em>No lab currently maps to this chapter.</em></p>
+<p>The account is rendered, and it comes to this: the system this book has built is legal, plausibly justifiable, and shipped with its most welfare-critical number inside its own flagged danger zone — three findings that coexist without contradiction, which is precisely why the ethics had to be a chapter and not a checkbox. What remains is to put the whole machine together. The next chapter — the book’s last — assembles every node, every budget, and every guard this book has built into one running system, and the constraints established here ride along not as an appendix of good intentions but as requirements with the same standing the geofence and the failsafe ladder have held since Part II: part of what the system <em>is</em>, checked where everything else is checked, in the code, in the parameters, and in the logs.</p>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-afridi2025wildlife" class="csl-entry" role="listitem">
+Afridi, S., L. Laporte-Devylder, G. Maalouf, J. M. Kline, S. G. Penny, K. Hlebowicz, D. Cawthorne, and U. P. S. Lundquist. 2025. <span>“Impact of Drone Disturbances on Wildlife: A Review.”</span> <em>Drones</em> 9 (4): 311. <a href="https://doi.org/10.3390/drones9040311">https://doi.org/10.3390/drones9040311</a>.
+</div>
+<div id="ref-barnas2018snowgeese" class="csl-entry" role="listitem">
+Barnas, Andrew F., Christopher J. Felege, Robert F. Rockwell, and Susan N. Ellis-Felege. 2018. <span>“Evaluating Behavioral Responses of Nesting Lesser Snow Geese to Unmanned Aircraft Surveys.”</span> <em>Ecology and Evolution</em> 8 (2): 1328–38. <a href="https://doi.org/10.1002/ece3.3731">https://doi.org/10.1002/ece3.3731</a>.
+</div>
+<div id="ref-bechhansen2019geese" class="csl-entry" role="listitem">
+Bech-Hansen, Malene, Rune Michaelis Kallehauge, Julia Mikkelsen Sørensen Lauritzen, et al. 2019. <span>“Evaluation of Disturbance Effect on Geese Caused by an Approaching Unmanned Aerial Vehicle.”</span> <em>Bird Conservation International</em> 30 (2): 169–75. <a href="https://doi.org/10.1017/S0959270919000364">https://doi.org/10.1017/S0959270919000364</a>.
+</div>
+<div id="ref-blackwell2019goosevehicle" class="csl-entry" role="listitem">
+Blackwell, Bradley F., Thomas W. Seamans, Travis L. DeVault, Steven L. Lima, Morgan B. Pfeiffer, and Esteban Fernández-Juricic. 2019. <span>“Social Information Affects <span>C</span>anada Goose Alert and Escape Responses to Vehicle Approach: Implications for Animal–Vehicle Collisions.”</span> <em>PeerJ</em> 7: e8164. <a href="https://doi.org/10.7717/peerj.8164">https://doi.org/10.7717/peerj.8164</a>.
+</div>
+<div id="ref-egan2020riskperception" class="csl-entry" role="listitem">
+Egan, Conor C., Bradley F. Blackwell, Esteban Fernández-Juricic, and Page E. Klug. 2020. <span>“Testing a Key Assumption of Using Drones as Frightening Devices: Do Birds Perceive Drones as Risky?”</span> <em>The Condor: Ornithological Applications</em> 122 (3): duaa014. <a href="https://doi.org/10.1093/condor/duaa014">https://doi.org/10.1093/condor/duaa014</a>.
+</div>
+<div id="ref-egan2023dispersal" class="csl-entry" role="listitem">
+———. 2023. <span>“Dispersal of Blackbird Flocks from Sunflower Fields: Efficacy Influenced by Flock and Field Size but Not Drone Platform.”</span> <em>Wildlife Society Bulletin</em> 47 (3): e1478. <a href="https://doi.org/10.1002/wsb.1478">https://doi.org/10.1002/wsb.1478</a>.
+</div>
+<div id="ref-fenwick2009threers" class="csl-entry" role="listitem">
+Fenwick, Nicole, Gilly Griffin, and Charu Gauthier. 2009. <span>“The Welfare of Animals Used in Science: How the <span>‘<span>T</span>hree <span>R</span>s’</span> Ethic Guides Improvements.”</span> <em>Canadian Veterinary Journal</em> 50 (5): 523–30.
+</div>
+<div id="ref-hodgson2016bestpractice" class="csl-entry" role="listitem">
+Hodgson, Jarrod C., and Lian Pin Koh. 2016. <span>“Best Practice for Minimising Unmanned Aerial Vehicle Disturbance to Wildlife in Biological Field Research.”</span> <em>Current Biology</em> 26 (10): R404–5. <a href="https://doi.org/10.1016/j.cub.2016.04.001">https://doi.org/10.1016/j.cub.2016.04.001</a>.
+</div>
+<div id="ref-mcevoy2016evaluation" class="csl-entry" role="listitem">
+McEvoy, John F., Graham P. Hall, and Paul G. McDonald. 2016. <span>“Evaluation of Unmanned Aerial Vehicle Shape, Flight Path and Camera Type for Waterfowl Surveys: Disturbance Effects and Species Recognition.”</span> <em>PeerJ</em> 4: e1831. <a href="https://doi.org/10.7717/peerj.1831">https://doi.org/10.7717/peerj.1831</a>.
+</div>
+<div id="ref-mellor2016fivedomains" class="csl-entry" role="listitem">
+Mellor, David J. 2016. <span>“Updating Animal Welfare Thinking: Moving Beyond the <span>‘<span>F</span>ive <span>F</span>reedoms’</span> Towards <span>‘<span>A</span> <span>L</span>ife <span>W</span>orth <span>L</span>iving’</span>.”</span> <em>Animals</em> 6 (3): 21. <a href="https://doi.org/10.3390/ani6030021">https://doi.org/10.3390/ani6030021</a>.
+</div>
+<div id="ref-mulero-pazmany2017systematic" class="csl-entry" role="listitem">
+Mulero-Pázmány, Margarita, Susanne Jenni-Eiermann, Nicolas Strebel, Thomas Sattler, Juan José Negro, and Zulima Tablado. 2017. <span>“Unmanned Aircraft Systems as a New Source of Disturbance for Wildlife: A Systematic Review.”</span> <em>PLOS ONE</em> 12 (6): e0178448. <a href="https://doi.org/10.1371/journal.pone.0178448">https://doi.org/10.1371/journal.pone.0178448</a>.
+</div>
+<div id="ref-murray2026coyote" class="csl-entry" role="listitem">
+Murray, Dennis L., Emily Foucault, and Keith Patton. 2026. <span>“Reframing Coexistence: The Need for Threshold-Based Intervention in Urban Coyote Management.”</span> <em>Frontiers in Ecology and Evolution</em> 14: 1885888. <a href="https://doi.org/10.3389/fevo.2026.1885888">https://doi.org/10.3389/fevo.2026.1885888</a>.
+</div>
+<div id="ref-penny2019rhino" class="csl-entry" role="listitem">
+Penny, Samuel G., Rachael L. White, Dawn M. Scott, Lynne MacTavish, and Angelo P. Pernetta. 2019. <span>“Using Drones and Sirens to Elicit Avoidance Behaviour in White Rhinoceros as an Anti-Poaching Tactic.”</span> <em>Proceedings of the Royal Society B: Biological Sciences</em> 286 (1907): 20191135. <a href="https://doi.org/10.1098/rspb.2019.1135">https://doi.org/10.1098/rspb.2019.1135</a>.
+</div>
+<div id="ref-sarmento2025dronesbears" class="csl-entry" role="listitem">
+Sarmento, Wesley M. 2025. <span>“Drones Outperform Dogs for Hazing Bears: A Comparison of Carnivore Aversive Conditioning Tools.”</span> <em>Frontiers in Conservation Science</em> 5: 1478450. <a href="https://doi.org/10.3389/fcosc.2024.1478450">https://doi.org/10.3389/fcosc.2024.1478450</a>.
+</div>
+<div id="ref-smith2024ethicsframework" class="csl-entry" role="listitem">
+Smith, Christopher A., Jim Tantillo, Ben Hale, Daniel J. Decker, Ashley B. Forstchen, Emily F. Pomeranz, T. Bruce Lauber, et al. 2024. <span>“A Practical Framework for Ethics Assessment in Wildlife Management Decision-Making.”</span> <em>Journal of Wildlife Management</em> 88 (1): e22502. <a href="https://doi.org/10.1002/jwmg.22502">https://doi.org/10.1002/jwmg.22502</a>.
+</div>
+<div id="ref-storms2022robotfalcon" class="csl-entry" role="listitem">
+Storms, Rolf F., Claudio Carere, Robert Musters, Hans van Gasteren, Simon Verhulst, and Charlotte K. Hemelrijk. 2022. <span>“Deterrence of Birds with an Artificial Predator, the <span>R</span>obot<span>F</span>alcon.”</span> <em>Journal of the Royal Society Interface</em> 19 (195): 20220497. <a href="https://doi.org/10.1098/rsif.2022.0497">https://doi.org/10.1098/rsif.2022.0497</a>.
+</div>
+<div id="ref-vas2015approaching" class="csl-entry" role="listitem">
+Vas, Elisabeth, Amélie Lescroël, Olivier Duriez, Guillaume Boguszewski, and David Grémillet. 2015. <span>“Approaching Birds with Drones: First Experiments and Ethical Guidelines.”</span> <em>Biology Letters</em> 11 (2): 20140754. <a href="https://doi.org/10.1098/rsbl.2014.0754">https://doi.org/10.1098/rsbl.2014.0754</a>.
+</div>
+<div id="ref-velilla2025bestpractice" class="csl-entry" role="listitem">
+Velilla, Elke, Nathan Hijner, Adriaan van Ginkel, Menno Zwarts, Jasper H. T. Heusinkveld, Kees Koffijberg, Kees Oosterbeek, Julia Stahl, Sjoerd Duijns, and Laura L. Govers. 2025. <span>“Best Practice Guidance for Recreational and Professional Drones Near Colonial Breeding Birds.”</span> <em>PLOS ONE</em> 20 (11): e0332619. <a href="https://doi.org/10.1371/journal.pone.0332619">https://doi.org/10.1371/journal.pone.0332619</a>.
+</div>
+<div id="ref-weston2020codeofpractice" class="csl-entry" role="listitem">
+Weston, Michael A., Chloe O’Brien, Kristal N. Kostoglou, and Matthew R. E. Symonds. 2020. <span>“Escape Responses of Terrestrial and Aquatic Birds to Drones: Towards a Code of Practice to Minimise Disturbance.”</span> <em>Journal of Applied Ecology</em> 57 (4): 777–85. <a href="https://doi.org/10.1111/1365-2664.13575">https://doi.org/10.1111/1365-2664.13575</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="pagination-link" aria-label="Remote Sensing at Scale: Multispectral Imaging in Agriculture">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="pagination-link" aria-label="Full-System Integration: The Goose Management System End to End">
+        <span class="nav-page-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

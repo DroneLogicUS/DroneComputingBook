@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>24&nbsp; Multi-Agent Systems and Coordination – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" rel="next">
+<link href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</a></li><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">24.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">24.2</span> Key Vocabulary</a></li>
+  <li><a href="#what-a-second-aircraft-buys-and-what-it-costs" id="toc-what-a-second-aircraft-buys-and-what-it-costs" class="nav-link" data-scroll-target="#what-a-second-aircraft-buys-and-what-it-costs"><span class="header-section-number">24.3</span> What a Second Aircraft Buys — and What It Costs</a></li>
+  <li><a href="#centralized-decentralized-and-the-space-between" id="toc-centralized-decentralized-and-the-space-between" class="nav-link" data-scroll-target="#centralized-decentralized-and-the-space-between"><span class="header-section-number">24.4</span> Centralized, Decentralized, and the Space Between</a></li>
+  <li><a href="#a-framework-that-actually-ships-the-mrs-uav-system" id="toc-a-framework-that-actually-ships-the-mrs-uav-system" class="nav-link" data-scroll-target="#a-framework-that-actually-ships-the-mrs-uav-system"><span class="header-section-number">24.5</span> A Framework That Actually Ships: The MRS UAV System</a></li>
+  <li><a href="#collision-avoidance-without-a-conversation" id="toc-collision-avoidance-without-a-conversation" class="nav-link" data-scroll-target="#collision-avoidance-without-a-conversation"><span class="header-section-number">24.6</span> Collision Avoidance Without a Conversation</a></li>
+  <li><a href="#consensus-and-formation-one-control-pattern-again" id="toc-consensus-and-formation-one-control-pattern-again" class="nav-link" data-scroll-target="#consensus-and-formation-one-control-pattern-again"><span class="header-section-number">24.7</span> Consensus and Formation: One Control Pattern, Again</a></li>
+  <li><a href="#n-drones-over-the-protected-area" id="toc-n-drones-over-the-protected-area" class="nav-link" data-scroll-target="#n-drones-over-the-protected-area"><span class="header-section-number">24.8</span> N Drones over the Protected Area</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">24.9</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">24.10</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</a></li><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The previous chapter ended on a scaling seam it could see but not cross: a single drone herds a single cohesive flock well, but the moment a flock splits — or a second flock lands across the site — one aircraft cannot hold two herding vectors at once. The Harassment Pattern Generation chapter’s whole design vocabulary assumes one point of pressure; a protected area large enough to need a lawnmower sweep is large enough to make one point of pressure a bottleneck. The obvious answer — add a second aircraft — turns out to be the least obvious part of the problem. Two drones over the same field are not twice one drone; they are a new kind of system, one whose members must divide work without duplicating it, share what they see without drowning their radios, avoid each other without a referee, and keep functioning when the thing coordinating them goes silent. This chapter is about that system.</p>
+<p>It is also, deliberately, a chapter about architecture rather than a survey of vendors and acronyms. The multi-drone field has a large vocabulary — mesh networks, flying ad-hoc networks, formation taxonomies, commercial fleet-management suites — and a much smaller set of load-bearing ideas. The chapter works four of them in depth: the centralized-versus-decentralized design axis and the real evidence that the best answer is often neither extreme; one genuinely fielded ROS-plus-PX4 multi-drone framework, chosen because its stack is nearly the running example’s own; a decentralized collision-avoidance algorithm with an actual geometric core, deployed on physical quadrotors that sensed each other with cameras and never exchanged a message; and the concrete question the running example has earned the right to ask — what, exactly, would have to change about the Goose Management System’s single-drone code for two or three aircraft to fly it together? The chapter closes Part IV by answering that question at the level of topics, tokens, and nodes, using every piece of machinery the Part has built.</p>
+<section id="learning-objectives" class="level2" data-number="24.1">
+<h2 data-number="24.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">24.1</span> Learning Objectives</h2>
+<ul>
+<li>Define a multi-agent system and identify the three coordination problems any multi-drone deployment must solve — task allocation, mutual collision avoidance, and shared situational awareness — independent of how the fleet is architected.</li>
+<li>Explain the centralized/decentralized architectural trade-off as a design <em>space</em> rather than a binary, using the classification literature’s separate axes (control, communication, awareness) and reported experimental evidence that hybrid architectures can outperform both pure extremes.</li>
+<li>Describe the architecture of a real ROS-plus-PX4 multi-drone framework — the MRS UAV System — and explain why redundant multi-frame state estimation and a swappable controller pair matter for multi-vehicle field deployment.</li>
+<li>Derive the velocity-obstacle picture of drone-on-drone collision risk, state the ORCA half-plane construction, and work a two-drone encounter numerically from relative velocity to each drone’s corrected command.</li>
+<li>Write the basic consensus update rule and a simple leader-follower separation-bearing law, and recognize both as the same error-times-gain pattern used by the book’s earlier control loops, with the error now measured against another aircraft.</li>
+<li>Redesign the running example’s single-drone architecture for <span class="math inline">\(N\)</span> drones: per-drone topic namespaces, the scope of the active-controller token, a fleet-level allocator node, and the fallback behavior each drone needs when the allocator disappears.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="24.2">
+<h2 data-number="24.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">24.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Multi-agent system</strong> (MAS) — a system of multiple autonomous agents, each able to sense its environment, make local decisions, and communicate with peers, cooperating toward a shared mission objective rather than being driven as remote effectors of one program.</li>
+<li><strong>Centralized coordination</strong> — an architecture in which one entity (a ground station or designated leader) holds the global picture and computes every agent’s assignment or trajectory; globally informed and easy to reason about, but its hub is a single point of failure and a communication bottleneck.</li>
+<li><strong>Decentralized coordination</strong> — an architecture in which each agent decides from local information and peer-to-peer exchange, with no global authority; robust to individual loss and scalable, at the cost of harder-to-verify global behavior.</li>
+<li><strong>Swarm</strong> — a fleet of cooperating drones treated as one collective; the term describes fleet behavior, <em>not</em> architecture — real swarms exist at both ends of the centralization axis.</li>
+<li><strong>Telemetry sharing</strong> — the continuous exchange of vehicle state (position, velocity, heading, battery, mission status, detections) between aircraft or between aircraft and a ground station; the raw material of every coordination scheme that uses communication at all.</li>
+<li><strong>Communication topology</strong> — the graph of who can exchange messages with whom — star, mesh, ring, fully connected — whose connectivity determines both a fleet’s failure modes and, for consensus algorithms, how fast agreement spreads.</li>
+<li><strong>Velocity obstacle</strong> (VO) — for agent <span class="math inline">\(A\)</span> facing agent <span class="math inline">\(B\)</span>, the set of velocities that, if held, lead to collision within a time horizon; the geometric object that turns “will we hit?” into a question about a region in velocity space.</li>
+<li><strong>Reciprocal collision avoidance</strong> (RVO/ORCA) — a decentralized scheme in which each of two conflicting agents takes responsibility for half of the needed correction; ORCA expresses each pairwise obligation as a half-plane of permitted velocities, so avoiding all neighbors is a small linear program.</li>
+<li><strong>Consensus protocol</strong> — a distributed update rule in which each agent nudges its own state toward its neighbors’ states, provably driving a connected network to agreement on a shared value with no central coordinator.</li>
+<li><strong>Formation control</strong> — maintaining designed geometric relationships between flying agents; classically approached by leader-follower control, virtual rigid structures, or blended local behaviors.</li>
+<li><strong>Task allocation</strong> — deciding which agent performs which job — which sector to sweep, which flock to herd, which corridor to watch — and reassigning as the world changes; the fleet-level twin of the single drone’s state machine.</li>
+</ul>
+</section>
+<section id="what-a-second-aircraft-buys-and-what-it-costs" class="level2" data-number="24.3">
+<h2 data-number="24.3" class="anchored" data-anchor-id="what-a-second-aircraft-buys-and-what-it-costs"><span class="header-section-number">24.3</span> What a Second Aircraft Buys — and What It Costs</h2>
+<p>A multi-agent system, in the standard sense, is a set of autonomous agents that each perceive their environment, decide locally, exchange information with peers, and share a mission objective. Every word of that definition is doing work. <em>Autonomous</em> excludes a fleet of remotely piloted aircraft — the agents decide, not a bank of operators. <em>Locally</em> concedes that no agent sees everything. <em>Exchange</em> admits that coordination has a price paid in bandwidth and latency. And <em>share a mission objective</em> is what separates a team from air traffic: two delivery drones deconflicting over a street corner are coexisting; two deterrence drones splitting a flock’s escape routes are cooperating.</p>
+<p>For the running example, the benefits of a second or third aircraft are concrete and worth pricing honestly. <strong>Parallel coverage</strong>: the Path Planning on the Edge chapter’s lawnmower sweep is embarrassingly parallel — split the protected area into <span class="math inline">\(N\)</span> sectors and <span class="math inline">\(N\)</span> drones sweep it in roughly <span class="math inline">\(1/N\)</span> the time, which matters because sweep time bounds how long a flock can graze undetected. <strong>Multiple simultaneous viewpoints</strong>: the Target Tracking and Visual Servoing chapter’s whole inner-loop apparatus exists because one camera loses what it cannot face; two aircraft on opposite bearings make the flock’s position estimate richer and the track harder to break. <strong>Multi-point pressure</strong>: the previous chapter’s herding geometry places one drone on one herding vector; two drones can close two escape directions at once, or one can herd while the other holds station over the escape corridor watching for the flock to double back. <strong>Graceful degradation</strong>: a single-drone mission ends when its battery does; a fleet rotates aircraft through charging and keeps the site covered. These are the classic advantages claimed for multi-drone fleets — parallel sensing, faster completion, redundancy — and for this mission each maps to a specific, named piece of Part IV machinery being duplicated or complemented.</p>
+<p>The costs are just as specific, and they are the chapter’s real subject matter. The moment a second aircraft exists, three problems exist that no single-drone chapter ever had to solve. <em>Who does what?</em> — task allocation, because two drones sweeping the same sector paid double for nothing. <em>How do they not hit each other?</em> — mutual collision avoidance, because the airspace over the protected area is now shared by cooperating aircraft whose paths, unlike the goose’s, are fast, deliberate, and mutually invisible unless engineered otherwise. <em>What does each believe?</em> — shared situational awareness, because drone 1’s confirmed flock and drone 2’s confirmed flock may be the same birds counted twice, and a fleet that cannot agree on how many flocks exist cannot allocate itself sensibly. Every architecture in this chapter is a different answer to these three questions, and the axis along which the answers differ most is where the deciding happens.</p>
+</section>
+<section id="centralized-decentralized-and-the-space-between" class="level2" data-number="24.4">
+<h2 data-number="24.4" class="anchored" data-anchor-id="centralized-decentralized-and-the-space-between"><span class="header-section-number">24.4</span> Centralized, Decentralized, and the Space Between</h2>
+<p>The textbook contrast is easy to draw. In a <strong>centralized</strong> architecture, one entity — a ground control station, or one designated aircraft — collects every agent’s telemetry, holds the only global picture, and computes everyone’s assignments or trajectories; the agents execute. Coordination is exactly as good as the hub’s information and algorithms, which makes global optimization natural and debugging tractable: there is one place where every decision is made, and one log to read. The costs mirror the benefits point for point: the hub is a single point of failure, every byte of coordination transits its radio link, and both burdens grow with fleet size. In a <strong>decentralized</strong> architecture there is no hub: each agent decides from its own sensing and whatever its neighbors share, following local rules designed so that sensible global behavior <em>emerges</em>. Lose any aircraft — any aircraft — and the rest continue; add aircraft and no bottleneck saturates. The price is that the design problem inverts and hardens: instead of writing an algorithm that computes good global behavior, the designer must write local rules and then <em>prove or test</em> that good global behavior follows, and debugging means reconstructing a distributed interaction from <span class="math inline">\(N\)</span> logs whose clocks may not even agree.</p>
+<div id="fig-coordination-architectures" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Three-panel comparison diagram titled one axis, three architectures: where does the deciding happen. Left panel, centralized: a teal ground-station hub at the bottom with radio links fanning out to four drone glyphs in a star topology; annotations state the hub holds the only global picture, computes all trajectories and assignments, agents execute; listed strengths are global planning, one place to debug, predictable coordination; listed weaknesses are single point of failure, communication bottleneck, and scaling limited by the hub, with a red-tinted note that losing the hub grounds the fleet. A caption cites a real example: a large indoor nano-quadcopter swarm flown from one central process over a few shared radios. Middle panel, decentralized: four drone glyphs connected peer-to-peer in a mesh with no hub; annotations state each agent decides from local sensing plus neighbor exchange, and global behavior emerges from local rules; strengths listed are no single point of failure, scales with fleet size, fast local reactions; weaknesses are harder to verify global behavior, synchronization difficulty, and debugging distributed across N logs; a caption notes a real fielded example in which drones detected neighbors by onboard camera with no explicit communication link at all. Right panel, hybrid: a smaller coordinator box above three drones, with solid assignment links downward but each drone also carrying its own local-reflex loop and dashed peer links; annotations state the coordinator does slow global allocation while each agent keeps fast local collision avoidance and a fallback behavior that survives coordinator loss. A footer band states that a controlled sweep-coverage comparison of five architectures reported centralized approaches generally stronger on coverage completeness, uniformity, and completion time, decentralized approaches generally stronger on scalability and fault tolerance, and a hybrid achieving better outcomes across more scenarios than either pure form.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-coordination-architectures-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/centralized-decentralized-coordination.svg" class="img-fluid figure-img" style="width:100.0%" alt="Three-panel comparison diagram titled one axis, three architectures: where does the deciding happen. Left panel, centralized: a teal ground-station hub at the bottom with radio links fanning out to four drone glyphs in a star topology; annotations state the hub holds the only global picture, computes all trajectories and assignments, agents execute; listed strengths are global planning, one place to debug, predictable coordination; listed weaknesses are single point of failure, communication bottleneck, and scaling limited by the hub, with a red-tinted note that losing the hub grounds the fleet. A caption cites a real example: a large indoor nano-quadcopter swarm flown from one central process over a few shared radios. Middle panel, decentralized: four drone glyphs connected peer-to-peer in a mesh with no hub; annotations state each agent decides from local sensing plus neighbor exchange, and global behavior emerges from local rules; strengths listed are no single point of failure, scales with fleet size, fast local reactions; weaknesses are harder to verify global behavior, synchronization difficulty, and debugging distributed across N logs; a caption notes a real fielded example in which drones detected neighbors by onboard camera with no explicit communication link at all. Right panel, hybrid: a smaller coordinator box above three drones, with solid assignment links downward but each drone also carrying its own local-reflex loop and dashed peer links; annotations state the coordinator does slow global allocation while each agent keeps fast local collision avoidance and a fallback behavior that survives coordinator loss. A footer band states that a controlled sweep-coverage comparison of five architectures reported centralized approaches generally stronger on coverage completeness, uniformity, and completion time, decentralized approaches generally stronger on scalability and fault tolerance, and a hybrid achieving better outcomes across more scenarios than either pure form.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-coordination-architectures-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;24.1: The coordination-architecture axis: a centralized hub computes for everyone and fails for everyone; decentralized peers decide locally and degrade gracefully; a hybrid keeps a global planner in the loop while agents retain local reflexes that outlive it.
+</figcaption>
+</figure>
+</div>
+<p>Two pieces of real research keep this picture honest, and both push back on the two-column-table version of it. The first is the classic classification of multi-robot coordination by Farinelli, Iocchi, and Nardi, which makes the point that “centralized versus decentralized” is not one switch but shorthand for a small design space: where <em>control</em> decisions are made is one axis, but it is separate from the communication structure (who can talk to whom, at what range) and from <em>awareness</em> — whether agents model their teammates at all or simply treat them as environment <span class="citation" data-cites="farinelli2004classification">(<a href="#ref-farinelli2004classification" role="doc-biblioref">Farinelli, Iocchi, and Nardi 2004</a>)</span>. The axes combine freely. A fleet can be centrally controlled over a mesh network; a fully decentralized fleet can be built from agents that never model each other. Collapsing the space to a binary hides real designs — including most of the good ones.</p>
+<p>The second is quantitative. A controlled comparison by Jamshidpey and colleagues put five control architectures — from random walk and decentralized beacon-following through a hybrid self-organizing hierarchy to fully centralized formation control and predetermined paths — on the <em>same</em> sweep-coverage task, using ground robots aided by UAVs, and measured them across coverage completeness, uniformity, completion time, scalability (at 4, 8, and 16 robots), and fault tolerance (with up to 75% of robots failed) <span class="citation" data-cites="jamshidpey2025centralization">(<a href="#ref-jamshidpey2025centralization" role="doc-biblioref">Jamshidpey et al. 2025</a>)</span>. The reported pattern matches the folk trade-off in its outlines — centralized approaches generally stronger on completeness, uniformity, and time; decentralized approaches generally stronger on scalability and fault tolerance — but the reported headline is that a <em>hybrid</em> architecture, combining central structure with local self-organization, achieved better outcomes across more scenarios than either pure form. The trade-off, in other words, is real but not a dilemma: it is a menu, and the strongest fielded designs order from both columns. That finding shapes this chapter’s own design for the running example in its final section — a fleet with a central allocator <em>and</em> per-drone reflexes that survive the allocator’s death.</p>
+<p>One more correction the literature insists on: <strong>“swarm” is not a synonym for “decentralized.”</strong> Crazyswarm, for years the standard academic swarm testbed, is reported to have flown 49 palm-sized Crazyflie quadrotors in tight indoor formation from a single central process — one computer tracking every vehicle by motion capture, planning every trajectory, and streaming commands over a few shared radios <span class="citation" data-cites="preiss2017crazyswarm">(<a href="#ref-preiss2017crazyswarm" role="doc-biblioref">Preiss et al. 2017</a>)</span>. It is unambiguously a swarm, and it is architecturally a star with one very busy hub. What made centralization the right call there is instructive: indoors, with motion capture, the hub’s global picture is essentially perfect and its radio link is short and reliable — the two resources whose scarcity is the usual argument <em>against</em> centralization. Architecture follows the resource budget, not the vocabulary word.</p>
+</section>
+<section id="a-framework-that-actually-ships-the-mrs-uav-system" class="level2" data-number="24.5">
+<h2 data-number="24.5" class="anchored" data-anchor-id="a-framework-that-actually-ships-the-mrs-uav-system"><span class="header-section-number">24.5</span> A Framework That Actually Ships: The MRS UAV System</h2>
+<p>Between the diagram and a working fleet sits an unglamorous mountain of engineering — state estimation that survives sensor dropouts, controllers that fly real airframes in wind, per-vehicle configuration, simulation that matches the field — and it is worth studying one system that actually climbed it. The <strong>MRS UAV System</strong>, from the multi-robot systems group at the Czech Technical University in Prague, is the closest published match to this book’s own stack: it is built on ROS and integrates directly with the PX4 autopilot through a dedicated hardware-abstraction plugin, exactly the ROS-to-PX4 bridge shape the running example has used since Part II, hardened for multi-vehicle research deployment <span class="citation" data-cites="baca2021mrs">(<a href="#ref-baca2021mrs" role="doc-biblioref">Báča et al. 2021</a>)</span>. Reading its architecture is like reading the running example’s own stack after several years of field seasons.</p>
+<p>Two of its design decisions matter most for this chapter. The first is what the authors call multi-frame localization: each UAV estimates its state <em>simultaneously in several coordinate frames</em> — satellite navigation (GNSS), local odometry, vision-based sources — with redundant estimators that can be swapped in when a given source degrades <span class="citation" data-cites="baca2021mrs">(<a href="#ref-baca2021mrs" role="doc-biblioref">Báča et al. 2021</a>)</span>. A single-drone hobby stack picks one localization source and hopes; a multi-drone field system cannot, because with <span class="math inline">\(N\)</span> aircraft aloft, <em>some</em> source is degraded on <em>some</em> vehicle most of the time, and a fleet whose members silently diverge in their beliefs about where they are is a fleet whose separation guarantees are fiction. The Coordinate Frames chapter priced a single drone’s frame chain in centimetres and milliradians; MRS’s answer to that chapter’s error budget is redundancy with a switch. The second decision is a controller <em>pair</em> — an aggressive, precise controller and a smoother, noise-tolerant one, selected by mission phase <span class="citation" data-cites="baca2021mrs">(<a href="#ref-baca2021mrs" role="doc-biblioref">Báča et al. 2021</a>)</span>. That is the two-personalities idea the running example met in miniature when the Harassment Pattern Generation chapter separated the swoop’s committed phase from the orbit’s patient one, promoted to a first-class architectural feature.</p>
+<p>What makes MRS more than infrastructure for this chapter is what the same group built on top of it. Hořyna and colleagues reported a fully decentralized search-and-rescue swarm on this ROS/PX4 stack whose defining feature is coordination <strong>without explicit communication</strong>: each UAV detects its neighbors directly with an onboard RGB camera and adapts its own flocking motion accordingly — a “local visual communication channel,” in the authors’ framing, standing in for a radio link <span class="citation" data-cites="horyna2023decentralized">(<a href="#ref-horyna2023decentralized" role="doc-biblioref">Hořyna et al. 2023</a>)</span>. Pause on how strong a statement that is. The slide-deck picture of multi-drone coordination is a picture of <em>messages</em> — telemetry sharing over MAVLink (Micro Air Vehicle Link, the telemetry protocol Part II introduced), mesh networks, synchronized clocks — and here is a fielded system reporting that the messages are optional: what coordination fundamentally requires is that each agent can <em>estimate its neighbors’ states</em>, and a camera pointed at a teammate is one estimator among several. The same lesson arrives from the wildlife side of the literature. A recent preprint from an MIT-led group describes a decentralized multi-quadrotor wildlife-monitoring system designed for exactly the constraint profile of a field deployment — no motion capture, no reliable central infrastructure, one RGB camera per drone — in which neighboring drones reconcile their independently detected animals by aligning bounding-box sets and passing the agreed identities around a <strong>ring topology</strong>, each drone talking only to its two neighbors in messages of a few hundred bytes, with consensus confirmed when the information returns to its originator <span class="citation" data-cites="chahine2025decentralized">(<a href="#ref-chahine2025decentralized" role="doc-biblioref">Chahine et al. 2025</a>)</span>. The same work is candid about the cost: its own analysis notes that pairwise-registration success compounds geometrically as the ring grows, so the scheme does not trivially scale to large fleets <span class="citation" data-cites="chahine2025decentralized">(<a href="#ref-chahine2025decentralized" role="doc-biblioref">Chahine et al. 2025</a>)</span> — a real, quantified instance of the decentralized column’s “complex algorithms” bullet. And a drone-swarm field campaign monitoring zebra herds at a Kenyan conservancy — the published mission closest in shape to the running example’s own — coordinated its drones’ viewpoints with a particle-swarm-optimization placement algorithm and reported that the optimizer’s computation time was slow enough to degrade monitoring quality, motivating a faster redesign <span class="citation" data-cites="rolland2026droneswarms">(<a href="#ref-rolland2026droneswarms" role="doc-biblioref">Rolland et al. 2026</a>)</span>. Coordination algorithms, that report reminds us, must clear the same latency bar the rest of this book’s control loops do: correct-but-slow is a failure mode, not a compromise.</p>
+</section>
+<section id="collision-avoidance-without-a-conversation" class="level2" data-number="24.6">
+<h2 data-number="24.6" class="anchored" data-anchor-id="collision-avoidance-without-a-conversation"><span class="header-section-number">24.6</span> Collision Avoidance Without a Conversation</h2>
+<p>Of the three coordination problems, mutual collision avoidance has the most elegant decentralized solution in the literature, and it is worth working in full because it is a complete, deployable algorithm whose entire mathematical content is one geometric construction. The line of work runs from velocity obstacles through <strong>Reciprocal Velocity Obstacles</strong> (RVO) <span class="citation" data-cites="vandenberg2008rvo">(<a href="#ref-vandenberg2008rvo" role="doc-biblioref">Berg, Lin, and Manocha 2008</a>)</span> to <strong>Optimal Reciprocal Collision Avoidance</strong> (ORCA) <span class="citation" data-cites="vandenberg2011orca">(<a href="#ref-vandenberg2011orca" role="doc-biblioref">Berg et al. 2011</a>)</span>, and its premise is the same one the Vector-Based Threat Evasion chapter reached from the other direction: collision is a fact about <em>velocities</em>, not positions, so the natural place to reason about it is velocity space.</p>
+<p>Model each aircraft as a disc (a safety envelope of radius <span class="math inline">\(r_A\)</span>, <span class="math inline">\(r_B\)</span> — the same move the previous chapters made when they wrapped the goose in a safety radius). For agent <span class="math inline">\(A\)</span>, the <strong>velocity obstacle</strong> induced by agent <span class="math inline">\(B\)</span> over a time horizon <span class="math inline">\(\tau\)</span> is the set of relative velocities <span class="math inline">\(\mathbf{v} = \mathbf{v}_A - \mathbf{v}_B\)</span> that, if held, bring the two envelopes into contact within <span class="math inline">\(\tau\)</span>. Geometrically it is a cone in velocity space, pointed at <span class="math inline">\(B\)</span>’s relative position and truncated near its apex by a disc: relative velocities aimed at <span class="math inline">\(B\)</span> and fast enough to arrive within the horizon. If <span class="math inline">\(A\)</span>’s current relative velocity lies outside this region, the encounter resolves itself; inside it, something must change.</p>
+<p>The naive fix — each agent picks the nearest velocity outside the other’s obstacle — has a famous failure mode: two agents approaching head-on each dodge the same way at the same instant, discover the conflict re-created, dodge back, and oscillate. RVO’s insight is that the dodging must be <em>reciprocal</em>: each agent assumes the other will also handle half of the correction, rather than assuming the other will plow on unchanged <span class="citation" data-cites="vandenberg2008rvo">(<a href="#ref-vandenberg2008rvo" role="doc-biblioref">Berg, Lin, and Manocha 2008</a>)</span>. ORCA turns that insight into a linear constraint <span class="citation" data-cites="vandenberg2011orca">(<a href="#ref-vandenberg2011orca" role="doc-biblioref">Berg et al. 2011</a>)</span>. Let <span class="math inline">\(\mathbf{u}\)</span> be the smallest change to the current relative velocity that moves it just outside the velocity obstacle — the minimum correction that resolves the impending collision. Each agent takes responsibility for half of <span class="math inline">\(\mathbf{u}\)</span>, which defines for agent <span class="math inline">\(A\)</span> a <strong>half-plane</strong> of permitted velocities:</p>
+<p><span class="math display">\[
+ORCA^{\tau}_{A|B} = \left\{ \mathbf{v} \;\middle|\; \left(\mathbf{v} - \left(\mathbf{v}_A + \tfrac{1}{2}\mathbf{u}\right)\right) \cdot \hat{\mathbf{u}} \ge 0 \right\},
+\]</span></p>
+<p>the set of velocities on the far side of the line through <span class="math inline">\(\mathbf{v}_A + \frac{1}{2}\mathbf{u}\)</span>, perpendicular to <span class="math inline">\(\mathbf{u}\)</span>’s direction <span class="math inline">\(\hat{\mathbf{u}}\)</span>. With several neighbors, <span class="math inline">\(A\)</span> intersects one half-plane per neighbor — a convex region in velocity space — and picks the velocity inside it closest to the velocity it actually wants (its goal-directed, pattern-following preference). That choice is a tiny linear program, solvable in microseconds, and re-solved every tick. Under mild conditions the construction guarantees each pair stays collision-free for at least the horizon <span class="math inline">\(\tau\)</span> <span class="citation" data-cites="vandenberg2011orca">(<a href="#ref-vandenberg2011orca" role="doc-biblioref">Berg et al. 2011</a>)</span> — and since the program re-runs every tick, the horizon perpetually recedes.</p>
+<div id="fig-orca-half-plane" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Velocity-space diagram titled ORCA, collision avoidance as a half-plane, drawn with the chapter's worked numbers. The axes are relative-velocity components. A grey truncated cone opens rightward from the origin toward agent B's relative position, its apex region capped by a dashed disc of radius 0.75 metres per second centered at 3.0 on the horizontal axis, labeled the tau-truncated velocity obstacle, tau equals 2 seconds: relative velocities in this region collide within the horizon. A teal dot at 2.6 on the axis marks the current relative velocity v A minus v B, sitting inside the cap disc. A short amber arrow from that dot leftward to the cap boundary at 2.25 is labeled u, the smallest correction that exits the obstacle, magnitude 0.35 metres per second. Below, a second band shows agent A's own velocity space: A's current velocity 1.3 marked as a dot, the point v A plus one half u at 1.125 marked, and a vertical teal line through it labeled the ORCA half-plane boundary, with the permitted side shaded to the left annotated velocities with forward component at most 1.125 are allowed; A takes half the correction, B mirrors it. A small inset shows two drone glyphs approaching head-on 6 metres apart with equal and opposite speeds and their safety envelopes of combined radius 1.5 metres. A footer notes that each agent solves a small linear program choosing the permitted velocity closest to its preferred one, no message passing is required, and the construction is re-solved every tick so the collision-free horizon perpetually recedes.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-orca-half-plane-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/orca-half-plane-velocity-space.svg" class="img-fluid figure-img" style="width:100.0%" alt="Velocity-space diagram titled ORCA, collision avoidance as a half-plane, drawn with the chapter's worked numbers. The axes are relative-velocity components. A grey truncated cone opens rightward from the origin toward agent B's relative position, its apex region capped by a dashed disc of radius 0.75 metres per second centered at 3.0 on the horizontal axis, labeled the tau-truncated velocity obstacle, tau equals 2 seconds: relative velocities in this region collide within the horizon. A teal dot at 2.6 on the axis marks the current relative velocity v A minus v B, sitting inside the cap disc. A short amber arrow from that dot leftward to the cap boundary at 2.25 is labeled u, the smallest correction that exits the obstacle, magnitude 0.35 metres per second. Below, a second band shows agent A's own velocity space: A's current velocity 1.3 marked as a dot, the point v A plus one half u at 1.125 marked, and a vertical teal line through it labeled the ORCA half-plane boundary, with the permitted side shaded to the left annotated velocities with forward component at most 1.125 are allowed; A takes half the correction, B mirrors it. A small inset shows two drone glyphs approaching head-on 6 metres apart with equal and opposite speeds and their safety envelopes of combined radius 1.5 metres. A footer notes that each agent solves a small linear program choosing the permitted velocity closest to its preferred one, no message passing is required, and the construction is re-solved every tick so the collision-free horizon perpetually recedes.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-orca-half-plane-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;24.2: The ORCA construction in velocity space: agent B induces a truncated cone of forbidden relative velocities; the smallest escape u defines a half-plane boundary through the point halfway along it, and A picks the permitted velocity nearest its preferred one.
+</figcaption>
+</figure>
+</div>
+<p><strong>A worked encounter.</strong> Put two of the running example’s aircraft on a collision course during a two-sector sweep: drone <span class="math inline">\(A\)</span> at the origin flying east at <span class="math inline">\(\mathbf{v}_A = (1.3, 0)\)</span> m/s, drone <span class="math inline">\(B\)</span> six metres due east flying west at <span class="math inline">\(\mathbf{v}_B = (-1.3, 0)\)</span> m/s, each wrapped in a 0.75 m safety envelope, so contact means the <em>relative</em> position closing within <span class="math inline">\(r = 1.5\)</span> m. Take a horizon <span class="math inline">\(\tau = 2\)</span> s. The relative velocity is <span class="math inline">\(\mathbf{v} = \mathbf{v}_A - \mathbf{v}_B = (2.6, 0)\)</span> m/s — closing at 2.6 m/s with 4.5 m of clearance to lose, contact in <span class="math inline">\(4.5 / 2.6 \approx 1.7\)</span> s, inside the horizon, so <span class="math inline">\(\mathbf{v}\)</span> lies in the velocity obstacle. The obstacle’s truncating cap is the disc of radius <span class="math inline">\(r/\tau = 0.75\)</span> m/s centered at <span class="math inline">\(\mathbf{p}_{B} / \tau = (3.0, 0)\)</span>; our <span class="math inline">\(\mathbf{v}\)</span> sits <span class="math inline">\(0.4\)</span> m/s from that center, inside the cap. For this head-on geometry the cheapest exit is straight backward through the cap boundary at <span class="math inline">\((2.25, 0)\)</span> — the relative speed at which contact arrives exactly at the horizon — because any sideways exit through the cone’s flank is more than twice as far for these numbers. So</p>
+<p><span class="math display">\[
+\mathbf{u} = (2.25, 0) - (2.6, 0) = (-0.35, 0)\ \text{m/s},
+\]</span></p>
+<p>and agent <span class="math inline">\(A\)</span>’s half-plane boundary passes through <span class="math inline">\(\mathbf{v}_A + \frac{1}{2}\mathbf{u} = (1.3 - 0.175,\, 0) = (1.125, 0)\)</span>, with <span class="math inline">\(\hat{\mathbf{u}} = (-1, 0)\)</span>: <span class="math inline">\(A\)</span> may fly any velocity whose eastward component is at most <span class="math inline">\(1.125\)</span> m/s. Its preferred velocity <span class="math inline">\((1.3, 0)\)</span> violates the constraint, so the linear program returns the nearest permitted point, <span class="math inline">\((1.125, 0)\)</span> — ease off by <span class="math inline">\(0.175\)</span> m/s. Drone <span class="math inline">\(B\)</span>, running the identical computation from its own frame, eases off by the same amount in mirror image. The new closure rate is <span class="math inline">\(2.25\)</span> m/s, and the check writes itself: <span class="math inline">\(4.5\ \text{m} / 2.25\ \text{m s}^{-1} = 2.0\ \text{s}\)</span> — contact deferred to exactly the horizon, which next tick’s re-solve defers again, each round shaving speed until the conflict dissolves or geometry opens sideways. (A perfectly collinear encounter is a measure-zero special case; the moment the geometry is even slightly off-axis, the nearest exit becomes the cone’s flank and the familiar mutual sidestep emerges instead — implementations break exact ties by convention.)</p>
+<p>Notice what the algorithm never needed: a message. Each agent requires only an <em>estimate</em> of its neighbors’ positions and velocities, and it is indifferent to where the estimate comes from — a shared telemetry stream, or perception. That indifference was demonstrated physically by Conroy, Bareiss, Beall, and van den Berg, who implemented reciprocal collision avoidance in three dimensions on real quadrotor helicopters with each vehicle sensing its neighbor’s relative position and velocity through an onboard camera — no motion capture, no GPS, no inter-vehicle communication — and reported that the avoidance held up even when a human pilot deliberately tried to steer one aircraft into the other, with the approach reported to scale in simulation to real-time operation for over a hundred vehicles <span class="citation" data-cites="conroy2014quadrotor">(<a href="#ref-conroy2014quadrotor" role="doc-biblioref">Conroy et al. 2014</a>)</span>. Set that beside the Hořyna flocking result from the previous section and a theme crystallizes: the camera-and-estimator machinery Part III and Part IV built for geese is, unchanged in kind, the machinery that lets drones coordinate with <em>each other</em> when the radio is unavailable, jammed, or simply not trusted.</p>
+<p>One more connection worth making explicit. ORCA is a <em>reciprocal</em> protocol — its halving of <span class="math inline">\(\mathbf{u}\)</span> is a contract, honored by symmetric computation rather than by handshake, and it works because both parties run the same rule. The goose does not run ORCA. That is why the Vector-Based Threat Evasion chapter’s escape machinery and this section’s machinery remain two systems: against a non-reciprocating intruder, the drone must absorb the whole correction itself, which is exactly what the evasion vector does. Cooperative separation and adversarial evasion are both velocity-space reasoning, but only one of them gets to assume the other party is being reasonable.</p>
+</section>
+<section id="consensus-and-formation-one-control-pattern-again" class="level2" data-number="24.7">
+<h2 data-number="24.7" class="anchored" data-anchor-id="consensus-and-formation-one-control-pattern-again"><span class="header-section-number">24.7</span> Consensus and Formation: One Control Pattern, Again</h2>
+<p>Collision avoidance keeps a fleet apart; the remaining primitives pull it together — toward agreement on shared quantities, and toward designed geometry. Both reduce, pleasingly, to a control pattern the reader has now seen in every Part of this book.</p>
+<p><strong>Consensus.</strong> Suppose the fleet must agree on something — a common search altitude, a shared estimate of the flock’s centroid, a synchronized mission clock — with no coordinator to decree it. The canonical answer, analyzed in the standard reference by Olfati-Saber, Fax, and Murray, is the linear consensus protocol <span class="citation" data-cites="olfatisaber2007consensus">(<a href="#ref-olfatisaber2007consensus" role="doc-biblioref">Olfati-Saber, Fax, and Murray 2007</a>)</span>: each agent continuously nudges its own state toward its neighbors’,</p>
+<p><span class="math display">\[
+\dot{x}_i = \sum_{j \in \mathcal{N}_i} a_{ij}\,\big(x_j - x_i\big),
+\]</span></p>
+<p>where <span class="math inline">\(\mathcal{N}_i\)</span> is the set of agents that <span class="math inline">\(i\)</span> can currently hear (its neighbors in the communication graph) and <span class="math inline">\(a_{ij} &gt; 0\)</span> weights each link. In discrete per-tick form — the shape every control law in this book has taken —</p>
+<p><span class="math display">\[
+x_i(k{+}1) = x_i(k) + \epsilon \sum_{j \in \mathcal{N}_i} a_{ij}\,\big(x_j(k) - x_i(k)\big),
+\]</span></p>
+<p>for a small step <span class="math inline">\(\epsilon\)</span>. Read it as a P controller: the “error” is each neighbor’s disagreement with me, the gain is <span class="math inline">\(\epsilon\, a_{ij}\)</span>, and the setpoint is wherever we all end up — under mild connectivity conditions on the (possibly time-varying) graph, every <span class="math inline">\(x_i\)</span> provably converges to a common value <span class="citation" data-cites="olfatisaber2007consensus">(<a href="#ref-olfatisaber2007consensus" role="doc-biblioref">Olfati-Saber, Fax, and Murray 2007</a>)</span>. A three-drone example makes it concrete. Drones 1, 2, 3 hold search altitudes of 12, 8, and 7 m and want to agree; the radio graph is a chain (1 hears 2; 2 hears 1 and 3; 3 hears 2), all weights 1, <span class="math inline">\(\epsilon = 0.25\)</span>. One tick:</p>
+<p><span class="math display">\[
+\begin{aligned}
+x_1 &amp;\leftarrow 12 + 0.25\,(8 - 12) = 11.00 \\
+x_2 &amp;\leftarrow 8 + 0.25\,\big[(12 - 8) + (7 - 8)\big] = 8.75 \\
+x_3 &amp;\leftarrow 7 + 0.25\,(8 - 7) = 7.25.
+\end{aligned}
+\]</span></p>
+<p>The spread has contracted from 5 m to 3.75 m in one step, and — a property worth noticing — the sum is still 27: with symmetric weights, the protocol conserves the average, so the fleet is converging on the mean of its initial opinions, 9 m, with no agent ever computing that mean. Run it again and the spread contracts by the same factor. How <em>fast</em> it contracts is governed by the communication graph’s algebraic connectivity — the second-smallest eigenvalue of the graph’s Laplacian matrix <span class="citation" data-cites="olfatisaber2007consensus">(<a href="#ref-olfatisaber2007consensus" role="doc-biblioref">Olfati-Saber, Fax, and Murray 2007</a>)</span> — which is the rigorous version of an intuition the topology vocabulary gestures at: a well-connected mesh agrees quickly; a sparse chain agrees slowly; a disconnected graph never agrees at all. The deck-level bullet “mesh topologies are robust” has, underneath it, an eigenvalue.</p>
+<p><strong>Formation.</strong> The literature’s three classical strategies are <strong>leader-follower</strong> (one drone flies its own trajectory; each follower servos to hold a desired range and bearing from its assigned leader), <strong>virtual structure</strong> (the formation is one rigid virtual body; each drone tracks its assigned offset from the body’s pose), and <strong>behavior-based</strong> (each drone blends local rules — cohesion, separation, alignment — in the style of classical boid flocking). The leader-follower scheme descends from the separation-bearing formulation introduced for nonholonomic ground robots by Desai, Ostrowski, and Kumar <span class="citation" data-cites="desai2001formations">(<a href="#ref-desai2001formations" role="doc-biblioref">Desai, Ostrowski, and Kumar 2001</a>)</span>, and a minimal control law in that spirit is two proportional channels. If a follower measures range <span class="math inline">\(l\)</span> and bearing <span class="math inline">\(\psi\)</span> to its leader and wants to hold <span class="math inline">\(l_d\)</span> and <span class="math inline">\(\psi_d\)</span>:</p>
+<p><span class="math display">\[
+\begin{aligned}
+v_{\text{cmd}} &amp;= K_l\,(l_d - l) \\
+\omega_{\text{cmd}} &amp;= K_\psi\,(\psi_d - \psi).
+\end{aligned}
+\]</span></p>
+<p>Speed up to close a range error; turn to fix a bearing error. The reader has written this controller twice already. It is the Closed-Loop Control chapter’s proportional law with the altimeter swapped for a range estimate, and it is precisely the Target Tracking and Visual Servoing chapter’s decoupled centering law — error, gain, command, per axis — with one substitution that is the whole point of this chapter: <em>the error is now measured relative to another drone</em>. Servoing on a goose’s pixels, holding a standoff behind a flock, and keeping formation on a wingmate are one control idea wearing three error signals, and everything that chapter taught about that idea — deadbands against jitter, saturation against lunges, gain versus delay — transfers intact. What is genuinely new in the multi-agent setting is not the controller but the <em>graph</em>: who measures against whom, and what happens to the formation when a link in that graph — a leader, a radio, a line of sight — goes away. Which is to say: the new content is architecture, and it is time to build some.</p>
+</section>
+<section id="n-drones-over-the-protected-area" class="level2" data-number="24.8">
+<h2 data-number="24.8" class="anchored" data-anchor-id="n-drones-over-the-protected-area"><span class="header-section-number">24.8</span> N Drones over the Protected Area</h2>
+<p>Everything so far has been other people’s systems. This section asks the chapter’s real question: the Goose Management System, exactly as Parts II through IV built it, is a <em>single-drone</em> architecture — so what specifically breaks at <span class="math inline">\(N = 2\)</span>, and what is the smallest honest redesign? Working that out requires being concrete about what the single-drone system is, so here is its coordination-relevant skeleton, assembled from the chapters that built it. One mission supervisor — the five-state machine of the Finite State Machines chapter — owns all behavioral decisions in a single-writer tick. Multiple behavior nodes (navigation, harassment) can each compute Offboard setpoints, and PX4 will fly whichever arrives; the stack prevents fights with the <strong>active-controller token</strong>, a <code>String</code> on one topic (<code>/goose/active_controller</code>, the constant <code>T_ACTIVE_CONTROLLER</code>) naming the node that currently owns the aircraft, and every behavior node’s tick begins by checking whether it is the one named. The harassment node reports pattern completion on <code>T_HARASS_DONE</code> and the supervisor — never the node — performs the transition. Perception publishes a world-frame target estimate that the orbit re-centers on every tick. And underneath everything, PX4’s own topics arrive under the <code>/fmu/...</code> namespace via the DDS bridge from the PX4 and the Autopilot Stack chapter.</p>
+<p>Now clone the aircraft, change nothing else, and watch three failures happen in order.</p>
+<p><strong>Failure one: the graphs collide.</strong> ROS 2 topic names are global to the graph. Two aircraft whose bridges both publish <code>/fmu/out/vehicle_local_position</code> produce one topic carrying interleaved positions of two different vehicles; every subscriber — the supervisor’s staleness ladder, the harassment node’s <code>self.pos</code>, the frame chain — silently consumes a superposition of two drones. Nothing crashes; everything is wrong. The fix is the standard ROS 2 one, and it is the fix PX4’s own multi-vehicle simulation support anticipates — each vehicle runs its own PX4 instance, and everything the vehicle publishes or consumes lives under a per-vehicle <strong>namespace</strong>: <code>/drone_1/fmu/out/vehicle_local_position</code>, <code>/drone_2/goose/active_controller</code>, and so on. Done properly, this costs almost no code: nodes that already use relative topic names (<code>goose/target</code>, not <code>/goose/target</code>) are namespaced by launch configuration, unmodified — the single-drone stack becomes a per-drone stack by being <em>launched</em> differently, not rewritten. This is the first architectural law of the extension: <em>everything about flying one aircraft stays inside that aircraft’s namespace.</em></p>
+<p><strong>Failure two: the token’s scope was never stated.</strong> With one drone, “the active controller” had an unambiguous referent. With two, is the token fleet-wide — one node in the whole system may command <em>an</em> aircraft? — or per-drone? The question answers itself the moment it is asked: the token exists to enforce PX4’s one-setpoint-author rule, and each aircraft has its <em>own</em> PX4, so the invariant is per-vehicle. <code>/drone_1/goose/active_controller</code> arbitrates drone 1’s nodes; <code>/drone_2/...</code> arbitrates drone 2’s; the namespacing of failure one already delivers this, and drone 1’s harassment node can own its aircraft while drone 2’s navigation node owns <em>its</em> aircraft, simultaneously and correctly. The token generalizes cleanly precisely because it was scoped to a resource (one vehicle’s setpoint stream) rather than to the mission. What the token <em>cannot</em> do — and was never built to do — is decide which <em>aircraft</em> should be harassing in the first place. That is not authority over a vehicle; it is allocation of work across vehicles, and it is genuinely new.</p>
+<p><strong>Failure three: nobody owns the mission.</strong> Each namespaced stack contains a supervisor that runs <em>its</em> aircraft’s mission — but “sweep the whole area without duplication, herd the flock without both drones converging on it” is a statement about the fleet, and no node anywhere holds it. This is the hole the architecture-axis section equips us to fill deliberately. The chapter’s choice, for a fleet of two or three: a <strong>centralized allocator</strong> — one new node, the fleet coordinator — assigning each drone a sector and a role, with the decentralized column’s virtues recovered through per-drone fallbacks. The reported evidence favors centralized allocation on exactly the metrics this mission cares about at this scale (coverage completeness and time <span class="citation" data-cites="jamshidpey2025centralization">(<a href="#ref-jamshidpey2025centralization" role="doc-biblioref">Jamshidpey et al. 2025</a>)</span>), the fleet is far too small for the hub’s scaling costs to bind, and a two-drone “emergent” design would spend its entire novelty budget avoiding one small node. But the same evidence says pure centralization buys its optimality with fragility, so the design is explicitly hybrid: the coordinator does <em>slow</em> allocation (a 1 Hz assignment loop — sectors, roles), each drone keeps its <em>fast</em> loops local (the 20 Hz supervisor tick, evasion, pattern flight, and an ORCA-style peer-separation filter fed by subscribing to the other drone’s namespaced position topic), and every drone treats the coordinator’s silence like any other stale telemetry: a heartbeat ladder, in the exact style of the Finite State Machines chapter’s staleness guards, that falls back to finish-my-sector-then-home when the allocator dies. Losing the coordinator degrades the mission; it grounds nothing.</p>
+<div id="fig-multi-drone-namespaces" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Architecture diagram titled from one drone to N, namespaces, one new node, and two crossing arrows. Two large rounded boxes side by side represent per-drone namespaces labeled slash drone underscore 1 and slash drone underscore 2. Inside each, an identical vertical stack the reader knows from earlier chapters: a mission supervisor box labeled five-state machine, 20 hertz tick, single writer; below it behavior nodes navigation and harassment side by side, gated by a small token badge labeled goose slash active underscore controller, per-vehicle scope; below them a PX4 bridge box labeled fmu slash in and out topics, own PX4 instance; and beside the behaviors a perception box publishing goose slash target. A new small box in each namespace labeled peer-separation filter, ORCA-style, sits between the behavior nodes and the PX4 bridge with the caption every setpoint passes through it, like the safety-radius projection. Above both namespaces sits a single amber fleet coordinator node, subscribing to both drones' positions and targets, publishing role assignments downward to each namespace on goose slash role, annotated slow loop, 1 hertz: sectors and roles; solid arrows carry assignments like search sector 0, herd flock, guard corridor. Two dashed amber arrows cross between the namespaces from each drone's position topic to the other drone's peer-separation filter, labeled peer telemetry crosses namespaces. A heartbeat annotation on each supervisor reads coordinator stale more than 5 seconds: fall back, finish own sector, then return home. A footer states the three rules: everything about flying one aircraft stays inside its namespace; the active-controller token arbitrates nodes within a vehicle, never vehicles within a fleet; and the coordinator allocates work but owns no aircraft, so its death degrades the mission rather than grounding the fleet.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-multi-drone-namespaces-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/multi-drone-namespace-architecture.svg" class="img-fluid figure-img" style="width:100.0%" alt="Architecture diagram titled from one drone to N, namespaces, one new node, and two crossing arrows. Two large rounded boxes side by side represent per-drone namespaces labeled slash drone underscore 1 and slash drone underscore 2. Inside each, an identical vertical stack the reader knows from earlier chapters: a mission supervisor box labeled five-state machine, 20 hertz tick, single writer; below it behavior nodes navigation and harassment side by side, gated by a small token badge labeled goose slash active underscore controller, per-vehicle scope; below them a PX4 bridge box labeled fmu slash in and out topics, own PX4 instance; and beside the behaviors a perception box publishing goose slash target. A new small box in each namespace labeled peer-separation filter, ORCA-style, sits between the behavior nodes and the PX4 bridge with the caption every setpoint passes through it, like the safety-radius projection. Above both namespaces sits a single amber fleet coordinator node, subscribing to both drones' positions and targets, publishing role assignments downward to each namespace on goose slash role, annotated slow loop, 1 hertz: sectors and roles; solid arrows carry assignments like search sector 0, herd flock, guard corridor. Two dashed amber arrows cross between the namespaces from each drone's position topic to the other drone's peer-separation filter, labeled peer telemetry crosses namespaces. A heartbeat annotation on each supervisor reads coordinator stale more than 5 seconds: fall back, finish own sector, then return home. A footer states the three rules: everything about flying one aircraft stays inside its namespace; the active-controller token arbitrates nodes within a vehicle, never vehicles within a fleet; and the coordinator allocates work but owns no aircraft, so its death degrades the mission rather than grounding the fleet.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-multi-drone-namespaces-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;24.3: The single-drone stack, cloned per namespace, with one new node above: each aircraft keeps its own supervisor, token, behaviors, and PX4 bridge under /drone_i/, while a fleet coordinator assigns sectors and roles, and peer telemetry crossing namespaces feeds each drone’s separation filter.
+</figcaption>
+</figure>
+</div>
+<p>The coordinator itself is a small node, and its skeleton is worth writing out because every line is a decision defended above:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> FleetCoordinator(Node):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Fleet-level allocation: sectors and roles, at 1 Hz.</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Owns no aircraft. Each drone's own supervisor and token</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">    arbitrate everything inside that drone's namespace."""</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    DRONES <span class="op">=</span> (<span class="st">"drone_1"</span>, <span class="st">"drone_2"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(<span class="st">"fleet_coordinator"</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.sectors <span class="op">=</span> split_lawnmower(PROTECTED_AREA, <span class="bu">len</span>(<span class="va">self</span>.DRONES))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pose, <span class="va">self</span>.flock, <span class="va">self</span>.last_role <span class="op">=</span> {}, {}, {}</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.role_pub <span class="op">=</span> {}</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> d <span class="kw">in</span> <span class="va">self</span>.DRONES:</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.role_pub[d] <span class="op">=</span> <span class="va">self</span>.create_publisher(</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>                String, <span class="ss">f"/</span><span class="sc">{</span>d<span class="sc">}</span><span class="ss">/goose/role"</span>, <span class="dv">10</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.create_subscription(</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>                VehicleLocalPosition, <span class="ss">f"/</span><span class="sc">{</span>d<span class="sc">}</span><span class="ss">/fmu/out/vehicle_local_position"</span>,</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>                <span class="kw">lambda</span> m, d<span class="op">=</span>d: <span class="va">self</span>.pose.update({d: m}), qos_px4)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.create_subscription(</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>                Target, <span class="ss">f"/</span><span class="sc">{</span>d<span class="sc">}</span><span class="ss">/goose/target"</span>,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>                <span class="kw">lambda</span> m, d<span class="op">=</span>d: <span class="va">self</span>.flock.update({d: m}), <span class="dv">10</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.create_timer(<span class="fl">1.0</span>, <span class="va">self</span>._allocate)   <span class="co"># slow loop, by design</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _allocate(<span class="va">self</span>):</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        flocks <span class="op">=</span> merge_tracks(<span class="va">self</span>.flock)   <span class="co"># 2 drones, 1 flock? or 2?</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> flocks:                      <span class="co"># nothing found: sweep sectors</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i, d <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="va">self</span>.DRONES):</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>._assign(d, <span class="ss">f"search:</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># one flock: nearest drone herds; the other guards the corridor</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        herder <span class="op">=</span> <span class="bu">min</span>((d <span class="cf">for</span> d <span class="kw">in</span> <span class="va">self</span>.DRONES <span class="cf">if</span> d <span class="kw">in</span> <span class="va">self</span>.pose),</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>                     key<span class="op">=</span><span class="kw">lambda</span> d: dist(<span class="va">self</span>.pose[d], flocks[<span class="dv">0</span>]))</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> d <span class="kw">in</span> <span class="va">self</span>.DRONES:</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>            role <span class="op">=</span> <span class="st">"herd:0"</span> <span class="cf">if</span> d <span class="op">==</span> herder <span class="cf">else</span> <span class="st">"guard:exit"</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>._assign(d, role)</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _assign(<span class="va">self</span>, drone, role):</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.last_role.get(drone) <span class="op">!=</span> role:</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.get_logger().info(<span class="ss">f"[ALLOCATE] </span><span class="sc">{</span>drone<span class="sc">}</span><span class="ss"> -&gt; </span><span class="sc">{</span>role<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.last_role[drone] <span class="op">=</span> role</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.role_pub[drone].publish(String(data<span class="op">=</span>role))   <span class="co"># heartbeat too</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Three details carry the design. First, <code>merge_tracks</code> is doing the shared-situational-awareness job and deserves respect: two drones reporting flocks must be reconciled into a fleet-level belief — are these one flock seen twice, or two flocks? — which is the same data-association problem the ring-consensus wildlife system solved with bounding-box alignment <span class="citation" data-cites="chahine2025decentralized">(<a href="#ref-chahine2025decentralized" role="doc-biblioref">Chahine et al. 2025</a>)</span>; for two drones over one site, gating by world-frame distance (tracks within tens of metres are one flock) is a defensible start, and the Coordinate Frames chapter’s error budget says how tight that gate may be. Second, the role message doubles as the coordinator’s heartbeat — republished every allocation tick even when unchanged, so each drone’s supervisor can run a staleness guard on it with no extra machinery. Third, the roles themselves are the previous chapter’s own vocabulary, promoted: <code>herd</code> is the herding-vector hold; <code>guard:exit</code> parks the second drone at standoff over the escape corridor, watching for the flock to double back and feeding the tracker a second viewpoint — one drone herding while another watches the escape corridor is the two-drone version of the herding architecture the previous chapter could only draw with one aircraft. On the drone side, the change is one subscription and one guard added to the supervisor: a <code>role</code> callback stores the assigned role; the tick’s preamble gains a <code>coordinator stale &gt; 5 s → fall back to own sector, then home</code> rung on the existing staleness ladder; and SEARCH_GRID reads its waypoint list from the assigned sector rather than the whole area. The five states, the token, the behavior nodes, <code>T_HARASS_DONE</code>, the slew limiter — all unchanged. That smallness is the point, and it was purchased in earlier chapters: an architecture of single-writer ticks, resource-scoped tokens, and topic-shaped seams extends to a fleet by <em>addition</em>, not surgery.</p>
+<p>What would <em>not</em> survive growth is worth stating with the same honesty the book applies to its own safety numbers. At <span class="math inline">\(N = 10\)</span> the coordinator’s global <code>merge_tracks</code> and sector optimizer start to look like the PSO planner that could not keep up with the zebras <span class="citation" data-cites="rolland2026droneswarms">(<a href="#ref-rolland2026droneswarms" role="doc-biblioref">Rolland et al. 2026</a>)</span>; the single allocation topic becomes the bottleneck the architecture chose knowingly at <span class="math inline">\(N = 2\)</span>; and the design pressure points toward the decentralized column — market-based or role-based task allocation negotiated among the drones themselves, in the style of the searcher/worker protocols reported for distributed search-and-rescue fleets <span class="citation" data-cites="defreitas2021distributed">(<a href="#ref-defreitas2021distributed" role="doc-biblioref">Freitas et al. 2021</a>)</span>, consensus on the merged flock picture instead of a central fusion, and the fleet inheriting the fault tolerance that the reported evidence says decentralization buys <span class="citation" data-cites="jamshidpey2025centralization">(<a href="#ref-jamshidpey2025centralization" role="doc-biblioref">Jamshidpey et al. 2025</a>)</span>. The chapter’s two-drone design is not the end state; it is the honest first rung, with the ladder above it clearly labeled.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="24.9">
+<h2 data-number="24.9" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">24.9</span> Check Your Understanding</h2>
+<ol type="1">
+<li>A colleague argues: “We should make the goose fleet a true swarm — no ground coordinator — because swarms are decentralized by definition.” Using the Crazyswarm counter-example and the classification axes of Farinelli, Iocchi, and Nardi, explain what is wrong with “by definition,” and name the two resource conditions that made a fully centralized architecture the right call for that particular swarm.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>“Swarm” describes fleet behavior — many vehicles acting as one collective — not where decisions are made; the classification literature treats centralized-versus-distributed control as one axis of a design space, separate from communication topology and from whether agents model each other at all <span class="citation" data-cites="farinelli2004classification">(<a href="#ref-farinelli2004classification" role="doc-biblioref">Farinelli, Iocchi, and Nardi 2004</a>)</span>. Crazyswarm is the standing counter-example: a genuine swarm, reported at 49 nano-quadrotors in tight formation, flown by one central process that tracked every vehicle and streamed all commands over a few shared radios <span class="citation" data-cites="preiss2017crazyswarm">(<a href="#ref-preiss2017crazyswarm" role="doc-biblioref">Preiss et al. 2017</a>)</span>. Centralization was right there because the two resources whose scarcity usually argues against it were abundant: near-perfect global state (motion capture indoors) and short, reliable communication links. Architecture follows the resource budget, not the vocabulary word.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Two drones fly directly at each other 5 m apart, each at 1.1 m/s, each wrapped in a 0.5 m safety envelope (combined radius 1.0 m), with ORCA horizon <span class="math inline">\(\tau = 2\)</span> s. Show that the current relative velocity is inside the truncated velocity obstacle, compute <span class="math inline">\(\mathbf{u}\)</span>, state each drone’s half-plane constraint, and verify that the corrected velocities defer contact to exactly the horizon.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Relative velocity <span class="math inline">\(\mathbf{v} = (2.2, 0)\)</span> m/s; clearance to lose is <span class="math inline">\(5 - 1 = 4\)</span> m, so contact arrives in <span class="math inline">\(4/2.2 \approx 1.8\)</span> s <span class="math inline">\(&lt; \tau\)</span>: inside the obstacle. The truncating cap is the disc of radius <span class="math inline">\(r/\tau = 0.5\)</span> centered at <span class="math inline">\(\mathbf{p}/\tau = (2.5, 0)\)</span>; <span class="math inline">\(\mathbf{v}\)</span> sits 0.3 from its center, inside. The nearest exit for this head-on geometry is the cap boundary at <span class="math inline">\((2.0, 0)\)</span> — the relative speed for which contact takes <span class="math inline">\(4/2.0 = 2\)</span> s — so <span class="math inline">\(\mathbf{u} = (-0.2, 0)\)</span> m/s. Each drone takes half: drone <span class="math inline">\(A\)</span>’s boundary passes through <span class="math inline">\(\mathbf{v}_A + \frac{1}{2}\mathbf{u} = (1.1 - 0.1, 0) = (1.0, 0)\)</span> with <span class="math inline">\(\hat{\mathbf{u}} = (-1,0)\)</span>, so <span class="math inline">\(A\)</span> may hold any eastward component <span class="math inline">\(\le 1.0\)</span> m/s and picks <span class="math inline">\((1.0, 0)\)</span>, the permitted velocity nearest its preference; <span class="math inline">\(B\)</span> mirrors. New closure <span class="math inline">\(2.0\)</span> m/s, and <span class="math inline">\(4\ \text{m} / 2.0\ \text{m s}^{-1} = 2.0\ \text{s} = \tau\)</span> exactly — and the program re-runs next tick, pushing the horizon out again.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Three drones hold altitudes <span class="math inline">\((10, 6, 5)\)</span> m on a chain graph (1–2, 2–3), weights 1, step <span class="math inline">\(\epsilon = 0.25\)</span>. Compute one consensus update for all three, verify that the sum is conserved, state what value the fleet is converging to, and explain — without computing eigenvalues — why the same fleet on a fully connected graph would converge faster.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(x_1 \leftarrow 10 + 0.25(6-10) = 9\)</span>; <span class="math inline">\(x_2 \leftarrow 6 + 0.25[(10-6) + (5-6)] = 6.75\)</span>; <span class="math inline">\(x_3 \leftarrow 5 + 0.25(6-5) = 5.25\)</span>. Sum before: 21; after: <span class="math inline">\(9 + 6.75 + 5.25 = 21\)</span> — conserved, because with symmetric weights every pairwise exchange is equal and opposite. The fleet therefore converges to the initial mean, <span class="math inline">\(7\)</span> m, with no agent computing it. On a fully connected graph, drones 1 and 3 would also pull directly on each other instead of routing all disagreement through drone 2; more independent paths for disagreement to drain along is exactly what the graph’s algebraic connectivity measures, and higher connectivity is faster convergence <span class="citation" data-cites="olfatisaber2007consensus">(<a href="#ref-olfatisaber2007consensus" role="doc-biblioref">Olfati-Saber, Fax, and Murray 2007</a>)</span>.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>The active-controller token was the single-drone stack’s answer to “who commands the aircraft?” Explain why the token generalizes to <span class="math inline">\(N\)</span> drones without modification once topics are namespaced, why promoting it to a fleet-wide token would be a category error, and what genuinely new decision the fleet coordinator makes that no token — however scoped — could.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The token enforces a one-writer rule over a specific <em>resource</em>: one vehicle’s Offboard setpoint stream, into one PX4 instance. Namespacing gives each vehicle its own instance of that resource and its own copy of the token (<code>/drone_i/goose/active_controller</code>), so the invariant it protects — one setpoint author per autopilot — holds per aircraft with zero new code; drone 1’s harassment node and drone 2’s navigation node can each own their own aircraft simultaneously. A fleet-wide token would conflate authority over a vehicle with allocation of work across vehicles: it would permit only one aircraft to be commanded at a time, which is not a safety invariant but a mission-defeating bottleneck. The coordinator’s genuinely new decision is allocation — which drone sweeps which sector, which one herds, which one guards the corridor — a statement about the <em>fleet’s</em> division of labor that no arbitration mechanism scoped to a single vehicle’s command stream can express.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>Describe what actually goes wrong, at the message level, if two PX4 SITL instances are launched without namespaces so both bridges publish <code>/fmu/out/vehicle_local_position</code> — and explain why this failure is more dangerous than a crash. Then state which single-drone nodes must change <em>internally</em> for the namespaced fix to work, and why the answer is “almost none.”</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Both vehicles’ position estimates interleave on one topic, so every subscriber consumes an alternating superposition of two aircraft: the supervisor’s staleness guard sees a healthy fresh stream (it is fresh — half of it is just the wrong drone), the harassment node’s orbit computes its angle from a position that teleports between two vehicles, and the frame chain transforms detections against the wrong pose on alternate messages. Nothing throws; the system is confidently, silently wrong — the multi-vehicle version of the “wrong with confidence” stale-data failure, worse than a crash because no watchdog fires. The fix is per-vehicle namespaces (<code>/drone_i/fmu/...</code>), and nodes that already use relative topic names are namespaced entirely by launch configuration: the namespace is prepended at launch, so the single-drone code runs unmodified inside its box. Only code that hard-coded absolute topic names — or that must deliberately <em>cross</em> namespaces, like the peer-separation filter subscribing to the other drone’s position — needs touching.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>The two-drone design pairs a centralized 1 Hz allocator with decentralized 20 Hz per-drone loops and a heartbeat fallback. Justify each half of that split with the reported evidence from the sweep-coverage architecture comparison, and describe precisely what each drone does in the first five seconds after the coordinator process dies mid-mission.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The comparison reported centralized approaches generally stronger on coverage completeness, uniformity, and completion time — the metrics a two-drone deterrence mission lives on — and decentralized approaches generally stronger on scalability and fault tolerance, with a hybrid reported to do better across more scenarios than either extreme <span class="citation" data-cites="jamshidpey2025centralization">(<a href="#ref-jamshidpey2025centralization" role="doc-biblioref">Jamshidpey et al. 2025</a>)</span>. The design takes the hint literally: allocation, which benefits from the global picture and tolerates a 1 s cadence, is centralized; everything with a deadline — the supervisor tick, evasion, pattern flight, peer separation — stays on the aircraft, so no fast loop ever transits the hub. When the coordinator dies: each drone’s role topic goes silent; for the first ~5 s nothing changes, because the last assignment remains valid and every fast loop is local; when the heartbeat staleness guard trips, each supervisor logs the fallback transition, continues its <em>current</em> sector to completion using its stored sector assignment, declines new engagements that depended on fleet roles, and ends with the normal return-home machinery. Mission degraded; fleet never endangered, never grounded.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="24.10">
+<h2 data-number="24.10" class="anchored" data-anchor-id="try-it"><span class="header-section-number">24.10</span> Try It</h2>
+<p><strong>Part 1 — two aircraft, one graph, no collisions of names.</strong> Bring up PX4 multi-vehicle SITL in Gazebo with two vehicles, each under its own namespace (<code>/drone_1</code>, <code>/drone_2</code>), and confirm with <code>ros2 topic list</code> that two disjoint <code>/drone_i/fmu/...</code> trees exist. Launch two complete copies of your single-drone stack from the previous chapters — supervisor, navigation, harassment, the active-controller token — one per namespace, and verify the claim this chapter made: if your nodes used relative topic names, they run unmodified. Split the protected-area polygon into two sectors, hand each drone its own lawnmower list, and fly both missions concurrently: takeoff, parallel sweep, land. The acceptance test is the logs — each drone’s <code>[STATE CHANGE]</code> history should be a complete, self-consistent single-drone story, and the combined coverage map (plot both position logs over the polygon) should show the full area swept with no leg flown twice. Then break it on purpose: relaunch with namespacing disabled and watch what the interleaved <code>/fmu/out/vehicle_local_position</code> stream does to each supervisor’s beliefs — five minutes of confidently wrong telemetry that will permanently change how you feel about topic hygiene.</p>
+<p><strong>Part 2 — a coordinator, a role swap, and a dead process.</strong> Add the fleet coordinator: sector assignment on <code>goose/role</code> at 1 Hz, a scripted flock in one sector, and the herd-and-guard allocation — nearest drone gets <code>herd:0</code> and runs the previous chapter’s orbit against the target while the other gets <code>guard:exit</code> and holds standoff over the designated escape corridor. Add the heartbeat guard to each supervisor’s staleness ladder. Wire peer telemetry across namespaces — each drone subscribes to the other’s position — and implement a separation filter downstream of every behavior’s setpoints, in the same place the previous chapter’s safety-radius projection lives: at minimum a mutual-distance floor that projects setpoints apart, or the full ORCA half-plane from this chapter if you want the worked example flying in your own simulator. Then run the three torture cases this Part has taught you to run. Script the flock to bolt <em>between</em> the two drones and confirm the separation filter holds the floor while both aircraft maneuver — log inter-drone distance every tick and treat any dip below the floor as a failed test, not a warning. Kill the coordinator process mid-herd and confirm, from logs alone, the fallback sequence of Check 6: silence, staleness trip, logged transition, sector completion, return home. Finally, inject the Vector-Based Threat Evasion chapter’s threat at one drone mid-sweep and verify that its evasion, its re-entry, and its sector resume all happen inside its own namespace while the other drone’s mission proceeds untouched — one aircraft’s emergency staying one aircraft’s emergency being, in the end, the whole argument for the boxes.</p>
+<p><strong>Related Lab:</strong> <em>No lab currently maps to this chapter.</em></p>
+<p>This chapter closes Part IV, and the Part’s arc is worth seeing whole from its last rung. It opened with frames — the algebra that lets a pixel become a place — and then built upward through coverage paths, escape vectors, the state machine that arbitrates them, the servo loop that keeps the camera honest, and the deterrent patterns that give the mission its purpose. Each chapter’s machinery became the next one’s raw material, and this chapter spent all of it at once: the sweep became sectors, the token became per-vehicle, the servo law returned wearing a wingmate’s range error, the staleness ladder grew a heartbeat rung, and the herding geometry finally got its second aircraft. What the fleet still lacks is the thing no chapter has yet drawn in full: the complete system — every node, every topic, every authority transfer from perception to PX4, for one drone or several — laid out as one architecture and interrogated as one design. That is the business of the System Architecture chapter in Part V, where the running example is reassembled with the whole book behind it, and where the questions this Part deferred — including what it costs, ethically and ecologically, to run such a system at all — finally come due.</p>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-baca2021mrs" class="csl-entry" role="listitem">
+Báča, Tomáš, Matěj Petrlík, Matouš Vrba, Vít Spurný, Robert Pěnička, Daniel Heřt, and Martin Saska. 2021. <span>“The <span>MRS</span> <span>UAV</span> System: Pushing the Frontiers of Reproducible Research, Real-World Deployment, and Education with Autonomous Unmanned Aerial Vehicles.”</span> <em>Journal of Intelligent &amp; Robotic Systems</em> 102: 26. <a href="https://doi.org/10.1007/s10846-021-01383-5">https://doi.org/10.1007/s10846-021-01383-5</a>.
+</div>
+<div id="ref-vandenberg2011orca" class="csl-entry" role="listitem">
+Berg, Jur van den, Stephen J. Guy, Ming Lin, and Dinesh Manocha. 2011. <span>“Reciprocal n-Body Collision Avoidance.”</span> In <em>Robotics Research: The 14th International Symposium ISRR</em>, 70:3–19. Springer Tracts in Advanced Robotics. Springer. <a href="https://doi.org/10.1007/978-3-642-19457-3_1">https://doi.org/10.1007/978-3-642-19457-3_1</a>.
+</div>
+<div id="ref-vandenberg2008rvo" class="csl-entry" role="listitem">
+Berg, Jur van den, Ming Lin, and Dinesh Manocha. 2008. <span>“Reciprocal Velocity Obstacles for Real-Time Multi-Agent Navigation.”</span> In <em>2008 IEEE International Conference on Robotics and Automation (ICRA)</em>, 1928–35. <a href="https://doi.org/10.1109/ROBOT.2008.4543489">https://doi.org/10.1109/ROBOT.2008.4543489</a>.
+</div>
+<div id="ref-chahine2025decentralized" class="csl-entry" role="listitem">
+Chahine, Makram, William Yang, Alaa Maalouf, Justin Siriska, Ninad Jadhav, Daniel Vogt, Stephanie Gil, Robert Wood, and Daniela Rus. 2025. <span>“Decentralized Vision-Based Autonomous Aerial Wildlife Monitoring.”</span> <a href="https://arxiv.org/abs/2508.15038">https://arxiv.org/abs/2508.15038</a>.
+</div>
+<div id="ref-conroy2014quadrotor" class="csl-entry" role="listitem">
+Conroy, Parker, Daman Bareiss, Matt Beall, and Jur van den Berg. 2014. <span>“3-<span>D</span> Reciprocal Collision Avoidance on Physical Quadrotor Helicopters with on-Board Sensing for Relative Positioning.”</span> <a href="https://arxiv.org/abs/1411.3794">https://arxiv.org/abs/1411.3794</a>.
+</div>
+<div id="ref-desai2001formations" class="csl-entry" role="listitem">
+Desai, Jaydev P., James P. Ostrowski, and Vijay Kumar. 2001. <span>“Modeling and Control of Formations of Nonholonomic Mobile Robots.”</span> <em>IEEE Transactions on Robotics and Automation</em> 17 (6): 905–8.
+</div>
+<div id="ref-farinelli2004classification" class="csl-entry" role="listitem">
+Farinelli, Alessandro, Luca Iocchi, and Daniele Nardi. 2004. <span>“Multirobot Systems: A Classification Focused on Coordination.”</span> <em>IEEE Transactions on Systems, Man, and Cybernetics, Part B: Cybernetics</em> 34 (5): 2015–28. <a href="https://doi.org/10.1109/TSMCB.2004.832155">https://doi.org/10.1109/TSMCB.2004.832155</a>.
+</div>
+<div id="ref-defreitas2021distributed" class="csl-entry" role="listitem">
+Freitas, Edison Pignaton de et al. 2021. <span>“A Distributed Task Allocation Protocol for Cooperative Multi-<span>UAV</span> Search and Rescue Systems.”</span> In <em>2021 International Conference on Unmanned Aircraft Systems (ICUAS)</em>, 909–17. <a href="https://doi.org/10.1109/ICUAS51884.2021.9476740">https://doi.org/10.1109/ICUAS51884.2021.9476740</a>.
+</div>
+<div id="ref-horyna2023decentralized" class="csl-entry" role="listitem">
+Hořyna, Jiří, Tomáš Báča, Viktor Walter, Dario Albani, Daniel Hert, Eliseo Ferrante, and Martin Saska. 2023. <span>“Decentralized Swarms of Unmanned Aerial Vehicles for Search and Rescue Operations Without Explicit Communication.”</span> <em>Autonomous Robots</em> 47: 77–93. <a href="https://doi.org/10.1007/s10514-022-10066-5">https://doi.org/10.1007/s10514-022-10066-5</a>.
+</div>
+<div id="ref-jamshidpey2025centralization" class="csl-entry" role="listitem">
+Jamshidpey, Ahmadreza, Mohamed Wahby, Michael Allwright, Weixu Zhu, Marco Dorigo, and Mary Katherine Heinrich. 2025. <span>“Centralization Vs. Decentralization in Multi-Robot Sweep Coverage with Ground Robots and <span>UAVs</span>.”</span> <a href="https://arxiv.org/abs/2408.06553">https://arxiv.org/abs/2408.06553</a>.
+</div>
+<div id="ref-olfatisaber2007consensus" class="csl-entry" role="listitem">
+Olfati-Saber, Reza, J. Alex Fax, and Richard M. Murray. 2007. <span>“Consensus and Cooperation in Networked Multi-Agent Systems.”</span> <em>Proceedings of the IEEE</em> 95 (1): 215–33. <a href="https://doi.org/10.1109/JPROC.2006.887293">https://doi.org/10.1109/JPROC.2006.887293</a>.
+</div>
+<div id="ref-preiss2017crazyswarm" class="csl-entry" role="listitem">
+Preiss, James A., Wolfgang Hönig, Gaurav S. Sukhatme, and Nora Ayanian. 2017. <span>“Crazyswarm: A Large Nano-Quadcopter Swarm.”</span> In <em>2017 IEEE International Conference on Robotics and Automation (ICRA)</em>. <a href="https://doi.org/10.1109/ICRA.2017.7989376">https://doi.org/10.1109/ICRA.2017.7989376</a>.
+</div>
+<div id="ref-rolland2026droneswarms" class="csl-entry" role="listitem">
+Rolland, Edouard, Kilian Meier, Kasper Andreas Rømer Grøntved, Lucie Laporte-Devylder, Guy Maalouf, Ulrik Pagh Schultz Lundquist, and Anders Christensen. 2026. <span>“Drone Swarms for Multi-Perspective Monitoring of Large Mammals in Their Natural Habitats: Deployment and Field Trials.”</span> In <em>Advances in Practical Applications of Agents, Multi-Agent Systems, and Computational Social Science — the PAAMS Collection</em>, 16031:266–77. Lecture Notes in Computer Science. Springer. <a href="https://doi.org/10.1007/978-3-032-07638-0_22">https://doi.org/10.1007/978-3-032-07638-0_22</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="pagination-link" aria-label="Harassment Pattern Generation: Designing Deterrent Flight Paths">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="pagination-link" aria-label="System Architecture: ROS 2 Nodes, Services, and Topics">
+        <span class="nav-page-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

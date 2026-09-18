@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>26&nbsp; Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" rel="next">
+<link href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html">Part V — Systems Integration, Diagnostics &amp; Ethics</a></li><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">26.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">26.2</span> Key Vocabulary</a></li>
+  <li><a href="#the-aircraft-that-writes-its-own-history" id="toc-the-aircraft-that-writes-its-own-history" class="nav-link" data-scroll-target="#the-aircraft-that-writes-its-own-history"><span class="header-section-number">26.3</span> The Aircraft That Writes Its Own History</a>
+  <ul class="collapse">
+  <li><a href="#what-is-in-the-file" id="toc-what-is-in-the-file" class="nav-link" data-scroll-target="#what-is-in-the-file"><span class="header-section-number">26.3.1</span> What is in the file</a></li>
+  </ul></li>
+  <li><a href="#opening-the-log" id="toc-opening-the-log" class="nav-link" data-scroll-target="#opening-the-log"><span class="header-section-number">26.4</span> Opening the Log</a></li>
+  <li><a href="#reading-vibration-the-airframes-mechanical-signature" id="toc-reading-vibration-the-airframes-mechanical-signature" class="nav-link" data-scroll-target="#reading-vibration-the-airframes-mechanical-signature"><span class="header-section-number">26.5</span> Reading Vibration: The Airframe’s Mechanical Signature</a>
+  <ul class="collapse">
+  <li><a href="#what-the-log-records" id="toc-what-the-log-records" class="nav-link" data-scroll-target="#what-the-log-records"><span class="header-section-number">26.5.1</span> What the log records</a></li>
+  <li><a href="#what-good-and-bad-look-like" id="toc-what-good-and-bad-look-like" class="nav-link" data-scroll-target="#what-good-and-bad-look-like"><span class="header-section-number">26.5.2</span> What good and bad look like</a></li>
+  <li><a href="#from-signature-to-wrench" id="toc-from-signature-to-wrench" class="nav-link" data-scroll-target="#from-signature-to-wrench"><span class="header-section-number">26.5.3</span> From signature to wrench</a></li>
+  </ul></li>
+  <li><a href="#reading-power-sag-depletion-and-the-three-tier-ladder" id="toc-reading-power-sag-depletion-and-the-three-tier-ladder" class="nav-link" data-scroll-target="#reading-power-sag-depletion-and-the-three-tier-ladder"><span class="header-section-number">26.6</span> Reading Power: Sag, Depletion, and the Three-Tier Ladder</a>
+  <ul class="collapse">
+  <li><a href="#a-worked-example-is-this-pack-sick" id="toc-a-worked-example-is-this-pack-sick" class="nav-link" data-scroll-target="#a-worked-example-is-this-pack-sick"><span class="header-section-number">26.6.1</span> A worked example: is this pack sick?</a></li>
+  <li><a href="#the-three-tier-ladder-in-the-log" id="toc-the-three-tier-ladder-in-the-log" class="nav-link" data-scroll-target="#the-three-tier-ladder-in-the-log"><span class="header-section-number">26.6.2</span> The three-tier ladder in the log</a></li>
+  </ul></li>
+  <li><a href="#a-systematic-debugging-workflow" id="toc-a-systematic-debugging-workflow" class="nav-link" data-scroll-target="#a-systematic-debugging-workflow"><span class="header-section-number">26.7</span> A Systematic Debugging Workflow</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">26.8</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">26.9</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html">Part V — Systems Integration, Diagnostics &amp; Ethics</a></li><li class="breadcrumb-item"><a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The previous chapter put the whole machine on the bench and closed with a warning: a graph this size fails in ways no single node’s chapter could show, and some of those failures can only be read <em>backwards</em> — from a log, after the flight, when the aircraft is on the ground and the question is no longer “what should it do?” but “what did it just do, and why?” This chapter teaches that reading. It is the natural continuation of the System Architecture chapter’s inventory, because everything that chapter named as a stream — the Flight Controller’s 5 Hz <code>FcStatus</code> aggregate, the Detector’s 10 Hz <code>Target</code>, the 1 Hz active-controller token, the Failsafe node’s <code>SEVERITY:reason</code> strings — is ephemeral by design. A topic asserts and moves on; nothing in the publish/subscribe contract keeps yesterday’s assertions. If the running example lands early, wobbling, with the crew unsure whether they saw a failsafe or a gust, the live graph has already forgotten. What remembers is a file.</p>
+<p>Two files, in fact, and knowing which holds what is this chapter’s first lesson in miniature. On the companion computer, <code>ros2 bag</code> can record the <code>/goose/*</code> topics — the mission-level story, in the mission’s own vocabulary. But underneath the grey edges of the previous chapter’s node graph, PX4 has been keeping its own record the entire time, without being asked: from the moment the vehicle armed to the moment it disarmed, the autopilot’s logger wrote every uORB topic it is configured to keep — attitude, position, battery, IMU health, mode changes, and its own printf-style diagnostic messages — into one binary <code>.ulg</code> file on the SD card. That file is the closest thing a small aircraft has to the flight data recorder that commercial aviation has carried for decades, and this chapter treats it accordingly: first the format and the tools that open it, then the two diagnostic skills the file most repays — reading a vibration signature and reading a power trace — and finally the systematic workflow that turns a log full of symptoms into a hypothesis, a bench test, a fix, and a re-flight that proves the fix.</p>
+<section id="learning-objectives" class="level2" data-number="26.1">
+<h2 data-number="26.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">26.1</span> Learning Objectives</h2>
+<ul>
+<li>Locate a PX4 flight log (<code>.ulg</code>), explain the structure of the ULog format that makes the file self-describing, and use <code>pyulog</code>’s command-line tools (<code>ulog_info</code>, <code>ulog_messages</code>, <code>ulog_params</code>, <code>ulog2csv</code>) to extract a specific field — a voltage series, a vibration metric — from a real log.</li>
+<li>Interpret the vibration diagnostics PX4 records in <code>vehicle_imu_status</code> — accelerometer and gyroscope clipping counts and computed vibration metrics — and classify a frequency-domain vibration signature against Flight Review’s documented worked examples, from excellent through borderline to a resonance that grounds the aircraft.</li>
+<li>Explain what a vibration signature indicates mechanically — propeller imbalance, loose hardware, frame or landing-gear resonance — and why the documented remediation order puts mechanical fixes before software filtering.</li>
+<li>Distinguish a voltage sag under load from genuine depletion in a logged <code>battery_status</code> series, compute a pack’s internal resistance from the logged voltage and current excursions, and relate both to PX4’s three-tier battery failsafe (<code>BAT_LOW_THR</code>, <code>BAT_CRIT_THR</code>, <code>BAT_EMERGEN_THR</code>).</li>
+<li>Describe and apply a systematic post-flight debugging workflow — log review, hypothesis, bench test, fix, re-fly — using named failure signatures (mechanical failure, GPS glitch, compass interference, brownout) as the vocabulary of hypotheses.</li>
+<li>Correlate the companion computer’s record (a ROS 2 bag, the Failsafe node’s logged <code>SEVERITY:reason</code> line) with the autopilot’s ULog on one timeline, and say which recorder is authoritative for which question.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="26.2">
+<h2 data-number="26.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">26.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Flight log</strong> — the record an autopilot writes of its own flight: for PX4, one <code>.ulg</code> file per arming session, holding timestamped sensor data, state estimates, parameter values, mode changes, and text diagnostics in a single binary stream.</li>
+<li><strong>ULog format</strong> — PX4’s self-describing binary log format: the file carries its own message-type definitions, so a parser needs no external schema; header, definitions, and data sections in sequence, little-endian throughout, every message stamped in microseconds.</li>
+<li><strong>Black-box recorder</strong> — the aviation flight data recorder that is the <code>.ulg</code> file’s conceptual ancestor: a continuously running onboard recorder whose value lies both in reconstructing accidents and in routine review of uneventful flights.</li>
+<li><strong>Telemetry parsing</strong> — extracting specific fields from a recorded telemetry stream into an analyzable form — for a ULog, one <code>ulog2csv</code> invocation per topic of interest.</li>
+<li><strong>Vibration metric</strong> — a computed summary of high-frequency IMU disturbance; PX4 logs an accelerometer metric (m/s²) and a gyroscope metric (rad/s) in <code>vehicle_imu_status</code>, alongside raw per-axis clipping counts.</li>
+<li><strong>Clipping</strong> (sensor) — a measurement that exceeded the sensor’s physical range: the vibration amplitude at that instant was literally unrepresentable, not merely large. Logged as running per-axis counts; any sustained growth is disqualifying.</li>
+<li><strong>Blade-passing frequency</strong> — the rate at which propeller blades pass a fixed point: blade count times rotation rate, and the characteristic frequency at which propeller-induced vibration concentrates in a log’s spectrum.</li>
+<li><strong>Voltage sag</strong> — the transient drop in a battery’s terminal voltage under load, equal to the drawn current times the pack’s internal resistance; it tracks the current trace and recovers when load drops, which is exactly how a log distinguishes it from depletion.</li>
+<li><strong>Internal resistance</strong> — the effective series resistance of a cell, the mechanistic cause of sag; it rises with age and cold, and PX4 both estimates it in flight (<code>internal_resistance_estimate</code>) and uses it to load-compensate the charge estimate.</li>
+<li><strong>Failure signature</strong> — a named, recognizable pattern in logged data that points to a specific cause: setpoint/actual divergence for mechanical failure, satellite-count drops for GPS glitches, throttle-correlated magnetometer drift for compass interference, abrupt mid-air log truncation for a brownout.</li>
+</ul>
+</section>
+<section id="the-aircraft-that-writes-its-own-history" class="level2" data-number="26.3">
+<h2 data-number="26.3" class="anchored" data-anchor-id="the-aircraft-that-writes-its-own-history"><span class="header-section-number">26.3</span> The Aircraft That Writes Its Own History</h2>
+<p>Commercial aviation settled this question long before drones existed: an aircraft must carry a record of its own behavior, because the alternative is reconstructing incidents from memory and wreckage. The flight data recorder — the “black box,” bright orange in practice so that searchers can find it — earns its keep twice over. After an accident it lets investigators establish what happened and why; and, at least as importantly, routine review of <em>ordinary</em> recorded flights lets an operator catch developing problems before they become accidents at all. The United States’ National Transportation Safety Board makes precisely this dual argument in advocating recorders for the aircraft classes that still lack them, noting that 83% of the turbine-powered aircraft in its 2005–2020 fatal-accident investigations carried no recording equipment whatsoever <span class="citation" data-cites="ntsb2021recorders">(<a href="#ref-ntsb2021recorders" role="doc-biblioref">National Transportation Safety Board 2021</a>)</span>. The FAA’s Flight Operational Quality Assurance guidance extends the proactive half into a standing program: airlines routinely download and analyze recorder data from essentially every flight — not just the eventful ones — specifically to find safety trends early <span class="citation" data-cites="faa2004foqa">(<a href="#ref-faa2004foqa" role="doc-biblioref">Federal Aviation Administration 2004</a>)</span>. That is the posture this chapter argues a drone program should inherit. The log is not something you open after a crash; it is something you glance at after every flight, because the flight before the failure often contains the warning.</p>
+<p>PX4 makes the inheritance nearly free, because the recorder is already running. By default, PX4’s <code>logger</code> module starts when the vehicle arms and stops when it disarms, writing one new <code>.ulg</code> file per arming session to the SD card; other documented modes log from boot, gate logging on an RC switch, or run until shutdown, and the logger can be driven manually from the system console with <code>logger on</code> and <code>logger off</code> <span class="citation" data-cites="px4docs2026logging">(<a href="#ref-px4docs2026logging" role="doc-biblioref">PX4 Autopilot 2026f</a>)</span>. What gets logged is configurable — a <code>SDLOG_PROFILE</code> parameter selects logging profiles, a plain-text <code>logger_topics.txt</code> file on the SD card can add topics or change rates, and parameters cap file size and rotate old logs off a filling card — but the out-of-the-box default set is deliberately chosen to support flight reporting and analysis without any configuration at all <span class="citation" data-cites="px4docs2026logging">(<a href="#ref-px4docs2026logging" role="doc-biblioref">PX4 Autopilot 2026f</a>)</span>. Every flight of the running example that has flown in this book, real or simulated, has left one of these files behind.</p>
+<section id="what-is-in-the-file" class="level3" data-number="26.3.1">
+<h3 data-number="26.3.1" class="anchored" data-anchor-id="what-is-in-the-file"><span class="header-section-number">26.3.1</span> What is in the file</h3>
+<p>The ULog format rewards a few minutes of attention, because its design decisions are exactly the ones a diagnostician benefits from. A <code>.ulg</code> file is three sections in sequence, drawn in <a href="#fig-ulog-file-anatomy" class="quarto-xref">Figure&nbsp;<span>26.1</span></a>. A 16-byte <strong>header</strong> carries the magic bytes identifying the file, a format version, and the log’s start timestamp in microseconds. A <strong>definitions section</strong> makes the file self-describing: <code>'F'</code> format messages declare the field names and types of every uORB message the log contains — so a parser needs no external schema files and a log remains readable years later, against any firmware version — alongside <code>'I'</code> information messages (hardware and firmware versions) and <code>'P'</code>/<code>'Q'</code> parameter messages recording every parameter value in force when logging started. Then the <strong>data section</strong> carries the flight: <code>'A'</code> subscription messages binding each format to a numeric ID, <code>'D'</code> logged-data messages holding the actual timestamped binary payloads, and — easy to miss, and disproportionately useful — <code>'L'</code>/<code>'C'</code> logged-string messages, which is where PX4’s <code>PX4_INFO()</code>/<code>PX4_ERR()</code> printf-style diagnostics end up. The “system telemetry log,” in other words, is not a separate text file: the autopilot’s prose and its numbers share one file and one microsecond clock, which is what makes “what was the vehicle <em>saying</em> when the voltage dipped?” a single-file question. Finally, <code>'O'</code> dropout messages mark periods where logging itself was interrupted — a diagnosis channel for SD-card and scheduling trouble, distinct from any flight anomaly. All of it is little-endian; every subscribable message carries a monotonically increasing <code>uint64</code> microsecond timestamp; and a well-behaved parser is expected to skip unknown message types and <em>resynchronize past corrupted data rather than abort</em> — which is why a log truncated mid-write by a crash, the case where the file matters most, can usually still be partly read <span class="citation" data-cites="px4docs2026ulogformat">(<a href="#ref-px4docs2026ulogformat" role="doc-biblioref">PX4 Autopilot 2026i</a>)</span>.</p>
+<div id="fig-ulog-file-anatomy" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Diagram titled anatomy of a dot u-l-g flight log and the tools that open it. On the left, a tall file box labeled flight dot u-l-g, written by the logger from arming to disarm, little-endian throughout, contains three stacked bands. A grey header band reads: header, sixteen fixed bytes, magic byte sequence, format version, start timestamp in microseconds. An amber definitions band reads: definitions, the file explains itself, with F format messages giving every uORB message's field names and types with no external schema needed, I information messages with hardware version and firmware build, and P and Q parameter values at logging start plus defaults, the same values ulog underscore params extracts. A teal data band reads: data, the flight itself, with A subscription messages mapping topic name to numeric ID, D logged data as timestamped binary payloads including battery status, vehicle IMU status, vehicle status, and vehicle attitude, L and C logged strings holding the text channel of PX4 info, warn, and error messages, and O dropout markers for gaps where logging paused, noted as SD card or scheduling trouble with its own diagnosis; a note says numbers and prose share one file and one clock, every message carries a microsecond timestamp. On the right, amber arrows fan out from the file to six pyulog script boxes: ulog underscore info giving duration, vehicle and firmware, and the list of logged topics; ulog underscore messages giving the timestamped text channel of warnings, errors, and mode changes; ulog underscore params giving every parameter active on this flight; ulog2csv with a topic flag giving one CSV per topic for pandas, matplotlib, or a spreadsheet; ulog2kml giving the flown path replayable in Google Earth; and ulog2ros2bag giving a ROS 2 bag placing the autopilot's record on the companion's timeline. A teal box below them represents Flight Review at logs dot px4 dot io or self-hosted: drag the file in for flight-mode timeline, tracking, GPS, and vibration panels. A footer notes that the schemas travel inside the file and a well-behaved parser resynchronizes past corrupted bytes rather than aborting, so a log truncated by a crash is still partly readable, which is exactly when it matters most.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ulog-file-anatomy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/ulog-file-anatomy.svg" class="img-fluid figure-img" style="width:100.0%" alt="Diagram titled anatomy of a dot u-l-g flight log and the tools that open it. On the left, a tall file box labeled flight dot u-l-g, written by the logger from arming to disarm, little-endian throughout, contains three stacked bands. A grey header band reads: header, sixteen fixed bytes, magic byte sequence, format version, start timestamp in microseconds. An amber definitions band reads: definitions, the file explains itself, with F format messages giving every uORB message's field names and types with no external schema needed, I information messages with hardware version and firmware build, and P and Q parameter values at logging start plus defaults, the same values ulog underscore params extracts. A teal data band reads: data, the flight itself, with A subscription messages mapping topic name to numeric ID, D logged data as timestamped binary payloads including battery status, vehicle IMU status, vehicle status, and vehicle attitude, L and C logged strings holding the text channel of PX4 info, warn, and error messages, and O dropout markers for gaps where logging paused, noted as SD card or scheduling trouble with its own diagnosis; a note says numbers and prose share one file and one clock, every message carries a microsecond timestamp. On the right, amber arrows fan out from the file to six pyulog script boxes: ulog underscore info giving duration, vehicle and firmware, and the list of logged topics; ulog underscore messages giving the timestamped text channel of warnings, errors, and mode changes; ulog underscore params giving every parameter active on this flight; ulog2csv with a topic flag giving one CSV per topic for pandas, matplotlib, or a spreadsheet; ulog2kml giving the flown path replayable in Google Earth; and ulog2ros2bag giving a ROS 2 bag placing the autopilot's record on the companion's timeline. A teal box below them represents Flight Review at logs dot px4 dot io or self-hosted: drag the file in for flight-mode timeline, tracking, GPS, and vibration panels. A footer notes that the schemas travel inside the file and a well-behaved parser resynchronizes past corrupted bytes rather than aborting, so a log truncated by a crash is still partly readable, which is exactly when it matters most.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ulog-file-anatomy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;26.1: The anatomy of a PX4 flight log and the tool pipeline that opens it: the three sections of the self-describing <code>.ulg</code> binary on the left, and the six <code>pyulog</code> command-line scripts plus the Flight Review web application that turn it back into metadata, text, parameters, CSVs, a flight path, and a ROS 2 bag on the right.
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="opening-the-log" class="level2" data-number="26.4">
+<h2 data-number="26.4" class="anchored" data-anchor-id="opening-the-log"><span class="header-section-number">26.4</span> Opening the Log</h2>
+<p>The reference GUI for a <code>.ulg</code> file is <strong>Flight Review</strong>, PX4’s own web application: drag the file onto <code>logs.px4.io</code> (or run a local instance from the open-source repository, which needs no upload at all <span class="citation" data-cites="px4flightreview2026repo">(<a href="#ref-px4flightreview2026repo" role="doc-biblioref">PX4 Autopilot 2026d</a>)</span>) and it renders an interactive panel set — a timeline colored by flight mode, controller tracking plots of estimated-versus-setpoint attitude, actuator outputs, GPS quality, and a dedicated vibration section this chapter leans on below <span class="citation" data-cites="px4docs2026flightreview">(<a href="#ref-px4docs2026flightreview" role="doc-biblioref">PX4 Autopilot 2026e</a>)</span>. The documentation itself cautions that interpreting these plots “requires experience to understand acceptable ranges” — log reading is a skill, not a button — and building that experience against known-good and known-bad examples is exactly what the rest of this chapter does. For ad hoc work outside Flight Review’s fixed panels, the same official tool roundup lists PlotJuggler and Foxglove, both with native ULog support, as general-purpose drag-and-drop plotting environments <span class="citation" data-cites="px4docs2026flightloganalysis">(<a href="#ref-px4docs2026flightloganalysis" role="doc-biblioref">PX4 Autopilot 2026c</a>)</span>.</p>
+<p>But the tool that best teaches what all of these are doing under the hood is <strong><code>pyulog</code></strong>, PX4’s official Python package (<code>pip install pyulog</code>), which ships six command-line scripts <span class="citation" data-cites="px4pyulog2026">(<a href="#ref-px4pyulog2026" role="doc-biblioref">PX4 Autopilot 2026g</a>)</span>. A complete first pass over an unfamiliar log is four commands:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pyulog</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">ulog_info</span> flight.ulg           <span class="co"># duration, vehicle, firmware, topic list</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">ulog_messages</span> flight.ulg       <span class="co"># the text channel: timestamped INFO/WARN/ERR</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">ulog_params</span> flight.ulg         <span class="co"># every parameter active during this flight</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">ulog2csv</span> <span class="at">-m</span> vehicle_imu_status,battery_status flight.ulg</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>ulog_info</code> answers the orientation questions — how long did the log run, which airframe, which firmware, which topics are present. <code>ulog_messages</code> dumps the logged strings with timestamps and severity: this is “parsing the system telemetry log” reduced to one command, and it is where a mode change, an arming refusal, or a firmware complaint announces itself in words. <code>ulog_params</code> recovers the configuration that was <em>actually in force</em> — not what anyone remembers setting — which settles a whole class of arguments before they start (“was the critical-battery threshold really at 10%?” is a lookup, not a debate). And <code>ulog2csv</code> converts chosen topics to one CSV file each: <code>vehicle_imu_status_0.csv</code> arrives with per-axis clipping counts and the vibration metrics as plain columns, <code>battery_status_0.csv</code> with voltage, current, and the warning level. Two further converters round out the set: <code>ulog2kml</code> renders the flown path for Google Earth, and <code>ulog2ros2bag</code> converts the ULog into a ROS 2 bag <span class="citation" data-cites="px4pyulog2026">(<a href="#ref-px4pyulog2026" role="doc-biblioref">PX4 Autopilot 2026g</a>)</span>.</p>
+<p>That last converter deserves a beat, because it resolves the two-recorders question this chapter opened with. The ULog records the <em>autopilot’s</em> world — the uORB topics below the grey bridge edges of the previous chapter’s node graph. The <code>/goose/*</code> mission topics — the token, the <code>Target</code> stream, the Failsafe node’s <code>SEVERITY:reason</code> strings the Geofencing and Fail-Safes chapter defined — live on the companion computer and are captured, if at all, by <code>ros2 bag</code>. Each recorder is authoritative for its own layer: the ULog for what the vehicle physically did and what PX4 believed and commanded; the bag (and the nodes’ own logged output) for what the mission logic decided and why. <code>ulog2ros2bag</code> puts both records into one format on one timeline, so “the watchdog logged <code>FAILSAFE: RTL:geofence breach</code> at 14:02:31 — did PX4’s mode actually change, and when?” becomes a mergeable, answerable question rather than two files squinted at side by side.</p>
+<p>For programmatic work, the same package is a library, and the CSV step can be skipped entirely:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">"""Pull the power and vibration series out of a ULog for plotting."""</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyulog <span class="im">import</span> ULog</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>log <span class="op">=</span> ULog(<span class="st">'flight.ulg'</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>           message_name_filter_list<span class="op">=</span>[<span class="st">'battery_status'</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>                                     <span class="st">'vehicle_imu_status'</span>])</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>batt <span class="op">=</span> log.get_dataset(<span class="st">'battery_status'</span>).data</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>imu  <span class="op">=</span> log.get_dataset(<span class="st">'vehicle_imu_status'</span>).data</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>fig, (ax_v, ax_i, ax_vib) <span class="op">=</span> plt.subplots(<span class="dv">3</span>, <span class="dv">1</span>, sharex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>t_b <span class="op">=</span> batt[<span class="st">'timestamp'</span>] <span class="op">/</span> <span class="fl">1e6</span>            <span class="co"># microseconds -&gt; seconds</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>ax_v.plot(t_b, batt[<span class="st">'voltage_v'</span>])<span class="op">;</span>  ax_v.set_ylabel(<span class="st">'pack V'</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>ax_i.plot(t_b, batt[<span class="st">'current_a'</span>])<span class="op">;</span>  ax_i.set_ylabel(<span class="st">'A'</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>t_i <span class="op">=</span> imu[<span class="st">'timestamp'</span>] <span class="op">/</span> <span class="fl">1e6</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>ax_vib.plot(t_i, imu[<span class="st">'accel_vibration_metric'</span>])</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>ax_vib.set_ylabel(<span class="st">'accel vib (m/s$^2$)'</span>)<span class="op">;</span> ax_vib.set_xlabel(<span class="st">'t (s)'</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Nine lines of real work, and the two traces the next two sections teach you to read are on the screen. Everything Flight Review plots is, in the end, this: a dataset pulled from the file by name, against the file’s own microsecond clock.</p>
+</section>
+<section id="reading-vibration-the-airframes-mechanical-signature" class="level2" data-number="26.5">
+<h2 data-number="26.5" class="anchored" data-anchor-id="reading-vibration-the-airframes-mechanical-signature"><span class="header-section-number">26.5</span> Reading Vibration: The Airframe’s Mechanical Signature</h2>
+<p>The Anatomy of a Multirotor chapter established the physics this section now reads back out of the log: every propeller injects excitation at its rotation rate and at the blade-passing frequency — about 90 Hz and 181 Hz respectively for the running example’s two-blade props at hover RPM — and an IMU is a micromechanical resonator that suffers under exactly that excitation, up to and including the vibration-rectification bias the Sensing the World chapter derived. The flight log is where that physics stops being theoretical. PX4’s documentation is blunt about the stakes: high vibration is linked to inefficient flight, motor overheating, material wear, tuning difficulty, sensor clipping, and — the endpoint that makes this a safety topic rather than a comfort topic — corrupted position estimation that can produce fly-aways <span class="citation" data-cites="px4docs2026vibrationisolation">(<a href="#ref-px4docs2026vibrationisolation" role="doc-biblioref">PX4 Autopilot 2026k</a>)</span>. Vibration diagnosed in a log after a wobbly flight is a crash prevented; the same signature ignored is a crash scheduled.</p>
+<section id="what-the-log-records" class="level3" data-number="26.5.1">
+<h3 data-number="26.5.1" class="anchored" data-anchor-id="what-the-log-records"><span class="header-section-number">26.5.1</span> What the log records</h3>
+<p>The message to pull is <code>vehicle_imu_status</code>, logged per IMU instance by default. Its documented diagnostic fields come in two kinds <span class="citation" data-cites="px4docs2026vehicleimustatus">(<a href="#ref-px4docs2026vehicleimustatus" role="doc-biblioref">PX4 Autopilot 2026j</a>)</span>. The <strong>clipping counts</strong> — <code>accel_clipping[3]</code> and <code>gyro_clipping[3]</code>, running per-axis totals — count the moments when the raw sensor’s measurement range was exceeded: not “vibration was high” but “the physical amplitude was literally unrepresentable.” Clipping is the binary red flag; a counter that grows during flight means the estimator was intermittently blind on that axis, and no software filter downstream can recover information the sensor never captured. The <strong>vibration metrics</strong> — <code>accel_vibration_metric</code> in m/s² and <code>gyro_vibration_metric</code> in rad/s — are PX4’s computed summaries of high-frequency disturbance since the last publication, the analog quantity to the clipping counters’ digital one, with per-axis means and variances alongside as coarser proxies. For the deepest analysis — choosing an isolation mount, tuning a notch filter — PX4 supports full-rate raw IMU logging at several kilohertz via <code>SDLOG_PROFILE</code>’s FIFO profiles, precisely because the default logged rate averages away the high-frequency content those decisions turn on <span class="citation" data-cites="px4docs2026flightreview">(<a href="#ref-px4docs2026flightreview" role="doc-biblioref">PX4 Autopilot 2026e</a>)</span>.</p>
+</section>
+<section id="what-good-and-bad-look-like" class="level3" data-number="26.5.2">
+<h3 data-number="26.5.2" class="anchored" data-anchor-id="what-good-and-bad-look-like"><span class="header-section-number">26.5.2</span> What good and bad look like</h3>
+<p>Summary metrics say <em>how much</em>; the frequency domain says <em>what kind</em>, and kind is what points at a mechanical cause. Flight Review’s vibration section offers three views <span class="citation" data-cites="px4docs2026flightreview">(<a href="#ref-px4docs2026flightreview" role="doc-biblioref">PX4 Autopilot 2026e</a>)</span>: an FFT of the actuator control signal (requires high-rate logging), where a healthy airframe shows a single peak at the low end — below roughly 20 Hz, the band of genuine vehicle motion — with everything above it low and flat; an acceleration power spectral density heatmap over time, healthy when it is mostly green with a little yellow confined to the lowest few hertz, and disqualifying when it is almost completely yellow — the documentation’s own line for vibration levels too high to fly with; and the raw acceleration traces, with a memorable rule of thumb: in hover, gravity holds the z-axis trace well apart from x and y, so if z is touching x/y during hover or slow flight, vibration is too high.</p>
+<p>What makes this teachable rather than abstract is that PX4’s documentation walks the comparison across three real, named airframes, and <a href="#fig-vibration-signature-comparison" class="quarto-xref">Figure&nbsp;<span>26.2</span></a> sketches the four signatures side by side. The <strong>QAV-R 5″ racer</strong> is the reference: one low peak, flat spectrum, clean heatmap, z well separated — so clean that the documentation’s verdict is that the software filter cutoffs can be <em>raised</em>, trading now-unneeded filtering for lower control latency. The <strong>DJI F450</strong> is good with a visible flaw: the same low peak plus a bump near 100 Hz, which the documentation identifies as the blade-passing frequency — the propellers’ beat, showing through mildly and tolerably. The <strong>S500</strong> is the borderline case: a similar spectral shape but more energy throughout, and in the raw traces the z-axis rides close to x/y — documented as at the limit where vibration starts to negatively affect flight performance. And the fourth panel is the documented failure case: a landing-gear vibration problem appearing as a strong single peak close to 50 Hz — flagged as concerning precisely <em>because</em> it is strong, single, and low, close to the vehicle’s own dynamics, where a filter aggressive enough to remove it would also delay response to genuine attitude motion <span class="citation" data-cites="px4docs2026flightreview">(<a href="#ref-px4docs2026flightreview" role="doc-biblioref">PX4 Autopilot 2026e</a>)</span>. Frequency is the diagnosis: energy at blade-passing frequency indicts the propellers; energy at once-per-revolution indicts rotating balance — a bent shaft or a damaged prop hub produces exactly that narrow low peak, the same signature class as the imbalance cases the documentation names; and a strong narrow peak that tracks <em>neither</em> motor frequency is a structure resonating, like that landing gear.</p>
+<div id="fig-vibration-signature-comparison" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Four sketched frequency-domain plots arranged two by two, each with a frequency axis from zero to two hundred hertz and an amplitude axis. Top left, labeled QAV-R five-inch racer with a teal badge reading excellent: a single tall narrow peak below about twenty hertz, then a low flat trace, annotated single peak below twenty hertz, low and flat, with a note that the spectrum is so clean the software filter cutoffs can be raised for less control latency. Top right, labeled DJI F450 with a green badge reading good: the same low peak plus a moderate bump centered at one hundred hertz annotated as the blade-passing frequency, with a note that the mildly elevated energy where the blades beat the air is visible, expected, and tolerable. Bottom left, labeled S500 with an amber badge reading borderline: a similar shape but a raised broadband floor across the spectrum, with a note that in the raw-acceleration plot the z-axis closes on x and y, at the limit where vibration starts to degrade flight performance. Bottom right, on a red-tinted panel labeled landing-gear resonance failure case with a red badge reading fix first: a strong single peak near fifty hertz annotated as low and close to the vehicle's own dynamics, with a note that it is too near the frequencies of real attitude motion for filtering to remove without delaying genuine control response, so a mechanical fix, stiffening or damping the gear, is the only good one. A footer notes the running example's two-blade props spin near ninety hertz in hover so its healthy log shows blade-passing energy near one hundred eighty-one hertz, the Anatomy of a Multirotor chapter's excitation frequencies read back out of the flight log.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-vibration-signature-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/vibration-signature-comparison.svg" class="img-fluid figure-img" style="width:100.0%" alt="Four sketched frequency-domain plots arranged two by two, each with a frequency axis from zero to two hundred hertz and an amplitude axis. Top left, labeled QAV-R five-inch racer with a teal badge reading excellent: a single tall narrow peak below about twenty hertz, then a low flat trace, annotated single peak below twenty hertz, low and flat, with a note that the spectrum is so clean the software filter cutoffs can be raised for less control latency. Top right, labeled DJI F450 with a green badge reading good: the same low peak plus a moderate bump centered at one hundred hertz annotated as the blade-passing frequency, with a note that the mildly elevated energy where the blades beat the air is visible, expected, and tolerable. Bottom left, labeled S500 with an amber badge reading borderline: a similar shape but a raised broadband floor across the spectrum, with a note that in the raw-acceleration plot the z-axis closes on x and y, at the limit where vibration starts to degrade flight performance. Bottom right, on a red-tinted panel labeled landing-gear resonance failure case with a red badge reading fix first: a strong single peak near fifty hertz annotated as low and close to the vehicle's own dynamics, with a note that it is too near the frequencies of real attitude motion for filtering to remove without delaying genuine control response, so a mechanical fix, stiffening or damping the gear, is the only good one. A footer notes the running example's two-blade props spin near ninety hertz in hover so its healthy log shows blade-passing energy near one hundred eighty-one hertz, the Anatomy of a Multirotor chapter's excitation frequencies read back out of the flight log.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-vibration-signature-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;26.2: Four frequency-domain vibration signatures, sketched after the worked comparison in PX4’s Flight Review documentation: the QAV-R racer’s excellent single-low-peak spectrum, the DJI F450’s good spectrum with its ~100 Hz blade-passing bump, the S500’s borderline raised floor, and the landing-gear resonance failure case with its strong single peak near 50 Hz, too close to the vehicle’s own dynamics to filter away.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="from-signature-to-wrench" class="level3" data-number="26.5.3">
+<h3 data-number="26.5.3" class="anchored" data-anchor-id="from-signature-to-wrench"><span class="header-section-number">26.5.3</span> From signature to wrench</h3>
+<p>A signature is only useful if it dispatches to a fix, and PX4’s vibration-isolation guidance supplies both the catalog and the priority order <span class="citation" data-cites="px4docs2026vibrationisolation">(<a href="#ref-px4docs2026vibrationisolation" role="doc-biblioref">PX4 Autopilot 2026k</a>)</span>. The mechanical causes it names are the ones the spectra above finger: imbalanced or low-quality propellers, motors, and ESCs; loose airframe hardware — landing gear and GPS masts are called out specifically — rattling as secondary resonators; and frame resonance at the autopilot’s own mounting location, which well-designed frames damp and poorly designed or damaged ones amplify. The priority order is the part worth internalizing as doctrine: reduce vibration at its source <em>before</em> filtering it in software. Balance the propellers, tighten every fastener, replace the worn motor, add isolation mounting — and only then reach for lower filter cutoffs or additional notches, because software filtering spends control latency to hide a mechanical problem that is still there, still heating motors and fatiguing the frame. This is the same layered defense the Sensing the World chapter listed for vibration rectification, now driven by evidence: the log tells you <em>which</em> layer to reach for, because a blade-passing bump and a 50 Hz gear resonance and a climbing clip counter are three different work orders.</p>
+</section>
+</section>
+<section id="reading-power-sag-depletion-and-the-three-tier-ladder" class="level2" data-number="26.6">
+<h2 data-number="26.6" class="anchored" data-anchor-id="reading-power-sag-depletion-and-the-three-tier-ladder"><span class="header-section-number">26.6</span> Reading Power: Sag, Depletion, and the Three-Tier Ladder</h2>
+<p>The second trace every post-flight review should touch is power, and the log gives it to you as a correlated pair: <code>battery_status.voltage_v</code> and <code>battery_status.current_a</code>, sampled together, with the estimator’s own conclusions alongside — <code>remaining</code> as a 0–1 fraction of capacity, <code>time_remaining_s</code> as a prediction at recent load, a <code>warning</code> level that steps through <code>WARNING_LOW</code>, <code>WARNING_CRITICAL</code>, and <code>WARNING_EMERGENCY</code> as thresholds are crossed, and, remarkably, <code>internal_resistance_estimate</code>, PX4’s live per-cell estimate of the one parameter that governs everything in this section <span class="citation" data-cites="px4docs2026batterystatus">(<a href="#ref-px4docs2026batterystatus" role="doc-biblioref">PX4 Autopilot 2026b</a>)</span>.</p>
+<p>The physics is the Materials and Power chapter’s, one sentence of it: a battery’s terminal voltage under load is its open-circuit voltage minus the drawn current times its internal resistance — PX4’s battery-estimation documentation states the mechanism in exactly those terms, the internal resistance causing a voltage drop that reduces the measured output voltage relative to the no-load value <span class="citation" data-cites="px4docs2026battery">(<a href="#ref-px4docs2026battery" role="doc-biblioref">PX4 Autopilot 2026a</a>)</span>. In a log, that mechanism has an unmistakable shape, drawn in <a href="#fig-voltage-sag-diagnostics" class="quarto-xref">Figure&nbsp;<span>26.3</span></a>: the voltage trace <em>dips when the current trace spikes and recovers when it drops</em>. That is <strong>sag</strong> — a statement about resistance, not about how much energy remains. <strong>Depletion</strong> is the other motion in the same trace: the slow, one-way descent of the resting voltage between loads as capacity is actually consumed. The whole art of reading a power trace is refusing to confuse the two, and the log makes the distinction computable, because voltage and current are logged together.</p>
+<section id="a-worked-example-is-this-pack-sick" class="level3" data-number="26.6.1">
+<h3 data-number="26.6.1" class="anchored" data-anchor-id="a-worked-example-is-this-pack-sick"><span class="header-section-number">26.6.1</span> A worked example: is this pack sick?</h3>
+<p>Take a real excerpt shape from a search leg of the running example. Cruising the survey grid at the mission draw the book has carried since Part I (~365 W on the 4S pack, about 25 A), the log shows <code>voltage_v</code> near 15.1 V — mid-plateau. At the transition into an engagement climb, current spikes to 65 A and the voltage dips to 14.3 V, recovering as the climb ends. Is that alarming? Compute what the pair of excursions actually measures:</p>
+<p><span class="math display">\[
+\begin{aligned}
+R_{\text{int}} &amp;= \frac{\Delta V}{\Delta I} = \frac{15.1 - 14.3}{65 - 25}\ \text{V/A} \\
+               &amp;= \frac{0.8}{40}\ \Omega = 20\ \text{m}\Omega\ \text{(pack)} \\
+               &amp;= 5\ \text{m}\Omega\ \text{per cell (4S)}
+\end{aligned}
+\]</span></p>
+<p>Five milliohms per cell is a <em>healthy</em> LiPo — it matches both the Materials and Power chapter’s fresh-cell figure and the typical value PX4’s own documentation cites for its manual internal-resistance parameter <span class="citation" data-cites="px4docs2026battery">(<a href="#ref-px4docs2026battery" role="doc-biblioref">PX4 Autopilot 2026a</a>)</span>. The under-load reading of <span class="math inline">\(14.3/4 \approx 3.58\)</span> V per cell also clears the documented real-world under-load minimum of 3.5 V per cell for LiPo (the same page’s table: 3.7 V/cell as the conservative no-load minimum, 3.5 V/cell as the realistic minimum under load, 3.0 V/cell as the damage threshold; lithium-ion chemistry runs lower at 3.0/2.7/2.5) <span class="citation" data-cites="px4docs2026battery">(<a href="#ref-px4docs2026battery" role="doc-biblioref">PX4 Autopilot 2026a</a>)</span>. Verdict: an unremarkable sag on a healthy pack under a hard but legitimate load.</p>
+<p>Now age the pack to the Materials and Power chapter’s worn-out figure, 15 mΩ per cell — 60 mΩ across the pack — and replay the same climb. The dip becomes <span class="math inline">\(40 \times 0.060 = 2.4\)</span> V: the same maneuver now reads <span class="math inline">\(15.1 - 2.4 = 12.7\)</span> V, or about 3.2 V per cell — <em>below</em> the 3.5 V under-load floor and brushing the 3.0 V damage threshold — while the resting voltage between maneuvers still sits placidly mid-plateau. This is the signature of the pack that “flies gentle missions convincingly and fails exactly when full performance is demanded”: nothing about its state of charge is wrong; its <em>resistance</em> is. And it is why PX4’s charge estimator does not take the sagged voltage at face value. The documentation describes three progressively better estimation strategies — raw voltage comparison, explicitly coarse because sag is uncompensated; load compensation, which uses the simultaneous current measurement and the internal-resistance estimate (or the manually configured value) to correct the reading back toward open-circuit; and current-integration fused with the voltage estimate, with accuracy the docs compare to smart batteries <span class="citation" data-cites="px4docs2026battery">(<a href="#ref-px4docs2026battery" role="doc-biblioref">PX4 Autopilot 2026a</a>)</span>. Internal resistance is not a constant, the same page notes: it moves with temperature during a flight and grows as the pack ages — which is precisely why the logged <code>internal_resistance_estimate</code> series is itself a diagnostic: a pack whose estimate trends upward flight over flight is announcing its retirement on a schedule you can read.</p>
+</section>
+<section id="the-three-tier-ladder-in-the-log" class="level3" data-number="26.6.2">
+<h3 data-number="26.6.2" class="anchored" data-anchor-id="the-three-tier-ladder-in-the-log"><span class="header-section-number">26.6.2</span> The three-tier ladder in the log</h3>
+<p>What the failsafe machinery watches is not the sagging instantaneous voltage but the load-compensated <code>remaining</code> fraction, and PX4’s safety configuration hangs three thresholds on it in strictly decreasing order: <code>BAT_LOW_THR</code>, the warn level, which notifies and nothing more; <code>BAT_CRIT_THR</code>, the failsafe level, which triggers the configured action; and <code>BAT_EMERGEN_THR</code>, the emergency level, which triggers a more severe one. The overall action is selected by <code>COM_LOW_BAT_ACT</code>, whose documented recommended default is “Return then Land” — Return-to-Launch at the critical level, unconditional landing at the emergency level — with warning-only, land-at-critical, and a parachute-oriented “Return then Terminate” as the documented alternatives; when several failsafes are active at once, PX4 executes the single most severe applicable action. Two adjacent parameters complete the picture: <code>COM_ARM_BAT_MIN</code> refuses to arm below a floor, and <code>COM_FLT_TIME_MAX</code> bounds total flight time outright, a belt-and-suspenders limit independent of the charge model <span class="citation" data-cites="px4docs2026safety">(<a href="#ref-px4docs2026safety" role="doc-biblioref">PX4 Autopilot 2026h</a>)</span>. The same configuration page carries an easily missed field note: the ESC’s own low-voltage cutoff should be disabled or set below PX4’s empty threshold, so that the <em>autopilot’s</em> graded logic — not an ESC reacting to one sagged instantaneous reading — governs what happens as voltage falls <span class="citation" data-cites="px4docs2026battery">(<a href="#ref-px4docs2026battery" role="doc-biblioref">PX4 Autopilot 2026a</a>)</span>.</p>
+<div id="fig-voltage-sag-diagnostics" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two stacked time-series panels sharing a flight-time axis from arming to disarm. The top panel plots battery status voltage in teal against a left axis from thirteen to sixteen volts, and battery status current in amber against a right axis from zero to sixty amps. The current trace holds a low baseline with two tall spikes; the voltage trace dips sharply during each current spike and recovers after, annotated: the dip tracks the load, delta V equals I times R internal, and it recovers the moment current drops — sag. A second annotation points at the slowly declining resting voltage between loads: the resting level between loads only ever descends — depletion. The bottom panel plots battery status remaining, the load-compensated fraction of capacity, declining smoothly from one toward zero, against three dashed horizontal tier lines labeled BAT LOW THR, warn the operator; BAT CRIT THR, act, default return then; and BAT EMERGEN THR, land unconditionally. An amber dot where the remaining trace crosses the warn tier is labeled warning zero to one, WARNING LOW, timestamped in the log at the crossing. A footer states the tiers run on estimated remaining capacity, not on the sagged instantaneous voltage, so a hard climb's dip does not trip the failsafe while a genuinely depleted or aged high-resistance pack does, and that ordering is enforced, warn above failsafe above emergency, with the most severe active action winning.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-voltage-sag-diagnostics-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/voltage-sag-diagnostics.svg" class="img-fluid figure-img" style="width:100.0%" alt="Two stacked time-series panels sharing a flight-time axis from arming to disarm. The top panel plots battery status voltage in teal against a left axis from thirteen to sixteen volts, and battery status current in amber against a right axis from zero to sixty amps. The current trace holds a low baseline with two tall spikes; the voltage trace dips sharply during each current spike and recovers after, annotated: the dip tracks the load, delta V equals I times R internal, and it recovers the moment current drops — sag. A second annotation points at the slowly declining resting voltage between loads: the resting level between loads only ever descends — depletion. The bottom panel plots battery status remaining, the load-compensated fraction of capacity, declining smoothly from one toward zero, against three dashed horizontal tier lines labeled BAT LOW THR, warn the operator; BAT CRIT THR, act, default return then; and BAT EMERGEN THR, land unconditionally. An amber dot where the remaining trace crosses the warn tier is labeled warning zero to one, WARNING LOW, timestamped in the log at the crossing. A footer states the tiers run on estimated remaining capacity, not on the sagged instantaneous voltage, so a hard climb's dip does not trip the failsafe while a genuinely depleted or aged high-resistance pack does, and that ordering is enforced, warn above failsafe above emergency, with the most severe active action winning.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-voltage-sag-diagnostics-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;26.3: A logged flight’s power story in two aligned panels: on top, the voltage trace dips in step with current spikes and recovers (sag, a resistance measurement) while its resting level between loads only descends (depletion); below, the load-compensated remaining-capacity estimate crosses the three failsafe tiers — warn, act, land — with the <code>warning</code> field transition timestamped at the crossing.
+</figcaption>
+</figure>
+</div>
+<p>The diagnostic payoff of the ladder is that its rungs are <em>timestamped into the log</em>. When <code>remaining</code> crosses the critical threshold, <code>battery_status.warning</code> steps from <code>WARNING_LOW</code> to <code>WARNING_CRITICAL</code> at a specific microsecond, and PX4’s commanded response lands in the mode-change record moments later — so “did the battery failsafe fire where the battery data says it should have?” is a two-column correlation, not an inference. The running example adds its own rungs above the firmware’s, as the Geofencing and Fail-Safes chapter built them: the Failsafe node compares this very <code>remaining</code> field against its <code>battery_rtl</code> (0.30) and <code>battery_land</code> (0.15) parameters — deliberately far above PX4’s own defaults — and publishes <code>RTL:battery below mission threshold</code> or <code>LAND:battery below land floor</code> when they trip. A healthy mission’s post-flight record therefore shows the <em>mission</em> thresholds acting and the firmware tiers never reached; a log in which <code>WARNING_CRITICAL</code> appears at all is evidence that a whole mission-layer margin was somehow consumed or bypassed, and that is a finding even when the flight ended safely.</p>
+</section>
+</section>
+<section id="a-systematic-debugging-workflow" class="level2" data-number="26.7">
+<h2 data-number="26.7" class="anchored" data-anchor-id="a-systematic-debugging-workflow"><span class="header-section-number">26.7</span> A Systematic Debugging Workflow</h2>
+<p>Everything so far is instrumentation. What turns instrumentation into engineering is a loop, and the loop this chapter recommends is the standard troubleshooting cycle of any experimental discipline, applied to flight: <strong>log review → hypothesis → bench test → fix → re-fly</strong> (and re-review — the loop closes only when the new log shows the signature gone). Neither PX4 nor any other autopilot project hands down this five-step loop as named doctrine; what the documentation supplies is the two ingredients the loop runs on — an ordered first-pass checklist, and a vocabulary of named failure signatures precise enough to be hypotheses.</p>
+<p>The first pass is PX4’s own, from its flight-log-analysis guide <span class="citation" data-cites="px4docs2026flightloganalysis">(<a href="#ref-px4docs2026flightloganalysis" role="doc-biblioref">PX4 Autopilot 2026c</a>)</span>. <strong>One:</strong> establish that the log actually captured the event — did logging run through the anomaly, or stop short of it? (A log that ends <em>before</em> the incident is itself a finding; see brownouts, below.) <strong>Two:</strong> check controller tracking — plot estimated attitude and rate against their setpoints, the comparison Flight Review draws automatically. The guide presents setpoint-versus-actual as the single easiest lens for whether a subsystem misbehaved: a controller tracking its setpoints faithfully while the aircraft misbehaved points the investigation upstream, at the setpoints’ author — which, for the running example in an engagement, means the mission layer’s Offboard stream, not the autopilot. <strong>Three:</strong> validate the sensors, vibration explicitly included, with a rough documented guideline that peak-to-peak accelerations beyond 2–3 m/s² warrant a closer look. <strong>Four:</strong> for hardware-level failures, check the second, lower-level log — PX4 flight controllers can write separate <code>fault_[date].log</code> files recording processor-level hardware faults, a channel independent of the ULog itself.</p>
+<p>The hypothesis vocabulary is where a comparison source earns its place. ArduPilot — the other major open-source autopilot, whose DataFlash log format and message names differ from PX4’s throughout — publishes a diagnostics page that is exactly the artifact this step needs: six common failure categories, each with a named log signature and, where applicable, a numeric threshold <span class="citation" data-cites="ardupilot2026diagnosing">(<a href="#ref-ardupilot2026diagnosing" role="doc-biblioref">ArduPilot Dev Team 2026</a>)</span>. The book’s system is PX4-based, and none of ArduPilot’s field names or numbers applies to a <code>.ulg</code> file directly; the page is presented here as a debugging-methodology exemplar, because the <em>diagnostic logic</em> transfers even where the fields do not. Its categories, with the transferable logic stated in PX4 terms where PX4’s own documentation supports it:</p>
+<div id="tbl-failure-signatures" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-failure-signatures-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;26.1: ArduPilot’s documented failure-signature checklist, presented as a comparative debugging-methodology source — the diagnostic logic transfers to PX4’s log streams; the field names and numeric thresholds do not.
+</figcaption>
+<div aria-describedby="tbl-failure-signatures-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Signature in the log</th>
+<th>Hypothesis</th>
+<th>Transferable logic</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Sudden divergence of desired vs.&nbsp;actual roll/pitch</td>
+<td>Mechanical failure — motor, ESC, or propeller loss</td>
+<td>The setpoint/actual lens PX4’s own checklist teaches; on PX4, the attitude and attitude-setpoint streams</td>
+</tr>
+<tr class="even">
+<td>Vibration beyond documented bands (ArduPilot: <code>VIBE</code> &lt; 30 m/s² acceptable, &gt; 60 m/s² nearly always causes position problems)</td>
+<td>Mechanical imbalance or resonance</td>
+<td>The <em>shape</em> of a graded numeric judgment — ArduPilot’s numbers are for its own metric and do <strong>not</strong> port to PX4’s <code>accel_vibration_metric</code>; PX4’s equivalents are the airframe comparisons above</td>
+</tr>
+<tr class="odd">
+<td>Satellite count drops, dilution-of-precision rises (ArduPilot: HDOP ≤ 1.5 very good, &gt; 2.0 poor), position steps, then an aggressive “correction”</td>
+<td>GPS glitch — the vehicle chases an error it believes is displacement</td>
+<td>Satellite count and accuracy figures are logged by PX4’s GPS telemetry too; the step-then-lunge shape is the tell in either stack</td>
+</tr>
+<tr class="even">
+<td>Magnetometer trace that follows the throttle/current trace instead of actual heading changes</td>
+<td>Compass interference from the vehicle’s own power wiring</td>
+<td>The correlation test is stack-agnostic: heading sensors should not know what the motors are doing</td>
+</tr>
+<tr class="odd">
+<td>Log terminates abruptly mid-air; board supply-voltage telemetry swings beyond a normal band (ArduPilot documents 0.10–0.15 V as normal variation)</td>
+<td>Brownout — the flight controller’s own regulated rail glitched</td>
+<td>Distinct from pack sag: a sag is a smooth, recovering curve in a continuing log; a brownout is the log <em>ending</em></td>
+</tr>
+<tr class="even">
+<td>Dedicated error/failsafe records with subsystem codes</td>
+<td>An unexpected failsafe fired</td>
+<td>On PX4: <code>ulog_messages</code> output and the logged failsafe/warning fields — the moment and reason, timestamped</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Two rows repay a second look. The GPS-glitch row is the archetype of a signature that <em>predicts behavior</em>: in an autonomous position-holding mode, a sudden position error convinces the vehicle it has been displaced, and the controller commands an aggressive correction toward where it wrongly believes it should be — so the log shows cause (satellite drop, accuracy spike, position step) and effect (a lunge no one commanded) in adjacent streams <span class="citation" data-cites="ardupilot2026diagnosing">(<a href="#ref-ardupilot2026diagnosing" role="doc-biblioref">ArduPilot Dev Team 2026</a>)</span>. PX4 logs the corresponding GNSS quality and estimator-health information in its own GPS and estimator status streams; the field-level mapping is left as documented general practice rather than recited here, but the shape of the signature — discontinuity in the believed position, followed by a vigorous correction — is what to hunt for in any stack. And the brownout row completes a distinction this chapter has been building: “a power problem in the log” can mean the flight <em>battery</em> sagging — the smooth, recovering dip in <code>voltage_v</code> the previous section read — or the flight <em>controller’s</em> own 5 V rail glitching, which does not draw a curve at all; it truncates the file, mid-air, with no disarm event. One is diagnosed by reading the trace, the other by noticing where the trace stops.</p>
+<p>With a hypothesis named, the rest of the loop is deliberately boring. <strong>Bench test:</strong> reproduce the mechanism on the ground where it is cheap — spin the suspect motor with the props off and feel the bearing; balance the accused propeller; put the aged pack under a load tester and measure the resistance the log estimated; power the compass rail and watch the magnetometer while stepping motor current. <strong>Fix</strong> what the bench confirms — and here PX4’s mechanical-first doctrine from the vibration section generalizes: fix causes before compensating for them. <strong>Re-fly</strong> the <em>same</em> profile, and re-read the new log against the old one: the QAV-R/F450/S500 comparison exists because someone flew comparable flights on different hardware and kept the files, and your before-and-after pair is the same method pointed at one aircraft. A fix that cannot be seen in the next log is a fix you cannot prove happened — which is the FOQA lesson again, in miniature: the value of a log archive is comparative, and it only exists if the uneventful flights were kept too.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="For More">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>For More
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Flight Review’s public instance at <code>logs.px4.io</code> doubles as a browsable database of real-world <code>.ulg</code> uploads — a ready supply of unfamiliar logs to practice the first-pass checklist on. For vibration work beyond the default logged rates, PX4’s high-rate FIFO logging profiles (<code>SDLOG_PROFILE</code>) capture raw IMU samples at several kilohertz, the input a proper spectral analysis or notch-filter tuning session needs <span class="citation" data-cites="px4docs2026flightreview">(<a href="#ref-px4docs2026flightreview" role="doc-biblioref">PX4 Autopilot 2026e</a>)</span>. And for multi-topic ad hoc plotting that Flight Review’s fixed panels don’t cover, PlotJuggler and Foxglove both open <code>.ulg</code> files natively <span class="citation" data-cites="px4docs2026flightloganalysis">(<a href="#ref-px4docs2026flightloganalysis" role="doc-biblioref">PX4 Autopilot 2026c</a>)</span>.</p>
+</div>
+</div>
+</section>
+<section id="check-your-understanding" class="level2" data-number="26.8">
+<h2 data-number="26.8" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">26.8</span> Check Your Understanding</h2>
+<ol type="1">
+<li>A crash ends a flight — and the aircraft’s power — mid-write, leaving a truncated <code>.ulg</code> file. Explain <em>two</em> properties of the ULog format that make this file substantially recoverable anyway, and name the section of the file where you would look for PX4’s own last words (and the <code>pyulog</code> tool that prints them).</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>First, the format is self-describing: the definitions section — written at the <em>start</em> of the file, before any flight data — carries every message’s field names and types plus the full parameter set, so whatever data section survives can be parsed without external schemas. Second, parsers are expected to handle corruption gracefully: rather than aborting at the first damaged byte, a well-behaved ULog reader resynchronizes and continues, so everything up to the truncation (and past isolated corruption) is readable. PX4’s own diagnostic prose — <code>PX4_INFO</code>/<code>PX4_WARN</code>/<code>PX4_ERR</code> output — lives in the logged-string (<code>'L'</code>/<code>'C'</code>) messages of the <em>data</em> section, on the same microsecond clock as the numeric streams, and <code>ulog_messages flight.ulg</code> prints it with timestamps and severities. (If the truncation itself is the mystery, the separate <code>fault_[date].log</code> hardware-fault files are the second place to look.)</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>A logged 4S LiPo flight shows <code>voltage_v</code> = 14.9 V at a cruise draw of <code>current_a</code> = 8 A, and 13.9 V during a 30 A climb. Compute the pack and per-cell internal resistance, compare against a healthy cell’s ~5 mΩ, evaluate the under-load per-cell voltage against the documented LiPo thresholds, and give the verdict: sagging-but-healthy, aged, or depleted?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(R_{\text{int}} = \Delta V / \Delta I = (14.9 - 13.9)/(30 - 8) = 1.0/22 \approx 45\)</span> mΩ for the pack, ≈ 11 mΩ per cell — roughly double a healthy cell’s ~5 mΩ. Under load the cells sit at <span class="math inline">\(13.9/4 \approx 3.48\)</span> V, marginally below the documented 3.5 V/cell realistic under-load minimum (though far from the 3.0 V damage threshold). Is it depleted? Load-compensate: the open-circuit equivalent is <span class="math inline">\(13.9 + 30 \times 0.045 \approx 15.3\)</span> V ≈ 3.8 V/cell — mid-plateau, plenty of charge. Verdict: not depleted but <em>aged</em> (or very cold): elevated internal resistance is making legitimate loads read like emergencies. The fix is a battery-bench decision — warm, load-test, and likely retire the pack — not a mission-threshold change.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>On an airframe whose two-blade propellers turn about 6,000 RPM in hover, a high-rate log’s FFT shows peaks at 100 Hz and 200 Hz. Identify the likely source of each peak, name the mechanical check each one dispatches to, and explain why a strong single peak at 50 Hz — <em>not</em> matching either motor frequency — would be a more troubling finding than both.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>6,000 RPM is 100 Hz of shaft rotation, so the 100 Hz peak is once-per-revolution energy — rotating imbalance: check propeller balance, hub damage, and motor shaft/bearing condition. Two blades pass at twice shaft rate, so 200 Hz is the blade-passing frequency — the propellers beating the air, expected at modest amplitude (the F450’s documented ~100 Hz bump is this same feature at that airframe’s lower RPM). A strong 50 Hz peak matching neither frequency indicates something <em>else</em> resonating — the documented landing-gear failure case is exactly this — and it is worse for two reasons: it points to a structural resonance that will not be fixed by balancing anything, and it sits low, close to the frequencies of genuine vehicle dynamics, where a software filter aggressive enough to remove it would also delay real control response. The remedy is mechanical — stiffen or damp the resonating structure — per the documented reduce-the-source-first priority.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>A teammate reads that vibration under 30 m/s² is acceptable and over 60 m/s² nearly always causes position-hold problems, and proposes wiring those numbers into a script that flags the running example’s logged <code>accel_vibration_metric</code>. What is wrong with the proposal, and what should the script compare against instead?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Those thresholds are ArduPilot’s, documented for ArduPilot’s own <code>VIBE</code> message — a differently computed quantity on a different scale in a different log format. PX4’s <code>accel_vibration_metric</code> is not the same measurement, so the numbers do not port; treating them as universal constants is exactly the citation-across-systems error a diagnostician must not make. What transfers is the <em>shape</em> of the judgment — a graded numeric band from fine through suspect to disqualifying. For a PX4 log, the script should use PX4-native references: growing <code>accel_clipping</code>/<code>gyro_clipping</code> counts (range exceeded — disqualifying), the documented ~2–3 m/s² peak-to-peak first-pass guideline, the raw-trace z-touching-x/y hover test, and, best of all, the aircraft’s own baseline — the metric’s values from known-good flights of the same airframe, which is the comparison Flight Review’s worked airframe examples model.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>Reviewing a mission’s records, you find the companion computer’s log contains the Failsafe node’s single line <code>FAILSAFE: RTL:geofence breach</code> at 14:02:31, per the Geofencing and Fail-Safes chapter’s latching protocol. List what you would expect to find in the <em>ULog</em> around that timestamp if the override executed correctly, and explain which questions only the ULog can answer and which only the companion-side record can.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>In the ULog, seconds after 14:02:31: a commanded mode change to Return-to-Launch in the vehicle-status/mode record (the Mission Manager’s <code>_enter_failsafe</code> parses <code>RTL</code>, zeroes the token, and calls the flight controller’s RTL service, which the Flight Controller verifies against PX4 telemetry), plus position telemetry showing the vehicle at or beyond the configured radius just before, and a homeward track after; <code>ulog_messages</code> may also show mode-change text. Only the ULog can answer physical-truth questions: where the vehicle actually was, when the mode actually changed, what the battery and estimator were doing — it is the autopilot’s own record, immune to companion-side bugs. Only the companion record can answer intent questions: <em>why</em> the override fired (the <code>SEVERITY:reason</code> string), what the watchdog’s thresholds were, which behavior node held the token, what the mission state machine did — none of the <code>/goose/*</code> topics exists in the ULog. Correlating the two (one timeline, e.g., via <code>ulog2ros2bag</code>) is the only way to check the full chain: condition detected → token revoked → service called → PX4 mode actually changed.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>Two logs both end with the aircraft on the ground unexpectedly. Log A runs to a normal disarm; its <code>voltage_v</code> shows deepening dips during maneuvers in the last two minutes, and <code>warning</code> reaches <code>WARNING_CRITICAL</code> before an automatic return. Log B simply stops at 471 seconds, mid-air, with no disarm event and unremarkable battery voltage throughout. Give the leading hypothesis for each, and the bench test each one dispatches to.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Log A is a battery-side story told to completion: worsening sag (rising effective internal resistance as the pack empties and heats, and dips deepening as <code>remaining</code> falls) until the load-compensated estimate crossed <code>BAT_CRIT_THR</code>, stepping <code>warning</code> to <code>WARNING_CRITICAL</code> and triggering the configured return — the recorder captured cause, threshold crossing, and response, all timestamped. Bench test: load-test the pack, measure internal resistance against the log’s own <code>internal_resistance_estimate</code>, check cell balance; the fix is pack management (retire, warm, or resize), not software. Log B is the brownout signature: an abrupt mid-air log truncation with a healthy flight battery points at the flight controller’s own regulated supply rail, a different failure with a different mechanism — the recorder itself lost power, so the evidence is the <em>absence</em> of data. Bench test: power the flight controller through its actual harness, exercise peak loads (all peripherals, servo/ESC transients), and watch the board’s supply-voltage telemetry for excursions beyond normal variation; also inspect the power-module wiring and connectors. Checking the separate hardware fault log for a processor-level record is the corroborating step.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="26.9">
+<h2 data-number="26.9" class="anchored" data-anchor-id="try-it"><span class="header-section-number">26.9</span> Try It</h2>
+<p><strong>Part 1 — the routine review, made routine.</strong> Fly the running example’s mission (or any Part II mission) in SITL — the simulator’s PX4 writes the same <code>.ulg</code> files a real flight controller does; find the newest one under the SITL working tree’s log directory, or download it from QGroundControl’s log list. Then produce a two-page post-flight report using only this chapter’s tools. Page one, vibration: <code>ulog2csv -m vehicle_imu_status</code> (or the <code>pyulog</code> snippet), plot both vibration metrics and all six clipping counters over time, and classify the flight against the chapter’s criteria — any clipping growth, metrics steady or trending, and (if you enable high-rate logging and hover deliberately for thirty seconds) where the spectral energy sits relative to your airframe’s rotation and blade-passing frequencies. Page two, power: plot <code>voltage_v</code> and <code>current_a</code> on shared time, mark every sag excursion, compute <span class="math inline">\(R_{\text{int}}\)</span> from the largest one, and plot <code>remaining</code> beneath with the three tier values you recover from <code>ulog_params</code> (look up <code>BAT_LOW_THR</code>, <code>BAT_CRIT_THR</code>, <code>BAT_EMERGEN_THR</code>, and check <code>COM_LOW_BAT_ACT</code>) drawn as horizontal lines. Upload the same file to Flight Review and check your plots against its panels — you should now be able to say what every panel is showing and where its data lives in the file. Keep the report: it is flight one of your baseline archive, and the comparison target for everything that follows.</p>
+<p><strong>Part 2 — diagnose an injected fault from the log alone.</strong> Have a partner (or your future self, a week from now) prepare a SITL flight with exactly one fault injected, without telling you which: an aged battery (raise the simulated pack’s internal resistance or cut its capacity), a vibration problem (if your setup exposes IMU noise/vibration simulation parameters), a GPS degradation (PX4’s SITL failure injection can cut or degrade GNSS mid-flight when the failure-injection parameter is enabled), or a mission-layer event (a mid-flight geofence tightening that trips the running example’s watchdog). You get the <code>.ulg</code> file — plus the companion-side log if the mission stack was up — and nothing else. Run the full loop in writing: the first-pass checklist (did the log capture it? does the controller track its setpoints? do the sensors validate?), the signature hunt against <a href="#tbl-failure-signatures" class="quarto-xref">Table&nbsp;<span>26.1</span></a> and this chapter’s traces, a <em>named hypothesis</em>, and the bench test you would run on real hardware to confirm it. Only then compare against what was actually injected. Score yourself not on the guess but on the chain: a wrong hypothesis reached by defensible reading of real evidence is worth more than a right one reached by luck — and either way, finish the loop: state the fix, re-fly the corrected configuration, and show the before/after pair of logs with the signature gone.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#autonomous-state-machine-control">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+<p>The previous chapter assembled the machine; this one taught it to testify. A program that reviews its logs after every flight — not just the frightening ones — is running the same discipline aviation formalized decades ago, and it accumulates the one asset no amount of cleverness substitutes for: a baseline, against which the next anomaly is visible early and provably fixed. What the log cannot testify to is whether the flight should have happened at all — what a system that autonomously pursues wild animals owes the animals, the public, and the law is an account no telemetry stream records, and rendering it is the work this Part turns to next.</p>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-ardupilot2026diagnosing" class="csl-entry" role="listitem">
+ArduPilot Dev Team. 2026. <span>“Diagnosing Some Common Problems Using Logs.”</span> ArduPilot; ArduPilot Copter Documentation. <a href="https://ardupilot.org/copter/docs/common-diagnosing-problems-using-logs.html">https://ardupilot.org/copter/docs/common-diagnosing-problems-using-logs.html</a>.
+</div>
+<div id="ref-faa2004foqa" class="csl-entry" role="listitem">
+Federal Aviation Administration. 2004. <span>“Advisory Circular 120-82: Flight Operational Quality Assurance.”</span> Federal Aviation Administration. <a href="https://www.faa.gov/regulations_policies/advisory_circulars/index.cfm/go/document.information/documentid/23227">https://www.faa.gov/regulations_policies/advisory_circulars/index.cfm/go/document.information/documentid/23227</a>.
+</div>
+<div id="ref-ntsb2021recorders" class="csl-entry" role="listitem">
+National Transportation Safety Board. 2021. <span>“Install Crash-Resistant Recorders and Establish Flight Data Monitoring Programs.”</span> National Transportation Safety Board; NTSB Most Wanted List of Transportation Safety Improvements, 2021–2022. <a href="https://www.ntsb.gov/Advocacy/mwl/Pages/mwl-21-22/mwl-as-02.aspx">https://www.ntsb.gov/Advocacy/mwl/Pages/mwl-21-22/mwl-as-02.aspx</a>.
+</div>
+<div id="ref-px4docs2026battery" class="csl-entry" role="listitem">
+PX4 Autopilot. 2026a. <span>“Battery Estimation Tuning (Power Setup).”</span> PX4 Autopilot; PX4 User Guide (main). <a href="https://docs.px4.io/main/en/config/battery.html">https://docs.px4.io/main/en/config/battery.html</a>.
+</div>
+<div id="ref-px4docs2026batterystatus" class="csl-entry" role="listitem">
+———. 2026b. <span>“<span>BatteryStatus</span> (u<span>ORB</span> Message).”</span> PX4 Autopilot; PX4 User Guide (main). <a href="https://docs.px4.io/main/en/msg_docs/BatteryStatus.html">https://docs.px4.io/main/en/msg_docs/BatteryStatus.html</a>.
+</div>
+<div id="ref-px4docs2026flightloganalysis" class="csl-entry" role="listitem">
+———. 2026c. <span>“Flight Log Analysis.”</span> PX4 Autopilot; PX4 User Guide (main). <a href="https://docs.px4.io/main/en/log/flight_log_analysis.html">https://docs.px4.io/main/en/log/flight_log_analysis.html</a>.
+</div>
+<div id="ref-px4flightreview2026repo" class="csl-entry" role="listitem">
+———. 2026d. <span>“Flight_review: Web Application for Flight Log Analysis and Review.”</span> PX4 Autopilot; GitHub repository. <a href="https://github.com/PX4/flight_review">https://github.com/PX4/flight_review</a>.
+</div>
+<div id="ref-px4docs2026flightreview" class="csl-entry" role="listitem">
+———. 2026e. <span>“Log Analysis Using Flight Review.”</span> PX4 Autopilot; PX4 User Guide (main). <a href="https://docs.px4.io/main/en/log/flight_review.html">https://docs.px4.io/main/en/log/flight_review.html</a>.
+</div>
+<div id="ref-px4docs2026logging" class="csl-entry" role="listitem">
+———. 2026f. <span>“Logging.”</span> PX4 Autopilot; PX4 User Guide (main). <a href="https://docs.px4.io/main/en/dev_log/logging.html">https://docs.px4.io/main/en/dev_log/logging.html</a>.
+</div>
+<div id="ref-px4pyulog2026" class="csl-entry" role="listitem">
+———. 2026g. <span>“Pyulog: <span>P</span>ython Module and Scripts for <span>ULog</span> Files.”</span> PX4 Autopilot; GitHub repository. <a href="https://github.com/PX4/pyulog">https://github.com/PX4/pyulog</a>.
+</div>
+<div id="ref-px4docs2026safety" class="csl-entry" role="listitem">
+———. 2026h. <span>“Safety (<span>F</span>ailsafe) Configuration.”</span> PX4 Autopilot; PX4 User Guide (main). <a href="https://docs.px4.io/main/en/config/safety.html">https://docs.px4.io/main/en/config/safety.html</a>.
+</div>
+<div id="ref-px4docs2026ulogformat" class="csl-entry" role="listitem">
+———. 2026i. <span>“<span>ULog</span> File Format.”</span> PX4 Autopilot; PX4 User Guide (main). <a href="https://docs.px4.io/main/en/dev_log/ulog_file_format.html">https://docs.px4.io/main/en/dev_log/ulog_file_format.html</a>.
+</div>
+<div id="ref-px4docs2026vehicleimustatus" class="csl-entry" role="listitem">
+———. 2026j. <span>“<span>VehicleImuStatus</span> (u<span>ORB</span> Message).”</span> PX4 Autopilot; PX4 User Guide (main). <a href="https://docs.px4.io/main/en/msg_docs/VehicleImuStatus.html">https://docs.px4.io/main/en/msg_docs/VehicleImuStatus.html</a>.
+</div>
+<div id="ref-px4docs2026vibrationisolation" class="csl-entry" role="listitem">
+———. 2026k. <span>“Vibration Isolation.”</span> PX4 Autopilot; PX4 User Guide (main). <a href="https://docs.px4.io/main/en/assembly/vibration_isolation.html">https://docs.px4.io/main/en/assembly/vibration_isolation.html</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="pagination-link" aria-label="System Architecture: ROS 2 Nodes, Services, and Topics">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="pagination-link" aria-label="Remote Sensing at Scale: Multispectral Imaging in Agriculture">
+        <span class="nav-page-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

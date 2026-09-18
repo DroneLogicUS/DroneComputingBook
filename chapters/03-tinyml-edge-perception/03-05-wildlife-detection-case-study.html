@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>17&nbsp; Case Study: Wildlife Detection from the Air – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" rel="next">
+<link href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html">Part III — Perception at the Edge: TinyML &amp; Computer Vision</a></li><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">17.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">17.2</span> Key Vocabulary</a></li>
+  <li><a href="#the-problem-the-literature-keeps-meeting" id="toc-the-problem-the-literature-keeps-meeting" class="nav-link" data-scroll-target="#the-problem-the-literature-keeps-meeting"><span class="header-section-number">17.3</span> The Problem the Literature Keeps Meeting</a></li>
+  <li><a href="#sheep-at-eighty-metres" id="toc-sheep-at-eighty-metres" class="nav-link" data-scroll-target="#sheep-at-eighty-metres"><span class="header-section-number">17.4</span> Sheep at Eighty Metres</a></li>
+  <li><a href="#five-detectors-one-question" id="toc-five-detectors-one-question" class="nav-link" data-scroll-target="#five-detectors-one-question"><span class="header-section-number">17.5</span> Five Detectors, One Question</a></li>
+  <li><a href="#reading-the-results-with-part-iiis-instruments" id="toc-reading-the-results-with-part-iiis-instruments" class="nav-link" data-scroll-target="#reading-the-results-with-part-iiis-instruments"><span class="header-section-number">17.6</span> Reading the Results with Part III’s Instruments</a></li>
+  <li><a href="#from-sheep-to-geese" id="toc-from-sheep-to-geese" class="nav-link" data-scroll-target="#from-sheep-to-geese"><span class="header-section-number">17.7</span> From Sheep to Geese</a></li>
+  <li><a href="#the-altitude-the-animals-set" id="toc-the-altitude-the-animals-set" class="nav-link" data-scroll-target="#the-altitude-the-animals-set"><span class="header-section-number">17.8</span> The Altitude the Animals Set</a></li>
+  <li><a href="#what-the-case-study-settles" id="toc-what-the-case-study-settles" class="nav-link" data-scroll-target="#what-the-case-study-settles"><span class="header-section-number">17.9</span> What the Case Study Settles</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">17.10</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">17.11</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html">Part III — Perception at the Edge: TinyML &amp; Computer Vision</a></li><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Every quantitative claim in this Part so far has been the book’s own: worked miniatures, illustrative budgets, published benchmark tables read at a distance. That was the right way to build the machinery, but machinery built entirely from first principles carries a standing risk — that the problems it prepares for are not quite the problems the field actually has. The corrective is a case study, and this chapter conducts one. Its primary text is a real research paper: a team at a New Zealand university spent years trying to detect sheep from a drone at 80 m, built their own dataset because none existed, compared five detector architectures head to head, and published what worked, what failed, and how fast each ran <span class="citation" data-cites="sarwar2020sheep">(<a href="#ref-sarwar2020sheep" role="doc-biblioref">Sarwar et al. 2020</a>)</span>. Around that paper sits a wider literature — cattle counted from quadrotors <span class="citation" data-cites="barbedo2020cattle">(<a href="#ref-barbedo2020cattle" role="doc-biblioref">Barbedo et al. 2020</a>)</span>, seabird colonies censused by the tens of thousands <span class="citation" data-cites="hayes2021seabird">(<a href="#ref-hayes2021seabird" role="doc-biblioref">Hayes et al. 2021</a>)</span>, waterfowl surveys that include Canada geese by name <span class="citation" data-cites="zhai2025waterfowl">(<a href="#ref-zhai2025waterfowl" role="doc-biblioref">Zhai et al. 2025</a>)</span> — and a smaller, sharper literature on the other side of the camera: field measurements of what geese <em>do</em> when a drone approaches them <span class="citation" data-cites="bechhansen2019geese">(<a href="#ref-bechhansen2019geese" role="doc-biblioref">Bech-Hansen et al. 2019</a>)</span>.</p>
+<p>Reading published work is a skill this book has not yet asked for, so the chapter models it. The questions an engineer puts to a paper are the ones Part III has spent four chapters making precise: What are the problem’s constants — altitude, target size in pixels, background? Where did the dataset come from, how big is it, and how was it split? What does the headline metric actually compute, and at what operating point? And what did the authors <em>not</em> do — which claims are measurements and which are projections? Asked of the sheep paper, those questions return a study that lands with almost uncanny precision on the running example’s own territory: small whitish blobs against pasture, a detector meant for the aircraft, precision and recall argued over in percentage points. Asked of the goose literature, they return the constants the running example will actually face — including one, set by the geese themselves, that no previous chapter has priced.</p>
+<section id="learning-objectives" class="level2" data-number="17.1">
+<h2 data-number="17.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">17.1</span> Learning Objectives</h2>
+<ul>
+<li>Explain why animal detection from a moving aerial platform is harder than static-camera detection, naming the five recurring challenges — scale variation, background contrast, clustering, motion, and structural false positives — with a quantified example of each from the published literature.</li>
+<li>Summarize the sheep-detection study’s approach: the dataset it had to build, the five architectures it compared, why a centroid-based UNet with the weighted Hausdorff distance won on both accuracy and speed, and what each losing architecture’s failure mode was.</li>
+<li>Analyze a published paper’s evaluation with the detection-metric machinery of this Part: identify why a centroid detector reports F1 rather than mAP, read a precision–recall pair as an operating point, and distinguish measured results from projected ones.</li>
+<li>Situate the running example’s goose-detection problem in the aerial-wildlife literature, using reported waterfowl results to predict which conditions will be easy, which hard, and by roughly how much.</li>
+<li>Derive the altitude bind: combine pixels-on-target arithmetic with measured goose disturbance responses to show why detection range and disturbance-free approach conflict, and name the sensor-side levers that relax the conflict.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="17.2">
+<h2 data-number="17.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">17.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Onboard detection</strong> — running the detector on the aircraft’s own computer rather than on the ground or in the cloud; the deployment mode Part III has argued for throughout, and the stated (but not demonstrated) goal of the sheep study.</li>
+<li><strong>Aerial survey</strong> — a systematic overflight flown to detect, count, or map animals over an area; the observational mode of wildlife work, where the deliverable is a census rather than an intervention.</li>
+<li><strong>Scale variation</strong> — the change in a target’s apparent pixel size with altitude and terrain: the same animal spans a few pixels or tens of pixels depending on range, so a detector must either see all scales in training or have the scale pinned by flight discipline.</li>
+<li><strong>Small-object detection</strong> — the regime in which targets span roughly twenty pixels or fewer, too few to exhibit the internal detail general-purpose detectors rely on; the regime every high-altitude animal detector lives in.</li>
+<li><strong>Animal clustering</strong> — the tendency of animals to group until their bodies touch or overlap in the image, merging distinct individuals into one blob and defeating both segmentation and box-based non-maximum suppression; the dominant reported error source across species.</li>
+<li><strong>Centroid annotation</strong> — a ground-truth label consisting of a single point at each object’s center rather than a bounding box; natural for counting tasks and for small, overlapping targets, at the cost of the box-based metric machinery.</li>
+<li><strong>False negative (missed detection)</strong> — an animal present but not detected; in a survey it biases the count low, in the running example’s mission it leaves a goose undeterred.</li>
+<li><strong>False positive (false alarm)</strong> — a detection with no animal behind it — a rock, a fence post, a shed roof; in a survey it biases the count high, in the running example’s mission it spends a flight leg harassing grass.</li>
+<li><strong>Disturbance response</strong> — the measurable behavioral reaction of animals to an approaching aircraft, from raised-head vigilance to flushing (the whole flock taking flight); a function of altitude and approach distance that field studies quantify and flight plans must respect.</li>
+</ul>
+</section>
+<section id="the-problem-the-literature-keeps-meeting" class="level2" data-number="17.3">
+<h2 data-number="17.3" class="anchored" data-anchor-id="the-problem-the-literature-keeps-meeting"><span class="header-section-number">17.3</span> The Problem the Literature Keeps Meeting</h2>
+<p>Why is finding an animal from a drone hard, when finding a face in a phone photo is solved? A camera trap bolted to a tree answers by contrast. The trap’s viewpoint never changes; its scale is fixed, so a deer is always roughly the same size in pixels; and its background is <em>the same background, every frame</em>, so the oldest trick in computer vision — model the background, subtract it, and whatever remains is the animal — works. A drone forfeits all three properties at takeoff. Every frame arrives from a different pose and altitude, under a different lighting angle, over a different patch of ground, and the aerial-animal literature is, at bottom, the record of what that forfeiture costs. Five challenges recur across it — across cattle, seabirds, waterfowl, and sheep, across a decade of architectures — with a regularity that marks them as properties of the problem rather than of any one study. <a href="#fig-aerial-animal-detection-challenges" class="quarto-xref">Figure&nbsp;<span>17.1</span></a> collects them.</p>
+<div id="fig-aerial-animal-detection-challenges" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Diagram titled why animals from the air are hard, five compounding challenges. A top banner contrasts two boxes: a static camera trap with constant viewpoint, fixed scale, and the same background every frame so background subtraction is viable, against a camera on a UAV where every frame has a different pose, altitude, lighting angle, and background composition, so scale-normalization and background-invariance become first-class problems. Five challenge panels follow. One, scale variation with altitude: ground distance per pixel grows with altitude and drifts with terrain relief; cattle work reported about one centimeter per pixel at thirty meters varying plus or minus twenty percent with terrain, needing an explicit correction. Two, background contrast and camouflage: contrast is seasonal and lighting-dependent, pasture runs bright green to pale yellow, no fixed threshold survives; waterfowl work reports over ninety-five percent accuracy on open water but eighty to eighty-five percent where vegetation obscures the birds. Three, clustering and occlusion: a sketch shows three touching animals covered by one detection box; touching bodies merge into one blob or overlapping boxes get collapsed by non-max suppression; cattle F1 falls from 99.1 percent isolated to 89.3 percent in four-animal clusters, and the sheep UNet fails only on sheep very close together. Four, motion, theirs and yours: platform vibration and animal movement blur small targets and double-count moved ones; the cattle protocol flies during low-activity hours. Five, structural false positives: at ten to twenty pixels a white rock, shadow, or shed roof carries the same few features as the animal; white roofs cut cattle F1 from 97.4 to 92.4 percent and the sheep networks false-alarmed on fences. A footer states the common structure: all five are properties of the platform and the animals, not of any one model, which is why they recur unchanged across species, architectures, and years, and why a pipeline built for geese must budget for every one.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-aerial-animal-detection-challenges-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/aerial-animal-detection-challenges.svg" class="img-fluid figure-img" style="width:100.0%" alt="Diagram titled why animals from the air are hard, five compounding challenges. A top banner contrasts two boxes: a static camera trap with constant viewpoint, fixed scale, and the same background every frame so background subtraction is viable, against a camera on a UAV where every frame has a different pose, altitude, lighting angle, and background composition, so scale-normalization and background-invariance become first-class problems. Five challenge panels follow. One, scale variation with altitude: ground distance per pixel grows with altitude and drifts with terrain relief; cattle work reported about one centimeter per pixel at thirty meters varying plus or minus twenty percent with terrain, needing an explicit correction. Two, background contrast and camouflage: contrast is seasonal and lighting-dependent, pasture runs bright green to pale yellow, no fixed threshold survives; waterfowl work reports over ninety-five percent accuracy on open water but eighty to eighty-five percent where vegetation obscures the birds. Three, clustering and occlusion: a sketch shows three touching animals covered by one detection box; touching bodies merge into one blob or overlapping boxes get collapsed by non-max suppression; cattle F1 falls from 99.1 percent isolated to 89.3 percent in four-animal clusters, and the sheep UNet fails only on sheep very close together. Four, motion, theirs and yours: platform vibration and animal movement blur small targets and double-count moved ones; the cattle protocol flies during low-activity hours. Five, structural false positives: at ten to twenty pixels a white rock, shadow, or shed roof carries the same few features as the animal; white roofs cut cattle F1 from 97.4 to 92.4 percent and the sheep networks false-alarmed on fences. A footer states the common structure: all five are properties of the platform and the animals, not of any one model, which is why they recur unchanged across species, architectures, and years, and why a pipeline built for geese must budget for every one.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-aerial-animal-detection-challenges-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;17.1: The five recurring challenges of animal detection from a UAV, each quantified by the published literature, and the static-camera contrast that explains why all five are aerial-specific.
+</figcaption>
+</figure>
+</div>
+<p>Three of the five deserve a sentence beyond the figure, because they will drive everything that follows. <strong>Scale variation</strong> is Part I’s ground-sample-distance relation acting as an adversary: a cattle-counting team reported a nominal 1 cm-per-pixel resolution at 30 m that wandered by ±20% with terrain relief alone, enough to break any size-based filtering until they built an explicit correction into the pipeline <span class="citation" data-cites="barbedo2020cattle">(<a href="#ref-barbedo2020cattle" role="doc-biblioref">Barbedo et al. 2020</a>)</span>. <strong>Background contrast</strong> is not a fixed difficulty but a <em>seasonal, lighting-dependent variable</em> — the same team documented pasture ranging from bright green to pale yellow across a season — which is the field-scale version of the distribution-shift lesson the previous chapter drew, and it produces the single most consistent quantitative pattern in this literature: detection in the high 90s against simple backgrounds, dropping ten to twenty points wherever vegetation intrudes. And <strong>clustering</strong> is the failure that survives every architecture: animals bunch until their bodies touch, at which point a segmenter merges them, a box detector’s overlapping predictions get collapsed by the very non-maximum suppression step meant to clean duplicates — a seabird study watched legitimate penguin detections eliminated exactly this way <span class="citation" data-cites="hayes2021seabird">(<a href="#ref-hayes2021seabird" role="doc-biblioref">Hayes et al. 2021</a>)</span> — and a counting pipeline undercounts. Cattle F1 falls from 99.1% for isolated animals to 89.3% in four-animal clusters <span class="citation" data-cites="barbedo2020cattle">(<a href="#ref-barbedo2020cattle" role="doc-biblioref">Barbedo et al. 2020</a>)</span>; geese, which raft together on water and graze in dense flocks, sit squarely in the danger zone.</p>
+<p>The remaining two — motion, and structural false positives — round out the budget. Animals move between overlapping frames, so surveys double-count; the pragmatic mitigation in the cattle work is to fly when the animals are least active, a reminder that flight planning is part of the perception system. And at fifteen pixels, an animal is a shape and a color, which means everything sharing that shape and color is a candidate: white shed roofs depressed cattle F1 from 97.4% to 92.4% on the images containing them <span class="citation" data-cites="barbedo2020cattle">(<a href="#ref-barbedo2020cattle" role="doc-biblioref">Barbedo et al. 2020</a>)</span>, rocks and shadows were logged as penguins <span class="citation" data-cites="hayes2021seabird">(<a href="#ref-hayes2021seabird" role="doc-biblioref">Hayes et al. 2021</a>)</span>, and the sheep study’s own networks — the case this chapter now turns to — false-alarmed on fences.</p>
+</section>
+<section id="sheep-at-eighty-metres" class="level2" data-number="17.4">
+<h2 data-number="17.4" class="anchored" data-anchor-id="sheep-at-eighty-metres"><span class="header-section-number">17.4</span> Sheep at Eighty Metres</h2>
+<p>The sheep study’s problem statement is one sentence long and contains, on inspection, most of Part III. Detect sheep from a UAV flying at 80 m, where an adult sheep in a 2048 × 1080 video frame is “a rather nondescript whitish blob about 20 pixels long and 10 pixels wide” <span class="citation" data-cites="sarwar2020sheep">(<a href="#ref-sarwar2020sheep" role="doc-biblioref">Sarwar et al. 2020</a>)</span>. Every number in that sentence is a decision. The altitude is a three-way compromise the authors state explicitly: 80 m — well under the 120 m legal ceiling that New Zealand shares with much of the world — bought enough detail on each sheep, enough paddock per frame to be useful, and minimal disturbance to the animals. The pixel count is that altitude passed through the pixels-on-target relation of the Images as Data chapter, and it is worth checking their arithmetic against ours, because the check teaches something. The platform was a consumer quadrotor whose camera family has a wide field of view of roughly 94°; spread over 2,048 columns that is about 0.8 mrad per pixel, so at 80 m each pixel covers about 6.5 cm of paddock, and a sheep roughly 1.2 m long by 0.6 m wide spans about 19 × 9 pixels — the paper’s 20 × 10, recovered from first principles. The same relation exposes the uncomfortable comparison: the running example’s depth camera in its 640-column mode subtends roughly 2.45 mrad per pixel, three times coarser, which is why <em>its</em> 0.35 m goose gets only 7 pixels at 20 m. The sheep team could fly at 80 m because their sensor spent 2,048 columns on the scene; angular resolution, not courage, sets the survey altitude.</p>
+<p>Fifteen-ish pixels puts the task deep in <strong>small-object detection</strong>, and the paper’s literature review is a catalog of why that regime breaks the standard toolkit: small objects lack the internal detail — texture, parts, structure — that convolutional features feed on, and the authors note the YOLO family’s own documentation of its localization weakness on small targets, concluding that (as of the study’s writing) no off-the-shelf single-stage detector was good enough for the job <span class="citation" data-cites="sarwar2020sheep">(<a href="#ref-sarwar2020sheep" role="doc-biblioref">Sarwar et al. 2020</a>)</span>. The claim has aged — the waterfowl literature below fields modern detectors against comparably small birds with strong results — but the underlying physics has not: a detector asked about a 15-pixel blob is reasoning from a few dozen informative values, and every design choice in the study flows from that scarcity.</p>
+<p>The dataset had to be built, because — to the authors’ knowledge — no public dataset of drone imagery of sheep existed. This is the collect-and-label stage of the Building a Detection Pipeline chapter, executed for real, and the study’s choices read like that chapter’s checklist: video recorded at different times of day and in different weather, deliberately capturing the diversity of illumination, shadow, and background color; frames cut to 256 × 256 tiles; and, after augmentation, 22,742 labeled images split 80/10/10 into train, validation, and test. One labeling decision matters more than it first appears: every image was annotated <em>twice</em>, with bounding boxes and with <strong>centroid annotations</strong> — a point per sheep — because the five architectures under comparison consume different ground truth. The double labeling is the tell that this is a genuine comparison study: the same images, the same split, the same training budget, and only the detector varies.</p>
+</section>
+<section id="five-detectors-one-question" class="level2" data-number="17.5">
+<h2 data-number="17.5" class="anchored" data-anchor-id="five-detectors-one-question"><span class="header-section-number">17.5</span> Five Detectors, One Question</h2>
+<p>The comparison spans the two-stage/one-stage divide this Part has met twice already. On the two-stage side, the authors trained four networks through a modified R-CNN procedure — generate candidate regions, classify each — trimmed for the task: 1,000 region proposals per image instead of the classic 2,000, overlap thresholds tuned so that proposals count as positive examples more readily (small targets need every positive they can get), and a softmax-plus-cross-entropy classifier in place of the traditional support-vector-machine stage, purely to save training time. Two of the four were the era’s standard pretrained backbones, AlexNet and GoogLeNet, retrained on sheep. The other two were built for the occasion, and their design logic is the paper’s quiet thesis about small objects. Network-I is one convolutional layer, one fully connected layer, and a softmax — very nearly the smallest CNN that can exist — testing whether a tiny network suffices when the objects themselves carry so little detail. Network-II is seven convolution–batch-norm–ReLU–maxpool blocks that halve the spatial dimension at every step, 256 × 256 down to 2 × 2, deliberately densifying the features toward the end so that what survives is essentially the objects’ <em>contour</em> information — the authors’ explicit bet that a 15-pixel sheep is a contour and nothing else.</p>
+<p>The one-stage entrant is the interesting one. Rather than YOLO or SSD — dismissed for their small-object record — the authors adopted a UNet: an encoder–decoder network with skip connections, producing not boxes but a full-resolution <em>probability map</em>, trained with the <strong>weighted Hausdorff distance</strong> as its loss <span class="citation" data-cites="sarwar2020sheep">(<a href="#ref-sarwar2020sheep" role="doc-biblioref">Sarwar et al. 2020</a>)</span>. The ground truth here is the centroid labels, and the loss is built from the geometry of point sets — for estimated locations <span class="math inline">\(x\)</span> with probabilities <span class="math inline">\(p_x\)</span> and true centroids <span class="math inline">\(Y\)</span>:</p>
+<p><span class="math display">\[
+\begin{aligned}
+L_T(p, Y) \;=\;&amp; \frac{1}{|X|+\varepsilon} \sum_{x \in \Omega} p_x \, \min_{y \in Y} d(x,y) \\
+&amp;+ \frac{1}{|Y|} \sum_{y \in Y} \min_{x \in \Omega} \frac{d(x,y)+\varepsilon}{\,p_x^{\alpha} + \varepsilon/d_{\max}\,} \\
+&amp;+ L_1\!\left(C - \hat{C}\right),
+\end{aligned}
+\]</span></p>
+<p>whose two main terms are a conversation between prediction and truth: the first says <em>everywhere you claim a sheep, a true centroid should be nearby</em> — it penalizes confident probability mass far from any real sheep, which is the false-positive direction; the second says <em>every true centroid should have confident probability mass nearby</em> — it penalizes real sheep that no prediction approaches, the false-negative direction. The third term trains a count: a scalar regressed from the network’s deepest features, passed through a SoftPlus, <span class="math inline">\(\hat{C} = \log(1 + e^{s})\)</span>, and rounded to give the number of sheep directly. The architecture’s stated limitation is single-class operation — one species, no more, without modification — but for small, complexly shaped, <em>overlapping</em> objects, centroids have a structural advantage over boxes: two touching sheep have two distinct centers even when no line separates their pixels, and there is no non-maximum suppression step to collapse them.</p>
+<p>All five networks trained under identical conditions — stochastic gradient descent, 500 epochs, on a single desktop GPU (an NVIDIA GTX 1080) — and the results are unambiguous:</p>
+<div id="tbl-sheep-results" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sheep-results-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;17.1: The five networks’ reported performance on the sheep test set <span class="citation" data-cites="sarwar2020sheep">(<a href="#ref-sarwar2020sheep" role="doc-biblioref">Sarwar et al. 2020</a>)</span>.
+</figcaption>
+<div aria-describedby="tbl-sheep-results-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Network</th>
+<th>Precision</th>
+<th>Recall</th>
+<th>F1-score</th>
+<th>Location RMSE (px)</th>
+<th>Time per image</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>UNet (centroids + WHD)</td>
+<td><strong>96.20%</strong></td>
+<td><strong>90.14%</strong></td>
+<td><strong>93.07%</strong></td>
+<td><strong>0.783</strong></td>
+<td><strong>0.14 s</strong></td>
+</tr>
+<tr class="even">
+<td>Network-II (7-layer)</td>
+<td>91.21%</td>
+<td>81.91%</td>
+<td>86.31%</td>
+<td>1.819</td>
+<td>2.22 s</td>
+</tr>
+<tr class="odd">
+<td>Network-I (1-layer)</td>
+<td>88.77%</td>
+<td>80.45%</td>
+<td>84.38%</td>
+<td>1.961</td>
+<td>0.20 s</td>
+</tr>
+<tr class="even">
+<td>GoogLeNet</td>
+<td>80.79%</td>
+<td>81.67%</td>
+<td>81.23%</td>
+<td>1.899</td>
+<td>3.53 s</td>
+</tr>
+<tr class="odd">
+<td>AlexNet</td>
+<td>78.74%</td>
+<td>81.37%</td>
+<td>80.03%</td>
+<td>2.132</td>
+<td>1.31 s</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p><a href="#fig-sheep-detector-comparison" class="quarto-xref">Figure&nbsp;<span>17.2</span></a> plots the table the way the previous chapter taught — accuracy against time — and the shape of the result is its own lesson. The previous chapter’s frontier forced a trade: more accuracy for more milliseconds, pick your point. Here there is no trade to make. The UNet wins every column at once — most accurate, fastest by a wide margin, tightest localization — because the four R-CNN-trained networks pay a structural tax it does not: a thousand region proposals per image, each classified separately, against the UNet’s single forward pass. Frontiers are properties of <em>scaling within an architecture</em>; across architectures, one design can simply dominate another for a given task, and finding the dominant design for <em>this</em> task — not the best-known design for tasks in general — is what the comparison bought.</p>
+<div id="fig-sheep-detector-comparison" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Scatter plot titled five detectors on one sheep dataset, accuracy against inference time. Horizontal axis is time per image in seconds from zero to four, measured on a desktop GTX 1080 GPU, not flight hardware; vertical axis is F1-score on the sheep test set from 78 to 94 percent. UNet with weighted Hausdorff distance sits alone in the good corner at 0.14 seconds and 93.07 percent F1, with precision 96.20 and recall 90.14, noted as predicting centroids not boxes, best on every metric, failing only on sheep very close together. Network-I, one convolutional layer, sits at 0.20 seconds and 84.38 percent, with false positives on fences. Network-II, seven layers, contour-oriented, sits at 2.22 seconds and 86.31 percent, second-best accuracy but sixteen times slower than UNet. AlexNet sits at 1.31 seconds and 80.03 percent with duplicate detections on the same sheep. GoogLeNet sits at 3.53 seconds and 81.23 percent with duplicate detections but the fewest false alarms of the R-CNN four. A dashed bracket groups the four box-predicting networks, noting they were trained through a modified R-CNN procedure with one thousand region proposals per image, every proposal classified, a per-image cost the one-pass UNet never pays. The footer gives two readings: the winner sits alone in the good corner so there was no accuracy-latency trade to make for this task; and every time on the axis is a desktop-GPU number, so at 0.14 seconds per image, about seven FPS on a GTX 1080, the real-time-onboard conclusion is a projection onto weaker hardware the study never measured.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-sheep-detector-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/sheep-detector-comparison.svg" class="img-fluid figure-img" style="width:95.0%" alt="Scatter plot titled five detectors on one sheep dataset, accuracy against inference time. Horizontal axis is time per image in seconds from zero to four, measured on a desktop GTX 1080 GPU, not flight hardware; vertical axis is F1-score on the sheep test set from 78 to 94 percent. UNet with weighted Hausdorff distance sits alone in the good corner at 0.14 seconds and 93.07 percent F1, with precision 96.20 and recall 90.14, noted as predicting centroids not boxes, best on every metric, failing only on sheep very close together. Network-I, one convolutional layer, sits at 0.20 seconds and 84.38 percent, with false positives on fences. Network-II, seven layers, contour-oriented, sits at 2.22 seconds and 86.31 percent, second-best accuracy but sixteen times slower than UNet. AlexNet sits at 1.31 seconds and 80.03 percent with duplicate detections on the same sheep. GoogLeNet sits at 3.53 seconds and 81.23 percent with duplicate detections but the fewest false alarms of the R-CNN four. A dashed bracket groups the four box-predicting networks, noting they were trained through a modified R-CNN procedure with one thousand region proposals per image, every proposal classified, a per-image cost the one-pass UNet never pays. The footer gives two readings: the winner sits alone in the good corner so there was no accuracy-latency trade to make for this task; and every time on the axis is a desktop-GPU number, so at 0.14 seconds per image, about seven FPS on a GTX 1080, the real-time-onboard conclusion is a projection onto weaker hardware the study never measured.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sheep-detector-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;17.2: The five detectors’ reported F1-score against time per image: the centroid-based UNet dominates on both axes at once, and every timing is a desktop-GPU measurement, not a flight measurement.
+</figcaption>
+</figure>
+</div>
+<p>The failure modes are as instructive as the rankings, because they are the challenge taxonomy of <a href="#fig-aerial-animal-detection-challenges" class="quarto-xref">Figure&nbsp;<span>17.1</span></a> reporting for duty. The two custom networks false-alarmed on <em>fences</em> — linear, high-contrast structures that share edge statistics with a sheep’s contour: structural false positives, exactly as the cattle and seabird studies predicted. The two pretrained backbones produced <em>duplicate detections</em> on the same sheep — several boxes on one animal — the pathology the detection-pipeline chapter’s matching rules would score as one true positive plus a string of false positives. And the winning UNet’s only reported failure is that it errs “when sheep are very close together” <span class="citation" data-cites="sarwar2020sheep">(<a href="#ref-sarwar2020sheep" role="doc-biblioref">Sarwar et al. 2020</a>)</span> — clustering, the challenge that survives even the architecture built to resist it. The best detector in the study fails exactly where the whole literature fails, which is the strongest evidence the chapter has that the taxonomy is real.</p>
+</section>
+<section id="reading-the-results-with-part-iiis-instruments" class="level2" data-number="17.6">
+<h2 data-number="17.6" class="anchored" data-anchor-id="reading-the-results-with-part-iiis-instruments"><span class="header-section-number">17.6</span> Reading the Results with Part III’s Instruments</h2>
+<p>Now put the paper under this Part’s instruments, starting with a question a careful reader should already have: where is mAP? The Building a Detection Pipeline chapter presented mean average precision as <em>the</em> standard detector summary, yet this study reports precision, recall, and F1 at a single operating point, and never mentions it. The answer is structural, and it generalizes. The entire mAP construction stands on IoU — box-overlap matching between prediction and ground truth — and the winning network <em>has no boxes</em>: a centroid detector’s output is a set of points, so matching must be by distance (is there a predicted point near enough to this true centroid?), localization quality becomes the root-mean-square error of matched locations — the table’s RMSE column, under one pixel for the UNet — and the natural summary becomes the precision/recall/F1 triple computed at the model’s operating point. The lesson is not that the paper is deficient; it is that <em>the metric follows the output representation</em>, and an engineer comparing this study against a box-detector paper must down-convert both to the common currency — TP, FP, FN — before believing any comparison. The counts, and the two ways of being wrong they encode, survive every change of representation; the summary statistics on top of them do not.</p>
+<p>The operating point itself repays reading. Precision 96.2%, recall 90.1%: when this detector says sheep, it is right 24 times in 25, and it finds nine sheep in ten. That asymmetry — precision comfortably above recall — is well suited to the study’s implicit mission, which is <em>counting</em>: false positives corrupt a census as badly as false negatives, and a follow-up count-regression head makes systematic over-detection actively harmful. The running example’s mission prices the same two errors differently, as the detection-pipeline chapter argued: an unharassed goose is a mission failure, an investigated patch of empty grass a battery expense, so the goose detector deliberately trades precision for recall. Same machinery, opposite operating point — chosen, in both cases, in mission currency. A survey counts; a deterrence system must not miss.</p>
+<p>Then there is the claim in the title, and the word doing quiet work in it: <em>towards</em> detection of sheep onboard a UAV. Nothing in the paper runs on an aircraft. Every timing in <a href="#tbl-sheep-results" class="quarto-xref">Table&nbsp;<span>17.1</span></a> was measured on a desktop GTX 1080; the onboard argument is a closing projection — the UNet’s 0.14 s per image, about 7 FPS, is fast enough that the authors are “confident” the task could run in real or near-real time on an embedded board such as the Jetson Nano, whose specifications (128 CUDA cores, 4 GB of shared memory, 5 W) they cite <span class="citation" data-cites="sarwar2020sheep">(<a href="#ref-sarwar2020sheep" role="doc-biblioref">Sarwar et al. 2020</a>)</span>. The previous chapter equips the reader to see precisely what stands between that confidence and a flight: a Jetson Nano is not a GTX 1080 with fewer fins — it is an order-of-magnitude step down in cores, memory bandwidth, and power, sharing its memory with an operating system and (on a real aircraft) a full sensing stack. The measure-on-the-target discipline, the tail-latency question, thermal behavior under sustained load, the capture-and-preprocess stages that the 0.14 s figure does not include — every honest-benchmarking rule of the Real-Time Inference chapter names a gap between this paper’s last section and a working onboard system. None of this is a criticism of the study, which claims exactly what it demonstrates and flags the rest as future work; the same group’s journal follow-up reports a refined multi-scale U-Net variant reaching approximately 98% F1 on the sheep task <span class="citation" data-cites="sarwar2021sheep">(<a href="#ref-sarwar2021sheep" role="doc-biblioref">Sarwar et al. 2021</a>)</span>. It is, rather, a calibration for reading: <em>a paper’s conclusions section is where measurement ends and projection begins, and the reader is responsible for knowing which side of that line each claim lives on.</em> The gap between “towards onboard” and <em>onboard</em> is, not coincidentally, the exact territory the previous two chapters of this Part were written to cross.</p>
+</section>
+<section id="from-sheep-to-geese" class="level2" data-number="17.7">
+<h2 data-number="17.7" class="anchored" data-anchor-id="from-sheep-to-geese"><span class="header-section-number">17.7</span> From Sheep to Geese</h2>
+<p>How hard is the running example’s problem, relative to the case just studied? The cross-species literature gives a calibrated answer, and <a href="#fig-aerial-detection-reported-accuracy" class="quarto-xref">Figure&nbsp;<span>17.3</span></a> assembles it. White sheep on green pasture sit near the <em>easy</em> pole of aerial animal detection — the highest animal-background contrast the problem ever offers, no vegetation tall enough to occlude, modest flock densities in the imagery. Geese offer none of those mercies, and the waterfowl literature quantifies what their absence costs. The most directly on-point study is a drone-based waterfowl survey system whose detection classes include Canada, Brant, and Emperor geese by name: it reports detection accuracy above 95% for birds sitting on open water — a background as clean as pasture — falling to 80–85% in vegetated and cropped habitat where birds overlap with cover <span class="citation" data-cites="zhai2025waterfowl">(<a href="#ref-zhai2025waterfowl" role="doc-biblioref">Zhai et al. 2025</a>)</span>. That ten-to-fifteen-point drop is the background-contrast challenge measured <em>on geese</em>, and it forecasts the running example’s own validation table: strong over mown grass, weakest exactly where geese actually loiter — pond margins, reed beds, crop stubble.</p>
+<div id="fig-aerial-detection-reported-accuracy" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Grouped bar chart titled reported accuracy across the aerial animal-detection literature, showing within each study the easy condition against the hard one, with a note that metrics differ across studies so the drops should be compared, not the bars. Cattle, F1-score: 99.1 percent for isolated animals versus 89.3 percent in four-animal clusters. Seabird colonies, mAP: 97.7 percent for albatross, large and spaced, versus 87.2 for penguin, small and packed. Waterfowl including geese, reported detection accuracy: over 95 percent for birds on open water versus 80 to 85 percent in vegetated or cropped habitat. Sheep at 80 meters, F1-score for the UNet: 93.1 percent, marked as near the easy pole, white animals on green pasture. Sixteen waterbird species, mAP: 67.9 percent, marked as the other hard axis, fine-grained species identity. A footer states the recurring shape: high-80s to high-90s on visually distinct animals against simple backgrounds, and a ten-to-twenty-point drop wherever animals cluster, vegetation intrudes, or species must be told apart, independently across cattle, seabirds, waterfowl, and sheep; the pattern is a property of the problem, not of any dataset or architecture, so the running example should expect it too. A fine-print line notes figures are as reported in the respective studies, the waterfowl accuracies are drawn from the authors' published summary, and F1, mAP, and accuracy are different computations so cross-study bar heights are indicative only.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-aerial-detection-reported-accuracy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/aerial-detection-reported-accuracy.svg" class="img-fluid figure-img" style="width:95.0%" alt="Grouped bar chart titled reported accuracy across the aerial animal-detection literature, showing within each study the easy condition against the hard one, with a note that metrics differ across studies so the drops should be compared, not the bars. Cattle, F1-score: 99.1 percent for isolated animals versus 89.3 percent in four-animal clusters. Seabird colonies, mAP: 97.7 percent for albatross, large and spaced, versus 87.2 for penguin, small and packed. Waterfowl including geese, reported detection accuracy: over 95 percent for birds on open water versus 80 to 85 percent in vegetated or cropped habitat. Sheep at 80 meters, F1-score for the UNet: 93.1 percent, marked as near the easy pole, white animals on green pasture. Sixteen waterbird species, mAP: 67.9 percent, marked as the other hard axis, fine-grained species identity. A footer states the recurring shape: high-80s to high-90s on visually distinct animals against simple backgrounds, and a ten-to-twenty-point drop wherever animals cluster, vegetation intrudes, or species must be told apart, independently across cattle, seabirds, waterfowl, and sheep; the pattern is a property of the problem, not of any dataset or architecture, so the running example should expect it too. A fine-print line notes figures are as reported in the respective studies, the waterfowl accuracies are drawn from the authors' published summary, and F1, mAP, and accuracy are different computations so cross-study bar heights are indicative only.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-aerial-detection-reported-accuracy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;17.3: Reported accuracy across five aerial animal-detection studies, easy condition against hard condition within each: the recurring ten-to-twenty-point drop is the background and clustering cost, measured independently across species.
+</figcaption>
+</figure>
+</div>
+<p>Two more bars on that figure locate the goose problem’s other axes. Where the task is a <em>single</em> visually distinct species against varied backgrounds, modern box detectors do well: a predecessor waterfowl effort — from the group behind the goose-inclusive survey system — assembled aerial duck datasets running to roughly 197,000 annotations and reported a Faster R-CNN baseline at 95.38% mAP <span class="citation" data-cites="zhang2022waterfowldataset">(<a href="#ref-zhang2022waterfowldataset" role="doc-biblioref">Zhang et al. 2022</a>)</span>. Where the task becomes <em>fine-grained</em> — sixteen visually similar waterbird species on the Texas coast — reported mAP falls to 67.9% for the best model in a Faster R-CNN-versus-RetinaNet comparison <span class="citation" data-cites="kabra2022waterbird">(<a href="#ref-kabra2022waterbird" role="doc-biblioref">Kabra et al. 2022</a>)</span>. The running example lives between those poles: two classes, <code>goose</code> and <code>other_bird</code>, which is fine-grained enough to be non-trivial (a distant duck and a distant goose are a few dozen pixels of brown each) but far from a sixteen-way identification. And on the sensing side, the literature has an answer the running example’s current payload does not exploit: for warm-bodied animals against cool backgrounds, thermal imaging substantially outperforms visible light alone — a wildlife-detection benchmarking effort reports large gains from thermal and fused streams over RGB <span class="citation" data-cites="chang2023thermal">(<a href="#ref-chang2023thermal" role="doc-biblioref">Chang et al. 2023</a>)</span> — and an open-source waterfowl identification tool built for management agencies pairs a thermal and an RGB sensor precisely to get detection from one and species identity from the other <span class="citation" data-cites="loken2025ducknet">(<a href="#ref-loken2025ducknet" role="doc-biblioref">Loken et al. 2025</a>)</span>. Thermal is a payload and cost decision, not a free upgrade, but it is the standard escape hatch when visible-light contrast runs out — dusk, dawn, and vegetation — and worth holding in reserve against the robustness failure modes the previous chapter cataloged.</p>
+<p>One more contrast between the sheep study and the goose problem is about <em>time</em>, and it is good news. The sheep team’s first act was building a dataset from nothing, because in their sub-field nothing public existed. The waterfowl sub-field, a few years on, is different: the goose-inclusive survey work publishes a companion dataset — reported at some nine thousand high-resolution aerial images carrying over half a million machine-assisted box annotations, Brant and Canada and Emperor geese among the classes, hosted in an open conservation-imagery repository <span class="citation" data-cites="zhai2025waterfowl">(<a href="#ref-zhai2025waterfowl" role="doc-biblioref">Zhai et al. 2025</a>)</span>. For the running example’s collect stage, that changes the opening move the detection-pipeline chapter prescribed: public aerial goose imagery now exists at a scale no field campaign will match, ideal for pretraining and for populating the easy conditions — with the usual caveat that a dataset collected over an Alaskan lagoon shares neither the altitude profile, the optics, nor the backgrounds of the running example’s protected field, so the session-split discipline and the fly-your-own-camera collection round remain exactly as necessary as that chapter argued.</p>
+</section>
+<section id="the-altitude-the-animals-set" class="level2" data-number="17.8">
+<h2 data-number="17.8" class="anchored" data-anchor-id="the-altitude-the-animals-set"><span class="header-section-number">17.8</span> The Altitude the Animals Set</h2>
+<p>Every constraint on flight altitude so far in this book has come from physics or law: pixels-on-target from below, the 122 m ceiling from above, battery and coverage in between. The wildlife literature adds a constraint from an unexpected authority — the animals — and for geese specifically, it has been measured. A field study flew a consumer quadrotor toward 24 wild goose flocks of five species, at 50 m and 100 m altitude, and recorded the birds’ response <span class="citation" data-cites="bechhansen2019geese">(<a href="#ref-bechhansen2019geese" role="doc-biblioref">Bech-Hansen et al. 2019</a>)</span>. The results draw a sharp line in the sky: approaches at 100 m overflew the flock without flushing it 74% of the time, while approaches below 100 m succeeded only 20% of the time — four flights in five, the flock was airborne before the aircraft arrived. Vigilance behavior began when the drone was still 200–300 m away, and the authors’ operational recommendation is blunt: to survey geese without disturbing them, launch about 500 m out and fly at about 100 m.</p>
+<p>Set that finding against the pixels-on-target arithmetic and the bind is immediate. At the disturbance-safe altitude, with the running example’s camera in its 640-column mode,</p>
+<p><span class="math display">\[
+\begin{aligned}
+\text{metres per pixel at } 100\ \text{m} &amp;= R\,\theta_{\text{pix}} = 100 \times 2.45 \times 10^{-3} = 24.5\ \text{cm} \\
+\text{pixels on a } 0.35\ \text{m goose} &amp;= \frac{0.35}{0.245} \approx 1.4\ \text{pixels}.
+\end{aligned}
+\]</span></p>
+<p>One and a half pixels is not a small target; it is no target at all. The altitude band the geese tolerate and the altitude band the detector needs do not overlap — <em>for this sensor configuration</em> — and <a href="#fig-altitude-disturbance-window" class="quarto-xref">Figure&nbsp;<span>17.4</span></a> draws the squeeze. The sheep study threaded the same needle without remarking on it: 80 m was gentle enough for sheep (a species far more drone-tolerant than wild geese) while its 2,048-column sensor still delivered 20-pixel animals. The general lesson is the one the figure’s footer states: the reconciling lever is angular resolution, not altitude. Feeding the detector from the camera’s full sensor width rather than the reduced mode, cropping a full-resolution region of interest around a candidate before classifying it — the Images as Data chapter’s trick — or carrying a longer lens all raise the detection floor toward the tolerance band, each at memory, compute, and field-of-view prices this Part has already taught the reader to itemize.</p>
+<div id="fig-altitude-disturbance-window" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Diagram titled the altitude negotiation, pixels push down, geese push up, with a vertical altitude axis from zero to above 122 meters. A dashed red line at 122 meters marks the regulatory ceiling from Part 107, the hard lid from Part I. A left panel, what detection needs, pixels on target, computed for the running example's camera in 640-column mode at about 2.45 milliradians per pixel, lists: 10 meters gives about 14 pixels per goose, a bird with a neck to compose features from; 20 meters gives about 7 pixels, a smudge, the working floor; 40 meters gives 3 to 4 pixels, below any detector's floor; 80 meters gives about 2 pixels; detection pressure points down. A right panel, what the geese tolerate, from a field study of 24 wild goose flocks approached by a quadrotor: at 100 meters, 74 percent of approaches overflew without flushing the flock, with recommended survey altitude about 100 meters approached from about 500 meters out; below 100 meters only 20 percent of approaches succeeded, most flocks flushed before the aircraft arrived; vigilance rises once the aircraft is within 200 to 300 meters; disturbance-free-survey pressure points up. A note adds that for a deterrence mission the flush is the goal, but only on command: an uncommanded flush during search scatters the flock before it is localized, counted, or deliberately driven. A teal marker at 80 meters shows the sheep study still put about 20 by 10 pixels on each sheep because its 2048-column frames keep about 0.8 milliradians per pixel, three times the running example's 640-mode angular resolution. The footer states the bind: at the disturbance-safe 100 meters the running example's 640-column mode puts one or two pixels on a goose, which nothing detects; the reconciling lever is not altitude but angular resolution, more columns on target via full sensor width, a longer lens, or a cropped region of interest, at the memory and compute prices Part III has itemized.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-altitude-disturbance-window-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/altitude-disturbance-window.svg" class="img-fluid figure-img" style="width:100.0%" alt="Diagram titled the altitude negotiation, pixels push down, geese push up, with a vertical altitude axis from zero to above 122 meters. A dashed red line at 122 meters marks the regulatory ceiling from Part 107, the hard lid from Part I. A left panel, what detection needs, pixels on target, computed for the running example's camera in 640-column mode at about 2.45 milliradians per pixel, lists: 10 meters gives about 14 pixels per goose, a bird with a neck to compose features from; 20 meters gives about 7 pixels, a smudge, the working floor; 40 meters gives 3 to 4 pixels, below any detector's floor; 80 meters gives about 2 pixels; detection pressure points down. A right panel, what the geese tolerate, from a field study of 24 wild goose flocks approached by a quadrotor: at 100 meters, 74 percent of approaches overflew without flushing the flock, with recommended survey altitude about 100 meters approached from about 500 meters out; below 100 meters only 20 percent of approaches succeeded, most flocks flushed before the aircraft arrived; vigilance rises once the aircraft is within 200 to 300 meters; disturbance-free-survey pressure points up. A note adds that for a deterrence mission the flush is the goal, but only on command: an uncommanded flush during search scatters the flock before it is localized, counted, or deliberately driven. A teal marker at 80 meters shows the sheep study still put about 20 by 10 pixels on each sheep because its 2048-column frames keep about 0.8 milliradians per pixel, three times the running example's 640-mode angular resolution. The footer states the bind: at the disturbance-safe 100 meters the running example's 640-column mode puts one or two pixels on a goose, which nothing detects; the reconciling lever is not altitude but angular resolution, more columns on target via full sensor width, a longer lens, or a cropped region of interest, at the memory and compute prices Part III has itemized.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-altitude-disturbance-window-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;17.4: The altitude negotiation for the running example: detection range pushes the aircraft down, measured goose disturbance responses push it up, regulation caps it, and angular resolution is the lever that reconciles them.
+</figcaption>
+</figure>
+</div>
+<p>A deterrence mission complicates the picture in an interesting way: flushing the flock is not a failure mode, it is the deliverable. But it is the deliverable <em>on command</em> — an uncommanded flush, triggered by the search pattern itself, scatters the flock before it has been localized and before the system can drive it in a chosen direction, and it habituates the birds to exactly the stimulus the mission depends on. Disturbance, in other words, is a resource to be spent deliberately, not leaked; and the broader literature on drone disturbance of wildlife — now substantial enough to support systematic review <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span> — is the reference the mission’s ethics chapter in Part V will draw on when it prices that spending properly. The nearest thing the published record offers to the running example as a <em>whole system</em> is instructive to name here: a field-tested agricultural drone that detects deer with a YOLO-family model, plans coverage paths over the protected crop, and returns to an autonomous charging station between sorties <span class="citation" data-cites="temesgen2025guard">(<a href="#ref-temesgen2025guard" role="doc-biblioref">Temesgen et al. 2025</a>)</span> — detection, planning, and endurance engineering composed into one loop. That composition — what the detector node publishes, who consumes it, and how the mission logic, planner, and platform close around it — is precisely the subject the System Architecture chapter of Part V takes up for the running example itself.</p>
+</section>
+<section id="what-the-case-study-settles" class="level2" data-number="17.9">
+<h2 data-number="17.9" class="anchored" data-anchor-id="what-the-case-study-settles"><span class="header-section-number">17.9</span> What the Case Study Settles</h2>
+<p>Six findings travel from this chapter’s reading directly into the running example’s design file. <em>First</em>, the challenge taxonomy is real: scale variation, background contrast, clustering, motion, and structural false positives recur, quantified, across every species and architecture surveyed, so a goose pipeline budgets for all five or rediscovers them in the field. <em>Second</em>, the small-object regime governs architecture: below about twenty pixels, standard detectors weaken and task-shaped designs — up to and including abandoning boxes for centroids — can dominate the general-purpose toolkit on accuracy and speed at once. <em>Third</em>, the metric follows the output representation, and comparisons across papers are made in the common currency of TP, FP, and FN, at stated operating points, or not at all. <em>Fourth</em>, easy and hard conditions differ by ten to twenty points everywhere in this literature; the running example should plan for that spread — per-condition evaluation, targeted collection at the reedy margins — rather than be surprised by it. <em>Fifth</em>, “towards onboard” and <em>onboard</em> are separated by exactly the disciplines of the previous two chapters: target-hardware measurement, latency budgets, and the quantize-convert-deploy pipeline; a desktop-GPU timing is the beginning of that argument, never its end. And <em>sixth</em>, the animals are a stakeholder in the flight plan: measured disturbance responses set an altitude band as binding as any regulation, and reconciling it with pixels-on-target is a sensor-resolution problem the design must solve on purpose.</p>
+<p>The Part’s story is now complete twice over — once as machinery, built across four chapters, and once as corroboration, read out of the published record of people solving the same problem for sheep, cattle, seabirds, and geese. What remains is everything the detector’s output <em>feeds</em>: the search patterns that put the camera over the right field, the pursuit behaviors that spend the detections, and the coordination that makes several aircraft more than the sum of their cameras. That is Part IV’s territory.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="17.10">
+<h2 data-number="17.10" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">17.10</span> Check Your Understanding</h2>
+<ol type="1">
+<li>The sheep study reports its animals as roughly 20 × 10 pixels at 80 m, while the running example’s goose spans only about 7 pixels at 20 m — four times closer, yet fewer pixels. Reconstruct the arithmetic that explains the apparent paradox, and state the general design lesson.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Pixels on target depend on range <em>and</em> per-pixel angle: pixels ≈ (target size)/(R·θ<sub>pix</sub>). The sheep platform spreads a ~94° field of view over 2,048 columns, giving θ<sub>pix</sub> ≈ 0.8 mrad, so at 80 m each pixel covers ~6.5 cm and a 1.2 m sheep spans ~19 pixels. The running example’s 640-column mode spreads ~90° over 640 columns — θ<sub>pix</sub> ≈ 2.45 mrad, three times coarser — so at 20 m each pixel covers ~4.9 cm and a 0.35 m goose spans ~7. The sheep is also simply a bigger animal. Lesson: angular resolution (sensor columns per degree) is as decisive as altitude, and it is a design variable — full-sensor capture, region-of-interest crops, or a longer lens buy detection range without descending.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>The sheep study never reports mAP, the metric the detection-pipeline chapter called the standard detector summary. Explain the structural reason, name what the study reports instead for localization quality, and state the rule for comparing its results against a box-detector paper’s mAP.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>mAP is built on IoU matching, and IoU requires boxes; the winning UNet predicts centroids — points — so box overlap is undefined. Matching must instead be by distance (a predicted point close enough to a true centroid is a TP), and localization quality is reported as the RMSE of matched locations (0.783 px for the UNet). Precision, recall, and F1 survive unchanged because they are computed from TP/FP/FN counts, which any matching rule produces. The comparison rule: reduce both papers to counts and stated operating points before comparing — F1 at one threshold and mAP (an area over all thresholds) are not directly comparable numbers, and the matching criteria beneath them differ besides.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>The sheep detector operates at precision 96.2%, recall 90.1%; the detection-pipeline chapter argued the goose detector should operate with recall <em>above</em> precision. Explain why both choices are correct, in the currency each mission uses.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The operating point prices the two error types against mission costs. The sheep system’s implicit mission is counting: a false positive inflates the census exactly as a false negative deflates it, and the paper’s count-regression head makes systematic over-detection actively corrupting — so precision is kept high, accepting that one sheep in ten is missed in any single frame. The goose mission is deterrence: a false negative is a goose left undeterred (the mission’s purpose unmet), while a false positive costs battery and time investigating grass — so the threshold moves down, trading precision for recall. Same machinery, opposite corners: the confidence threshold belongs to the mission, not the model.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>The winning UNet’s only reported failure is on sheep “very close together” — and clustering is also the dominant reported error for cattle, penguins, and vegetated waterfowl. Explain why clustering defeats box detectors and centroid detectors through <em>different</em> mechanisms, and name the machinery from the Real-Time Inference chapter that partially compensates in the running example.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Box detectors on clustered animals produce heavily overlapping predictions, and non-maximum suppression — the step that removes duplicate boxes on one object — cannot distinguish “two boxes, one animal” from “two boxes, two touching animals,” so it collapses legitimate detections (the seabird study’s penguin failure). Centroid detectors avoid NMS but fail when the probability map’s peaks merge: two animals close enough that their predicted probability mass fuses into one blob yield one centroid. Both mechanisms undercount. In the running example, tracking helps at the margins: animals that separate even briefly across frames get distinct track identities that persistence and coasting can maintain through subsequent merges — though a flock that never separates remains undercounted, which is one reason flock-level behavior (Part IV) matters more than per-bird counts for deterrence.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>The sheep paper concludes that detection “should be able” to run in real or near-real time onboard, citing the UNet’s 0.14 s per image and the Jetson Nano’s specifications. Using the previous chapter’s disciplines, list what this projection has not yet established, and estimate the first-order concern.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The 0.14 s (~7 FPS) was measured on a desktop GTX 1080; the projection target is an order of magnitude weaker in cores, memory bandwidth, and power. Unestablished: (1) on-target latency — measured on the Nano, not inferred from spec sheets; (2) the full budget — 0.14 s covers inference, not capture, preprocessing, or postprocessing; (3) tail latency, not just a mean; (4) sustained thermal behavior at 5–10 W in an enclosure; (5) contention with the rest of a flight stack sharing the same memory and cores. First-order concern: raw throughput — a conservative scaling of a 0.14 s desktop-GPU inference onto Nano-class hardware lands at whole seconds per frame, far from frame rate, which is why the deployment chapters’ quantization, resolution, and runtime-optimization levers (int8, TensorRT) are not optional refinements but the difference between the projection and a working system.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>The goose-inclusive waterfowl study reports &gt;95% detection accuracy on open water but 80–85% in vegetated habitat. Restate this result in the vocabulary of the previous chapter’s robustness section, and derive from it two concrete rows in the running example’s evaluation plan.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>It is a quantified, condition-dependent performance gap: background composition is a dimension of the input distribution, and pooled accuracy hides a ten-to-fifteen-point spread between its easy and hard regions — exactly the argument for per-condition evaluation rather than one averaged number. Evaluation-plan rows: (1) report the goose detector’s metrics separately for open-ground/open-water backgrounds versus vegetated-margin backgrounds (reed beds, pond edges, crop stubble), so the gap is measured before deployment rather than discovered during it; (2) weight the next collection round toward the hard condition — vegetated-margin footage with partially occluded geese, labeled under the written class-boundary rules for partial visibility — since that is where both the literature and the mission’s geese concentrate the failures.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="17.11">
+<h2 data-number="17.11" class="anchored" data-anchor-id="try-it"><span class="header-section-number">17.11</span> Try It</h2>
+<p><strong>Part 1 — read a paper with the instruments.</strong> Choose one study from this chapter’s literature — the cattle, seabird, waterfowl, or multi-species waterbird paper — and extract it into a one-page engineering brief using this chapter’s template: the problem’s constants (altitude or GSD, target size in pixels, background types); the dataset (source, size, annotation type, split discipline — and whether the split would pass the detection-pipeline chapter’s leakage test); the method (architecture, one-stage or two-stage, loss, ground-truth representation); the evaluation (which metrics, at what operating point or threshold, and what the matching criterion was); and the claims ledger — two columns, <em>measured</em> versus <em>projected</em>, with every conclusion in the paper assigned to one. Close with three sentences: the result most transferable to the goose problem, the result least transferable and why, and the one experiment you would run that the authors did not.</p>
+<p><strong>Part 2 — reproduce the small-object cliff.</strong> Take the detector you fine-tuned in the detection-pipeline chapter’s exercise and measure how its accuracy degrades as targets shrink toward the sheep paper’s regime. Downsample your validation images by factors of 2 and 4 (then upsample back to the model’s input size, so input resolution is constant and only target scale changes — this simulates flying 2× and 4× higher), and run validation at each scale. Plot mAP@0.5 against median target size in pixels, and find your detector’s cliff — the target size at which mAP falls below half its full-scale value. Compare your cliff against the pixels-on-target table for your own camera: what is the maximum altitude at which your detector’s targets stay above the cliff? Finally, test one mitigation from this chapter: crop full-resolution regions of interest around targets in the downsampled-by-4 condition and re-run validation on the crops — and report, in two sentences, how much of the lost accuracy the resolution lever recovered and what the crop cost you in field of view.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#edge-based-target-detection">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-afridi2025wildlife" class="csl-entry" role="listitem">
+Afridi, S., L. Laporte-Devylder, G. Maalouf, J. M. Kline, S. G. Penny, K. Hlebowicz, D. Cawthorne, and U. P. S. Lundquist. 2025. <span>“Impact of Drone Disturbances on Wildlife: A Review.”</span> <em>Drones</em> 9 (4): 311. <a href="https://doi.org/10.3390/drones9040311">https://doi.org/10.3390/drones9040311</a>.
+</div>
+<div id="ref-barbedo2020cattle" class="csl-entry" role="listitem">
+Barbedo, Jayme Garcia Arnal, Luciano Vieira Koenigkan, Patrícia Menezes Santos, and Andrea Roberto Bueno Ribeiro. 2020. <span>“Counting Cattle in <span>UAV</span> Images—Dealing with Clustered Animals and Animal/Background Contrast Changes.”</span> <em>Sensors</em> 20 (7): 2126. <a href="https://doi.org/10.3390/s20072126">https://doi.org/10.3390/s20072126</a>.
+</div>
+<div id="ref-bechhansen2019geese" class="csl-entry" role="listitem">
+Bech-Hansen, Malene, Rune Michaelis Kallehauge, Julia Mikkelsen Sørensen Lauritzen, et al. 2019. <span>“Evaluation of Disturbance Effect on Geese Caused by an Approaching Unmanned Aerial Vehicle.”</span> <em>Bird Conservation International</em> 30 (2): 169–75. <a href="https://doi.org/10.1017/S0959270919000364">https://doi.org/10.1017/S0959270919000364</a>.
+</div>
+<div id="ref-chang2023thermal" class="csl-entry" role="listitem">
+Chang, Miao, Tan Vuong, Manas Palaparthi, Lachlan Howell, Alessio Bonti, Mohamed Abdelrazek, and Duc Thanh Nguyen. 2023. <span>“An Empirical Study of Automatic Wildlife Detection Using Drone Thermal Imaging and Object Detection.”</span> <a href="https://arxiv.org/abs/2310.11257">https://arxiv.org/abs/2310.11257</a>.
+</div>
+<div id="ref-hayes2021seabird" class="csl-entry" role="listitem">
+Hayes, Mark C., Patrick C. Gray, Gregory Harris, Windsor C. Sedgwick, V. Dagg Crawford, Nicolas Chazal, Sarah Crofts, and David W. Johnston. 2021. <span>“Drones and Deep Learning Produce Accurate and Efficient Monitoring of Large-Scale Seabird Colonies.”</span> <em>Ornithological Applications</em> 123 (3): duab022. <a href="https://doi.org/10.1093/ornithapp/duab022">https://doi.org/10.1093/ornithapp/duab022</a>.
+</div>
+<div id="ref-kabra2022waterbird" class="csl-entry" role="listitem">
+Kabra, Krish, Alexander Xiong, Wenbin Li, Minxuan Luo, William Lu, Raul Garcia, Dhananjay Vijay, et al. 2022. <span>“Deep Object Detection for Waterbird Monitoring Using Aerial Imagery.”</span> In <em>21st IEEE International Conference on Machine Learning and Applications (ICMLA)</em>. <a href="https://arxiv.org/abs/2210.04868">https://arxiv.org/abs/2210.04868</a>.
+</div>
+<div id="ref-loken2025ducknet" class="csl-entry" role="listitem">
+Loken, Zachary J., Kevin M. Ringelman, Amanda Mini, Devin James, and Michael Mitchell. 2025. <span>“<span>DuckNet</span>: An Open-Source Deep Learning Tool for Waterfowl Species Identification in <span>UAV</span> Imagery.”</span> <em>Remote Sensing in Ecology and Conservation</em>. <a href="https://doi.org/10.1002/rse2.70028">https://doi.org/10.1002/rse2.70028</a>.
+</div>
+<div id="ref-sarwar2020sheep" class="csl-entry" role="listitem">
+Sarwar, Farah, Anthony Griffin, Saeed Ur Rehman, and Timotius Pasang. 2020. <span>“Towards Detection of Sheep Onboard a <span>UAV</span>.”</span> In <em>Proceedings of the British Machine Vision Conference Workshops</em>.
+</div>
+<div id="ref-sarwar2021sheep" class="csl-entry" role="listitem">
+———. 2021. <span>“Detecting Sheep in <span>UAV</span> Images.”</span> <em>Computers and Electronics in Agriculture</em> 187: 106219. <a href="https://doi.org/10.1016/j.compag.2021.106219">https://doi.org/10.1016/j.compag.2021.106219</a>.
+</div>
+<div id="ref-temesgen2025guard" class="csl-entry" role="listitem">
+Temesgen, Ebasa, Mario Jerez, Greta Brown, Graham Wilson, Sree Ganesh Lalitaditya Divakarla, Sarah Boelter, Oscar Nelson, Robert McPherson, and Maria Gini. 2025. <span>“Geofenced Unmanned Aerial Robotic Defender for Deer Detection and Deterrence (<span>GUARD</span>).”</span> In <em>IEEE ICRA Workshop on Novel Approaches for Precision Agriculture and Forestry with Autonomous Robots</em>. <a href="https://arxiv.org/abs/2505.10770">https://arxiv.org/abs/2505.10770</a>.
+</div>
+<div id="ref-zhai2025waterfowl" class="csl-entry" role="listitem">
+Zhai, Zhenduo et al. 2025. <span>“New Methods for Waterfowl and Habitat Survey Using <span>AI</span> and Drone Imagery.”</span> <em>Drones</em> 9 (7): 451. <a href="https://doi.org/10.3390/drones9070451">https://doi.org/10.3390/drones9070451</a>.
+</div>
+<div id="ref-zhang2022waterfowldataset" class="csl-entry" role="listitem">
+Zhang, Yang, Shizhen Wang, Zhenduo Zhai, Yi Shang, Reid Viegut, Elisabeth Webb, Andrew Raedeke, and Joseph Sartwell. 2022. <span>“Development of New Aerial Image Datasets and Deep Learning Methods for Waterfowl Detection and Classification.”</span> In <em>2022 IEEE Fourth International Conference on Cognitive Machine Intelligence (CogMI)</em>. <a href="https://doi.org/10.1109/CogMI56440.2022.00026">https://doi.org/10.1109/CogMI56440.2022.00026</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="pagination-link" aria-label="Real-Time Inference on the Edge: Latency and Trade-offs">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="pagination-link" aria-label="Coordinate Frames: From Camera to World">
+        <span class="nav-page-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

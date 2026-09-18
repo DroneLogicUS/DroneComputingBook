@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>12&nbsp; Geofencing and Fail-Safes: Designing for the Unexpected – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" rel="next">
+<link href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html">Part II — Flight Control &amp; Mission Scripting</a></li><li class="breadcrumb-item"><a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">12.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">12.2</span> Key Vocabulary</a></li>
+  <li><a href="#arming-the-fence" id="toc-arming-the-fence" class="nav-link" data-scroll-target="#arming-the-fence"><span class="header-section-number">12.3</span> Arming the Fence</a>
+  <ul class="collapse">
+  <li><a href="#the-boundary-check-itself" id="toc-the-boundary-check-itself" class="nav-link" data-scroll-target="#the-boundary-check-itself"><span class="header-section-number">12.3.1</span> The boundary check itself</a></li>
+  </ul></li>
+  <li><a href="#a-taxonomy-of-fail-safes" id="toc-a-taxonomy-of-fail-safes" class="nav-link" data-scroll-target="#a-taxonomy-of-fail-safes"><span class="header-section-number">12.4</span> A Taxonomy of Fail-Safes</a></li>
+  <li><a href="#the-running-examples-watchdog-failsafe_monitor.py" id="toc-the-running-examples-watchdog-failsafe_monitor.py" class="nav-link" data-scroll-target="#the-running-examples-watchdog-failsafe_monitor.py"><span class="header-section-number">12.5</span> The Running Example’s Watchdog: <code>failsafe_monitor.py</code></a></li>
+  <li><a href="#override-authority-who-may-preempt-whom" id="toc-override-authority-who-may-preempt-whom" class="nav-link" data-scroll-target="#override-authority-who-may-preempt-whom"><span class="header-section-number">12.6</span> Override Authority: Who May Preempt Whom</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">12.7</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">12.8</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html">Part II — Flight Control &amp; Mission Scripting</a></li><li class="breadcrumb-item"><a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The previous chapter ended on a deliberately loose thread. A geofence polygon had been drawn in QGroundControl, stored in the <code>.plan</code> file, decoded vertex by vertex, uploaded to the simulated vehicle — and then ignored. Nothing happened when the aircraft crossed it, because nothing had been told to happen. The fence was data without consequences, and the mission’s state machine carried a matching hole: a <code>failsafe_event()</code> check evaluated first on every tick, wired to nothing. This chapter closes both gaps. It arms the fence, fills the failsafe slot, and more generally takes up the discipline the whole Part has been circling: designing flight software for the flights that go wrong. The happy path — waypoints reached, battery ample, links alive — needs remarkably little engineering once the previous three chapters are absorbed. What separates a demonstration from a system is everything else: the gust that carries the vehicle toward the boundary, the battery that reads 28% with the aircraft 200 metres from home, the mission process that dies mid-flight. None of these is exotic. Each will happen, on a long enough sequence of flights, with probability one — and the entire craft of safety engineering is arranging, in advance, that when it happens the aircraft does something boring.</p>
+<p>There is also an older thread to pick up. The Airspace Law chapter closed by observing that every rule it covered — the altitude ceiling, the authorized operating area, the rehearsed emergency procedure — was enforced by human discipline, and promised that this chapter would revisit those same constraints as software: coordinates the autopilot refuses to leave, thresholds compiled into parameters, emergency procedures that execute without waiting for a human to remember them. That promise is the right frame for everything below. A geofence is airspace law translated into a boundary check; a battery failsafe is the fuel-reserve rule translated into a threshold comparison; and the layered-margin doctrine — the organization’s 10-foot ceiling sitting far beneath the FAA’s 400-foot (122 m) one — reappears here, exactly, as mission thresholds sitting far above the firmware’s own floors.</p>
+<section id="learning-objectives" class="level2" data-number="12.1">
+<h2 data-number="12.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">12.1</span> Learning Objectives</h2>
+<ul>
+<li>Configure and arm a geofence — a boundary polygon or radius plus an altitude ceiling — so that a breach triggers a chosen automatic action, and demonstrate the trigger in software-in-the-loop simulation.</li>
+<li>Implement the boundary check itself: a point-in-polygon test by ray casting against live estimated position, extended to a fenced <em>volume</em> by an independent altitude comparison.</li>
+<li>Distinguish a hard failsafe (an automatic, authority-seizing response such as Return-to-Launch or immediate landing) from a soft warning, and choose between the graded responses — warn, hover in place, return, land, terminate — for a given trigger.</li>
+<li>Size battery failsafe thresholds from mission geometry: compute the worst-case cost of the trip home and justify a Return-to-Launch trigger and a land floor against it.</li>
+<li>Read the running example’s <code>failsafe_monitor.py</code> and explain its structure — an independent watchdog node with thresholds as parameters, a 1 Hz evaluation tick, and a publish-while-active protocol — and implement the evaluation logic its scaffold leaves open.</li>
+<li>Trace the override authority chain of a multi-node autonomy system from the safety pilot’s transmitter down to the behavior nodes, and state the design rule that overrides flow strictly downward.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="12.2">
+<h2 data-number="12.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">12.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Geofence</strong> — a software-defined boundary the vehicle must respect — an inclusion polygon or a radius about home for the horizontal plane, plus an altitude ceiling — checked continuously against the estimated position and wired to an automatic action on breach; introduced as <code>.plan</code> data in the previous chapter, armed here.</li>
+<li><strong>Breach action</strong> — the configured response to a geofence violation, chosen from a graded menu: log only, warn the operator, hold position, return to launch, land immediately, or terminate flight.</li>
+<li><strong>Point-in-polygon test</strong> — the geometric core of a polygonal fence check: cast a ray from the test position and count polygon-edge crossings — an odd count means inside, an even count outside.</li>
+<li><strong>Failsafe</strong> — a pre-programmed automatic response to a detected fault or rule violation — link loss, low battery, boundary breach — designed so that the vehicle’s default behavior under failure is a safe one rather than a continuation of the mission.</li>
+<li><strong>Hard failsafe</strong> — a failsafe that seizes authority when it fires: the triggering condition changes the flight mode itself (RTL, land, hold), and the mission software’s consent is neither requested nor required.</li>
+<li><strong>Soft warning</strong> — an advisory response to an approaching limit — a margin fence, a battery caution — that informs the operator or mission logic while leaving authority where it is; the graceful layer that fires before the hard one must.</li>
+<li><strong>Hover-in-place</strong> — the gentlest hard response: the vehicle stops and holds its current position (PX4’s Hold mode, a commanded loiter), buying time for a human decision without moving through any more of the world.</li>
+<li><strong>Battery failsafe</strong> — the graded response ladder tied to remaining charge: a warning threshold, a return threshold sized to cover the worst-case trip home, and a land floor below which the only safe destination is straight down.</li>
+<li><strong>Watchdog</strong> — an independent process that monitors a system it does not control, holding no mission state and sharing no failure mode with the logic it supervises; the running example’s <code>failsafe_monitor</code> node is one.</li>
+<li><strong>Override authority</strong> — the explicit ordering of who may preempt whom in a multi-node system — safety pilot above firmware, firmware above watchdog, watchdog above mission logic, mission logic above behaviors — with overrides flowing strictly downward.</li>
+</ul>
+</section>
+<section id="arming-the-fence" class="level2" data-number="12.3">
+<h2 data-number="12.3" class="anchored" data-anchor-id="arming-the-fence"><span class="header-section-number">12.3</span> Arming the Fence</h2>
+<p>The previous chapter’s <code>.plan</code> file stored its geofence as four latitude/longitude vertices and an <code>"inclusion": true</code> flag — a region the vehicle must stay inside. Turning that stored polygon into an enforced boundary takes one decision, not more code: telling the autopilot what to <em>do</em> about a breach. PX4 exposes the choice as a parameter — the geofence action — with a graded menu: do nothing but log; warn the operator over telemetry; hold position at the boundary; fly Return-to-Launch; land immediately; or terminate flight, cutting the motors outright. QGroundControl presents the same menu in its safety settings, and uploads the fence geometry alongside the mission over the same MAVLink session. With the polygon uploaded and the action set to RTL, the fence from the previous chapter stops being documentation. The firmware now checks the estimated position against the boundary continuously — and, in modern PX4, checks a short <em>prediction</em> of the trajectory as well, so a vehicle flying fast at the fence is turned back before the line rather than after it. Even with no polygon uploaded at all, two parameters provide a minimal fence — a maximum horizontal distance from home and a maximum altitude — which is exactly the shape the running example’s own watchdog will adopt later in this chapter.</p>
+<p>The graded menu deserves a moment, because choosing from it is a genuine design decision with the same structure every failsafe response will have. <em>Warning</em> preserves all authority and all risk: appropriate only when a human is watching and able to act. <em>Hold</em> — hover in place — is the gentlest seizure of authority: the vehicle stops moving through the world, which converts a developing situation into a static one, at the price of hovering indefinitely on a draining battery. <em>Return</em> trades airspace for energy: the vehicle leaves the situation entirely, along a predictable path, at a known cost. <em>Land</em> trades everything for immediacy: minimum time to the ground, wherever the ground happens to be. And <em>termination</em> is the response of last resort — a falling aircraft is the certain cost, paid to bound the harm a flying one might do; it exists for the case where continued powered flight is itself the hazard. The right choice depends on what surrounds the fence: a boundary with open field beyond it can afford RTL; a boundary shared with a crowd line cannot afford anything that keeps flying toward it. For the lawnmower survey of the previous chapter — a fenced grass field, nothing beyond the boundary but more grass — RTL is the standard and correct choice, and it is the choice the simulation exercise at the end of this chapter demonstrates: fly at the fence on purpose, and watch the mission end and the trip home begin.</p>
+<section id="the-boundary-check-itself" class="level3" data-number="12.3.1">
+<h3 data-number="12.3.1" class="anchored" data-anchor-id="the-boundary-check-itself"><span class="header-section-number">12.3.1</span> The boundary check itself</h3>
+<p>The firmware does this checking for you, and the running example’s watchdog will do it again independently — so it is worth owning the few lines of geometry involved. The horizontal question is: given the estimated position and a polygon of <span class="math inline">\(m\)</span> vertices, is the point inside? The standard answer is the <strong>ray-casting test</strong>, drawn in <a href="#fig-point-in-polygon-ray-cast" class="quarto-xref">Figure&nbsp;<span>12.1</span></a>: cast a ray from the test point in any fixed direction (east, by convention) and count how many polygon edges it crosses. A point inside the polygon must cross the boundary an odd number of times to escape to infinity; a point outside crosses an even number of times (possibly zero). The parity of the count <em>is</em> the answer, for any simple polygon, convex or not.</p>
+<div id="fig-point-in-polygon-ray-cast" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Diagram of the point-in-polygon ray-casting test. An amber quadrilateral labeled hard fence, breach triggers the configured action RTL, has four labeled vertices given as latitude longitude pairs. Inside it, a dashed teal polygon is labeled soft-warning fence, the hard fence shrunk inward by a margin. A teal dot labeled p-hat inside casts a solid ray east that crosses one fence edge, marked crossing 1, with the annotation one crossing, odd, therefore inside the fence. A grey dot labeled p-hat prime outside the polygon casts a dashed ray east that crosses two edges, marked crossing 1 and crossing 2, with the annotation two crossings, even, therefore outside, breach. A note box below states that the horizontal test is only half the fence: the full geofence is a volume, the polygon bounds the horizontal plane and a ceiling bounds altitude, two independent comparisons evaluated together against the same estimated position, and breach of either is a breach of the fence. A footer notes each fence edge is tested once per check, order m for an m-vertex polygon, cheap enough to run against every position update.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-point-in-polygon-ray-cast-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/point-in-polygon-ray-cast.svg" class="img-fluid figure-img" style="width:90.0%" alt="Diagram of the point-in-polygon ray-casting test. An amber quadrilateral labeled hard fence, breach triggers the configured action RTL, has four labeled vertices given as latitude longitude pairs. Inside it, a dashed teal polygon is labeled soft-warning fence, the hard fence shrunk inward by a margin. A teal dot labeled p-hat inside casts a solid ray east that crosses one fence edge, marked crossing 1, with the annotation one crossing, odd, therefore inside the fence. A grey dot labeled p-hat prime outside the polygon casts a dashed ray east that crosses two edges, marked crossing 1 and crossing 2, with the annotation two crossings, even, therefore outside, breach. A note box below states that the horizontal test is only half the fence: the full geofence is a volume, the polygon bounds the horizontal plane and a ceiling bounds altitude, two independent comparisons evaluated together against the same estimated position, and breach of either is a breach of the fence. A footer notes each fence edge is tested once per check, order m for an m-vertex polygon, cheap enough to run against every position update.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-point-in-polygon-ray-cast-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.1: The geofence boundary check: a ray cast east from the estimated position crosses the fence boundary an odd number of times from inside, an even number from outside. A soft-warning fence, shrunk inward from the hard fence, fires an advisory before the hard boundary fires an action, and an independent altitude comparison closes the top of the fenced volume.
+</figcaption>
+</figure>
+</div>
+<p>In code, working in the local metric coordinates the previous chapter’s conversion produces (east and north in metres about home):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> inside(fence, e, n):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Ray-cast point-in-polygon: fence is a list of (east, north)</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">    vertices; (e, n) is the position under test. Casts a ray east</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">    and counts edge crossings — odd means inside."""</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    crossings_odd <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> <span class="bu">len</span>(fence)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(m):</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        e1, n1 <span class="op">=</span> fence[i]</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        e2, n2 <span class="op">=</span> fence[(i <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> m]</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (n1 <span class="op">&gt;</span> n) <span class="op">!=</span> (n2 <span class="op">&gt;</span> n):              <span class="co"># edge spans the ray's northing</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>            e_cross <span class="op">=</span> e1 <span class="op">+</span> (n <span class="op">-</span> n1) <span class="op">*</span> (e2 <span class="op">-</span> e1) <span class="op">/</span> (n2 <span class="op">-</span> n1)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> e_cross <span class="op">&gt;</span> e:                    <span class="co"># crossing lies east of the point</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                crossings_odd <span class="op">=</span> <span class="kw">not</span> crossings_odd</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> crossings_odd</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Each edge is examined once, so the test is <span class="math inline">\(O(m)\)</span> — for the four-vertex fence of the previous chapter, four comparisons and at most four multiplications, comfortably nothing at any update rate a position estimate arrives at. Three practical points turn the textbook test into a fence worth trusting. First, <strong>the fence is a volume, not a polygon</strong>: the horizontal test is paired with an independent altitude comparison against a ceiling, and breach of either is a breach — that ceiling is where the layered-margin doctrine lands in code, set not at the 122 m legal maximum but at the mission’s own working limit, the same way an organization’s 10-foot training ceiling sat far below the FAA’s number. Second, <strong>the test runs against an estimate</strong>, and the previous chapter’s acceptance-radius lesson applies unchanged: the position carries metre-scale scatter, so a vehicle hovering exactly on the boundary would flicker between inside and outside at the noise rate. The standard repairs are a margin and a debounce — which is the third point: <strong>build two fences</strong>. A <em>soft</em> fence, shrunk inward from the hard one by a few metres, fires a warning (to the operator, to the mission logic) while everything is still legal; the <em>hard</em> fence fires the action. The gap between them is bought room for the graceful response — the mission node can turn the vehicle around on its own terms inside the margin, and the hard failsafe becomes what its name should always mean: the layer that fires only when the layer above it has already failed.</p>
+</section>
+</section>
+<section id="a-taxonomy-of-fail-safes" class="level2" data-number="12.4">
+<h2 data-number="12.4" class="anchored" data-anchor-id="a-taxonomy-of-fail-safes"><span class="header-section-number">12.4</span> A Taxonomy of Fail-Safes</h2>
+<p>The geofence is one instance of a general pattern, and naming the pattern organizes everything the firmware offers. A failsafe is a <em>trigger</em> bound to a <em>response</em>. The triggers PX4 monitors continuously: loss of the RC link; loss of the data link to the ground station; loss of the Offboard setpoint stream — the dead-man’s switch of two chapters standing, now recognizable as one row of a larger table; low, critical, and emergency battery; geofence breach; and estimator failure, the EKF losing a usable position fix. The responses are the graded menu already met: warn, hold, return, land, terminate. The engineering content is in the binding — which response suits which trigger — and in one distinction that runs through the whole table: a <strong>hard failsafe</strong> changes the flight mode itself when it fires, seizing authority from whatever was flying the vehicle, while a <strong>soft warning</strong> informs and leaves authority in place. The previous chapter’s state machine already encoded where hard failsafes live in mission logic: checked <em>first</em>, every tick, outranking every state. What it left open — what fires the check — is precisely this table.</p>
+<p>Return-to-Launch, the workhorse hard response, is itself a small mission: climb to a configured return altitude (so the path home clears whatever the vehicle was working beneath), fly to home — the position <em>recorded at arming</em>, with everything the previous chapter said about that — descend, and land. Its predictability is its virtue and its trap. The virtue: everyone on the crew knows, before the flight, exactly what the aircraft will do when something fails, and can stand where that path is not. The trap: RTL flies a straight line home through whatever happens to be in the way, which is why the return altitude is a safety parameter and not a convenience, and why a fence breach at the <em>far</em> side of a field must leave enough battery to fly the whole diagonal back.</p>
+<p>That last clause is a calculation, and it sizes the battery failsafe. The running example’s pack stores 77 Wh, and the loaded aircraft draws about 365 W in mission flight — the numbers carried since Part I — so one percent of charge is about 0.77 Wh, or 7.6 seconds of flight. Now price the worst-case trip home for the watchdog’s fence geometry (a 200 m radius about home, a 30 m ceiling — the parameters met in the next section): 200 m of return cruise at 5 m/s is 40 s; the climb to return altitude and a metre-per-second descent from 30 m add roughly another 40–50 s; call the trip 90 seconds, about 12% of the pack. A Return-to-Launch trigger at 30% remaining therefore buys the worst-case trip home twice over — margin for a headwind, a detour, a slow human noticing — and a land floor at 15% marks the honest boundary below which the trip home is no longer affordable at all: under two minutes of flight remain, the cells are approaching the steep knee of the discharge curve where indicated charge falls fastest, and the only destination that is guaranteed reachable is straight down. <a href="#fig-battery-failsafe-ladder" class="quarto-xref">Figure&nbsp;<span>12.2</span></a> draws the ladder, and its most important feature is what sits <em>beneath</em> the mission thresholds: the firmware’s own defaults — warn near 15%, act near 7%, land near 5% — which protect the aircraft, not the mission. The mission thresholds are set far above them deliberately, and the doctrine is the Airspace Law chapter’s, verbatim: the platform’s floor is where your margins begin, not where they end.</p>
+<div id="fig-battery-failsafe-ladder" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Horizontal bar chart of remaining battery fraction from 100 percent on the left to 0 percent on the right. A wide green band from 100 to 30 percent is labeled normal operations, mission proceeds, watchdog publishes nothing. An amber band from 30 to 15 percent is labeled RTL battery, abandon the mission, fly home now, with the tick at 30 percent labeled battery underscore rtl. A red band from 15 to 0 percent is labeled LAND battery, no energy to go home, descend where you are, with the tick at 15 percent labeled battery underscore land. A bracket above the bar spans 30 to 18 percent, annotated worst-case return from the fence edge, about 90 seconds, about 12 percent of the pack. A second axis below shows the firmware's own PX4 default thresholds: warn at 15 percent, critical at 7 percent, land at 5 percent. A note box explains that at 30 percent remaining, 23 watt-hours are left, about 3.8 minutes at mission draw, against a worst-case return of roughly 90 seconds from 200 metres out at 30 metres altitude, so the RTL trigger buys the trip home twice over; at 15 percent under two minutes remain and the cells approach the steep knee of the discharge curve. A footer draws the parallel to the 10 foot institutional ceiling under the 400 foot legal one: the platform's floor is where margins begin, not where they end.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-battery-failsafe-ladder-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/battery-failsafe-ladder.svg" class="img-fluid figure-img" style="width:95.0%" alt="Horizontal bar chart of remaining battery fraction from 100 percent on the left to 0 percent on the right. A wide green band from 100 to 30 percent is labeled normal operations, mission proceeds, watchdog publishes nothing. An amber band from 30 to 15 percent is labeled RTL battery, abandon the mission, fly home now, with the tick at 30 percent labeled battery underscore rtl. A red band from 15 to 0 percent is labeled LAND battery, no energy to go home, descend where you are, with the tick at 15 percent labeled battery underscore land. A bracket above the bar spans 30 to 18 percent, annotated worst-case return from the fence edge, about 90 seconds, about 12 percent of the pack. A second axis below shows the firmware's own PX4 default thresholds: warn at 15 percent, critical at 7 percent, land at 5 percent. A note box explains that at 30 percent remaining, 23 watt-hours are left, about 3.8 minutes at mission draw, against a worst-case return of roughly 90 seconds from 200 metres out at 30 metres altitude, so the RTL trigger buys the trip home twice over; at 15 percent under two minutes remain and the cells approach the steep knee of the discharge curve. A footer draws the parallel to the 10 foot institutional ceiling under the 400 foot legal one: the platform's floor is where margins begin, not where they end.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-battery-failsafe-ladder-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.2: The battery failsafe ladder for the running example: mission-level thresholds — Return-to-Launch at 30% remaining, land at 15% — sized against the worst-case 90-second trip home from the fence edge, sitting far above the firmware’s own default floors near 15%, 7%, and 5%.
+</figcaption>
+</figure>
+</div>
+<p>Two remaining rows of the table complete the taxonomy. Link-loss failsafes answer the question “who is flying this aircraft?” when the answer becomes “nobody”: RC loss and data-link loss each trigger a configurable response after a configurable delay, with RTL the common choice — and the Offboard stream timeout from two chapters ago is the same mechanism applied to a companion computer, with the vital property that the <em>absence</em> of messages is the trigger, so no failed component needs to succeed at announcing its own failure. Estimator failure is the humbling row: every response above assumes the vehicle knows where it is, and RTL toward a hallucinated home position is worse than useless, so a vehicle that loses its position fix falls back to responses that need progressively less state — attitude-stabilized descent, ultimately termination. It is the table’s reminder that failsafes are software running on the same estimates as everything else, which is exactly the argument for the <em>independent</em> monitor the next section builds: not because the firmware’s table is deficient, but because the mission has rules the firmware cannot know.</p>
+</section>
+<section id="the-running-examples-watchdog-failsafe_monitor.py" class="level2" data-number="12.5">
+<h2 data-number="12.5" class="anchored" data-anchor-id="the-running-examples-watchdog-failsafe_monitor.py"><span class="header-section-number">12.5</span> The Running Example’s Watchdog: <code>failsafe_monitor.py</code></h2>
+<p>Everything so far lives in the firmware, guarding limits any aircraft shares: batteries, links, fences. But the Goose Management System has safety rules PX4 has never heard of — a standoff distance from a living animal, a mission battery budget stricter than the firmware’s, an altitude ceiling set by policy rather than physics — and enforcing mission rules takes mission software. The architecture Part I sketched for the running example includes a dedicated node for exactly this: a Failsafe node that continuously monitors mission safety — battery state and safe separation among its concerns — and, when an unsafe condition is detected, can override the active controller and trigger a protective action: hover, Return-to-Launch, or mission abort. Here is the node, in full — the real code, not a sketch:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">Failsafe Monitor</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">Independent mission specific watchdog</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">Publishes to /goose/failsafe that triggers various overrides</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rclpy</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rclpy.node <span class="im">import</span> Node</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> std_msgs.msg <span class="im">import</span> String</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> px4_msgs.msg <span class="im">import</span> VehicleLocalPosition, BatteryStatus, VehicleStatus</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> goose_ops.px4_defs <span class="im">import</span> (PX4_QOS, T_VEHICLE_LOCAL_POSITION,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>                                T_BATTERY, T_VEHICLE_STATUS, T_FAILSAFE)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> FailsafeMonitor(Node):</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(<span class="st">'failsafe_monitor'</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.declare_parameter(<span class="st">'battery_rtl'</span>, <span class="fl">0.30</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.declare_parameter(<span class="st">'battery_land'</span>, <span class="fl">0.15</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.declare_parameter(<span class="st">'geofence_radius_m'</span>, <span class="fl">200.0</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.declare_parameter(<span class="st">'max_altitude_m'</span>, <span class="fl">30.0</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pos <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.batt <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.status <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._last_reason <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.create_subscription(VehicleLocalPosition,</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>                                 T_VEHICLE_LOCAL_POSITION,</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>                                 <span class="va">self</span>._on_lpos, PX4_QOS)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.create_subscription(BatteryStatus, T_BATTERY,</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>                                 <span class="va">self</span>._on_batt, PX4_QOS)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.create_subscription(VehicleStatus, T_VEHICLE_STATUS,</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>                                 <span class="va">self</span>._on_status, PX4_QOS)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pub <span class="op">=</span> <span class="va">self</span>.create_publisher(String, T_FAILSAFE, <span class="dv">10</span>)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.create_timer(<span class="fl">1.0</span>, <span class="va">self</span>._tick)</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.get_logger().info(<span class="st">'failsafe_monitor up'</span>)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _on_lpos(<span class="va">self</span>, m): <span class="va">self</span>.pos <span class="op">=</span> m</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _on_batt(<span class="va">self</span>, m): <span class="va">self</span>.batt <span class="op">=</span> m</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _on_status(<span class="va">self</span>, m): <span class="va">self</span>.status <span class="op">=</span> m</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _evaluate(<span class="va">self</span>):</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _tick(<span class="va">self</span>):</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>        reason <span class="op">=</span> <span class="va">self</span>._evaluate()</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> reason <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> reason <span class="op">!=</span> <span class="va">self</span>._last_reason:</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.get_logger().error(<span class="ss">f'FAILSAFE: </span><span class="sc">{</span>reason<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.pub.publish(String(data<span class="op">=</span>reason))</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>._last_reason <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.get_logger().info(<span class="st">'failsafe condition cleared'</span>)</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._last_reason <span class="op">=</span> reason</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>    rclpy.init()</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>    rclpy.spin(FailsafeMonitor())</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">'__main__'</span>:</span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>    main()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Read it as three design decisions, because that is what it is. First, <strong>independence</strong>. The node is a separate process holding no mission state — it does not know whether the vehicle is searching, engaging, or returning, and does not care. It subscribes to three PX4 telemetry streams (local position, battery status, vehicle status — the same uORB-over-DDS topics the previous chapters established) and publishes one string. A crash in the mission logic cannot take it down; a bug in a behavior node cannot corrupt its view of the battery. This is the modularity argument from Part I’s closing chapter made concrete: the safety monitor must not share a failure mode with the logic it supervises, and the only way to guarantee that is a process boundary. Second, <strong>thresholds as parameters, not constants</strong>: <code>battery_rtl</code> at 0.30, <code>battery_land</code> at 0.15, a <code>geofence_radius_m</code> of 200 and a <code>max_altitude_m</code> of 30 are declared as ROS 2 parameters, so the field crew can tighten them per site — a smaller field, a lower ceiling — without touching code, exactly the property that made the autopilot’s own parameter system the right home for <code>NAV_ACC_RAD</code> in the previous chapter. (Note the fence shape: a radius about home and a ceiling — a cylinder in the local NED frame where home is the origin, so the whole horizontal check is one hypotenuse. The polygon test earlier in this chapter is what this becomes when the site demands a shape; the cylinder is what it is when 200 m of grass in every direction makes the shape irrelevant.) Third, <strong>the publish protocol</strong>, which lives in <code>_tick</code> and repays close reading: while a condition holds, the reason string is published <em>every second</em> — a continuous assertion, not a single event, so a subscriber that starts late or drops a message still hears about an active failsafe within a tick; the log gets one <code>FAILSAFE:</code> line when the reason first appears and one <code>cleared</code> line when it goes away, the same latching discipline (<code>_last_reason</code>) that keeps a persistent condition from flooding the log at 1 Hz.</p>
+<p>And then the fourth thing, which is not a decision but a seam: <code>_evaluate</code> returns <code>None</code>. The shipped file is the watchdog’s <em>scaffold</em> — subscriptions, parameters, tick, protocol, all the plumbing that makes a monitor trustworthy — with the monitored conditions themselves left as the open socket (note <code>import math</code>, sitting unused at the top of the file, waiting). Everything this chapter has built is the material for filling it:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _evaluate(<span class="va">self</span>):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""Return 'SEVERITY:reason' for the worst active condition, else</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">        None. Rules are ordered worst-first, so the first match wins."""</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        p <span class="op">=</span> <span class="va">self</span>.get_parameter</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.batt <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.batt.remaining <span class="op">&lt;</span> p(<span class="st">'battery_land'</span>).value:</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="st">'LAND:battery below land floor'</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.pos <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> math.hypot(<span class="va">self</span>.pos.x, <span class="va">self</span>.pos.y) <span class="op">&gt;</span> p(<span class="st">'geofence_radius_m'</span>).value:</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="st">'RTL:geofence breach'</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="op">-</span><span class="va">self</span>.pos.z <span class="op">&gt;</span> p(<span class="st">'max_altitude_m'</span>).value:</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="st">'RTL:altitude above ceiling'</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.batt <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.batt.remaining <span class="op">&lt;</span> p(<span class="st">'battery_rtl'</span>).value:</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="st">'RTL:battery below mission threshold'</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The details carry the chapter’s lessons. <code>BatteryStatus.remaining</code> is a fraction of full charge, compared directly against the parameter thresholds of <a href="#fig-battery-failsafe-ladder" class="quarto-xref">Figure&nbsp;<span>12.2</span></a>. The position is PX4’s local NED estimate — north, east, <em>down</em>, metres from home — so altitude is <span class="math inline">\(-z\)</span>, the sign convention that has been earning its keep since the coordinate discussion of Part I, and the horizontal fence check is <code>math.hypot</code> of the two horizontal components against the radius. The ordering is a severity sort: a vehicle that is simultaneously outside the fence and below the land floor must land, not fly home, so <code>LAND</code> conditions are tested before any <code>RTL</code> condition. The reason strings are deliberately <em>static</em>: fold the live battery percentage into the string and it would change on every percent step, defeating the <code>_last_reason</code> latch and turning the one-line log into a stream — the tick’s latching discipline works only if “same condition” means “same string.” And the returned string is not prose — it is a tiny protocol, <code>SEVERITY:reason</code>, whose consumer is the next section’s subject.</p>
+</section>
+<section id="override-authority-who-may-preempt-whom" class="level2" data-number="12.6">
+<h2 data-number="12.6" class="anchored" data-anchor-id="override-authority-who-may-preempt-whom"><span class="header-section-number">12.6</span> Override Authority: Who May Preempt Whom</h2>
+<p>A watchdog that publishes a string has detected a problem, not solved one. The <code>failsafe_monitor</code> node deliberately owns no ability to fly the aircraft — it never streams a setpoint, never calls a flight-mode service. Authority to <em>act</em> lives one layer down, in the mission manager: the top-level state machine node (the production version of the previous chapter’s figure, with a <code>FAILSAFE</code> state among its states) subscribes to <code>/goose/failsafe</code>, and on the first message during an active mission (it ignores the topic while idle, done, or already in failsafe) it executes the override in four moves. It sets the shared <em>active-controller token</em> — the topic on which it continuously names which behavior node currently owns the vehicle — to <code>none</code>, which silences the navigation and harassment nodes within a message, because those nodes stream setpoints only while the token names them. It abandons whatever service call was in flight. It enters its own terminal <code>FAILSAFE</code> state, from which no transition leads back to the mission. And it parses the severity prefix and calls the matching flight-controller service — <code>LAND</code> calls land, <code>RTL</code> calls return, <code>HOLD</code> calls hold — which the flight-controller node translates into a PX4 mode command. One subtlety in the parsing is a design lesson in itself: an <em>unrecognized</em> severity does not guess. The manager logs that it is standing down and assumes a PX4 native failsafe is already in control — deference, encoded, to the layer above.</p>
+<p>That phrase — the layer above — is the load-bearing structure, and <a href="#fig-failsafe-override-authority" class="quarto-xref">Figure&nbsp;<span>12.3</span></a> draws it in full. Authority in the running example is a strict ladder. At the top, the safety pilot’s RC transmitter: sticks wired to a receiver on the flight controller with no companion software in the path, able to seize control in any mode at any time — the human backstop the Airspace Law chapter’s rules (a licensed remote pilot present, one pilot flying at a time) put in place, now visible as the top rung of a software diagram. Below it, PX4’s native failsafes: the firmware acts by changing flight mode itself and needs no cooperation from anything above the autopilot — the dead-man’s switch fires whether or not the companion computer agrees, which is the point of it. Below the firmware, the watchdog and the mission manager, splitting detection from execution across a process boundary. And at the bottom, the behavior nodes — navigation and harassment — which hold the least authority in the system by construction: they may act only while the token names them, and they are never consulted about losing it. The design rule the ladder encodes: <strong>overrides flow strictly downward</strong>. The watchdog never streams a setpoint; the behavior nodes never see the failsafe topic; authority is revoked at the token, not negotiated with the node losing it. Every rung can silence every rung below it, and no rung can veto one above.</p>
+<div id="fig-failsafe-override-authority" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Five stacked layers with a vertical axis labeled increasing authority. Top layer, grey: safety pilot's RC transmitter, sticks straight to the receiver on the flight controller, no companion software in the path, a mode switch seizes control from every layer below at any time. Second, amber: PX4 native failsafes in firmware — Offboard dead-man's switch, geofence breach action, low-battery ladder, RC and data-link loss — acting by changing flight mode itself, needing no cooperation from anything above the autopilot. Third, teal: failsafe monitor, the independent mission watchdog, a separate process subscribing to position, battery, and vehicle status, evaluating mission rules at one hertz and publishing severity colon reason on the goose failsafe topic every tick a condition holds, with severities HOLD, RTL, and LAND. Fourth, teal: mission manager, which executes the override on any failsafe message by setting the active-controller token to none, dropping the pending service call, entering its terminal FAILSAFE state, and calling the matching hold, RTL, or land service; it carries watchdogs of its own — engagement timeout, target lost, repeated resume failure — and stands down on an unrecognized severity, assuming a PX4 native failsafe is in control. Bottom: behavior nodes, navigation and harassment, lowest authority, streaming setpoints only while the token names them, silenced within one message when the token reads none. A side panel lists the plumbing topics: goose failsafe from watchdog to manager, goose active controller from manager to behavior nodes, the hold, RTL, and land services on the flight-controller node which sets the PX4 flight mode, and the PX4 vehicle status topic carrying the firmware's own failsafe flag. A footer states the design rule: overrides flow strictly downward; authority is revoked at the token, not negotiated with the node losing it.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-failsafe-override-authority-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/failsafe-override-authority.svg" class="img-fluid figure-img" style="width:95.0%" alt="Five stacked layers with a vertical axis labeled increasing authority. Top layer, grey: safety pilot's RC transmitter, sticks straight to the receiver on the flight controller, no companion software in the path, a mode switch seizes control from every layer below at any time. Second, amber: PX4 native failsafes in firmware — Offboard dead-man's switch, geofence breach action, low-battery ladder, RC and data-link loss — acting by changing flight mode itself, needing no cooperation from anything above the autopilot. Third, teal: failsafe monitor, the independent mission watchdog, a separate process subscribing to position, battery, and vehicle status, evaluating mission rules at one hertz and publishing severity colon reason on the goose failsafe topic every tick a condition holds, with severities HOLD, RTL, and LAND. Fourth, teal: mission manager, which executes the override on any failsafe message by setting the active-controller token to none, dropping the pending service call, entering its terminal FAILSAFE state, and calling the matching hold, RTL, or land service; it carries watchdogs of its own — engagement timeout, target lost, repeated resume failure — and stands down on an unrecognized severity, assuming a PX4 native failsafe is in control. Bottom: behavior nodes, navigation and harassment, lowest authority, streaming setpoints only while the token names them, silenced within one message when the token reads none. A side panel lists the plumbing topics: goose failsafe from watchdog to manager, goose active controller from manager to behavior nodes, the hold, RTL, and land services on the flight-controller node which sets the PX4 flight mode, and the PX4 vehicle status topic carrying the firmware's own failsafe flag. A footer states the design rule: overrides flow strictly downward; authority is revoked at the token, not negotiated with the node losing it.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-failsafe-override-authority-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12.3: Override authority in the running example, drawn as a ladder: the safety pilot’s transmitter above PX4’s native failsafes, above the independent failsafe-monitor watchdog, above the mission manager that executes overrides by revoking the active-controller token and calling flight-controller services, above the behavior nodes that may act only while the token names them.
+</figcaption>
+</figure>
+</div>
+<p>Three further details show the ladder working end to end. The mission manager carries hard-failsafe consumers <em>and producers</em> — with an escalation ladder of its own. Its watchdogs — an engagement timeout, a target-lost timer — do not invoke <code>_enter_failsafe</code> directly: they route the vehicle into a resume state that attempts recovery first, handing control back to the firmware’s mission so the search can continue — the soft response, tried before the hard one. Only when that recovery itself fails three times running does the manager escalate, feeding the same <code>_enter_failsafe</code> path with an <code>RTL:</code> reason — so a mission that cannot continue safely ends the same way a breached fence does, through one code path, one log line, one behavior the crew has rehearsed. The operator’s abort service is the same path again — a human on the ground station commands <code>RTL:operator abort</code> through precisely the machinery a low battery would use, which means the emergency everyone practices is also the button anyone can press. And the flight-controller node closes the loop upward: its preflight check refuses to launch while PX4 reports an active failsafe, and its status stream republishes the firmware’s failsafe flag so every layer can see when the rung above has taken over. The full node graph — every topic, every service, every authority transfer, including the perception nodes Part III adds — is the business of the System Architecture chapter in Part V; the reader arriving there will find this ladder unchanged at its core, with more rungs’ worth of <em>detail</em>, not more rungs.</p>
+<p>One last symmetry closes the Part. The software ladder’s top rung is a person, and that is not an implementation compromise — it is the design. The Airspace Law chapter’s institutional rules (the licensed pilot present, the single pilot flying, the 10-foot training ceiling under the 122 m legal one) are the human layers of exactly this diagram, enforcing what software cannot: judgment about weather, bystanders, and the thousand conditions no <code>_evaluate</code> enumerates. The software layers, in turn, enforce what humans cannot: a 300-millisecond response at 2 a.m. of attention span, every second, without boredom. Designing for the unexpected is not choosing between the two. It is stacking them, each layer honest about what it can catch, each one armed before the flight on which it is needed — because the flight on which it is needed does not announce itself.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="12.7">
+<h2 data-number="12.7" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">12.7</span> Check Your Understanding</h2>
+<ol type="1">
+<li>A fence polygon has vertices, in local metres (east, north): (0, 0), (100, 10), (90, 80), (−10, 70). Using the ray-casting test with a ray cast east, determine whether the point (40, 40) is inside. Which edges does the ray cross?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The ray from (40, 40) runs east at northing 40. Test each edge for spanning <span class="math inline">\(n = 40\)</span>: edge (0,0)→(100,10) spans northings 0–10, no; edge (100,10)→(90,80) spans 10–80, yes — crossing at <span class="math inline">\(e = 100 + (40-10)\times(90-100)/(80-10) = 100 - 4.3 \approx 95.7\)</span>, which is east of 40, so it counts; edge (90,80)→(−10,70) spans 70–80, no; edge (−10,70)→(0,0) spans 0–70, yes — crossing at <span class="math inline">\(e = -10 + (40-70)\times(0-(-10))/(0-70) \approx -5.7\)</span>, which is <em>west</em> of 40, so it does not count. One eastward crossing — odd — so (40, 40) is inside the fence.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>The same mission is protected by a QGC geofence with the breach action set to RTL and by the running example’s <code>failsafe_monitor</code> publishing <code>RTL:geofence</code> on breach. These look redundant. Give two concrete failure scenarios in which exactly one of the two layers catches the problem, and state the general principle.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Firmware-only catch: the companion computer crashes or hangs entirely — the watchdog node is dead and publishes nothing, but PX4’s fence check runs on the flight controller and fires regardless (as does the Offboard dead-man’s switch). Watchdog-only catch: a mission rule the firmware cannot know — the watchdog’s fence is deliberately tighter than the uploaded one (or the crew set <code>geofence_radius_m</code> down for a small site without re-uploading firmware fence geometry), or a mission-specific condition such as a separation distance fires — the firmware sees a perfectly legal flight while the mission layer correctly aborts. The principle is layered enforcement with independent failure modes: the firmware layer survives companion-computer death; the mission layer encodes rules above the firmware’s floor. Neither substitutes for the other, which is why both are armed.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Using the running example’s numbers — 77 Wh pack, 365 W mission draw, fence radius 200 m, ceiling 30 m, return cruise 5 m/s — a teammate proposes lowering <code>battery_rtl</code> from 0.30 to 0.18 to buy more search time. Evaluate the proposal quantitatively.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>One percent of the pack is <span class="math inline">\(0.77\ \text{Wh} / 365\ \text{W} \approx 7.6\)</span> s of flight. The worst-case return — 200 m at 5 m/s (40 s) plus climb and a descent from 30 m (roughly 40–50 s) — costs about 90 s, i.e.&nbsp;about 12% of the pack. Triggering RTL at 18% means arriving in the landing phase near <span class="math inline">\(18 - 12 = 6\%\)</span> — at or below the firmware’s own critical threshold (~7%), inside the steep knee of the discharge curve where indicated charge falls fastest and voltage sag under load is worst, with zero margin for a headwind or a delayed trigger. The 30% setting lands the aircraft near 18% — above the 15% land floor with the worst case already paid. The proposal converts about 90 s of extra search into the elimination of the entire safety margin; reject it, or fund the search time honestly with a larger pack or a tighter fence (a smaller radius shrinks the worst-case return and <em>legitimately</em> lowers the defensible threshold).</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>In <code>failsafe_monitor.py</code>, the reason string is re-published every tick while the condition holds, but logged only when it changes; and in the mission manager, the <em>first</em> failsafe message latches the FAILSAFE state, which is terminal. Explain what each of the three choices (continuous publish, change-only logging, latched terminal state) protects against.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Continuous publish protects against lost messages and late joiners: with a best-effort transport and independently restarting nodes, a single event message could be missed forever, but an assertion repeated at 1 Hz reaches any subscriber within a tick — the same “stream as proof” logic as the Offboard heartbeat. Change-only logging protects the log (and the human reading it) from 1 Hz flooding during a persistent condition: one line when the condition appears, one when it clears, is the record an incident review needs. The latched terminal state protects against oscillation and secondary logic re-entering the mission: a battery hovering around the threshold or a fence flicker under GNSS noise would otherwise toggle the system between mission and failsafe repeatedly — once safety has been invoked, the flight is over, and only a human (restarting the mission after landing) resets it.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>The mission manager, on receiving <code>LAND:battery below land floor</code>, sets the active-controller token to <code>none</code> <em>before</em> calling the land service. Why does the order matter, and what could happen with the reverse order?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The behavior nodes stream Offboard setpoints while the token names them. If the manager called the land service first, PX4 would begin the landing — but the still-authorized behavior node would keep streaming setpoints, and an active setpoint stream is precisely the condition for (re-)entering Offboard mode: the mission logic could fight the landing, or flip the vehicle back out of it. Revoking the token first silences every setpoint source (the nodes stop publishing within one message), so when the land command arrives there is no competing claimant to authority. It is the mission-layer version of the previous chapters’ silence discipline: software hands back control by ceasing to prove it wants control — and the manager makes that happen <em>for</em> the nodes, by decree, rather than trusting each to do it itself.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>PX4’s own low-battery failsafe would eventually return and land the aircraft with no companion software at all. State two distinct reasons the running example nonetheless sets its mission thresholds (0.30/0.15) far above the firmware defaults (~0.15/0.07/0.05), and connect the pattern to a rule from the Airspace Law chapter.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>First, the firmware defaults protect the <em>aircraft</em>, not the mission’s geometry: they know nothing about the 200 m fence radius or the 30 m ceiling, so they cannot guarantee the worst-case trip home is affordable when they fire — at 7% remaining, the ~12% return trip is already unpayable. The mission thresholds are sized against the mission’s own worst case, with margin. Second, acting early converts an emergency into a routine: an RTL at 30% is a calm, predictable end-of-mission with the crew watching; an emergency landing at 5% happens wherever the vehicle is, on a sagging pack. The pattern is the layered-margin doctrine of the Airspace Law chapter — the organization’s 10-foot ceiling under the FAA’s 400-foot (122 m) limit — recurring in software: the platform’s legal or firmware floor is where an operation’s margins begin, and every responsible layer adds rules matched to its own hazard profile above it.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="12.8">
+<h2 data-number="12.8" class="anchored" data-anchor-id="try-it"><span class="header-section-number">12.8</span> Try It</h2>
+<p><strong>Part 1 — arm the fence and break it on purpose.</strong> Reload the previous chapter’s SITL workbench and the lawnmower mission, and this time finish the job: in QGroundControl, draw an inclusion polygon around the field (or reuse the plan’s), set the geofence breach action to Return-to-Launch, and upload. Fly the mission once inside the fence to confirm nothing fires. Then edit one waypoint to sit outside the polygon and fly again: watch the mission proceed until the boundary, the fence trigger, and the RTL climb-return-land sequence — the mission plan, the vehicle’s track, and the moment of the trigger are the demonstration that matters, so record the screen. Repeat with the action set to Hold and note the difference in what you would do next as an operator: the returning aircraft solved its own problem; the hovering one is holding a draining battery and waiting for you. Finally, lower the fence’s altitude ceiling below the mission altitude and confirm the <em>vertical</em> half of the volume triggers exactly like the horizontal half.</p>
+<p><strong>Part 2 — fill the watchdog’s seam.</strong> Implement <code>_evaluate</code> in the running example’s <code>failsafe_monitor.py</code> (or a copy of its scaffold) with the four parameterized conditions from this chapter — land-floor battery, fence radius, altitude ceiling, RTL-threshold battery, in that severity order — and test it the way the previous chapter tested the state machine: feed it scripted telemetry rather than a live vehicle. Drive <code>remaining</code> down through 0.30 and 0.15 and check the published severities and the single logged line per transition; walk the position out through 200 m and confirm <code>RTL:geofence</code>; hold the battery at exactly 0.299 and watch the 1 Hz re-publish. Then add the two refinements the chapter argued for: a soft layer (publish <code>WARN:</code> at radius minus a margin — and decide, in writing, who should consume it), and a debounce (a condition must hold for <span class="math inline">\(k\)</span> consecutive ticks before it is published; pick <span class="math inline">\(k\)</span> by reasoning about GNSS scatter at the fence line versus the cost of a one-second delay). Finish by wiring your monitor to the SITL vehicle from Part 1 and forcing one real trigger — the moment the simulated aircraft turns for home because <em>your</em> code said so is the moment this Part has been building toward.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#sitl-simulation-and-geofencing">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="pagination-link" aria-label="Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="pagination-link" aria-label="Images as Data: From Pixels to Tensors">
+        <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>10&nbsp; PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2 – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" rel="next">
+<link href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html">Part II — Flight Control &amp; Mission Scripting</a></li><li class="breadcrumb-item"><a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">10.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">10.2</span> Key Vocabulary</a></li>
+  <li><a href="#choosing-the-firmware-px4-versus-ardupilot" id="toc-choosing-the-firmware-px4-versus-ardupilot" class="nav-link" data-scroll-target="#choosing-the-firmware-px4-versus-ardupilot"><span class="header-section-number">10.3</span> Choosing the Firmware: PX4 versus ArduPilot</a>
+  <ul class="collapse">
+  <li><a href="#what-the-licenses-actually-oblige" id="toc-what-the-licenses-actually-oblige" class="nav-link" data-scroll-target="#what-the-licenses-actually-oblige"><span class="header-section-number">10.3.1</span> What the licenses actually oblige</a></li>
+  <li><a href="#tooling-and-culture" id="toc-tooling-and-culture" class="nav-link" data-scroll-target="#tooling-and-culture"><span class="header-section-number">10.3.2</span> Tooling and culture</a></li>
+  </ul></li>
+  <li><a href="#mavlink-one-protocol-three-speakers" id="toc-mavlink-one-protocol-three-speakers" class="nav-link" data-scroll-target="#mavlink-one-protocol-three-speakers"><span class="header-section-number">10.4</span> MAVLink: One Protocol, Three Speakers</a></li>
+  <li><a href="#mavsdk-flying-in-a-dozen-lines" id="toc-mavsdk-flying-in-a-dozen-lines" class="nav-link" data-scroll-target="#mavsdk-flying-in-a-dozen-lines"><span class="header-section-number">10.5</span> MAVSDK: Flying in a Dozen Lines</a></li>
+  <li><a href="#ros-2-the-middleware-path" id="toc-ros-2-the-middleware-path" class="nav-link" data-scroll-target="#ros-2-the-middleware-path"><span class="header-section-number">10.6</span> ROS 2: The Middleware Path</a></li>
+  <li><a href="#offboard-mode-a-dead-mans-switch" id="toc-offboard-mode-a-dead-mans-switch" class="nav-link" data-scroll-target="#offboard-mode-a-dead-mans-switch"><span class="header-section-number">10.7</span> Offboard Mode: A Dead-Man’s Switch</a></li>
+  <li><a href="#a-complete-mission-node-flying-a-square" id="toc-a-complete-mission-node-flying-a-square" class="nav-link" data-scroll-target="#a-complete-mission-node-flying-a-square"><span class="header-section-number">10.8</span> A Complete Mission Node: Flying a Square</a></li>
+  <li><a href="#simulate-then-fly" id="toc-simulate-then-fly" class="nav-link" data-scroll-target="#simulate-then-fly"><span class="header-section-number">10.9</span> Simulate, Then Fly</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">10.10</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">10.11</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html">Part II — Flight Control &amp; Mission Scripting</a></li><li class="breadcrumb-item"><a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The previous chapter ended inside the flight controller, with the cascade’s gains living as named parameters — <code>MC_ROLLRATE_P</code> and its kin — in a piece of software it kept calling “the PX4 firmware” without ever justifying the choice. And the Companion Computers chapter of Part I ended at the other side of the wire, with a MAVLink heartbeat arriving over three verified conductors and a promise that Part II would show how a Python program turns that link into an autonomous takeoff. This chapter keeps both promises at once, because they are the same promise: it maps the software stack that stands between a mission script and the four motor commands, layer by layer, and makes the three decisions every autonomy project has to make before writing its first line of flight code. Which autopilot firmware runs the loops — PX4 or ArduPilot, a choice that turns out to hinge on law as much as engineering? Which programming layer does the mission code use to command it — MAVSDK, a library that makes a drone feel like an object with methods, or ROS 2, a middleware that makes it one participant in a graph of cooperating processes? And where does the code fly first — because the correct answer is <em>nowhere</em>, until the identical firmware has flown the identical mission in simulation.</p>
+<p>The stakes of the chapter are inherited directly from the one before. The cascade of PID loops is superb at what it does and completely indifferent to <em>why</em>: it will track a setpoint into the ground as faithfully as into a perfect hover. Everything that makes the running example a system rather than a stabilizer — the search, the detection, the deterrence — enters the flight controller from outside, as messages on the wire Part I installed. This chapter is about the grammar of those messages and the software that speaks it.</p>
+<section id="learning-objectives" class="level2" data-number="10.1">
+<h2 data-number="10.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">10.1</span> Learning Objectives</h2>
+<ul>
+<li>Compare PX4 and ArduPilot as autopilot firmware, and explain concretely what the BSD 3-clause and GPL v3 licenses each oblige a team to do when it modifies the firmware and distributes vehicles containing it — and why neither license reaches mission code on the companion computer.</li>
+<li>Describe MAVLink’s role as the common protocol among flight controller, ground station, and companion computer, and distinguish its two idioms: streamed telemetry and acknowledged commands.</li>
+<li>Write and explain a minimal MAVSDK mission — connect, verify, arm, take off, land — and identify the class of project for which MAVSDK is the right programming layer.</li>
+<li>Explain how ROS 2 talks to PX4 without MAVLink, through uORB topics exposed across the Micro XRCE-DDS bridge, and why the mission-side architecture becomes a timer-driven node rather than a linear script.</li>
+<li>State Offboard mode’s two hard rules — stream setpoints before entering, keep streaming above about 2 Hz to stay — and justify them as a dead-man’s switch protecting the vehicle from its own companion computer.</li>
+<li>Explain why “simulate, then fly” is standard practice: PX4 SITL runs the identical firmware against a modeled plant, so the mission code that survives Gazebo is byte-for-byte the code that flies.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="10.2">
+<h2 data-number="10.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">10.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>PX4</strong> — an open-source autopilot firmware, licensed BSD 3-clause, that implements the estimator, the cascaded control loops, the flight modes, and the failsafe logic on Pixhawk-class flight controllers; the firmware this book’s platform runs.</li>
+<li><strong>ArduPilot</strong> — the other major open-source autopilot firmware, licensed GPL v3, older and more extensively documented than PX4, with a faster-moving but historically rockier release cadence.</li>
+<li><strong>MAVLink</strong> (Micro Air Vehicle Link) — the lightweight binary message protocol spoken among flight controllers, ground stations, and companion computers: framed packets carrying typed payloads, addressed by system and component ID, over any serial or network transport.</li>
+<li><strong>QGroundControl</strong> — the cross-platform ground-control station developed alongside PX4: mission upload, live telemetry, parameter editing, sensor calibration, and firmware flashing through one MAVLink-speaking interface.</li>
+<li><strong>Mission Planner</strong> — ArduPilot’s companion ground-control station, Windows-first and denser, exposing more of the firmware’s features at the cost of a steeper interface.</li>
+<li><strong>MAVSDK</strong> — a library (with Python, C++, and other language bindings) that wraps MAVLink in high-level calls — <code>arm()</code>, <code>takeoff()</code>, <code>land()</code> — so a single linear program can command a vehicle without composing protocol messages by hand.</li>
+<li><strong>ROS 2</strong> (Robot Operating System 2) — the middleware, introduced with the running example’s architecture at the close of Part I, in which independent nodes exchange typed messages over named topics and services; here, the scalable alternative to MAVSDK for mission software.</li>
+<li><strong>uORB</strong> — PX4’s internal publish–subscribe message bus, over which the firmware’s own modules (estimator, controllers, commander) exchange data; the DDS bridge exposes these same topics to ROS 2 rather than translating them.</li>
+<li><strong>Micro XRCE-DDS</strong> — the bridge protocol between PX4 and ROS 2: a lightweight client inside the firmware serializes uORB topics across the UART to an agent process on the companion computer, which republishes them as ordinary ROS 2 topics.</li>
+<li><strong>Offboard mode</strong> — the PX4 flight mode in which the autopilot follows position, velocity, or attitude setpoints streamed by an external computer, entered only while a setpoint stream is already flowing and abandoned, in favor of a failsafe behavior, the moment the stream stalls.</li>
+<li><strong>SITL</strong> (Software-in-the-Loop) — running the unmodified autopilot firmware as a desktop process against a physics simulator such as Gazebo, so that missions, modes, and failsafes can be exercised — and crashed — with no aircraft at risk.</li>
+</ul>
+</section>
+<section id="choosing-the-firmware-px4-versus-ardupilot" class="level2" data-number="10.3">
+<h2 data-number="10.3" class="anchored" data-anchor-id="choosing-the-firmware-px4-versus-ardupilot"><span class="header-section-number">10.3</span> Choosing the Firmware: PX4 versus ArduPilot</h2>
+<p>The flight controller Part I selected is a piece of hardware; what the previous chapter analyzed — the estimator, the cascade, the parameters — is firmware running on it, and that firmware is a choice. Two open-source projects dominate the space, and the striking thing about the comparison is what it is <em>not</em> about. Both PX4 and ArduPilot are mature, both fly multirotors, fixed-wings, and stranger vehicles, both implement an EKF-based estimator and a cascaded control architecture of exactly the shape the previous chapter derived, and both are trusted by commercial operators. A team choosing between them on control performance is choosing on noise. The real differences are a software license, a ground station, and a development culture — and the first of these deserves more attention than engineering teams usually give it, because it is the one difference that can bind a company years later. <a href="#fig-px4-vs-ardupilot" class="quarto-xref">Figure&nbsp;<span>10.1</span></a> lays the comparison out.</p>
+<div id="fig-px4-vs-ardupilot" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Comparison chart with two columns. The left column header reads PX4, BSD 3-Clause, permissive; the right reads ArduPilot, GPL v3, copyleft. Four rows compare them. License terms: PX4 modifications may stay private, the obligation is attribution not disclosure; ArduPilot distributing modified firmware obliges you to offer your source to every recipient. Ground station: QGroundControl, cross-platform, cleaner interface, fewer knobs, versus Mission Planner, Windows-first, denser interface, more features exposed. Documentation: PX4 has a thinner record of prior projects to crib from; ArduPilot has extensive deep documentation from a longer hobbyist and survey lineage. Update history: PX4 has a reputation for cleaner, more conservative release patches; ArduPilot has faster-moving releases with a rockier patch history. A bottom panel titled the licensing consequence drawn out shows a box labeled proprietary firmware change, for example a custom control module, with two arrows: one labeled in PX4 leading to a teal box reading BSD, sell the vehicle, keep the source, competitors never see the modification; the other labeled in ArduPilot leading to an amber box reading GPL, sell the vehicle, publish the change, every recipient is entitled to the modified source and may redistribute it, including to competitors. A closing line notes that neither obligation touches mission code on the companion computer, since a separate program talking over a serial link is not a derivative work of the firmware under either license.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-px4-vs-ardupilot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/px4-vs-ardupilot.svg" class="img-fluid figure-img" style="width:95.0%" alt="Comparison chart with two columns. The left column header reads PX4, BSD 3-Clause, permissive; the right reads ArduPilot, GPL v3, copyleft. Four rows compare them. License terms: PX4 modifications may stay private, the obligation is attribution not disclosure; ArduPilot distributing modified firmware obliges you to offer your source to every recipient. Ground station: QGroundControl, cross-platform, cleaner interface, fewer knobs, versus Mission Planner, Windows-first, denser interface, more features exposed. Documentation: PX4 has a thinner record of prior projects to crib from; ArduPilot has extensive deep documentation from a longer hobbyist and survey lineage. Update history: PX4 has a reputation for cleaner, more conservative release patches; ArduPilot has faster-moving releases with a rockier patch history. A bottom panel titled the licensing consequence drawn out shows a box labeled proprietary firmware change, for example a custom control module, with two arrows: one labeled in PX4 leading to a teal box reading BSD, sell the vehicle, keep the source, competitors never see the modification; the other labeled in ArduPilot leading to an amber box reading GPL, sell the vehicle, publish the change, every recipient is entitled to the modified source and may redistribute it, including to competitors. A closing line notes that neither obligation touches mission code on the companion computer, since a separate program talking over a serial link is not a derivative work of the firmware under either license.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-px4-vs-ardupilot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10.1: The PX4 versus ArduPilot decision: identical control theory, different licenses, ground stations, and release cultures — with the licensing consequence drawn out for a team that modifies the firmware and ships vehicles containing it.
+</figcaption>
+</figure>
+</div>
+<section id="what-the-licenses-actually-oblige" class="level3" data-number="10.3.1">
+<h3 data-number="10.3.1" class="anchored" data-anchor-id="what-the-licenses-actually-oblige"><span class="header-section-number">10.3.1</span> What the licenses actually oblige</h3>
+<p>The source-of-record difference is one line — PX4 is licensed under the <strong>BSD 3-clause</strong> license, ArduPilot under the <strong>GPL v3</strong> — and the line is easy to read past, because both licenses grant the same generous core: anyone may use, study, modify, and redistribute the code, free of charge, forever. The divergence is entirely about what happens to <em>modifications</em>, and it only activates at a specific, well-defined moment: <strong>distribution</strong>. A team that modifies either firmware and flies it on its own aircraft owes nobody anything, under either license. The obligations attach when copies of the firmware leave the team’s hands — most commonly, when it sells or delivers vehicles with the modified firmware flashed aboard.</p>
+<p>At that moment the two licenses part company. The BSD 3-clause license is <strong>permissive</strong>: it asks that the copyright notice and license text be preserved, and that the project’s name not be used to endorse the derivative — and that is the entire bill. The modification itself may remain a trade secret. A drone manufacturer can develop a proprietary control module inside PX4, ship a thousand vehicles running it, and never show a line of it to anyone; this is precisely why a long roster of commercial autopilot vendors builds on PX4, and why the Dronecode ecosystem around it is structured as an industry consortium. The GPL v3 is <strong>copyleft</strong>: distributing a binary built from modified ArduPilot obliges the distributor to offer the <em>corresponding source</em> — the modification included — to every recipient, under the same GPL terms, which means every recipient is in turn free to redistribute it to the world. A proprietary firmware advantage built on ArduPilot is therefore, structurally, a contradiction: the act of selling the product is the act of publishing the advantage.</p>
+<p>Neither position is “better”; they encode different theories of how a commons should grow. Copyleft ensures improvements flow back — one reason ArduPilot’s feature set and vehicle support are so broad is that two decades of forks were legally obliged to remain open. Permissiveness ensures companies can invest without forfeiting their differentiation — one reason PX4 attracts commercial teams whose autonomy stack <em>is</em> their product. What a team must not do is discover the difference after the fact. The scenario that matters is concrete: a startup builds custom autonomy behavior into the firmware itself — a tighter rate controller, a proprietary failure-detection module — and later takes on customers. On PX4, that intellectual property is theirs to keep. On ArduPilot, their first shipment is a publication event.</p>
+<p>One boundary of the obligation matters just as much and is drawn at the bottom of <a href="#fig-px4-vs-ardupilot" class="quarto-xref">Figure&nbsp;<span>10.1</span></a>: the license governs the firmware, not the system around it. Mission code running on the companion computer — a MAVSDK script, the ROS 2 nodes of the running example — is a separate program communicating with the firmware over a serial protocol, not a derivative work of it, and neither license reaches across that link. A team can keep its entire autonomy stack proprietary above a GPL autopilot. The license question bites only those who modify the autopilot itself — which is exactly why the architecture this book builds does all of its innovating on the companion-computer side of the wire.</p>
+</section>
+<section id="tooling-and-culture" class="level3" data-number="10.3.2">
+<h3 data-number="10.3.2" class="anchored" data-anchor-id="tooling-and-culture"><span class="header-section-number">10.3.2</span> Tooling and culture</h3>
+<p>The second difference a team lives with daily is the ground station. <strong>QGroundControl</strong> grew up alongside PX4: cross-platform, comparatively clean, organized around the workflow of flying — mission upload, live telemetry, parameter editing, sensor calibration, firmware flashing. <strong>Mission Planner</strong> grew up alongside ArduPilot: Windows-first, denser, and famously feature-rich, exposing more of the firmware’s considerable surface area at the cost of a steeper interface. Both speak MAVLink, and either can talk to either firmware in a pinch, but each is at home with its own. The remaining differences are cultural and worth stating as tendencies rather than laws: ArduPilot, the older project, carries deeper documentation and a longer public record of prior builds to learn from, while PX4 has a reputation for cleaner, more conservative release engineering — patches that arrive less often and break less.</p>
+<p>This book’s platform runs PX4, and the reasons can now be stated honestly rather than by fiat. The permissive license matches the book’s premise — a team whose value lives in custom autonomy software. QGroundControl is the tool the coming chapters use for parameter work and mission upload. And one reason outranks the others for what follows: PX4’s first-class ROS 2 integration, which gives the running example’s node graph a direct line into the autopilot that ArduPilot’s MAVLink-translation route does not match. Everything the previous chapter said about the cascade still holds verbatim — PX4’s parameters (<code>MC_ROLLRATE_P</code>, <code>MPC_Z_VEL_P_ACC</code>, and hundreds more) are those loops’ gains, stored on the flight controller, inspected and changed live from QGroundControl without recompiling anything. The firmware is chosen; the question becomes how to talk to it.</p>
+</section>
+</section>
+<section id="mavlink-one-protocol-three-speakers" class="level2" data-number="10.4">
+<h2 data-number="10.4" class="anchored" data-anchor-id="mavlink-one-protocol-three-speakers"><span class="header-section-number">10.4</span> MAVLink: One Protocol, Three Speakers</h2>
+<p>The Companion Computers chapter introduced <strong>MAVLink</strong> operationally — the heartbeat arriving at 1 Hz was the proof the wire worked — and deferred the protocol itself to this chapter. MAVLink is a lightweight binary message protocol designed for exactly the environment Part I built: low-bandwidth serial links shared by devices that must not waste bytes. A MAVLink packet is a typed payload of at most 255 bytes wrapped in roughly a dozen bytes of framing — a start marker, a length, sequence and address fields, a message ID identifying which of the protocol’s several hundred defined message types the payload is, and a checksum computed over both the bytes <em>and</em> the message definition, so that two ends compiled against mismatched dialects reject each other’s traffic rather than misreading it. Every participant carries a <strong>system ID</strong> (the vehicle is conventionally system 1, a ground station 255) and a <strong>component ID</strong> (the autopilot, a camera, a gimbal), so one link can multiplex conversations among many parties. At the 921,600-baud link’s roughly 90 kB/s, the arithmetic from Part I holds comfortably: full telemetry and command traffic occupy a small fraction of the wire.</p>
+<p>Two idioms cover nearly all of the traffic. <strong>Streams</strong> are periodic, unacknowledged broadcasts — attitude, position, battery state, and the 1 Hz <code>HEARTBEAT</code> itself — carrying data where only the latest value matters and a lost packet costs nothing, because a fresher one is already on the way. <strong>Commands</strong> are the opposite contract: a <code>COMMAND_LONG</code> message carries a command ID and up to seven parameters — arm, set mode, return to launch — and the recipient answers with a <code>COMMAND_ACK</code> accepting or rejecting it, because “arm the vehicle” is not a request whose fate a sender can shrug about. The reader will recognize this pair: it is the topics-versus-services distinction the closing chapter of Part I drew for ROS 2, appearing one layer down, in a protocol that predates ROS 2 — the same engineering fork (streamed state versus acknowledged action) recurs at every level of the stack because the underlying question recurs.</p>
+<p><a href="#fig-mavlink-autopilot-stack" class="quarto-xref">Figure&nbsp;<span>10.2</span></a> places the protocol in the geography Part I established. Three speakers address the autopilot, along the three command paths enumerated in the Companion Computers chapter. <strong>QGroundControl</strong> speaks MAVLink over the telemetry radio: monitoring, mission upload, parameter changes. The <strong>companion computer</strong> speaks over the wired UART — and here the figure shows a fork this chapter spends its remaining pages on, because mission code has two quite different ways to form its side of the conversation. The <strong>RC transmitter</strong> speaks neither protocol; it is a straight radio link to the receiver, which is exactly why it survives as the safety pilot’s override when every software layer above it has failed.</p>
+<div id="fig-mavlink-autopilot-stack" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Layered block diagram. A dashed enclosure labeled on the aircraft contains three layers. Top: a companion computer box, Jetson Nano running Linux, holding two sub-boxes: MAVSDK mission script, one linear Python program, connect arm takeoff land, speaks MAVLink; and ROS 2 node graph, nodes exchanging topics and services with a Micro XRCE-DDS agent at the edge, speaks uORB over DDS. Two arrows descend from the sub-boxes, labeled MAVLink v2 packets and serialized uORB topics, into a band labeled UART, TELEM2, three wires, 921,600 baud, the physical link wired and heartbeat-verified in Part I, both protocols ride the same wire. An arrow continues down into an amber flight controller box, Pixhawk 6C running PX4, containing three sub-boxes: EKF2 estimator, one fused state every loop closes on; cascaded PID loops, position to velocity to attitude to rate; and modes plus parameters, Offboard, failsafes, MC underscore ROLLRATE underscore P. An arrow leads down to a box reading four motor commands. Outside the enclosure on the left, a QGroundControl box, a ground-control station on a laptop for monitoring, mission upload, parameter editing, and calibration, speaks MAVLink over a dashed line labeled MAVLink over the telemetry radio into the flight controller; below it an RC transmitter box, the safety pilot's sticks straight to a receiver on the flight controller, no protocol stack, always able to override, connects by a second dashed line. The caption reads: three command paths converge on one autopilot; the ground station and the MAVSDK script speak MAVLink, while ROS 2 skips the translation and publishes PX4's own uORB topics across the DDS bridge, over the same three wires.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mavlink-autopilot-stack-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/mavlink-autopilot-stack.svg" class="img-fluid figure-img" style="width:100.0%" alt="Layered block diagram. A dashed enclosure labeled on the aircraft contains three layers. Top: a companion computer box, Jetson Nano running Linux, holding two sub-boxes: MAVSDK mission script, one linear Python program, connect arm takeoff land, speaks MAVLink; and ROS 2 node graph, nodes exchanging topics and services with a Micro XRCE-DDS agent at the edge, speaks uORB over DDS. Two arrows descend from the sub-boxes, labeled MAVLink v2 packets and serialized uORB topics, into a band labeled UART, TELEM2, three wires, 921,600 baud, the physical link wired and heartbeat-verified in Part I, both protocols ride the same wire. An arrow continues down into an amber flight controller box, Pixhawk 6C running PX4, containing three sub-boxes: EKF2 estimator, one fused state every loop closes on; cascaded PID loops, position to velocity to attitude to rate; and modes plus parameters, Offboard, failsafes, MC underscore ROLLRATE underscore P. An arrow leads down to a box reading four motor commands. Outside the enclosure on the left, a QGroundControl box, a ground-control station on a laptop for monitoring, mission upload, parameter editing, and calibration, speaks MAVLink over a dashed line labeled MAVLink over the telemetry radio into the flight controller; below it an RC transmitter box, the safety pilot's sticks straight to a receiver on the flight controller, no protocol stack, always able to override, connects by a second dashed line. The caption reads: three command paths converge on one autopilot; the ground station and the MAVSDK script speak MAVLink, while ROS 2 skips the translation and publishes PX4's own uORB topics across the DDS bridge, over the same three wires.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mavlink-autopilot-stack-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10.2: The autopilot software stack: MAVSDK scripts and QGroundControl speak MAVLink to PX4 — over the UART and the telemetry radio respectively — while ROS 2 bypasses MAVLink entirely, exchanging PX4’s own uORB topics across the Micro XRCE-DDS bridge on the same three wires; the RC transmitter’s stick commands arrive with no protocol stack at all.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="mavsdk-flying-in-a-dozen-lines" class="level2" data-number="10.5">
+<h2 data-number="10.5" class="anchored" data-anchor-id="mavsdk-flying-in-a-dozen-lines"><span class="header-section-number">10.5</span> MAVSDK: Flying in a Dozen Lines</h2>
+<p>Raw MAVLink is a wire format; nobody should hand-assemble packet bytes to fly an aircraft. <strong>MAVSDK</strong> is the standard library answer: language bindings (Python here; C++, Swift, and others exist) that wrap the protocol in the vocabulary a mission author actually thinks in. The vehicle becomes an object; flying becomes method calls. Here is the entire program that takes the running example’s aircraft off the ground and brings it back — connecting over precisely the serial device and baud rate the Companion Computers chapter wired and verified:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> asyncio</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> mavsdk <span class="im">import</span> System</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> run():</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    drone <span class="op">=</span> System()</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The same UART link the heartbeat test proved, wrapped by MAVSDK</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> drone.<span class="ex">connect</span>(system_address<span class="op">=</span><span class="st">"serial:///dev/ttyTHS1:921600"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The same liveness check as the heartbeat test, far less code</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="cf">for</span> state <span class="kw">in</span> drone.core.connection_state():</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> state.is_connected:</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> drone.action.arm()</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> drone.action.takeoff()</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> asyncio.sleep(<span class="dv">10</span>)      <span class="co"># hover</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> drone.action.land()</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>asyncio.run(run())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The program is linear — do this, then this, then this — and Python’s <code>asyncio</code> machinery is what lets a linear story coexist with a fundamentally asynchronous world: each <code>await</code> yields until the underlying MAVLink exchange completes, so <code>await drone.action.arm()</code> does not return until the autopilot has actually acknowledged the arm command, the acknowledged-command idiom of the previous section surfacing as ordinary control flow. The <code>connection_state</code> loop is worth a second look, because it is the heartbeat test of Part I reborn as three lines of code: the program refuses to proceed until MAVLink heartbeats prove the far end is alive. The discipline is identical; only the notation changed. (One implementation note for the curious: the Python binding delegates protocol work to a small native server process it launches automatically — invisible in normal use, but the explanation for the extra process a <code>ps</code> will show.)</p>
+<p>What MAVSDK is <em>for</em> follows from what the example shows. For single-vehicle missions — waypoint surveys, scripted photography passes, the take-off-fly-land shape of most first projects — it is close to ideal: minutes from idea to flying code, no infrastructure, no middleware to configure. Its plugins (<code>action</code>, <code>telemetry</code>, <code>mission</code>, <code>offboard</code>) cover the autopilot’s whole public surface. What it is not built for is the thing the running example needs: a <em>system</em> in which perception, navigation, deterrence, and safety monitoring are separate concerns producing and consuming live data streams. A MAVSDK program is one process; as the mission grows, everything — the camera driver, the detector, the state machine, the failsafe checks — must grow inside that one process, and the modularity argument the closing chapter of Part I made (a crash in one function must not take down the safety monitor) has no purchase. The limitation is architectural, not a missing feature, and it is the doorway to ROS 2.</p>
+</section>
+<section id="ros-2-the-middleware-path" class="level2" data-number="10.6">
+<h2 data-number="10.6" class="anchored" data-anchor-id="ros-2-the-middleware-path"><span class="header-section-number">10.6</span> ROS 2: The Middleware Path</h2>
+<p>Part I’s closing chapter already introduced ROS 2’s vocabulary on the way to sketching the running example’s architecture: independent <strong>nodes</strong>, each one process with one job; <strong>topics</strong>, named publish–subscribe channels for streaming data; <strong>services</strong>, request–response channels for acknowledged actions; typed <strong>messages</strong> on all of them. That sketch stands; this section adds the one piece it deferred — how a graph of ROS 2 nodes actually reaches the autopilot.</p>
+<p>The answer is unexpectedly elegant: it doesn’t translate. PX4 is itself, internally, a publish–subscribe system — its modules exchange data over an in-firmware message bus called <strong>uORB</strong>, with topics for vehicle status, local position, trajectory setpoints, and everything else the firmware knows. Rather than converting uORB traffic to MAVLink and back, PX4 embeds a <strong>Micro XRCE-DDS</strong> client: a lightweight process in the firmware that serializes selected uORB topics across the UART to an <em>agent</em> running on the companion computer, which republishes them as native ROS 2 topics. From a mission node’s point of view, the autopilot’s internals simply appear in the ROS 2 graph, under a reserved namespace: subscribe to <code>/fmu/out/vehicle_local_position</code> and the EKF2 estimate of the previous chapter streams into your callback; publish to <code>/fmu/in/trajectory_setpoint</code> and the cascade’s outermost loop consumes your setpoint directly. There is no protocol seam for a concept to be lost in — the position estimate a ROS 2 node receives is the same message, in the same type, that PX4’s own position controller reads. <a href="#fig-mavsdk-vs-ros2" class="quarto-xref">Figure&nbsp;<span>10.3</span></a> sets the two programming layers side by side.</p>
+<div id="fig-mavsdk-vs-ros2" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two-panel comparison. Left panel, MAVSDK, the direct path: one linear script with steps in order, each awaited — connect to the serial link, then wait for a heartbeat, then arm, takeoff, hover, land — with an arrow labeled MAVLink messages over the UART into a PX4 flight controller box that translates each command internally. Best for: single-vehicle missions and waypoint work, quick prototyping, projects where the drone is the whole system. Limitation: not built for multi-sensor fusion, robot-to-robot communication, or large modular architectures; the program grows monolithic as the mission grows. Right panel, ROS 2, the middleware path: independent nodes coupled only by named topics. A camera node feeds an image topic to a detection node, which publishes a target position topic to a mission node, which publishes fmu in trajectory setpoint to a Micro XRCE-DDS agent box that bridges ROS 2 topics to PX4 with no MAVLink, then uORB topics over the UART into a PX4 flight controller whose DDS client exposes its internal topics directly. A separate failsafe node subscribes to the same topics and can override any node. Best for: multi-sensor multi-subsystem pipelines, perception feeding flight decisions directly, anything needing modularity and reuse. Limitation: steeper learning curve and real infrastructure — bridge, message packages, QoS profiles — to stand up before anything flies. Caption: the running example is built on the right-hand path, because its detection, navigation, and failsafe functions are separate processes that must exchange live data, exactly the architecture MAVSDK is not built to carry.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mavsdk-vs-ros2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/mavsdk-vs-ros2.svg" class="img-fluid figure-img" style="width:100.0%" alt="Two-panel comparison. Left panel, MAVSDK, the direct path: one linear script with steps in order, each awaited — connect to the serial link, then wait for a heartbeat, then arm, takeoff, hover, land — with an arrow labeled MAVLink messages over the UART into a PX4 flight controller box that translates each command internally. Best for: single-vehicle missions and waypoint work, quick prototyping, projects where the drone is the whole system. Limitation: not built for multi-sensor fusion, robot-to-robot communication, or large modular architectures; the program grows monolithic as the mission grows. Right panel, ROS 2, the middleware path: independent nodes coupled only by named topics. A camera node feeds an image topic to a detection node, which publishes a target position topic to a mission node, which publishes fmu in trajectory setpoint to a Micro XRCE-DDS agent box that bridges ROS 2 topics to PX4 with no MAVLink, then uORB topics over the UART into a PX4 flight controller whose DDS client exposes its internal topics directly. A separate failsafe node subscribes to the same topics and can override any node. Best for: multi-sensor multi-subsystem pipelines, perception feeding flight decisions directly, anything needing modularity and reuse. Limitation: steeper learning curve and real infrastructure — bridge, message packages, QoS profiles — to stand up before anything flies. Caption: the running example is built on the right-hand path, because its detection, navigation, and failsafe functions are separate processes that must exchange live data, exactly the architecture MAVSDK is not built to carry.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mavsdk-vs-ros2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10.3: MAVSDK and ROS 2 compared as programming layers: a linear awaited script speaking MAVLink, against a graph of independent nodes whose setpoints cross the Micro XRCE-DDS bridge into PX4’s own uORB topics — with the strengths and limits of each, and the running example committed to the graph.
+</figcaption>
+</figure>
+</div>
+<p>The comparison in the figure is a genuine trade, not a ranking. ROS 2 costs more before the first flight: a bridge agent to run, message packages to install, quality-of-service profiles to match, and a programming model — covered below — that is less natural than a script. It pays that cost back the moment the mission stops being one program’s story. Computer-vision output feeding flight decisions, multiple sensors fused on the companion computer, behaviors developed and tested as separate processes, a safety monitor that must not share a failure mode with the logic it supervises — each of these is a topic-and-node shape, and the running example needs all four. That is why the Goose Management System is built on ROS 2 rather than on MAVSDK, exactly as Part I’s closing sketch assumed: its mission sequencing, vehicle interfacing, navigation and deterrence behaviors, and Failsafe node are separate processes wired by the Services-for-actions, Topics-for-streams rule that chapter established. The full graph — every node, channel, and authority-transfer rule — is the business of the Systems Architecture chapter in Part V; this chapter’s job is the layer underneath it: how any one of those nodes commands flight at all.</p>
+</section>
+<section id="offboard-mode-a-dead-mans-switch" class="level2" data-number="10.7">
+<h2 data-number="10.7" class="anchored" data-anchor-id="offboard-mode-a-dead-mans-switch"><span class="header-section-number">10.7</span> Offboard Mode: A Dead-Man’s Switch</h2>
+<p>PX4 has many flight modes — manual stabilization, altitude hold, position hold, autonomous mission, return-to-launch — and one of them is the entire reason this book’s architecture works. In <strong>Offboard mode</strong>, the autopilot follows setpoints streamed by an external computer: position, velocity, or attitude targets, consumed by the cascade of the previous chapter at whatever loop the setpoint type addresses. Offboard is the handoff Part I’s closing chapter described — from this mode onward, a process is flying the aircraft — and PX4 makes it deliberately the <em>hardest mode to stay in</em>, because an external computer is the least trustworthy source of commands the autopilot ever accepts. A pilot’s sticks fail rarely and visibly; a Python process on a companion computer can hang, crash, or deadlock silently at any moment, and the autopilot has no way to inspect its health. So PX4 imposes two hard rules, both enforced by the firmware rather than by convention:</p>
+<ol type="1">
+<li><strong>Stream before you enter.</strong> PX4 refuses to switch into Offboard mode until setpoints are <em>already</em> arriving. A computer that cannot yet produce a steady stream has no business being handed the aircraft.</li>
+<li><strong>Keep streaming to stay in.</strong> If the setpoint stream stalls — drops below roughly 2 Hz — PX4 concludes the companion computer has died, exits Offboard on its own authority, and executes a failsafe behavior instead of coasting on the last command it heard.</li>
+</ol>
+<p>Both rules are one idea: a dead-man’s switch. The stream itself is the proof of life, and the proof must be continuous. This design converts the scariest failure in the system — autonomy software dying mid-flight — from a catastrophe into a mode change, and it does so without trusting a single line of companion-computer code. It also dictates, completely, the shape of the mission software: any program that flies in Offboard mode must be built around something that publishes a setpoint on a reliable clock, no matter what else the program is doing. A linear script structure fights that requirement; a timer-driven one embodies it.</p>
+</section>
+<section id="a-complete-mission-node-flying-a-square" class="level2" data-number="10.8">
+<h2 data-number="10.8" class="anchored" data-anchor-id="a-complete-mission-node-flying-a-square"><span class="header-section-number">10.8</span> A Complete Mission Node: Flying a Square</h2>
+<p>The shape becomes concrete in a full ROS 2 mission: take off, fly a square, land — the same flight a MAVSDK script would express in fifteen sequential lines, rebuilt around the streaming obligation. The rebuild is worth every line, because this node’s skeleton (setup once, then a 10 Hz callback that consults a few state flags and does exactly one thing per tick) is the skeleton of every Offboard node in the rest of this book, the running example’s included.</p>
+<p>The flight plan itself is plain data — a Python list the loop will walk:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Each waypoint: (x, y, z, hold_seconds, label)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># NED frame, metres, origin where the EKF started.</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># z is negative-up: -5.0 means 5 m altitude.</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>TRAJECTORY <span class="op">=</span> [</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    ( <span class="fl">0.0</span>,  <span class="fl">0.0</span>, <span class="op">-</span><span class="fl">5.0</span>, <span class="fl">10.0</span>, <span class="st">'takeoff_climb'</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    ( <span class="fl">0.0</span>,  <span class="fl">0.0</span>, <span class="op">-</span><span class="fl">5.0</span>,  <span class="fl">5.0</span>, <span class="st">'takeoff_settle'</span>),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    (<span class="fl">10.0</span>,  <span class="fl">0.0</span>, <span class="op">-</span><span class="fl">5.0</span>, <span class="fl">12.0</span>, <span class="st">'corner_1'</span>),</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    (<span class="fl">10.0</span>, <span class="fl">10.0</span>, <span class="op">-</span><span class="fl">5.0</span>, <span class="fl">12.0</span>, <span class="st">'corner_2'</span>),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    ( <span class="fl">0.0</span>, <span class="fl">10.0</span>, <span class="op">-</span><span class="fl">5.0</span>, <span class="fl">12.0</span>, <span class="st">'corner_3'</span>),</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    ( <span class="fl">0.0</span>,  <span class="fl">0.0</span>, <span class="op">-</span><span class="fl">5.0</span>, <span class="fl">12.0</span>, <span class="st">'corner_4_return'</span>),</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    ( <span class="fl">0.0</span>,  <span class="fl">0.0</span>, <span class="op">-</span><span class="fl">5.0</span>,  <span class="fl">5.0</span>, <span class="st">'pre_land_settle'</span>),</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>CMD_NAV_LAND <span class="op">=</span> <span class="dv">21</span>   <span class="co"># raw MAVLink command id for auto-land</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Three conventions in ten lines deserve flagging. Coordinates are <strong>NED</strong> — x north, y east, z <em>down</em>, so altitude is negative, and <code>-5.0</code> means five metres up; the frame conventions behind that choice get a chapter of their own in Part IV, but the sign discipline starts now, because the single most common simulator “crash” in a first Offboard mission is a positive z commanding five metres <em>underground</em>. The origin is wherever the EKF initialized — the launch point, echoing the barometer-reference discussion of Part I. And each waypoint carries a <em>hold time</em> rather than an arrival test: progression will be purely time-based, the simplest scheme that can work, with its obvious weakness (the vehicle advances on schedule whether or not it arrived) left for the state-machine treatment in the next chapter to repair.</p>
+<p>The node’s constructor wires it to PX4’s topics and starts the clock:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> OffboardSquare(Node):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(<span class="st">'offboard_square'</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        qos <span class="op">=</span> QoSProfile(reliability<span class="op">=</span>BEST_EFFORT,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                         durability<span class="op">=</span>TRANSIENT_LOCAL,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                         history<span class="op">=</span>KEEP_LAST, depth<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.mode_pub <span class="op">=</span> <span class="va">self</span>.create_publisher(</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>            OffboardControlMode, <span class="st">'/fmu/in/offboard_control_mode'</span>, <span class="dv">10</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.sp_pub <span class="op">=</span> <span class="va">self</span>.create_publisher(</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>            TrajectorySetpoint, <span class="st">'/fmu/in/trajectory_setpoint'</span>, <span class="dv">10</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cmd_pub <span class="op">=</span> <span class="va">self</span>.create_publisher(</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>            VehicleCommand, <span class="st">'/fmu/in/vehicle_command'</span>, <span class="dv">10</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.create_subscription(</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>            VehicleLocalPosition, <span class="st">'/fmu/out/vehicle_local_position'</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.on_pos, qos)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.timer <span class="op">=</span> <span class="va">self</span>.create_timer(<span class="fl">0.1</span>, <span class="va">self</span>.loop)   <span class="co"># 10 Hz</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The quality-of-service profile is the one genuinely ROS 2-specific trap here. PX4 publishes its topics <strong>best-effort</strong> — the streaming contract, where a lost message is cheaper than a retransmission — and ROS 2 only connects a publisher and subscriber whose QoS policies are compatible. A subscriber left at the default <em>reliable</em> policy is not degraded; it is silent, receiving nothing, with no error raised. Every integration checklist for this stack includes “match PX4’s QoS” for the same reason every serial checklist in Part I included “match the baud rate”: both are timing-and-contract agreements between parties who cannot see each other’s configuration, and both fail quietly. The 10 Hz timer is the node’s heart, chosen to clear PX4’s roughly-2 Hz Offboard floor with five-fold margin.</p>
+<p>The dead-man’s obligation gets its own method, called on every tick that the node wants PX4 to keep trusting it:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> publish_setpoint(<span class="va">self</span>, x, y, z):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Heartbeat AND setpoint stream together at &gt;= 2 Hz,</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># or PX4 refuses to enter (or stay in) Offboard mode.</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    m <span class="op">=</span> OffboardControlMode()</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    m.timestamp <span class="op">=</span> <span class="va">self</span>.now()</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    m.position <span class="op">=</span> <span class="va">True</span>                  <span class="co"># commanding by position</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.mode_pub.publish(m)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    sp <span class="op">=</span> TrajectorySetpoint()</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    sp.timestamp <span class="op">=</span> <span class="va">self</span>.now()</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    sp.position <span class="op">=</span> [<span class="bu">float</span>(x), <span class="bu">float</span>(y), <span class="bu">float</span>(z)]</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    sp.yaw <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.sp_pub.publish(sp)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Two messages ship together: the <code>OffboardControlMode</code> heartbeat, which tells PX4 <em>what kind</em> of setpoint to expect (<code>position = True</code> — the outermost loop of the cascade, exactly where the previous chapter said the mission layer plugs in), and the <code>TrajectorySetpoint</code> itself. The remaining logic is the 10 Hz callback, a handful of flags deciding which one thing this tick does:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> loop(<span class="va">self</span>):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.counter <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="va">self</span>.land_sent:                     <span class="co"># landing: stay silent</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.armed_sent:                <span class="co"># warm-up, then arm</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.publish_setpoint(<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="op">-</span><span class="fl">5.0</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.first_pos_tick <span class="kw">is</span> <span class="va">None</span>:    <span class="co"># PX4 not talking yet</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.counter <span class="op">-</span> <span class="va">self</span>.first_pos_tick <span class="op">&lt;</span> <span class="dv">10</span>:</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span>                         <span class="co"># stream for &gt;= 1 s first</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.send_cmd(VEHICLE_CMD_DO_SET_MODE, <span class="fl">1.0</span>, <span class="fl">6.0</span>)  <span class="co"># Offboard</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.send_cmd(VEHICLE_CMD_COMPONENT_ARM_DISARM, <span class="fl">1.0</span>)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.armed_sent <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.wp_start_tick <span class="op">=</span> <span class="va">self</span>.counter</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="va">self</span>.wp_index <span class="op">&lt;</span> <span class="bu">len</span>(TRAJECTORY):    <span class="co"># fly the square</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        x, y, z, hold, label <span class="op">=</span> TRAJECTORY[<span class="va">self</span>.wp_index]</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.publish_setpoint(x, y, z)     <span class="co"># re-stream active target</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="va">self</span>.counter <span class="op">-</span> <span class="va">self</span>.wp_start_tick) <span class="op">*</span> <span class="fl">0.1</span> <span class="op">&gt;=</span> hold:</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.wp_index <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.wp_start_tick <span class="op">=</span> <span class="va">self</span>.counter</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.send_cmd(CMD_NAV_LAND)            <span class="co"># hand off to PX4's landing</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.land_sent <span class="op">=</span> <span class="va">True</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Read the branches in mission order and each one is a rule from earlier in the chapter made executable. The <strong>warm-up</strong> branch streams setpoints <em>before</em> attempting anything — rule one — and goes further: it waits for the first <code>VehicleLocalPosition</code> message (proof PX4 is talking at all), then keeps streaming a full second more so the autopilot sees an established stream, and only then sends the mode change and the arm command. Arming earlier simply fails, and the failure is PX4 doing its job. The mode-change parameters (<code>1.0, 6.0</code>) say “custom mode, main mode six” — Offboard, in PX4’s numbering. The <strong>flying</strong> branch re-publishes the active waypoint every tick — rule two, the stream never pauses just because the target hasn’t changed — and advances on elapsed hold time. And the <strong>landing</strong> handoff inverts everything: the node sends <code>NAV_LAND</code> once, latches <code>land_sent</code>, and then <em>deliberately falls silent</em>. The silence is not sloppiness; it is the safest line in the program. PX4’s own landing logic — tuned descent rate, ground detection, auto-disarm — is more trustworthy than anything this node could stream, and a node that kept heartbeating could allow the autopilot to be flipped back into Offboard, fighting the landing it just requested. The dead-man’s switch is symmetric: the way software hands <em>back</em> control is to stop proving it wants control.</p>
+<p>That is the complete pattern — data, wiring, heartbeat, flags — and it scales. Replace the trajectory list with a search-grid generator and the time-based advance with position-error tests and a detection subscriber, and this node grows up into the running example’s navigation behavior; keep the skeleton and swap the branch logic, and it becomes any Offboard behavior at all.</p>
+</section>
+<section id="simulate-then-fly" class="level2" data-number="10.9">
+<h2 data-number="10.9" class="anchored" data-anchor-id="simulate-then-fly"><span class="header-section-number">10.9</span> Simulate, Then Fly</h2>
+<p>Everything above can be typed, and none of it should be trusted. The mission node has a dozen ways to be subtly wrong — a positive z, a QoS mismatch, arming before the stream is warm, heartbeats that continue through the landing — and several of them end with an aircraft on its back. The remedy is the last of this chapter’s three decisions, and the only one with a unanimous answer: <strong>PX4 SITL</strong>, software-in-the-loop simulation, shown in <a href="#fig-px4-sitl-loop" class="quarto-xref">Figure&nbsp;<span>10.4</span></a>.</p>
+<div id="fig-px4-sitl-loop" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two-row diagram. Top row, on the bench, SITL, everything is a process on one Linux machine: a mission code box, the same ROS 2 node or MAVSDK script unchanged, connects over a local socket to a PX4 firmware box, the flight code compiled for the laptop instead of the Pixhawk with the same EKF2, loops, modes, and failsafes, which exchanges motor commands and simulated sensor data with a Gazebo simulator box providing modeled physics, wind, and a synthetic IMU, GPS, and barometer, where a crash costs a restart. A dashed arrow between rows reads: when the mission survives simulation, swap only the plant. Bottom row, in the field, the two computers and three wires of Part I: the same mission code byte-for-byte, now on the Jetson Nano, connects over the UART at 921,600 baud to the same PX4 firmware now on the Pixhawk 6C's microcontroller, which exchanges motor commands and real sensor data with the 2.2 kilogram airframe — real physics, real wind, real sensors, where a crash costs the aircraft. Caption: a bug caught in the top row costs nothing; the identical bug in the bottom row costs a drone.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-px4-sitl-loop-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/px4-sitl-loop.svg" class="img-fluid figure-img" style="width:100.0%" alt="Two-row diagram. Top row, on the bench, SITL, everything is a process on one Linux machine: a mission code box, the same ROS 2 node or MAVSDK script unchanged, connects over a local socket to a PX4 firmware box, the flight code compiled for the laptop instead of the Pixhawk with the same EKF2, loops, modes, and failsafes, which exchanges motor commands and simulated sensor data with a Gazebo simulator box providing modeled physics, wind, and a synthetic IMU, GPS, and barometer, where a crash costs a restart. A dashed arrow between rows reads: when the mission survives simulation, swap only the plant. Bottom row, in the field, the two computers and three wires of Part I: the same mission code byte-for-byte, now on the Jetson Nano, connects over the UART at 921,600 baud to the same PX4 firmware now on the Pixhawk 6C's microcontroller, which exchanges motor commands and real sensor data with the 2.2 kilogram airframe — real physics, real wind, real sensors, where a crash costs the aircraft. Caption: a bug caught in the top row costs nothing; the identical bug in the bottom row costs a drone.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-px4-sitl-loop-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10.4: Software-in-the-loop: the identical mission code and identical PX4 firmware run on the bench against Gazebo’s modeled physics and synthetic sensors, and in the field against the real airframe — only the plant is swapped, so a bug caught in simulation is the same bug that would have cost the aircraft.
+</figcaption>
+</figure>
+</div>
+<p>The load-bearing word in the figure is <em>identical</em>. SITL is not a model of the autopilot; it is the autopilot — the same PX4 source, with the same EKF2, the same cascaded loops, the same mode logic, the same Offboard dead-man’s switch and failsafe behaviors, compiled for a desktop processor instead of the Pixhawk’s microcontroller. What is simulated is only the plant: <strong>Gazebo</strong> supplies the physics — rigid-body dynamics, propeller thrust, wind if asked — and synthesizes the sensor readings (IMU, GPS, barometer) that the real airframe would produce, closing the same sense–think–act loop Part I drew, entirely in software. The mission node connects to this simulated vehicle exactly as it would to the real one and cannot tell the difference; when the mission finally flies, <em>nothing about the software changes</em> — the plant is swapped under it, and that is all.</p>
+<p>That identity is what gives simulation its teaching and its safety value at once. The mistakes listed above are not hypothetical; every one of them is a rite of passage, and in SITL each produces its instructive failure — the underground setpoint, the silent QoS mismatch, PX4 curtly rejecting a premature arm — at a cost of one restart. The economics are stark and settle the practice: a bug caught in Gazebo costs nothing, and the same bug on hardware costs a drone — and Part I priced the drone. Standing the environment up (building PX4 SITL, installing the ROS 2 bridge packages, driving Gazebo’s worlds) and flying real waypoint missions in it is the opening business of the next chapter, and this chapter’s related lab walks the same ground; the habit, though, begins here, because it is a design principle rather than a tool: <em>no Offboard code touches the aircraft until the identical code has flown the identical mission in simulation.</em> The running example honors it throughout — every behavior in the chapters ahead debuts in Gazebo, and the field flights of Part V fly code that simulation has already tried to break.</p>
+<p>The stack is now complete from mission to motor. PX4 was chosen with reasons, MAVLink read as a protocol rather than folklore, the two programming layers weighed and the middleware path taken, Offboard mode’s contract turned into a working node, and a place established where all of it can fail safely. What the mission node still lacks is judgment: its square is flown on a timer, blind to whether the vehicle actually reached anything, and its plan cannot respond to the world at all. Giving mission logic that judgment — waypoints with arrival criteria, state machines that branch on events, and the SITL environment to prove them in — is the next chapter’s work.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="10.10">
+<h2 data-number="10.10" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">10.10</span> Check Your Understanding</h2>
+<ol type="1">
+<li>A startup modifies autopilot firmware with a proprietary fault-detection module and sells 200 vehicles with the firmware flashed aboard. State its source-code obligations if the base firmware was PX4, and if it was ArduPilot. Then explain why the startup’s ROS 2 mission stack, running on the companion computer, is unaffected in both cases.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>On PX4 (BSD 3-clause), the obligations are to preserve the copyright notice and license text and not use the project’s name for endorsement; the module itself may remain secret. On ArduPilot (GPL v3), selling the vehicles is distribution, which obliges the startup to offer the corresponding source — the fault-detection module included — to every recipient under the GPL, and recipients may redistribute it further. The ROS 2 stack is unaffected because it is a separate program communicating with the firmware over a serial protocol, not a derivative work of the firmware; neither license’s terms reach across that process boundary. Note also that a team that modifies either firmware but never distributes it — flying only its own aircraft — owes nothing under either license, because the obligations attach at distribution.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>PX4 refuses to enter Offboard mode until setpoints are already streaming, and drops out of Offboard if the stream falls below roughly 2 Hz. Explain the single design idea behind both rules, and why the square-mission node goes silent — stops publishing entirely — after sending <code>NAV_LAND</code>.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Both rules implement a dead-man’s switch: the setpoint stream is the companion computer’s continuous proof of life, and PX4 will neither accept nor retain authority from a computer that cannot maintain it, because a hung or crashed process cannot be detected any other way. Requiring the stream before entry proves the computer is healthy before it is trusted; requiring it continuously converts a mid-flight software death into a mode change and failsafe rather than a coast on stale commands. The silence after <code>NAV_LAND</code> is the same mechanism used in reverse: the safest descent is PX4’s own landing logic, and by stopping its stream the node guarantees it cannot be flipped back into Offboard mid-landing — software relinquishes control by ceasing to prove it wants control.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>In the mission’s trajectory list, one waypoint reads <code>(10.0, 10.0, -5.0, 12.0, 'corner_2')</code>. Decode all five fields, state the side length and altitude of the square being flown, and predict what happens on the first flight of a student who writes <code>5.0</code> instead of <code>-5.0</code> for the altitude.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The fields are x = 10.0 m north of the EKF origin, y = 10.0 m east, z = −5.0 m in the NED (north-east-down) frame — 5 m <em>above</em> the origin, since z points down — held for 12.0 seconds, with a human-readable label. The square is 10 m on a side, flown at 5 m altitude, with the origin at the launch point where the EKF initialized. Writing <code>+5.0</code> commands a position 5 m <em>below</em> the origin: the vehicle attempts to descend through the ground. In SITL this produces the classic first-mission crash into the floor of the Gazebo world at a cost of one restart — which is precisely the class of sign error the simulate-then-fly rule exists to catch before hardware is involved.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>Two projects need mission software: (a) a bridge-inspection drone that flies a pre-planned path and records video, operated by one script on the companion computer; (b) the running example, where a detector’s output must alter flight behavior in real time and a failsafe monitor must survive a crash of the mission logic. Choose the programming layer for each and give the deciding criterion.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Project (a) fits MAVSDK: a single vehicle flying a linear mission is exactly the one-process, one-story shape a MAVSDK script expresses in a few dozen lines, with no middleware to stand up. Project (b) needs ROS 2: perception feeding flight decisions requires live typed data streams between separate concerns, and a failsafe monitor that must not share a failure mode with the mission logic must be a separate process — both are node-and-topic shapes that a single monolithic script cannot provide. The deciding criterion is architectural: whether the drone is the whole system (MAVSDK) or one participant in a multi-process system exchanging live data (ROS 2). Convenience favors MAVSDK; modularity, and safety by process isolation, force ROS 2.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>A student’s mission node runs without errors, but its position callback never fires and PX4 rejects every arm attempt. The bridge agent is running and the heartbeat test from Part I passes. Diagnose the most likely fault, and explain why this failure — like a baud-rate mismatch — produces silence rather than an error message.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The signature fault is a quality-of-service mismatch: PX4 publishes its <code>/fmu/out/...</code> topics best-effort, and a subscription created with ROS 2’s default <em>reliable</em> policy is incompatible, so the middleware never connects the pair — no messages arrive, and no error is raised, because unmatched QoS is a legal configuration, not a fault. With no <code>VehicleLocalPosition</code> received, the node’s warm-up gate (<code>first_pos_tick is None</code>) never opens properly and its arm attempt comes before PX4 sees a warm stream, so PX4 correctly rejects it. The failure is silent for the same structural reason baud mismatch is: it is a contract disagreement between two parties who cannot inspect each other’s configuration — the wire (or middleware) faithfully does what both sides asked, and what they asked for happens to be nothing. The fix is to subscribe with a PX4-compatible profile (best-effort reliability).</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>SITL is sometimes described as “testing against a model of the autopilot.” Explain precisely what is and is not modeled in PX4 SITL, and why the distinction determines which classes of bug simulation can catch.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The autopilot is <em>not</em> modeled — SITL compiles the actual PX4 source, so the estimator, cascaded loops, mode logic, Offboard entry rules, and failsafe behaviors are the real code, bit-for-bit the logic that flies. What is modeled is the plant: Gazebo supplies rigid-body physics, propeller forces, and synthetic IMU, GPS, and barometer readings in place of the real airframe and sensors. Consequently SITL reliably catches every bug that lives in software and its contracts — sign errors in NED coordinates, QoS mismatches, arming before the stream is warm, heartbeats that continue through landing, state-machine logic errors — because the code paths involved are identical to flight. What it cannot fully catch are plant-fidelity issues: real vibration corrupting the IMU, real battery sag, wind beyond the model, sensor noise the synthesis underestimates. Simulation removes the software unknowns so that the first hardware flight risks only the physics.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="10.11">
+<h2 data-number="10.11" class="anchored" data-anchor-id="try-it"><span class="header-section-number">10.11</span> Try It</h2>
+<p><strong>Part 1 — dry-run the mission loop with no ROS 2 installed.</strong> The <code>loop()</code> method’s branch logic is plain Python, and its correctness is testable on any machine: write a harness that instantiates the flags (<code>counter</code>, <code>first_pos_tick</code>, <code>armed_sent</code>, <code>wp_index</code>, <code>wp_start_tick</code>, <code>land_sent</code>), stubs <code>publish_setpoint()</code> and <code>send_cmd()</code> to append to a log list instead of publishing, and calls <code>loop()</code> 1,500 times (150 simulated seconds), injecting <code>first_pos_tick = 25</code> to mimic PX4 first talking at tick 25. From the log, verify every contract in the chapter: no arm or mode command before ten ticks of established stream; a setpoint published on <em>every</em> tick between warm-up and landing with no gaps (count them); waypoints advancing exactly on their hold times; <code>NAV_LAND</code> sent exactly once; and zero publications of any kind afterward. Then break it the instructive way: reorder the branches so the trajectory check comes before the <code>land_sent</code> check, rerun, and find the contract violation in your log. This is the cheapest simulation level of all — below even SITL — and catching a flag bug here costs milliseconds.</p>
+<p><strong>Part 2 — rebudget the square as a mission.</strong> The trajectory holds each of its seven entries for the listed dwell times. Compute the mission’s minimum duration from the table alone, then re-plan it as a search pattern for the running example: replace the square with a four-leg lawnmower pass over a 40 m × 30 m area at the same 5 m altitude, choosing hold times from leg lengths at a conservative 2 m/s cruise. Check the total against the 3.5-minute search allocation in Part I’s mission time budget — and if it does not fit, decide what to trade (area, speed, or altitude) and defend the choice in two sentences. Then note what the time-based scheme cannot do: if wind slows the vehicle so a leg is unfinished when its hold expires, the plan advances anyway. Write down what signal the node would need to subscribe to, and what test it would apply, to advance on <em>arrival</em> instead — you have just specified the next chapter.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#sitl-simulation-and-geofencing">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="pagination-link" aria-label="Closed-Loop Control: PID Theory for Multirotors">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="pagination-link" aria-label="Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop">
+        <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>5&nbsp; Sensing the World: IMUs, Magnetometers, and Barometers – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" rel="next">
+<link href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html">Part I — Airframes, Regulation &amp; Flight Safety</a></li><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">5.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">5.2</span> Key Vocabulary</a></li>
+  <li><a href="#what-the-flight-controller-must-know" id="toc-what-the-flight-controller-must-know" class="nav-link" data-scroll-target="#what-the-flight-controller-must-know"><span class="header-section-number">5.3</span> What the Flight Controller Must Know</a></li>
+  <li><a href="#the-mems-accelerometer-a-spring-scale-in-silicon" id="toc-the-mems-accelerometer-a-spring-scale-in-silicon" class="nav-link" data-scroll-target="#the-mems-accelerometer-a-spring-scale-in-silicon"><span class="header-section-number">5.4</span> The MEMS Accelerometer: A Spring Scale in Silicon</a></li>
+  <li><a href="#the-mems-gyroscope-rotation-through-the-coriolis-effect" id="toc-the-mems-gyroscope-rotation-through-the-coriolis-effect" class="nav-link" data-scroll-target="#the-mems-gyroscope-rotation-through-the-coriolis-effect"><span class="header-section-number">5.5</span> The MEMS Gyroscope: Rotation Through the Coriolis Effect</a></li>
+  <li><a href="#the-barometer-altitude-from-a-sealed-cavity" id="toc-the-barometer-altitude-from-a-sealed-cavity" class="nav-link" data-scroll-target="#the-barometer-altitude-from-a-sealed-cavity"><span class="header-section-number">5.6</span> The Barometer: Altitude from a Sealed Cavity</a></li>
+  <li><a href="#why-the-raw-data-cannot-be-trusted" id="toc-why-the-raw-data-cannot-be-trusted" class="nav-link" data-scroll-target="#why-the-raw-data-cannot-be-trusted"><span class="header-section-number">5.7</span> Why the Raw Data Cannot Be Trusted</a></li>
+  <li><a href="#getting-the-data-aboard-i2c-versus-spi" id="toc-getting-the-data-aboard-i2c-versus-spi" class="nav-link" data-scroll-target="#getting-the-data-aboard-i2c-versus-spi"><span class="header-section-number">5.8</span> Getting the Data Aboard: I2C versus SPI</a></li>
+  <li><a href="#sensor-fusion-the-complementary-filter" id="toc-sensor-fusion-the-complementary-filter" class="nav-link" data-scroll-target="#sensor-fusion-the-complementary-filter"><span class="header-section-number">5.9</span> Sensor Fusion: The Complementary Filter</a>
+  <ul class="collapse">
+  <li><a href="#from-blend-to-estimator-the-ekf" id="toc-from-blend-to-estimator-the-ekf" class="nav-link" data-scroll-target="#from-blend-to-estimator-the-ekf"><span class="header-section-number">5.9.1</span> From Blend to Estimator: The EKF</a></li>
+  </ul></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">5.10</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">5.11</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html">Part I — Airframes, Regulation &amp; Flight Safety</a></li><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The last two chapters followed energy through the aircraft: out of the pack, through the structure, and into the air. The Anatomy of a Multirotor chapter identified a second chain running alongside it — sensors <span class="math inline">\(\rightarrow\)</span> flight controller <span class="math inline">\(\rightarrow\)</span> ESC, closing an attitude loop at several hundred hertz — that carries information rather than power, and that chain begins with a word which has so far gone unexamined. <em>Sensors.</em> Everything the aircraft will ever know about its own orientation, rotation, heading, and height originates in a few grams of micromachined silicon soldered to the flight controller: an inertial measurement unit, a magnetometer, and a barometer. None of these devices measures what the autopilot actually wants. The accelerometer measures the deflection of a microscopic spring; the gyroscope measures energy leaking between two vibration modes; the magnetometer measures a field that the drone’s own power wiring pollutes; the barometer measures a pressure that the propellers themselves disturb. The quantity the control loops need — a smooth, drift-free estimate of the vehicle’s attitude and altitude — exists nowhere on the aircraft as a direct reading. It has to be <em>constructed</em>, at hundreds of times per second, from several noisy, biased, mutually disagreeing measurements.</p>
+<p>This chapter follows the data from physics to estimate in three stages. First, what the sensors physically are: how a MEMS accelerometer and gyroscope convert motion into capacitance, why that transduction chain works as well as it does, and where its error sources live. Second, how the measurements get aboard: the two serial buses, I2C and SPI, that carry nearly every sensor stream in embedded robotics, and the bandwidth arithmetic that decides which sensor goes on which bus. Third, how disagreement becomes trust: the complementary filter, derived from the observation that the gyroscope and the accelerometer fail in exactly opposite ways, and the extended Kalman filter that production autopilots run in its place. The treatment is deliberately quantitative, because every rule of thumb in this domain — “gyros drift,” “don’t trust the accelerometer in a turn,” “put the IMU on SPI” — is an arithmetic conclusion wearing a slogan’s clothing.</p>
+<section id="learning-objectives" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">5.1</span> Learning Objectives</h2>
+<ul>
+<li>Explain what a MEMS accelerometer and a MEMS gyroscope physically measure — proof-mass displacement against a flexure spring, and Coriolis coupling between two vibration modes — and why each output is an inference from Newton’s laws rather than a direct reading of motion.</li>
+<li>Catalogue the principal IMU error sources (bias, bias instability, white noise specified as noise density, temperature drift, and vibration rectification), and compute the attitude error that results from integrating a given gyroscope bias over time.</li>
+<li>Derive the complementary filter from the complementary failure modes of the gyroscope and accelerometer, implement it in a few lines of code, and choose its gain from a desired correction time constant.</li>
+<li>Compare I2C and SPI as sensor buses — wire count, addressing, clock rate, duplex, and DMA compatibility — and use bandwidth arithmetic to justify the topology commonly found on flight controllers: IMU on SPI, magnetometer and barometer on I2C.</li>
+<li>Convert a barometric pressure reading to altitude with the standard-atmosphere formula, estimate the sensor’s resolution in metres, and explain why propeller wash corrupts barometric altitude on a multirotor and what mitigations are used in practice.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">5.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>MEMS</strong> (Micro-Electro-Mechanical Systems) — the fabrication technology of etching microscopic mechanical structures — springs, masses, membranes — into silicon alongside the electronics that read them, which is what makes gram-scale, milliwatt-scale inertial sensors possible at consumer prices.</li>
+<li><strong>IMU</strong> (Inertial Measurement Unit) — the packaged combination of a three-axis accelerometer and a three-axis gyroscope (sometimes with a magnetometer added, making nine axes), sampled together and timestamped as the primary input to attitude estimation.</li>
+<li><strong>Accelerometer</strong> — a sensor that measures specific force: the deflection of a spring-suspended proof mass relative to its housing. At rest it reads 1 g upward (the support force), in free fall it reads zero, and in unaccelerated hover its output vector points away from the Earth — which is precisely what makes it a usable gravity reference.</li>
+<li><strong>Gyroscope</strong> — a sensor that measures angular rate. MEMS gyroscopes drive a proof mass into resonant vibration and detect the Coriolis force that rotation couples into an orthogonal sense axis; the output is degrees per second, which must be integrated to yield an angle.</li>
+<li><strong>Magnetometer</strong> — a sensor measuring the local magnetic field vector, used to reference the vehicle’s heading (yaw) against the Earth’s field — the one attitude axis that neither the gyroscope nor the accelerometer can stabilize long-term.</li>
+<li><strong>Barometer</strong> — a pressure sensor built on a micromachined membrane over a sealed reference cavity, used to infer altitude from the roughly 12 Pa of pressure lost per metre of climb near sea level.</li>
+<li><strong>I2C</strong> (Inter-Integrated Circuit, often written I²C) — a two-wire, shared, addressed serial bus: many devices on one data line and one clock line, each selected by a 7-bit address. Wiring-cheap and convenient at modest data rates (100 kbit/s standard, 400 kbit/s fast mode).</li>
+<li><strong>SPI</strong> (Serial Peripheral Interface) — a four-wire, full-duplex serial bus with a dedicated chip-select line per device and clock rates commonly in the tens of megahertz, the usual choice where a single sensor must be read fast and often.</li>
+<li><strong>Sensor fusion</strong> — the algorithmic combination of multiple imperfect sensors into one estimate better than any of them alone, by exploiting the fact that different sensors fail in different ways at different timescales.</li>
+<li><strong>Complementary filter</strong> — the simplest useful fusion algorithm for attitude: a weighted blend <span class="math inline">\(\hat\theta = \alpha(\hat\theta + \omega\,\Delta t) + (1-\alpha)\,\theta_{\text{accel}}\)</span> that trusts the gyroscope at short timescales and lets the accelerometer’s absolute gravity reference slowly remove the gyroscope’s accumulated drift.</li>
+<li><strong>Noise density</strong> — a sensor’s white-noise floor normalized per unit bandwidth (e.g.&nbsp;µg/√Hz or °/s/√Hz); multiplied by the square root of the measurement bandwidth it predicts the RMS noise of the delivered signal, which is why low-pass filtering buys noise reduction at the price of latency.</li>
+</ul>
+</section>
+<section id="what-the-flight-controller-must-know" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="what-the-flight-controller-must-know"><span class="header-section-number">5.3</span> What the Flight Controller Must Know</h2>
+<p>The attitude control loops developed in Part II consume two quantities: the vehicle’s orientation (roll, pitch, yaw) and its angular rates, at update intervals of a few milliseconds. Altitude hold adds a third: height and vertical velocity. The sensor suite maps onto those needs with a deliberate redundancy — every quantity is observable through at least two different physical channels, and no single channel is good enough alone:</p>
+<ul>
+<li>The <strong>gyroscope</strong> delivers angular rate directly, at kilohertz rates, with low noise — but an angle obtained by integrating rate inherits every error in the rate signal, accumulated without bound.</li>
+<li>The <strong>accelerometer</strong> delivers the direction of gravity whenever the vehicle is not accelerating — an absolute, drift-free reference for roll and pitch — but it is noisy, and it is corrupted the moment the vehicle maneuvers, because it cannot distinguish gravity from the vehicle’s own acceleration.</li>
+<li>The <strong>magnetometer</strong> delivers heading against the Earth’s magnetic field — the only absolute reference for yaw, since gravity is silent about rotation around the vertical — but the field it measures is weak (tens of microtesla) and easily polluted by the tens of amperes flowing through the drone’s own power wiring, which is why flight controllers commonly place the magnetometer on the GPS mast, as far from the battery leads as the airframe allows.</li>
+<li>The <strong>barometer</strong> delivers altitude through pressure — absolute over minutes, but noisy over seconds and disturbed by the propellers’ own airflow.</li>
+</ul>
+<p>The pattern to hold onto: each sensor is trustworthy at a timescale where another fails. That asymmetry is not a nuisance; it is the entire basis of sensor fusion, and the rest of the chapter builds toward exploiting it.</p>
+</section>
+<section id="the-mems-accelerometer-a-spring-scale-in-silicon" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="the-mems-accelerometer-a-spring-scale-in-silicon"><span class="header-section-number">5.4</span> The MEMS Accelerometer: A Spring Scale in Silicon</h2>
+<p>Mechanically, a MEMS accelerometer is a mass on a spring, etched into a silicon die. A proof mass of tens to hundreds of micrograms is suspended over the substrate by thin silicon flexures — meandering “serpentine” beams anchored to the fixed frame, compliant along the sensing axis and stiff across it. When the package accelerates, the proof mass, by Newton’s first law, initially stays put, so it displaces <em>relative to the housing</em>, stretching one flexure and compressing the other. The system is the classic mass-spring-damper:</p>
+<p><span class="math display">\[m\ddot{x} + c\dot{x} + kx = ma,\]</span></p>
+<p>where <span class="math inline">\(x\)</span> is proof-mass displacement relative to the housing, <span class="math inline">\(a\)</span> the applied acceleration, <span class="math inline">\(k\)</span> the flexure stiffness, and <span class="math inline">\(c\)</span> the damping — largely squeeze-film damping of the gas sealed in the package. Once transients settle, the steady-state displacement is</p>
+<p><span class="math display">\[x \approx \frac{m}{k}\,a:\]</span></p>
+<p>the structure converts acceleration into displacement at a fixed, known exchange rate set by geometry. Everything after this is readout. The dominant readout scheme in consumer and robotics-grade parts is capacitive: comb-shaped fingers attached to the proof mass interleave with fixed fingers anchored to the substrate, forming a differential capacitor pair. When the mass deflects, one air gap narrows and the other widens, so <span class="math inline">\(C_1\)</span> rises as <span class="math inline">\(C_2\)</span> falls; an on-die ASIC measures <span class="math inline">\(\Delta C = C_1 - C_2\)</span>, which is proportional to <span class="math inline">\(x\)</span> and therefore to <span class="math inline">\(a\)</span>, then digitizes it and serves it over I2C or SPI. A three-axis part repeats the structure (or arranges electrodes to resolve three axes) on one die.</p>
+<div id="fig-imu-mems-accelerometer" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Schematic top view of a MEMS accelerometer. A central blue rectangle labeled proof mass m is suspended between two gray substrate anchors by serpentine flexure springs on its left and right. Blue movable fingers extend up and down from the proof mass and interleave with orange fixed sense fingers hanging from anchored electrode rails above and below. Two small gaps between a movable finger and its neighboring fixed fingers are labeled C1 and C2. A horizontal double-headed arrow marks the sense axis, and a caption reads: acceleration a leads to displacement x approximately equal to m over k times a, which leads to delta C equal to C1 minus C2, proportional to a.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-imu-mems-accelerometer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/imu-mems-accelerometer.svg" class="img-fluid figure-img" style="width:85.0%" alt="Schematic top view of a MEMS accelerometer. A central blue rectangle labeled proof mass m is suspended between two gray substrate anchors by serpentine flexure springs on its left and right. Blue movable fingers extend up and down from the proof mass and interleave with orange fixed sense fingers hanging from anchored electrode rails above and below. Two small gaps between a movable finger and its neighboring fixed fingers are labeled C1 and C2. A horizontal double-headed arrow marks the sense axis, and a caption reads: acceleration a leads to displacement x approximately equal to m over k times a, which leads to delta C equal to C1 minus C2, proportional to a.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-imu-mems-accelerometer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.1: Simplified structure of a single-axis MEMS capacitive accelerometer, viewed from above. The proof mass is suspended by flexure springs anchored to the substrate; acceleration along the sense axis displaces the mass, narrowing one capacitive gap and widening the other, and the differential capacitance change is proportional to the applied acceleration.
+</figcaption>
+</figure>
+</div>
+<p>Two consequences of this construction shape everything downstream. First, the accelerometer does not measure coordinate acceleration; it measures <strong>specific force</strong> — the net non-gravitational force per unit mass acting on the housing. A sensor at rest on a bench reads 1 g pointing <em>up</em>, because the bench pushes up on it; the same sensor in free fall reads zero, because mass and housing fall together and the spring relaxes. This is not a defect. It is exactly what makes the accelerometer a gravity reference: in unaccelerated flight, its output vector points opposite to gravity, and the roll and pitch angles can be recovered from its components by simple trigonometry. The corollary is equally important: during a hard maneuver, the vehicle’s own acceleration adds to that vector, and the “gravity direction” the accelerometer reports is simply wrong. A fusion algorithm must know when not to listen.</p>
+<p>Second, the sensing element is a mechanical resonator with microscopic displacements — capacitance changes of femtofarads riding on picofarads. That makes the device sensitive to exactly the environment a multirotor provides: broadband mechanical vibration at the propeller rotation and blade-passing frequencies (about 90 and 181 Hz for the platform sized in the Anatomy chapter). Vibration does not merely add noise; through small nonlinearities in the transduction it can <em>rectify</em> into a false DC offset — an effect examined below — which is why IMU mounting, discussed in the Materials and Power chapter’s stiffness arguments, is a flight-quality issue and not a packaging afterthought.</p>
+</section>
+<section id="the-mems-gyroscope-rotation-through-the-coriolis-effect" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="the-mems-gyroscope-rotation-through-the-coriolis-effect"><span class="header-section-number">5.5</span> The MEMS Gyroscope: Rotation Through the Coriolis Effect</h2>
+<p>A classical gyroscope stores angular momentum in a spinning rotor; nothing that spins survives miniaturization to silicon, so MEMS gyroscopes use vibration instead. The device — a Coriolis vibratory gyroscope — again suspends a proof mass on flexures, but now drives it electrostatically into sustained resonant oscillation along one axis, the <strong>drive mode</strong>, like one tine of a tuning fork. When the package rotates at angular rate <span class="math inline">\(\omega\)</span> about an axis perpendicular to that vibration, each element of the moving mass experiences a Coriolis acceleration</p>
+<p><span class="math display">\[\vec{a}_{\text{cor}} = -2\,\vec{\omega} \times \vec{v},\]</span></p>
+<p>where <span class="math inline">\(\vec{v}\)</span> is the instantaneous drive-mode velocity. That acceleration is perpendicular to both the rotation axis and the drive motion, so it pumps energy into a second, orthogonal <strong>sense mode</strong>, whose displacement is picked off by capacitive electrodes exactly as in the accelerometer. Because the Coriolis term is linear in <span class="math inline">\(\omega\)</span>, the sense-mode amplitude directly encodes angular rate, and the ASIC delivers a calibrated output in degrees per second.</p>
+<div id="fig-mems-gyroscope-coriolis" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Schematic top view of a MEMS vibratory gyroscope. A central blue rectangle labeled proof mass m is suspended between two gray substrate anchors by serpentine flexure springs on its left and right. A horizontal double-headed arrow inside the mass is labeled drive mode: oscillation, velocity v. Orange fixed sense electrodes sit above and below the mass, with the gaps labeled C1 and C2. A circled dot with a curved arrow at top left is labeled angular rate omega, rotation axis out of the page. A bold vertical arrow inside the mass is annotated Coriolis acceleration a cor equals minus 2 omega cross v, pumps the sense mode: the mass displaces toward one electrode, proportional to omega. A caption reads: drive vibration v plus package rotation omega leads to Coriolis force minus 2 m omega cross v, leads to sense-mode displacement, leads to delta C equal to C1 minus C2, proportional to angular rate omega.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mems-gyroscope-coriolis-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/mems-gyroscope-coriolis.svg" class="img-fluid figure-img" style="width:85.0%" alt="Schematic top view of a MEMS vibratory gyroscope. A central blue rectangle labeled proof mass m is suspended between two gray substrate anchors by serpentine flexure springs on its left and right. A horizontal double-headed arrow inside the mass is labeled drive mode: oscillation, velocity v. Orange fixed sense electrodes sit above and below the mass, with the gaps labeled C1 and C2. A circled dot with a curved arrow at top left is labeled angular rate omega, rotation axis out of the page. A bold vertical arrow inside the mass is annotated Coriolis acceleration a cor equals minus 2 omega cross v, pumps the sense mode: the mass displaces toward one electrode, proportional to omega. A caption reads: drive vibration v plus package rotation omega leads to Coriolis force minus 2 m omega cross v, leads to sense-mode displacement, leads to delta C equal to C1 minus C2, proportional to angular rate omega.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mems-gyroscope-coriolis-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.2: Simplified structure of a MEMS Coriolis vibratory gyroscope, viewed from above. The proof mass is driven into resonant oscillation along the drive axis; when the package rotates about the axis out of the page, the Coriolis acceleration pushes the mass along the orthogonal sense axis, toward one of the fixed sense electrodes, and the resulting differential capacitance change is proportional to the angular rate.
+</figcaption>
+</figure>
+</div>
+<p>The construction carries its own fine print. The sense signal is proportional to the <em>product</em> of drive velocity and rotation rate, so any wander in drive amplitude appears as a scale-factor error; drive amplitude and flexure stiffness both move with temperature, which is why gyroscope bias and scale factor are specified with temperature coefficients and why the bias you measure at power-on is not the bias you will have ten minutes into a flight, after motor and battery heat have warmed the die. And the structure is, again, a high-Q mechanical resonator living on a vibrating airframe — the same vibration-sensitivity caveat as the accelerometer, sometimes worse, because external vibration near the drive frequency interferes directly with the mechanism.</p>
+<p>One more property matters for everything that follows: the gyroscope measures <em>rate</em>, but control and navigation need <em>angle</em>. The only route from one to the other is integration, <span class="math inline">\(\theta(t) = \theta_0 + \int_0^t \omega\,dt\)</span>, and integration is an error amplifier: a constant rate bias <span class="math inline">\(b\)</span> becomes an angle error <span class="math inline">\(b\,t\)</span> that grows without limit. The numbers below make that concrete.</p>
+</section>
+<section id="the-barometer-altitude-from-a-sealed-cavity" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="the-barometer-altitude-from-a-sealed-cavity"><span class="header-section-number">5.6</span> The Barometer: Altitude from a Sealed Cavity</h2>
+<p>The barometric sensor completes the suite. A micromachined membrane is suspended over a cavity sealed at a reference pressure; ambient pressure flexes the membrane, and the deflection is read capacitively or piezoresistively, temperature-compensated on-chip against factory calibration coefficients, and served over the same buses. Devices of the widely used Bosch BMP280/BMP388 class resolve pressure to roughly ±0.12 hPa relative — and the reason that number is interesting is what it converts to in metres.</p>
+<div id="fig-barometer-sealed-cavity" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Schematic cross-section of a MEMS barometer. A gray silicon substrate contains a light-colored region labeled sealed reference cavity, trapped at reference pressure P ref. A bowed blue band across the top of the cavity is labeled flexible silicon membrane, with a dashed line marking the membrane at rest when P equals P ref, and small orange piezoresistors at the membrane flex points labeled strain readout. Five downward arrows above the membrane are labeled ambient pressure P, and an annotation reads deflection proportional to P minus P ref. An orange bar on the cavity floor is labeled fixed electrode on the cavity floor: C rises as the gap narrows, with a vertical double-headed arrow labeled gap leading to C. A side note reads near sea level, P falls approximately 12 pascals per metre of climb. A caption reads: ambient P leads to membrane deflection, leads to delta C or delta R, leads to digitized pressure, leads to altitude h equals 44330 times bracket 1 minus P over P0 to the power 1 over 5.255 bracket metres.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-barometer-sealed-cavity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/barometer-sealed-cavity.svg" class="img-fluid figure-img" style="width:85.0%" alt="Schematic cross-section of a MEMS barometer. A gray silicon substrate contains a light-colored region labeled sealed reference cavity, trapped at reference pressure P ref. A bowed blue band across the top of the cavity is labeled flexible silicon membrane, with a dashed line marking the membrane at rest when P equals P ref, and small orange piezoresistors at the membrane flex points labeled strain readout. Five downward arrows above the membrane are labeled ambient pressure P, and an annotation reads deflection proportional to P minus P ref. An orange bar on the cavity floor is labeled fixed electrode on the cavity floor: C rises as the gap narrows, with a vertical double-headed arrow labeled gap leading to C. A side note reads near sea level, P falls approximately 12 pascals per metre of climb. A caption reads: ambient P leads to membrane deflection, leads to delta C or delta R, leads to digitized pressure, leads to altitude h equals 44330 times bracket 1 minus P over P0 to the power 1 over 5.255 bracket metres.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-barometer-sealed-cavity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.3: Cross-section of a MEMS barometric pressure sensor. Ambient air presses on a flexible silicon membrane suspended over a cavity sealed at a reference pressure; the membrane’s deflection is read out capacitively against a fixed electrode on the cavity floor (or piezoresistively at the membrane’s flex points), and the digitized pressure is converted to altitude with the standard-atmosphere formula.
+</figcaption>
+</figure>
+</div>
+<p>Hydrostatic equilibrium sets the exchange rate. Pressure falls with height as <span class="math inline">\(dP/dh = -\rho g\)</span>; with sea-level air density <span class="math inline">\(\rho \approx 1.225\ \text{kg/m}^3\)</span>, that is <span class="math inline">\(1.225 \times 9.81 \approx 12\ \text{Pa}\)</span> per metre. A ±0.12 hPa (±12 Pa) sensor therefore resolves altitude to about ±1 m — good enough for altitude <em>hold</em>, nowhere near good enough for landing flare or obstacle clearance. Over larger height changes, density itself falls with altitude, and integrating the hydrostatic relation through the standard-atmosphere temperature lapse yields the practical closed form used in flight-controller code:</p>
+<p><span class="math display">\[h = 44330\left[1 - \left(\frac{P}{P_0}\right)^{1/5.255}\right]\ \text{metres},\]</span></p>
+<p>with <span class="math inline">\(P_0\)</span> the reference pressure. Worked through: if the reference is 101,325 Pa and the sensor now reads 100,725 Pa, then <span class="math inline">\(P/P_0 = 0.99408\)</span>, the bracket evaluates to <span class="math inline">\(1 - 0.99408^{0.1903} = 0.001129\)</span>, and <span class="math inline">\(h = 44330 \times 0.001129 \approx 50.1\ \text{m}\)</span> — matching the linear 600 Pa ÷ 12 Pa/m estimate, as it should for a small height change.</p>
+<p>The formula’s fine print is operationally important. <span class="math inline">\(P_0\)</span> is not a constant of nature; local sea-level-equivalent pressure moves with the weather by amounts that dwarf the sensor’s resolution (a modest pressure system shift of 3 hPa masquerades as 25 m of altitude). Flight controllers therefore use the barometer <em>relatively</em>: record the pad pressure at arming as <span class="math inline">\(P_0\)</span>, and report height above the launch point, fusing GPS altitude in the background to restrain slow drift. And on a multirotor the sensor has a further, self-inflicted problem: it sits inside the turbulent flow field of its own propellers. Prop wash, ground effect near the pad, and throttle transients all modulate the local static pressure, appearing as spurious altitude excursions precisely during takeoff and landing. The standard mitigations are physical and computational together: flight controllers typically shroud the barometer under open-cell foam, which damps turbulent pressure fluctuations while passing the slow static signal, and apply low-pass filtering plus estimator-level fusion so that short-term barometric excursions are outvoted by the inertial sensors’ vertical-acceleration evidence.</p>
+</section>
+<section id="why-the-raw-data-cannot-be-trusted" class="level2" data-number="5.7">
+<h2 data-number="5.7" class="anchored" data-anchor-id="why-the-raw-data-cannot-be-trusted"><span class="header-section-number">5.7</span> Why the Raw Data Cannot Be Trusted</h2>
+<p>Every error a fusion algorithm must fight can be read off an IMU datasheet, and it is worth doing so once with real numbers. The Bosch BMI088 — an IMU designed for drones and marketed for exactly the vibration environment described above — specifies, in round figures: accelerometer zero offset ±20 mg typical; gyroscope zero offset ±1 °/s typical, with temperature coefficient ±0.015 °/s per kelvin; gyroscope noise density 0.014 °/s/√Hz; accelerometer noise density 175 µg/√Hz. Four distinct failure modes hide in those lines.</p>
+<p><strong>Bias.</strong> The output at zero true input is not zero. A ±1 °/s gyro bias, integrated naively, is an attitude error growing at 60 degrees per <em>minute</em> — a horizon that rolls over in ninety seconds while the aircraft sits still on the bench. Autopilots therefore calibrate the bias at every boot by averaging the output while the vehicle is stationary. But calibration only removes the bias <em>as it was at boot</em>: with a temperature coefficient of ±0.015 °/s/K, a die that warms 20 K during flight — routine, with motors and battery working — can acquire up to 0.3 °/s of fresh bias, worth 18 degrees of accumulated error per minute of pure integration. Bias is not a constant to be subtracted once; it is a slowly moving target, which is exactly why production estimators track it as a state (below) rather than a calibration value.</p>
+<p><strong>White noise.</strong> Thermomechanical and electronic noise set a floor that no calibration touches; it can only be traded against bandwidth. Noise density makes the trade quantitative: RMS noise equals density times the square root of bandwidth. Sampled with a 100 Hz bandwidth, the BMI088’s gyro shows <span class="math inline">\(0.014 \times \sqrt{100} = 0.14\)</span> °/s RMS — negligible for rate control. The accelerometer shows <span class="math inline">\(175\ \text{µg} \times \sqrt{100} = 1.75\)</span> mg RMS, which corrupts a gravity-derived tilt angle by roughly <span class="math inline">\(\arcsin(0.00175) \approx 0.1°\)</span> — small, but only because the bandwidth was kept narrow. Widen the filter to catch faster dynamics and the noise grows as <span class="math inline">\(\sqrt{\text{bandwidth}}\)</span>; the accelerometer’s tilt estimate is inherently a <em>slow</em> reference.</p>
+<p><strong>Vibration rectification.</strong> A perfectly symmetric sinusoidal vibration should average to zero. Through the sensor’s small nonlinearities it does not: sustained vibration produces a net DC shift in the output — vibration rectification error, specified in datasheets as bias per g² of vibration. On a multirotor feeding the IMU continuous excitation at 90 and 181 Hz, this converts propeller imbalance directly into attitude bias. The defenses are layered: balance the propellers (reduce the source), soft-mount the flight controller or IMU (attenuate the path — the mechanical low-pass filter of the Anatomy chapter), keep frame resonances away from the excitation bands (the Materials chapter’s stiffness argument), and apply software notch filters keyed to measured motor RPM (remove what remains). Only after all four does the noise floor approach what the datasheet promised.</p>
+<p><strong>Scale factor and cross-axis error.</strong> The gain from true input to output deviates slightly from nominal and drifts with temperature, and a rotation about one axis leaks fractionally into the others through imperfect axis alignment. Both are percent-level effects, calibrated at the factory and refined by the estimator; they matter mostly for aggressive maneuvers, where a 1 % scale error on a 360°/s roll is 3.6°/s of phantom rate.</p>
+</section>
+<section id="getting-the-data-aboard-i2c-versus-spi" class="level2" data-number="5.8">
+<h2 data-number="5.8" class="anchored" data-anchor-id="getting-the-data-aboard-i2c-versus-spi"><span class="header-section-number">5.8</span> Getting the Data Aboard: I2C versus SPI</h2>
+<p>Between the sensor die and the autopilot’s memory sits a serial bus, and the choice of bus is a genuine engineering decision, not a wiring detail. The two candidates on virtually every flight controller:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Property</th>
+<th>I2C</th>
+<th>SPI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Wires</td>
+<td>2 shared (SDA data, SCL clock), open-drain with pull-up resistors</td>
+<td>4 (clock, master-out, master-in) plus one dedicated chip-select line <strong>per device</strong></td>
+</tr>
+<tr class="even">
+<td>Device selection</td>
+<td>7-bit address in-band; many devices share the same two wires</td>
+<td>Chip-select wire per device; pin count grows with device count</td>
+</tr>
+<tr class="odd">
+<td>Clock rate</td>
+<td>100 kbit/s standard, 400 kbit/s fast mode, 1 Mbit/s fast-mode-plus</td>
+<td>Commonly single-digit to tens of MHz; modern IMUs typically accept 10–24 MHz</td>
+</tr>
+<tr class="even">
+<td>Duplex</td>
+<td>Half — the wire turns around between write and read</td>
+<td>Full — data flows both directions simultaneously</td>
+</tr>
+<tr class="odd">
+<td>Scaling limit</td>
+<td>Bus capacitance and pull-up sizing degrade edges as devices and trace length grow</td>
+<td>Wiring only; each device’s bandwidth is independent, no arbitration</td>
+</tr>
+<tr class="even">
+<td>DMA streaming</td>
+<td>Workable but awkward at high rates</td>
+<td>Natural fit — burst reads at kilohertz rates without CPU involvement</td>
+</tr>
+</tbody>
+</table>
+<p>The arithmetic that settles the question for the IMU: a six-axis sample is 12 data bytes (three 16-bit words each for accelerometer and gyroscope). Reading it over I2C costs, with addressing, register pointer, ACK bits, and start/stop overhead, roughly 130 bit-times per transaction — about 325 µs at 400 kbit/s. That caps a lone IMU at roughly 3 kHz <em>while consuming the entire shared bus</em>, and modern rate controllers want gyro samples at 1–8 kHz with time left over for every other device on the wire. The same 12-byte burst over SPI at 10 MHz completes in about 10 µs, more than thirtyfold faster, full-duplex, and DMA-driven so the CPU never touches the transfer. This is why flight controllers of the Pixhawk and Betaflight class typically wire the primary IMU to a dedicated SPI bus.</p>
+<p>The magnetometer and barometer invert every term of that argument. Heading and altitude change slowly; both sensors are commonly read at 10–100 Hz, three orders of magnitude below the gyro. At those rates I2C’s bandwidth is ample, and its strengths dominate: two wires shared among several devices, in-band addressing so a compass, a barometer, and a battery monitor coexist without extra pins, and easy extension over the longer run to a mast-mounted GPS/compass module. Hence the hybrid topology found on most flight controllers: <em>fast, lonely sensor on SPI; slow, sociable sensors on I2C.</em> The general lesson generalizes well beyond drones — bus selection is the required sample rate, the device count, and the pin budget, evaluated in that order.</p>
+</section>
+<section id="sensor-fusion-the-complementary-filter" class="level2" data-number="5.9">
+<h2 data-number="5.9" class="anchored" data-anchor-id="sensor-fusion-the-complementary-filter"><span class="header-section-number">5.9</span> Sensor Fusion: The Complementary Filter</h2>
+<p>Now the punchline the chapter has been assembling. The gyroscope integrates into a smooth, responsive angle that drifts without bound; the accelerometer supplies an absolute, drift-free angle that is noisy and lies during maneuvers. One fails slowly, the other fails fast — so blend them, each at the timescale where it is trustworthy. For one axis (pitch, say), with gyro rate <span class="math inline">\(\omega\)</span>, sample interval <span class="math inline">\(\Delta t\)</span>, and <span class="math inline">\(\theta_{\text{accel}}\)</span> the tilt angle computed from the accelerometer’s gravity vector by trigonometry:</p>
+<p><span class="math display">\[\hat{\theta}_{k} = \alpha\left(\hat{\theta}_{k-1} + \omega_k\,\Delta t\right) + (1 - \alpha)\,\theta_{\text{accel},k},\]</span></p>
+<p>with gain <span class="math inline">\(\alpha \in [0,1]\)</span> chosen close to 1. Each step trusts the gyro’s propagation almost entirely — preserving its smoothness and responsiveness — while the small <span class="math inline">\((1-\alpha)\)</span> correction leaks the accelerometer’s absolute reference in, continuously bleeding off whatever drift the integration has accumulated. In the frequency domain the structure explains the name: the gyro path is high-pass filtered, the accelerometer path low-pass filtered, and the two responses are complementary — they sum to unity, so no frequency band is lost, merely assigned to the sensor that handles it best.</p>
+<p>The gain is not arbitrary; it encodes a time constant. The accelerometer correction acts as a first-order pull toward <span class="math inline">\(\theta_{\text{accel}}\)</span> with</p>
+<p><span class="math display">\[\tau = \frac{\alpha\,\Delta t}{1-\alpha}.\]</span></p>
+<p>Run the filter at 250 Hz (<span class="math inline">\(\Delta t = 4\)</span> ms) with <span class="math inline">\(\alpha = 0.99\)</span> and <span class="math inline">\(\tau \approx 0.4\)</span> s: gyro drift is corrected on a timescale of half a second, while accelerometer noise and maneuver corruption faster than that are averaged away. Choosing <span class="math inline">\(\alpha\)</span> <em>is</em> choosing where to place the crossover between the two sensors’ credibility — lower <span class="math inline">\(\alpha\)</span> tracks the gravity reference more tightly but lets accelerometer noise and the vehicle’s own accelerations bleed into the attitude; higher <span class="math inline">\(\alpha\)</span> rides the gyro longer but corrects drift more slowly. Typical values sit between 0.90 and 0.99 depending on sample rate and vibration environment.</p>
+<p>The algorithm is short enough to be shown whole:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ComplementaryFilter:</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Single-axis pitch estimator fusing gyro rate with accel tilt."""</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, alpha: <span class="bu">float</span> <span class="op">=</span> <span class="fl">0.99</span>):</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.alpha <span class="op">=</span> alpha</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pitch <span class="op">=</span> <span class="fl">0.0</span>          <span class="co"># radians</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> update(<span class="va">self</span>, gyro_rate: <span class="bu">float</span>, ax: <span class="bu">float</span>, az: <span class="bu">float</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>               dt: <span class="bu">float</span>) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 1. Propagate with the gyro (trusted short-term).</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        pitch_gyro <span class="op">=</span> <span class="va">self</span>.pitch <span class="op">+</span> gyro_rate <span class="op">*</span> dt</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 2. Absolute tilt from the gravity vector (trusted long-term).</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        pitch_accel <span class="op">=</span> math.atan2(ax, az)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 3. Blend: high-pass the gyro path, low-pass the accel path.</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pitch <span class="op">=</span> (<span class="va">self</span>.alpha <span class="op">*</span> pitch_gyro</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>                      <span class="op">+</span> (<span class="fl">1.0</span> <span class="op">-</span> <span class="va">self</span>.alpha) <span class="op">*</span> pitch_accel)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.pitch</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Yaw needs one more ingredient: gravity says nothing about rotation around the vertical, so the absolute reference for the third axis comes from the magnetometer — the same blend, with a tilt-compensated compass heading standing in for <span class="math inline">\(\theta_{\text{accel}}\)</span>. And one caveat must be carried forward: <span class="math inline">\(\theta_{\text{accel}}\)</span> is only the true tilt when the vehicle is unaccelerated. During a sustained coordinated maneuver the accelerometer’s vector tilts with the maneuver, and the filter slowly follows it into error. Keeping <span class="math inline">\(\alpha\)</span> high limits the damage; fixing it properly requires knowing <em>how much</em> to trust each measurement moment by moment — which is precisely the upgrade the Kalman filter provides.</p>
+<section id="from-blend-to-estimator-the-ekf" class="level3" data-number="5.9.1">
+<h3 data-number="5.9.1" class="anchored" data-anchor-id="from-blend-to-estimator-the-ekf"><span class="header-section-number">5.9.1</span> From Blend to Estimator: The EKF</h3>
+<p>Production autopilots do not fly on complementary filters. PX4’s default estimator, EKF2, is an extended Kalman filter that carries roughly two dozen states — attitude as a quaternion, three-axis velocity and position, <em>and the gyroscope and accelerometer biases themselves</em>, along with magnetic field and wind states — and fuses IMU, magnetometer, barometer, GPS, and optionally rangefinder and optical flow, each stream weighted by a continuously updated estimate of its own uncertainty. The conceptual advances over the fixed-<span class="math inline">\(\alpha\)</span> blend are three. The filter <em>estimates the biases</em> rather than averaging them out, so the slow bias wander that defeats boot-time calibration is tracked and removed in flight. It replaces the fixed gain with a covariance: each sensor’s influence at each instant is proportional to how trustworthy the filter currently computes it to be, so a GPS glitch or a maneuver-corrupted accelerometer sample is automatically down-weighted. And it monitors <em>innovations</em> — the gap between what a sensor reports and what the filter predicted it would report — which turns the estimator into a fault detector: a failing magnetometer announces itself statistically before it can steer the vehicle wrong. The complementary filter remains the right first implementation — transparent, tunable, sufficient for a bench demonstrator — and the right mental model for what the EKF is doing beneath its matrices.</p>
+<p>This estimate is also where the chapter’s material surfaces in the running example. The Systems Architecture chapter in Part V picks up the pipeline from the consumer’s side: the Goose Management System’s Failsafe node — the independent monitor that watches battery state and separation distance and can override whatever is flying the aircraft — does not read raw sensors at all, but consumes the fused attitude and position estimates published by the flight controller’s onboard EKF, trusting the estimator to have already fought every battle described here. When that chapter asks what happens if the estimate itself degrades, the error budget assembled above is the vocabulary the answer is written in.</p>
+</section>
+</section>
+<section id="check-your-understanding" class="level2" data-number="5.10">
+<h2 data-number="5.10" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">5.10</span> Check Your Understanding</h2>
+<ol type="1">
+<li>An accelerometer sitting motionless on a bench reads 1 g pointing up; the same accelerometer in free fall reads zero. Explain both readings from the proof-mass mechanism, and state precisely what physical quantity the sensor measures.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The sensor measures the displacement of a spring-suspended proof mass relative to its housing, which responds to <em>specific force</em> — the net non-gravitational force per unit mass on the housing. On the bench, the bench pushes the housing up with 1 g of support force while gravity acts equally on housing and proof mass; the spring must supply the proof mass’s share, deflecting by <span class="math inline">\((m/k)g\)</span> — hence a 1 g reading pointing up. In free fall, gravity accelerates housing and proof mass identically, no spring force is needed, the mass rides centered, and the output is zero. The practical consequence: in unaccelerated flight the output vector points opposite gravity, making the accelerometer an absolute tilt reference — but only when no other acceleration is present.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>A gyroscope is bias-calibrated at boot, but during flight the die warms 15 K. Using the BMI088’s temperature coefficient of ±0.015 °/s/K, bound the fresh bias and the resulting attitude error after 4 minutes of pure gyro integration. What does this imply about bias as a “calibrate once” quantity?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Fresh bias: up to <span class="math inline">\(15 \times 0.015 = 0.225\)</span> °/s. Integrated for 4 minutes: <span class="math inline">\(0.225 \times 240 = 54°\)</span> of attitude error — a horizon rolled halfway to vertical, from temperature drift alone, on a sensor that was perfectly calibrated at boot. Bias is therefore a slowly moving target, not a constant: boot-time calibration removes only its value at boot. This is why a drift-correcting fusion mechanism must run continuously (complementary filter at minimum), and why production estimators like PX4’s EKF2 go further and carry the gyro biases as estimated states, tracking their wander throughout the flight.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>A complementary filter runs at 500 Hz and should correct gyro drift with a time constant of about 0.5 s. Compute the required gain <span class="math inline">\(\alpha\)</span>, and describe qualitatively what changes if <span class="math inline">\(\alpha\)</span> is lowered to 0.95.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>From <span class="math inline">\(\tau = \alpha\,\Delta t/(1-\alpha)\)</span> rearranged, <span class="math inline">\(\alpha = \tau/(\tau + \Delta t) = 0.5/(0.5 + 0.002) \approx 0.996\)</span>. Lowering <span class="math inline">\(\alpha\)</span> to 0.95 at <span class="math inline">\(\Delta t = 2\)</span> ms gives <span class="math inline">\(\tau = 0.95 \times 0.002/0.05 = 38\)</span> ms: the filter now yanks the estimate toward the accelerometer within a few tens of milliseconds. Drift correction is far more aggressive, but accelerometer white noise passes almost unfiltered into the attitude, and every maneuver’s linear acceleration — which tilts the measured “gravity” vector — corrupts the estimate almost immediately. The gain sets the crossover frequency between the two sensors’ credibility, and 38 ms is far below the timescale on which the accelerometer can be trusted.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>A six-axis IMU sample is 12 data bytes, and the rate controller wants it at 2 kHz. A colleague proposes putting the IMU on the flight controller’s I2C bus (400 kbit/s fast mode) alongside the barometer and compass. Evaluate the proposal with arithmetic, and state the topology actually used.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>With addressing, register pointer, ACKs, and start/stop framing, each 12-byte read costs roughly 130 bit-times — about 325 µs at 400 kbit/s. At 2 kHz the IMU alone demands <span class="math inline">\(2000 \times 325\ \text{µs} = 0.65\)</span> s of bus time per second — 65 % of the shared bus, before the barometer or compass sends a byte; at higher gyro rates the demand exceeds the bus outright. The proposal fails. The standard topology puts the IMU alone on SPI — where a 10 MHz clock moves the burst in about 10 µs, full-duplex and DMA-driven — and leaves the slow, low-rate barometer and magnetometer sharing I2C, where two-wire wiring and in-band addressing are worth more than bandwidth.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>At arming, the barometer reads 101,325 Pa, recorded as <span class="math inline">\(P_0\)</span>. Later it reads 100,725 Pa. Compute the altitude gain both by the linear approximation and by the standard-atmosphere formula, and explain why the flight controller uses launch-point-relative rather than absolute barometric altitude.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Linear: <span class="math inline">\(\Delta P = 600\)</span> Pa at <span class="math inline">\(\approx 12\)</span> Pa/m gives <span class="math inline">\(\approx 50\)</span> m. Exact: <span class="math inline">\(h = 44330[1-(100725/101325)^{1/5.255}] = 44330 \times 0.001129 \approx 50.1\)</span> m — the two agree, as they must for small height changes. Absolute altitude is avoided because the formula’s reference pressure is weather-dependent: local sea-level-equivalent pressure routinely shifts by several hPa as systems move through, and a 3 hPa shift masquerades as roughly 25 m of altitude. Recording the pad pressure at arming cancels the weather term at the moment of takeoff, leaving only its slow drift during the flight — which the estimator restrains by fusing GPS altitude.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>During takeoff, a quadcopter’s barometric altitude briefly reads <em>below</em> the pad it just left. Give the physical cause, and name one physical and one computational mitigation.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The barometer measures local static pressure, and near the ground the propellers’ wash — intensified by ground effect — swirls turbulent, dynamically disturbed air over the sensor’s port. A transient pressure <em>rise</em> at the port reads as a drop in altitude, regardless of what the vehicle is doing. Physical mitigation: shroud the sensor under open-cell foam (and mount it away from direct prop wash), damping fast turbulent fluctuations while passing the slow static-pressure signal. Computational mitigation: low-pass filter the pressure stream and, more fundamentally, fuse barometric altitude with inertial vertical acceleration (and GPS) in the estimator, so a pressure excursion unsupported by accelerometer evidence is discounted rather than believed.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="5.11">
+<h2 data-number="5.11" class="anchored" data-anchor-id="try-it"><span class="header-section-number">5.11</span> Try It</h2>
+<p><strong>Part 1 — meet your sensor’s noise.</strong> Take any IMU you can log — a flight controller, a phone, or a breakout board — and capture a minute of raw accelerometer and gyroscope data with the device perfectly still. Compute each channel’s mean (the bias) and standard deviation (the RMS noise), and compare the noise against the datasheet’s noise density times the square root of your effective bandwidth; they should agree within a factor of two, and understanding why yours differs is half the exercise. Then integrate the raw gyro rate numerically and plot the resulting “attitude” of the motionless sensor over five minutes: the drift you watch accumulate is the failure mode this whole chapter exists to fix. Finally, subtract the measured bias and integrate again — and note that the drift is reduced but not gone, which is the temperature-wander argument made empirically.</p>
+<p><strong>Part 2 — build the filter and try to break it.</strong> Implement the complementary filter above against your logged (or live) data stream and plot three traces together: integrated gyro alone, accelerometer tilt alone, and the fused estimate. Tilt the board smoothly, hold it still, then shake it. Identify each raw estimator’s characteristic failure in the traces — drift in one, noise and shake-corruption in the other — and verify the fused trace inherits neither. Then sweep <span class="math inline">\(\alpha\)</span> through 0.80, 0.95, and 0.99, computing the implied time constant for each, and write two or three sentences stating which value you would fly and why. If you have access to a flight controller, finish with a bus audit: from its documentation or schematic, list which bus each sensor sits on, and justify the designer’s choices with the bandwidth arithmetic from this chapter.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#collaborative-drone-build">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="pagination-link" aria-label="Materials and Power: Structural Choices and LiPo Battery Management">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="pagination-link" aria-label="Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

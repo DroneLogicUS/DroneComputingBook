@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>7&nbsp; From Radio to Root Shell: Companion Computers and the UART Link – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" rel="next">
+<link href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html">Part I — Airframes, Regulation &amp; Flight Safety</a></li><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">7.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">7.2</span> Key Vocabulary</a></li>
+  <li><a href="#why-a-flight-controller-is-not-enough" id="toc-why-a-flight-controller-is-not-enough" class="nav-link" data-scroll-target="#why-a-flight-controller-is-not-enough"><span class="header-section-number">7.3</span> Why a Flight Controller Is Not Enough</a></li>
+  <li><a href="#choosing-the-computer-raspberry-pi-versus-jetson" id="toc-choosing-the-computer-raspberry-pi-versus-jetson" class="nav-link" data-scroll-target="#choosing-the-computer-raspberry-pi-versus-jetson"><span class="header-section-number">7.4</span> Choosing the Computer: Raspberry Pi versus Jetson</a>
+  <ul class="collapse">
+  <li><a href="#flashing-an-operating-system" id="toc-flashing-an-operating-system" class="nav-link" data-scroll-target="#flashing-an-operating-system"><span class="header-section-number">7.4.1</span> Flashing an Operating System</a></li>
+  </ul></li>
+  <li><a href="#three-ways-to-command-a-drone" id="toc-three-ways-to-command-a-drone" class="nav-link" data-scroll-target="#three-ways-to-command-a-drone"><span class="header-section-number">7.5</span> Three Ways to Command a Drone</a></li>
+  <li><a href="#the-uart-from-first-principles" id="toc-the-uart-from-first-principles" class="nav-link" data-scroll-target="#the-uart-from-first-principles"><span class="header-section-number">7.6</span> The UART, from First Principles</a>
+  <ul class="collapse">
+  <li><a href="#wiring-the-link-the-pixhawk-telem2-port" id="toc-wiring-the-link-the-pixhawk-telem2-port" class="nav-link" data-scroll-target="#wiring-the-link-the-pixhawk-telem2-port"><span class="header-section-number">7.6.1</span> Wiring the Link: The Pixhawk TELEM2 Port</a></li>
+  </ul></li>
+  <li><a href="#verify-before-you-code-the-heartbeat-test" id="toc-verify-before-you-code-the-heartbeat-test" class="nav-link" data-scroll-target="#verify-before-you-code-the-heartbeat-test"><span class="header-section-number">7.7</span> Verify Before You Code: The Heartbeat Test</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">7.8</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">7.9</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html">Part I — Airframes, Regulation &amp; Flight Safety</a></li><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Part I has so far treated the drone from five angles: as a market artifact, as a structure, as a power system, as a sensor platform, and as an aircraft under law. Every one of those treatments assumed, without saying so, that a human being holds the sticks. This chapter removes that assumption. The subject is the <strong>companion computer</strong> — a full Linux computer bolted to the airframe beside the flight controller — and the three wires that connect it to everything the previous chapters built. The shift it produces is easy to state and hard to overstate: with a radio transmitter, the drone is a vehicle you <em>drive</em>; with a companion computer, it is a platform you <em>program</em>. The pilot’s thumbs are replaced by a process; the radio uplink is replaced by a secure shell session into an aircraft that is, from the software’s point of view, just another Linux host that happens to be able to fly. Everything in Parts II through V — mission scripting, onboard neural networks, multi-vehicle coordination, and the Goose Management System itself — runs on the machine this chapter installs.</p>
+<p>The chapter’s structure follows the physical build order. First, the case for the second computer: what a flight controller cannot do, what a companion computer unlocks, and why this book’s platform is built from open components rather than bought as a closed product. Second, the hardware choice — Raspberry Pi versus NVIDIA Jetson — and the process of flashing an operating system onto the winner. Third, the communication problem: the three distinct paths by which commands can reach a flight controller, and why the autonomous path runs over a decades-old, three-wire serial interface called a UART. That interface is where the chapter slows down and does real engineering: <em>why</em> transmit must cross to receive, <em>why</em> both ends must agree on a baud rate, and <em>why</em> a shared ground wire is not optional are questions a rule of thumb answers by fiat, and this chapter answers with the underlying serial-communication physics. It closes at the bench, verifying that the assembled link actually carries a MAVLink heartbeat — the first diagnostic of every integration session, and the last piece of hardware Part I has to put in place.</p>
+<section id="learning-objectives" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">7.1</span> Learning Objectives</h2>
+<ul>
+<li>Explain the division of labor between a flight controller and a companion computer, and identify which capabilities — waypoint autonomy, computer vision, obstacle avoidance, remote network access — require the second computer and why.</li>
+<li>Weigh a Raspberry Pi against a Jetson-class board for a given mission using the deciding criteria: onboard GPU inference, power draw, mass, cost, and setup complexity.</li>
+<li>Describe the three command paths into a flight controller — RC radio, MAVLink over a telemetry radio, and an onboard companion computer — and place each on the manual-to-autonomous spectrum.</li>
+<li>Explain UART framing from first principles: why the interface needs no clock wire, what the start and stop bits do, why both ends must agree on the baud rate to within a few percent, and why TX and RX must cross between devices.</li>
+<li>Wire a companion computer to a Pixhawk TELEM2 port correctly — TX to RX, RX to TX, GND to GND, and never the 5 V pin to a signal line — and verify the finished link by receiving a MAVLink heartbeat with MAVProxy before writing any code.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">7.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Companion computer</strong> — a general-purpose Linux computer (Raspberry Pi, Jetson Nano, Jetson Orin NX) mounted on the airframe and wired to the flight controller, which runs the autonomy software — mission logic, computer vision, planning — that the flight controller’s real-time microcontroller cannot.</li>
+<li><strong>UART</strong> (Universal Asynchronous Receiver-Transmitter) — the serial-communication peripheral, and by extension the wiring convention, that moves bytes between two devices over a dedicated transmit line, a dedicated receive line, and a shared ground, with no clock wire; each end recovers bit timing from its own oscillator plus the frame’s start bit.</li>
+<li><strong>Baud rate</strong> — the signaling rate of a serial line in symbols per second (for UART, bits per second including framing bits); both ends must be configured to the same value, because it is the only timing agreement the clockless interface has.</li>
+<li><strong>TELEM2 port</strong> — the Pixhawk-family telemetry connector conventionally assigned to the companion-computer link; a 6-pin JST-GH socket carrying 5 V power, 3.3 V-logic TX/RX signal lines, optional CTS/RTS flow-control lines, and ground.</li>
+<li><strong>MAVLink heartbeat</strong> — the small status message every MAVLink participant broadcasts at about 1 Hz announcing its presence, type, and mode; receiving a steady stream of heartbeats is the standard proof that a telemetry link is alive end to end.</li>
+<li><strong>MAVProxy</strong> — a lightweight command-line MAVLink ground station that can attach to any serial or network link; used here as a diagnostic instrument, because pointing it at a serial device and seeing heartbeats verifies wiring, baud rate, and protocol configuration in one step.</li>
+<li><strong>Headless OS</strong> — an operating-system installation administered entirely over the network (typically SSH), with no monitor, keyboard, or graphical desktop attached — the only sensible configuration for a computer whose chassis is an aircraft.</li>
+<li><strong>Flashing</strong> — writing a complete operating-system image onto a device’s boot medium (SD card, eMMC, or NVMe), as opposed to running an interactive installer; the standard first step in commissioning any single-board computer.</li>
+</ul>
+</section>
+<section id="why-a-flight-controller-is-not-enough" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="why-a-flight-controller-is-not-enough"><span class="header-section-number">7.3</span> Why a Flight Controller Is Not Enough</h2>
+<p>The flight controller characterized across this Part is a marvel of specialization: a microcontroller running a real-time loop that reads the IMU at kilohertz rates, runs the estimator, and closes the attitude loop with millisecond determinism. That specialization is also its ceiling. The Pixhawk’s processor has no operating system in the desktop sense, no GPU, memory measured in fractions of a megabyte, and a scheduler whose whole design premise is that nothing unpredictable is ever allowed to run. It keeps the aircraft upright. It does not — cannot — decide where the aircraft should go, recognize what its camera sees, or serve a shell to an operator three buildings away.</p>
+<p>The companion computer supplies exactly the missing half, and the four capabilities it unlocks map directly onto the rest of this book:</p>
+<ul>
+<li><strong>Autonomous flight and missions.</strong> Waypoint plans can be generated, monitored, and revised <em>on board</em>, with no pilot in the loop — the mission-scripting subject of Part II.</li>
+<li><strong>Computer vision.</strong> Object detection, recognition, and tracking in real time against the camera streams introduced in the Sensing the World chapter — the perception subject of Part III.</li>
+<li><strong>Obstacle avoidance.</strong> Sensing the environment and re-routing around hazards as they appear, which requires perception and planning to run against the same clock — the behavior subject of Part IV.</li>
+<li><strong>Remote network access.</strong> With a network module aboard, the aircraft can be monitored, commanded, or debugged from anywhere — an SSH session into a flying Linux host, which is what the “root shell” of this chapter’s title means literally.</li>
+</ul>
+<p>A reasonable objection: commercial drones do several of these things out of the box, so why build? The answer is the difference between using a capability and owning it. A closed platform such as DJI’s is polished, tuned, and fast to fly, but it is a walled garden — the operator gets exactly the behaviors and APIs the vendor chooses to expose, the vendor’s geofencing and firmware policies apply whether or not they suit the mission, and deep custom payloads or onboard AI are difficult or impossible to bolt on. The open stack this book builds — an off-the-shelf frame, PX4 firmware, a companion computer running ROS 2 — inverts every one of those terms: full control of the flight code, freedom to choose any sensor or compute module, no vendor in the data path, and the ability to implement behaviors (a goose-harassment maneuver, say) that no consumer SDK will ever ship. The cost is that nothing works until you make it work — which is, for a book about how these systems work, precisely the point.</p>
+</section>
+<section id="choosing-the-computer-raspberry-pi-versus-jetson" class="level2" data-number="7.4">
+<h2 data-number="7.4" class="anchored" data-anchor-id="choosing-the-computer-raspberry-pi-versus-jetson"><span class="header-section-number">7.4</span> Choosing the Computer: Raspberry Pi versus Jetson</h2>
+<p>Two families dominate the companion-computer role, and the choice between them is the first real systems-engineering decision of a build.</p>
+<p>The <strong>Raspberry Pi</strong> is the default for lightweight duty: cheap, small, frugal with power, backed by an enormous community, and entirely adequate for telemetry relay, logging, mission scripting, and simple sensor management. Its limitation is architectural, not incremental: it is a CPU-only machine, and modern perception is not CPU-shaped. A convolutional object detector that a GPU executes as a few large, parallel tensor operations becomes, on a Pi’s four ARM cores, a serialized slog — frame rates drop from tens per second to single digits, which is the difference between a perception system and a slideshow.</p>
+<p>The <strong>NVIDIA Jetson</strong> family (Nano at the entry level, Orin NX well above it) exists to close exactly that gap: an ARM CPU paired with an onboard NVIDIA GPU sharing the same memory, running the same CUDA/TensorRT toolchain as a desktop or server GPU. Real-time vision pipelines, deep-learning inference, and multi-sensor fusion — the workloads of Parts III and IV — run on the GPU at frame rate. The costs are the mirror image of the Pi’s virtues: higher price, higher power draw, more mass (a Jetson wants a heatsink and often a fan), and a heavier setup process.</p>
+<p><a href="#fig-jetson-vs-raspberry-pi" class="quarto-xref">Figure&nbsp;<span>7.1</span></a> puts the two boards side by side with the differences labeled. Note what the two layouts share — four ARM cores, RAM, the 40-pin GPIO header that will carry this chapter’s UART link — and where they part: the block the Pi simply does not have is the block the Jetson exists to provide.</p>
+<div id="fig-jetson-vs-raspberry-pi" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Side-by-side comparison diagram of two simplified single-board computer layouts. On the left, a board labeled Raspberry Pi, described as CPU-only for telemetry relay, logging, and mission scripting, shows a 40-pin GPIO header labeled as the UART pins to the flight controller, a system-on-chip with four ARM CPU cores drawn as four squares, a RAM chip, USB and Ethernet ports, a USB power connector, and a dashed empty rectangle labeled no GPU, no AI accelerator. A callout notes that modern perception is not CPU-shaped, so parallel tensor operations become a serialized slog at single-digit frames per second. A summary strip reads cheap, small, frugal with power, fitting easily inside the roughly 12-watt avionics power budget. On the right, a board labeled NVIDIA Jetson, Nano or Orin NX, described as CPU plus GPU for real-time vision and onboard inference, shows a finned heatsink drawn exploded above the compute module, a block of four ARM CPU cores beside a highlighted block labeled onboard NVIDIA GPU drawn as a grid of many small cores, a RAM bar labeled one memory shared by CPU and GPU, a 40-pin GPIO header, and USB and Ethernet ports. A callout notes that GPU-shaped workloads such as detection, tracking, and fusion run at frame rate using the same CUDA and TensorRT toolchain as a desktop GPU. A summary strip reads higher price, more mass, higher power draw, and that a heavily loaded Jetson can exceed the roughly 12-watt budget on its own. A banner at the bottom states the mission-shaped decision rule: a drone that only needs to be told where to go gets a Raspberry Pi, one that must understand what it sees gets a Jetson, and the running example, in which a goose must be recognized by a neural network on the aircraft itself, chooses the Jetson Nano.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-jetson-vs-raspberry-pi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/jetson-vs-raspberry-pi.svg" class="img-fluid figure-img" style="width:95.0%" alt="Side-by-side comparison diagram of two simplified single-board computer layouts. On the left, a board labeled Raspberry Pi, described as CPU-only for telemetry relay, logging, and mission scripting, shows a 40-pin GPIO header labeled as the UART pins to the flight controller, a system-on-chip with four ARM CPU cores drawn as four squares, a RAM chip, USB and Ethernet ports, a USB power connector, and a dashed empty rectangle labeled no GPU, no AI accelerator. A callout notes that modern perception is not CPU-shaped, so parallel tensor operations become a serialized slog at single-digit frames per second. A summary strip reads cheap, small, frugal with power, fitting easily inside the roughly 12-watt avionics power budget. On the right, a board labeled NVIDIA Jetson, Nano or Orin NX, described as CPU plus GPU for real-time vision and onboard inference, shows a finned heatsink drawn exploded above the compute module, a block of four ARM CPU cores beside a highlighted block labeled onboard NVIDIA GPU drawn as a grid of many small cores, a RAM bar labeled one memory shared by CPU and GPU, a 40-pin GPIO header, and USB and Ethernet ports. A callout notes that GPU-shaped workloads such as detection, tracking, and fusion run at frame rate using the same CUDA and TensorRT toolchain as a desktop GPU. A summary strip reads higher price, more mass, higher power draw, and that a heavily loaded Jetson can exceed the roughly 12-watt budget on its own. A banner at the bottom states the mission-shaped decision rule: a drone that only needs to be told where to go gets a Raspberry Pi, one that must understand what it sees gets a Jetson, and the running example, in which a goose must be recognized by a neural network on the aircraft itself, chooses the Jetson Nano.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-jetson-vs-raspberry-pi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7.1: The two companion-computer families compared as simplified board layouts: both offer an ARM CPU, RAM, and a 40-pin GPIO header for the flight-controller UART, but only the Jetson carries an onboard NVIDIA GPU sharing the CPU’s memory — bought at the price of a heatsink, more mass, and a power draw that can strain the ~12 W avionics budget.
+</figcaption>
+</figure>
+</div>
+<p>The decision rule is therefore mission-shaped: <em>if the aircraft must understand what it sees, budget for a Jetson; if it only needs to be told where to go, a Pi is lighter, cheaper, and sufficient.</em> Two earlier threads of this Part bear on the choice. The power budget worked in the Anatomy of a Multirotor chapter allotted roughly 12 W to the entire avionics complement — a figure a Raspberry Pi fits inside easily and a heavily loaded Jetson can exceed on its own, which is a direct endurance cost by that chapter’s arithmetic. And mass is contested for the same reason: the heatsink is paid for in seconds of loiter time. The running example pays both costs knowingly. Its aircraft is the Holybro X500 V2 sized in the Anatomy of a Multirotor chapter, flying a Pixhawk 6C, and the computer riding beside that autopilot is a Jetson Nano — because a goose has to be recognized by a neural network running on the aircraft itself, and no CPU-only board runs one at a useful frame rate.</p>
+<section id="flashing-an-operating-system" class="level3" data-number="7.4.1">
+<h3 data-number="7.4.1" class="anchored" data-anchor-id="flashing-an-operating-system"><span class="header-section-number">7.4.1</span> Flashing an Operating System</h3>
+<p>A companion computer arrives as bare silicon; commissioning it means <strong>flashing</strong> an operating-system image onto its boot medium. For a Jetson the vehicle is <strong>JetPack</strong>, NVIDIA’s SDK: an Ubuntu-based Linux distribution bundled with the CUDA toolkit, cuDNN, and TensorRT — the entire GPU software stack, version-matched, in one image. The sequence is three steps: download JetPack; flash the device over USB using NVIDIA’s SDK Manager (or a command-line flashing script) from a host PC; then boot, complete first-time Linux setup, and install drivers, Python, and project dependencies. A Raspberry Pi follows the same pattern with simpler tooling — the Raspberry Pi Imager writes an OS image to an SD card in minutes.</p>
+<p>One configuration decision matters more than the rest: the installation should be <strong>headless</strong>. A computer strapped to an airframe will never again have a monitor plugged into it, so the working assumption from day one is administration over the network — enable SSH during setup, configure Wi-Fi credentials before first boot, and treat the graphical desktop as dead weight (on a Jetson it is also a meaningful consumer of the very GPU the board was bought for). The practical test of a finished flash is not a login screen; it is <code>ssh</code> from the bench laptop succeeding — the first appearance of the root shell the chapter is named for.</p>
+</section>
+</section>
+<section id="three-ways-to-command-a-drone" class="level2" data-number="7.5">
+<h2 data-number="7.5" class="anchored" data-anchor-id="three-ways-to-command-a-drone"><span class="header-section-number">7.5</span> Three Ways to Command a Drone</h2>
+<p>With two computers on the airframe, it is worth being precise about who can tell the flight controller what to do. There are three distinct command paths, and they form a clean spectrum from manual to autonomous:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Path</th>
+<th>Mechanism</th>
+<th>Character</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>RC radio</strong></td>
+<td>A human pilot’s stick movements are transmitted directly to a receiver wired to the flight controller</td>
+<td>Immediate, robust, entirely manual — the pilot <em>is</em> the outer control loop</td>
+</tr>
+<tr class="even">
+<td><strong>MAVLink over a telemetry radio</strong></td>
+<td>A ground-control station (QGroundControl, Mission Planner) sends protocol messages — waypoints, mode changes, arm/disarm — over a wireless link</td>
+<td>Semi-autonomous: the aircraft executes plans, but the intelligence sits on the ground, at the far end of a range-limited radio</td>
+</tr>
+<tr class="odd">
+<td><strong>Companion computer</strong></td>
+<td>Code running <em>on the aircraft</em> sends the same MAVLink messages over a wired serial link to the flight controller</td>
+<td>Fully autonomous: perception, decision, and command all ride the airframe; no ground link is required for the mission to proceed</td>
+</tr>
+</tbody>
+</table>
+<p>The three are complements, not competitors. Every flight in this book’s program keeps the RC radio live as the safety pilot’s override — the layered-margin logic of the Airspace Law chapter, implemented in hardware — and keeps a telemetry radio attached for monitoring. But the mission itself flows through the third path, and the third path has a physical substrate: a wired serial connection between the companion computer and the flight controller. On Pixhawk-class hardware that connection is a <strong>UART</strong>.</p>
+</section>
+<section id="the-uart-from-first-principles" class="level2" data-number="7.6">
+<h2 data-number="7.6" class="anchored" data-anchor-id="the-uart-from-first-principles"><span class="header-section-number">7.6</span> The UART, from First Principles</h2>
+<p>The Sensing the World chapter introduced the two buses that carry sensor data <em>inside</em> the flight controller: I2C and SPI, both synchronous — a shared clock wire tells every participant exactly when each bit is valid. The UART is the third great serial interface of embedded systems, and its defining feature is the letter <em>A</em>: <strong>asynchronous</strong>. There is no clock wire. A UART link between two devices is, at minimum, three conductors: a transmit line (TX) driven by one device, a receive line (RX) listened to by the other, and a common ground. Each device contains an independent transmitter and receiver, so a full bidirectional link is TX and RX in each direction plus the shared ground — three wires total, since each data line is unidirectional and the ground is common.</p>
+<p>Dropping the clock wire is a real engineering trade, and understanding what replaces it explains every UART wiring rule that is usually handed down without justification.</p>
+<p><strong>How bits survive without a clock.</strong> An idle UART line rests at logic high. To send a byte, the transmitter first pulls the line low for exactly one bit period — the <strong>start bit</strong> — then shifts out the eight data bits, least significant first, each held for one bit period, and finally returns the line high for at least one bit period — the <strong>stop bit</strong>. The receiver’s job is timing recovery: it watches the idle line for the falling edge of a start bit, waits half a bit period to land in the middle of the start bit, confirms the line is still low, and then samples the line at one-bit-period intervals thereafter — hitting, if all is well, the center of each data bit. The frame therefore carries its own synchronization: every byte begins with an edge that restarts the receiver’s timing, which is why the scheme is called asynchronous. In the common <code>8N1</code> configuration — 8 data bits, no parity, 1 stop bit — each byte costs 10 bit periods on the wire, so the <em>useful</em> data rate is 80 % of the baud rate.</p>
+<p><strong>Why the baud rate must match.</strong> The receiver times its samples with its own local oscillator, and the transmitter times its bits with <em>its</em> own; the configured <strong>baud rate</strong> is the agreement that makes those two clocks interchangeable. The tolerance can be computed, and it is instructive to do so. After synchronizing on the start-bit edge, the receiver takes its final sample — the stop bit — 9.5 bit periods later. If the two clocks disagree by a fraction <span class="math inline">\(\varepsilon\)</span>, the sampling point drifts by <span class="math inline">\(9.5\,\varepsilon\)</span> bit periods by frame’s end, and the frame decodes correctly only if that drift stays inside the half-bit margin:</p>
+<p><span class="math display">\[9.5\,\varepsilon &lt; 0.5 \quad\Longrightarrow\quad \varepsilon &lt; 5.3\ \%.\]</span></p>
+<p>A total mismatch beyond about 5 % — under 3 % per side, once rise times and jitter consume part of the margin — and the receiver samples the wrong bits: framing errors, or worse, plausible-looking garbage. This is why baud mismatch is the classic serial failure mode, and why its symptom is so distinctive: a terminal full of random characters means the electrical link is fine and the <em>timing agreement</em> is broken. It is also why the parameter must be set identically in two places that never see each other — the flight controller’s serial-port configuration and the companion computer’s port-opening code — and why the number is worth writing down. At this book’s standard rate of 921,600 baud, one bit lasts <span class="math inline">\(1/921{,}600 \approx 1.09\ \mu\text{s}\)</span>, a 10-bit frame carries one byte in about <span class="math inline">\(10.9\ \mu\text{s}\)</span>, and the link moves at most <span class="math inline">\(921{,}600 \times 0.8 = 737{,}280\)</span> data bits per second — roughly 90 kB/s, comfortable headroom for MAVLink telemetry and command traffic in both directions.</p>
+<p><strong>Why TX and RX must cross.</strong> Each UART pin has a fixed role: TX is an <em>output</em>, always driven by its own device; RX is an <em>input</em>, always listening. Communication therefore requires each device’s output to feed the other device’s input — the flight controller’s TX wired to the companion computer’s RX, and the companion computer’s TX to the flight controller’s RX. Wire it straight — TX to TX, RX to RX — and the result is two push-pull output drivers fighting each other on one wire (contention, and potential damage) while the two inputs listen to each other’s silence on the other. Nothing about the swap is subtle once the pin roles are stated, yet reversed TX/RX remains the single most common wiring fault in companion-computer integration, partly because different vendors label pins from different points of view. The reliable discipline is to ignore the labels and trace the <em>signal</em>: every wire in a UART link runs from exactly one transmitter to exactly one receiver.</p>
+<p><strong>Why grounds are shared.</strong> A logic signal is not a voltage; it is a voltage <em>difference</em>, measured between the signal conductor and a reference. The receiver decides “high” or “low” by comparing the RX line against its own ground pin. If the two boards’ grounds are not connected, that comparison is against a floating reference — the two devices’ ground potentials can drift volts apart, and the same physical signal may read as high, low, or noise depending on the moment. The third wire ties the two boards to a common reference so that “3.3 V” means the same thing on both ends. Three wires, then, and each is load-bearing: two directed data lines and the reference that gives their voltages meaning.</p>
+<p><a href="#fig-uart-crossover-wiring" class="quarto-xref">Figure&nbsp;<span>7.2</span></a> assembles the rule into a picture.</p>
+<div id="fig-uart-crossover-wiring" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Wiring diagram with two boxes, Flight Controller on the left and Companion Computer on the right, each showing three pins labeled TX, RX, and GND. A solid arrow runs from the flight controller's TX pin to the companion computer's RX pin, labeled TX to RX, flight controller transmits and computer listens. A second solid arrow runs from the companion computer's TX pin to the flight controller's RX pin, labeled RX from TX, computer transmits and flight controller listens. A dashed line connects the two GND pins, labeled shared voltage reference. A caption states the crossover rule: each transmitter drives the other device's receiver, and grounds are tied together.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-uart-crossover-wiring-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/uart-crossover-wiring.svg" class="img-fluid figure-img" style="width:85.0%" alt="Wiring diagram with two boxes, Flight Controller on the left and Companion Computer on the right, each showing three pins labeled TX, RX, and GND. A solid arrow runs from the flight controller's TX pin to the companion computer's RX pin, labeled TX to RX, flight controller transmits and computer listens. A second solid arrow runs from the companion computer's TX pin to the flight controller's RX pin, labeled RX from TX, computer transmits and flight controller listens. A dashed line connects the two GND pins, labeled shared voltage reference. A caption states the crossover rule: each transmitter drives the other device's receiver, and grounds are tied together.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-uart-crossover-wiring-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7.2: The UART crossover between a flight controller and a companion computer: the flight controller’s TX drives the computer’s RX, the computer’s TX drives the flight controller’s RX, and the two grounds are tied together to establish a common voltage reference.
+</figcaption>
+</figure>
+</div>
+<section id="wiring-the-link-the-pixhawk-telem2-port" class="level3" data-number="7.6.1">
+<h3 data-number="7.6.1" class="anchored" data-anchor-id="wiring-the-link-the-pixhawk-telem2-port"><span class="header-section-number">7.6.1</span> Wiring the Link: The Pixhawk TELEM2 Port</h3>
+<p>On Pixhawk-family flight controllers the conventional attachment point for a companion computer is the <strong>TELEM2</strong> port, a 6-pin JST-GH connector whose pinout rewards close reading:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Pin</th>
+<th>Signal</th>
+<th>Voltage</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1 (red)</td>
+<td>VCC</td>
+<td>+5 V</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>TX (out)</td>
+<td>3.3 V logic</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>RX (in)</td>
+<td>3.3 V logic</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>CTS (in)</td>
+<td>3.3 V logic</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>RTS (out)</td>
+<td>3.3 V logic</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>GND</td>
+<td>GND</td>
+</tr>
+</tbody>
+</table>
+<p>Three observations turn the table into practice. First, the signal lines are <strong>3.3 V logic</strong> while pin 1 carries <strong>+5 V power</strong> — and the red wire’s job is to make that distinction impossible to miss. Connecting the 5 V VCC pin to a 3.3 V signal input, one loose crimp away, can destroy a UART on either board; the 5 V pin exists to <em>power</em> small peripherals, not to signal, and in a companion-computer hookup (where the computer has its own supply) it is typically left unconnected. Second, pins 4 and 5 are <strong>hardware flow control</strong> — RTS/CTS lines by which each side can signal “stop sending, my buffer is full.” They are optional at moderate rates but recommended at 921,600 baud, where a stalled receiver can drop bytes faster than software can notice; if unused, flow control must be disabled in the flight controller’s port configuration, or it will wait forever for a permission signal that never comes. Third, on the companion side the same three signals appear on the board’s GPIO header or a dedicated serial header — on a Jetson, the pins corresponding to the device node <code>/dev/ttyTHS1</code> — and carry the same 3.3 V constraint. The finished harness is three (or five, with flow control) crimped wires, and per the crossover rule the flight controller’s pin 2 (TX) lands on the computer’s RX pin while the computer’s TX lands on pin 3 (RX).</p>
+</section>
+</section>
+<section id="verify-before-you-code-the-heartbeat-test" class="level2" data-number="7.7">
+<h2 data-number="7.7" class="anchored" data-anchor-id="verify-before-you-code-the-heartbeat-test"><span class="header-section-number">7.7</span> Verify Before You Code: The Heartbeat Test</h2>
+<p>The temptation after wiring is to start writing mission code; the discipline this book teaches is to first prove the link <em>carries data</em>, because a loose crimp or a wrong baud rate discovered through the lens of a misbehaving Python script wastes hours that a two-minute serial test would have saved. The proof is organized around a property of the protocol that will occupy Part II: every device speaking <strong>MAVLink</strong> — the standard message protocol between flight controllers, ground stations, and companion computers — broadcasts a <strong>heartbeat</strong> message at roughly 1 Hz, announcing its system ID, type, and flight mode. A heartbeat arriving on the companion computer is therefore end-to-end evidence: the wiring is right, the grounds are common, the baud rates agree, and the flight controller’s firmware is routing MAVLink to that port. The verification sequence is four steps:</p>
+<ol type="1">
+<li><strong>Identify the serial port.</strong> Find the companion computer’s device node for the UART that was physically wired — on a Jetson, typically <code>/dev/ttyTHS1</code>; on a Raspberry Pi, <code>/dev/serial0</code>.</li>
+<li><strong>Configure the flight-controller port.</strong> In the PX4 parameter set, assign a MAVLink instance to TELEM2 and set its baud rate — the flight controller’s half of the timing agreement.</li>
+<li><strong>Set port permissions.</strong> Linux guards serial devices; add the working user to the <code>dialout</code> group (then log out and back in) rather than reaching for <code>sudo</code>.</li>
+<li><strong>Listen for the heartbeat</strong> with MAVProxy:</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># On the companion computer, attached to the wired UART:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">mavproxy.py</span> <span class="at">--master</span><span class="op">=</span>/dev/ttyTHS1 <span class="at">--baudrate</span> 921600</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># A healthy link prints, within a second or two:</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   Heartbeat from system 1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The test doubles as a diagnostic decision tree. <em>Silence</em> — no heartbeat at all — points at the physical layer or configuration: TX/RX not crossed, a missing ground, the wrong device node, or a flight-controller port not yet assigned to MAVLink. <em>Garbage</em> — a stream of malformed bytes or framing errors — is the baud-mismatch signature derived above: the electrons are arriving, the timing agreement is broken. <em>A steady heartbeat</em> is the milestone: the flight controller and the companion computer are peers on a working link, and every subsequent layer — MAVLink commands, the MAVSDK library, the ROS 2 bridge — is software riding on a wire already known to be good. What those layers look like, and how a Python program turns this link into an autonomous takeoff, is where the PX4 and the Autopilot Stack chapter in Part II picks up.</p>
+<p>With that heartbeat, the physical platform is complete. The airframe is sized, the power system budgeted, the sensors understood, the regulations mapped, and a programmable computer now sits on the aircraft with a verified channel to the machine that flies it. What is still missing is the view of the whole: how these pieces stand to one another once they are assembled into a single vehicle that flies a mission by itself. That is where Part I ends, and it is the last thing to settle before the work becomes code.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="7.8">
+<h2 data-number="7.8" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">7.8</span> Check Your Understanding</h2>
+<ol type="1">
+<li>A flight controller already contains a processor. State precisely what the companion computer adds, and give the architectural reason the flight controller cannot simply absorb those functions.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The companion computer adds general-purpose compute under a full Linux OS: onboard mission planning, computer-vision inference, obstacle avoidance, and network access (SSH, remote monitoring). The flight controller cannot absorb these because it is a real-time microcontroller: its scheduler guarantees millisecond-deterministic attitude control precisely by excluding unpredictable workloads, and it lacks the memory, OS services, and GPU that perception and planning software require. The division of labor is deliberate — hard-real-time stability on one processor, computationally heavy intelligence on the other — with a serial link between them.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>A team is building two aircraft: one relays telemetry and executes pre-planned GPS waypoint missions; the other must detect and track objects with an onboard neural network. Recommend a companion computer for each, and justify both recommendations with the deciding criterion.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The waypoint aircraft should fly a Raspberry Pi: mission scripting and telemetry relay are light CPU workloads, and the Pi wins on cost, mass, power draw (well inside a ~12 W avionics budget), and simplicity. The detection aircraft needs a Jetson (Nano or Orin NX): real-time neural-network inference is a GPU-shaped workload, and a CPU-only Pi drops to single-digit frame rates on modern detectors. The deciding criterion is whether the mission requires onboard GPU inference; every other factor (power, mass, cost, setup effort) argues for the Pi, which is why the Jetson is chosen only when perception forces it.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Explain why a UART link fails if the two ends’ baud rates differ by, say, 10 %, using the receiver’s sampling mechanism — and compute the approximate maximum tolerable total clock mismatch for a 10-bit frame.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The receiver has no clock wire; it resynchronizes on each start-bit edge and then samples at intervals timed by its own oscillator, aiming for the center of each bit. A fractional rate mismatch <span class="math inline">\(\varepsilon\)</span> makes the sampling point drift by <span class="math inline">\(9.5\,\varepsilon\)</span> bit periods by the final (stop) bit of a 10-bit frame; correct decoding requires that drift to stay within half a bit: <span class="math inline">\(9.5\,\varepsilon &lt; 0.5\)</span>, so <span class="math inline">\(\varepsilon &lt; 5.3\ \%\)</span> total (in practice under ~3 % per side once noise and rise times eat margin). At 10 % mismatch the sample point has drifted a full bit period before the frame ends, so the receiver reads wrong bits — the classic symptom being a stream of garbage characters and framing errors rather than silence.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>A student wires flight-controller TX to companion-computer TX and RX to RX, reasoning that “like connects to like.” Describe both electrical consequences of this wiring and state the rule that prevents it.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>TX is always an output and RX always an input. TX-to-TX places two output drivers on the same wire: whenever they drive opposite logic levels, current flows directly between the drivers (bus contention), which at best corrupts the line and at worst damages a transceiver. RX-to-RX places two inputs on one wire with no driver at all, so both receivers listen to a floating line and hear nothing. The rule: every UART wire must run from exactly one transmitter to exactly one receiver — cross TX to RX in both directions, and verify by tracing signal direction rather than trusting pin labels, which vendors write from inconsistent points of view.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>The Pixhawk TELEM2 pinout puts +5 V on pin 1 (the red wire) and 3.3 V logic on pins 2-5. Explain the hazard this adjacency creates, and why the 5 V pin is usually left unconnected in a companion-computer harness.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The hazard is crossing power into a signal line: a mis-crimped or mis-seated connector can present +5 V to a UART input designed for 3.3 V logic, overstressing and potentially destroying the transceiver on either board. The red wire convention exists to keep the power pin visually distinct. It is left unconnected because its purpose is to <em>power</em> small peripherals (e.g., a telemetry radio), and a companion computer has its own independent supply — so the harness needs only the two crossed signal lines, ground, and optionally the RTS/CTS pair; omitting VCC removes the failure mode entirely.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>After wiring, <code>mavproxy.py --master=/dev/ttyTHS1 --baudrate 921600</code> prints nothing at all. A second attempt at a different baud rate prints unreadable garbage. Diagnose both observations.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Garbage is diagnostic gold: it means the physical layer works — electrons are arriving with edges the receiver can see — but the timing agreement is broken, i.e., the flight controller is transmitting at a different baud rate than the one MAVProxy is now using. Total silence at the (correct) first baud rate therefore most likely means the <em>configuration</em> is wrong somewhere other than wiring — commonly, the flight controller’s TELEM2 port has not been assigned a MAVLink instance at 921,600 baud. (Silence in general implicates the physical layer too — TX/RX not crossed, missing ground, wrong device node — but the garbage observation has already exonerated the wiring.) The fix: set the flight controller’s serial protocol and baud parameters for TELEM2 to match, then rerun the heartbeat test at 921,600.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="7.9">
+<h2 data-number="7.9" class="anchored" data-anchor-id="try-it"><span class="header-section-number">7.9</span> Try It</h2>
+<p><strong>Part 1 — decode a UART frame by hand.</strong> Draw the voltage-versus-time waveform for the byte <code>0x4D</code> (ASCII <code>M</code>, binary <code>01001101</code>) transmitted in 8N1 format at 9,600 baud: idle high, start bit low, eight data bits least-significant-bit first, stop bit high. Label the duration of each bit period in microseconds. Then play receiver: mark the sampling instant for each bit (start-bit edge plus 1.5, 2.5, … bit periods) and confirm the byte decodes. Finally, redo the sampling marks assuming your receiver’s clock runs 4 % fast, and identify the first bit at which the sampling point has left the correct bit cell — then check your answer against the <span class="math inline">\(9.5\,\varepsilon &lt; 0.5\)</span> margin from the chapter. If you have access to a logic analyzer or an oscilloscope and any UART source (an Arduino’s serial port suffices), capture a real frame and repeat the exercise against the measured waveform.</p>
+<p><strong>Part 2 — bring up a real link and break it on purpose.</strong> Using any two UART-capable devices available to you — a Pixhawk and a Jetson or Pi is ideal, but two USB-serial adapters looped together, or a Pi and an Arduino, teach the same lessons — wire the three-conductor crossover and run the heartbeat test (or, for non-MAVLink devices, an echo test with a terminal program at both ends). Document the working configuration: device nodes, baud rate, and which physical pin each wire lands on. Then break the link three ways, recording the observed symptom of each: swap TX and RX (expect silence), change one end’s baud rate by a factor of two (expect garbage), and disconnect the ground while keeping both data lines attached (expect anything from intermittent errors to apparent normality — and write two sentences on why this failure is the most dangerous of the three precisely because it can <em>seem</em> to work). Conclude with the diagnostic table you would hand a teammate: symptom in one column, most probable cause and first check in the other.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#collaborative-drone-build">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="pagination-link" aria-label="Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="pagination-link" aria-label="Putting It Together: The Autonomous Drone Stack">
+        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

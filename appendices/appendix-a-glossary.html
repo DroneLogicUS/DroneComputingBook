@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Appendix A — Appendix A: Glossary – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../appendices/appendix-b-labs.html" rel="next">
+<link href="../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../appendices/appendix-a-glossary.html">Appendices</a></li><li class="breadcrumb-item"><a href="../appendices/appendix-a-glossary.html"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../appendices/appendix-a-glossary.html">Appendices</a></li><li class="breadcrumb-item"><a href="../appendices/appendix-a-glossary.html"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Appendix A — Appendix A: Glossary</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Terms introduced across every chapter, compiled here for reference.</p>
+<ul>
+<li><strong>A* search</strong> — best-first graph search that expands nodes in order of <span class="math inline">\(f(n) = g(n) + h(n)\)</span>, the cost incurred so far plus a heuristic estimate of the cost remaining; with an admissible heuristic it returns a minimum-cost path.</li>
+<li><strong>Accelerometer</strong> — a sensor that measures specific force: the deflection of a spring-suspended proof mass relative to its housing. At rest it reads 1 g upward (the support force), in free fall it reads zero, and in unaccelerated hover its output vector points away from the Earth — which is precisely what makes it a usable gravity reference.</li>
+<li><strong>Acceptance radius</strong> — the distance threshold of the arrival test: a waypoint counts as reached when the estimated position comes within this radius of it, at which point the navigator advances to the next item.</li>
+<li><strong>Activation memory</strong> — the RAM occupied at inference time by the intermediate tensors flowing between layers; it scales with input resolution and often exceeds the weights, especially on memory-poor devices.</li>
+<li><strong>Active controller</strong> — the running example’s arbitration token: a <code>String</code> on <code>/goose/active_controller</code>, written only by the Mission Manager, naming which behavior node (<code>'none'</code>, <code>'navigation'</code>, or <code>'harassment'</code>) currently owns the aircraft’s setpoint stream; every behavior node’s tick begins by checking whether it is the one named.</li>
+<li><strong>Admissible heuristic</strong> — a heuristic that never overestimates the true remaining cost (straight-line distance is the standard example for spatial planning); the property that upgrades A* from “usually good” to provably optimal.</li>
+<li><strong>Aerial application</strong> — the dispensing of a substance (pesticide, fertilizer, seed, biological control agent) from an aircraft in flight; in the United States it is a separately certificated class of operation under 14 CFR Part 137, distinct from ordinary flight.</li>
+<li><strong>Aerial survey</strong> — a systematic overflight flown to detect, count, or map animals over an area; the observational mode of wildlife work, where the deliverable is a census rather than an intervention.</li>
+<li><strong>Aeronautical decision-making</strong> (ADM) — the systematic mental process aviation teaches for consistently determining the best course of action in response to a given set of circumstances; the discipline that turns risk management from a personality trait into a trainable procedure.</li>
+<li><strong>Airframe</strong> — the structural assembly of a drone: frame plates, arms, motor mounts, standoffs, and landing gear, excluding propulsion, avionics, and payload. Its job is to hold every other component in fixed relative position while transmitting rotor thrust to the vehicle’s centre of mass without deflecting enough to disturb the inertial sensors.</li>
+<li><strong>Alert distance</strong> — the separation at which an animal first shows detectable vigilance toward an approaching threat; always larger than the flight-initiation distance, and the earliest externally observable sign that a stress response has begun.</li>
+<li><strong>All-up weight</strong> (AUW) — the mass of the complete aircraft as flown: airframe, propulsion, avionics, battery, and payload. Every performance figure in this chapter is a function of it.</li>
+<li><strong>Animal clustering</strong> — the tendency of animals to group until their bodies touch or overlap in the image, merging distinct individuals into one blob and defeating both segmentation and box-based non-maximum suppression; the dominant reported error source across species.</li>
+<li><strong>ArduPilot</strong> — the other major open-source autopilot firmware, licensed GPL v3, older and more extensively documented than PX4, with a faster-moving but historically rockier release cadence.</li>
+<li><strong>Autonomy stack</strong> — the layered software that converts a remotely piloted vehicle into a self-directed one: state estimation and stabilization at the bottom, perception and guidance in the middle, mission sequencing and safety supervision at the top.</li>
+<li><strong>Back-electromotive force</strong> (back-EMF) — the voltage a spinning motor generates in opposition to the applied voltage, proportional to shaft speed. Its constant is the reciprocal of the KV rating, and its existence is why a loaded motor never reaches its no-load speed.</li>
+<li><strong>Barometer</strong> — a pressure sensor built on a micromachined membrane over a sealed reference cavity, used to infer altitude from the roughly 12 Pa of pressure lost per metre of climb near sea level.</li>
+<li><strong>Battery failsafe</strong> — the graded response ladder tied to remaining charge: a warning threshold, a return threshold sized to cover the worst-case trip home, and a land floor below which the only safe destination is straight down.</li>
+<li><strong>Baud rate</strong> — the signaling rate of a serial line in symbols per second (for UART, bits per second including framing bits); both ends must be configured to the same value, because it is the only timing agreement the clockless interface has.</li>
+<li><strong>Behavior Tree</strong> (BT) — a control architecture in which conditions and actions sit at the leaves of a tree, internal nodes sequence or select among their children, and the whole tree is re-evaluated from the root each tick; priority and preemption emerge from child ordering rather than explicit transition arrows.</li>
+<li><strong>Bit depth</strong> — the number of bits used to store one intensity sample, which fixes how many distinguishable levels it can take; 8 bits gives the 0–255 range of standard camera output.</li>
+<li><strong>Black-box recorder</strong> — the aviation flight data recorder that is the <code>.ulg</code> file’s conceptual ancestor: a continuously running onboard recorder whose value lies both in reconstructing accidents and in routine review of uneventful flights.</li>
+<li><strong>Blade-passing frequency</strong> — the rate at which propeller blades pass a fixed point: blade count times rotation rate, and the characteristic frequency at which propeller-induced vibration concentrates in a log’s spectrum.</li>
+<li><strong>Bounding box</strong> — the axis-aligned rectangle a detector reports around an object, typically as a centre, width, and height in pixel coordinates, accompanied by a class label and a confidence score.</li>
+<li><strong>Breach action</strong> — the configured response to a geofence violation, chosen from a graded menu: log only, warn the operator, hold position, return to launch, land immediately, or terminate flight.</li>
+<li><strong>Brushless motor</strong> — a synchronous permanent-magnet machine in which commutation is performed electronically rather than by mechanical brushes. In the outrunner form used on multirotors, the permanent magnets are bonded to a rotating outer bell and the copper windings sit on a stationary inner stator.</li>
+<li><strong>Buzzing pass</strong> (swoop) — a shallow descending approach toward the flock followed by a committed climb-out, producing a brief, visible, predator-like cue; the closest-approach point is bounded by the safety radius in both horizontal separation and altitude.</li>
+<li><strong>BVLOS</strong> (Beyond Visual Line of Sight) — operation in which the remote pilot cannot continuously see the aircraft unaided; prohibited under baseline Part 107 and permitted only under a specific waiver or exemption, and the single largest regulatory gate on drone economics.</li>
+<li><strong>C rating</strong> — a battery’s rated continuous discharge current expressed as a multiple of its capacity: a 5.2 Ah pack rated 50C may deliver <span class="math inline">\(50 \times 5.2 = 260\)</span> A continuously. Physically it is a claim about internal resistance and heat rejection, not a separate property.</li>
+<li><strong>Camera intrinsics</strong> — the parameters of the camera’s own projection (focal lengths <span class="math inline">\(f_x, f_y\)</span> and principal point <span class="math inline">\(c_x, c_y\)</span>, in pixels) that convert between a pixel coordinate and a direction in the optical frame.</li>
+<li><strong>Camera optical frame</strong> — the coordinate frame attached to the camera lens under the ROS REP-103 convention: x to the right of the image, y downward in the image, z forward along the viewing direction; the frame in which a depth camera reports every detected point.</li>
+<li><strong>Cascaded control loop</strong> — an architecture in which a slow outer controller does not command the actuators directly but instead generates the setpoint for a faster inner controller, repeated over as many layers as the plant’s time scales demand.</li>
+<li><strong>Cell voltage</strong> — the potential difference between a cell’s cathode and anode, itself a function of state of charge: 4.20 V fully charged, 3.7 V nominal, roughly 3.5 V at the practical in-flight floor, and 3.0 V at the damage threshold below which over-discharge chemistry begins.</li>
+<li><strong>Centralized coordination</strong> — an architecture in which one entity (a ground station or designated leader) holds the global picture and computes every agent’s assignment or trajectory; globally informed and easy to reason about, but its hub is a single point of failure and a communication bottleneck.</li>
+<li><strong>Centroid annotation</strong> — a ground-truth label consisting of a single point at each object’s center rather than a bounding box; natural for counting tasks and for small, overlapping targets, at the cost of the box-based metric machinery.</li>
+<li><strong>Channel</strong> — one complete plane of the image grid measuring a single quantity across the whole scene: red, green, and blue planes for a colour camera, a single luminance plane for grayscale or thermal, a range plane for a depth camera.</li>
+<li><strong>Clipping</strong> (sensor) — a measurement that exceeded the sensor’s physical range: the vibration amplitude at that instant was literally unrepresentable, not merely large. Logged as running per-axis counts; any sustained growth is disqualifying.</li>
+<li><strong>Closest point of approach</strong> (CPA) — the moment <span class="math inline">\(t^* = -(\mathbf{r} \cdot \mathbf{v}_{rel})/\lVert\mathbf{v}_{rel}\rVert^2\)</span> at which the separation between drone and threat is smallest, and the miss vector <span class="math inline">\(\mathbf{m} = \mathbf{r} + \mathbf{v}_{rel}\,t^*\)</span> describing where the threat passes and by how much.</li>
+<li><strong>Coarse-to-targeted search</strong> (two-stage survey) — the crop-scouting flight doctrine in which a first pass covers the whole field at high altitude and coarse GSD to build an index map, anomalous sectors are flagged algorithmically, and a second pass re-flies only the flagged sectors at low altitude and fine GSD to confirm and diagnose.</li>
+<li><strong>Collision course</strong> — an encounter that is closing (<span class="math inline">\(\mathbf{r} \cdot \mathbf{v}_{rel} &lt; 0\)</span>) <em>and</em> whose predicted point of closest approach falls inside the safety radius; either condition alone is not yet an emergency.</li>
+<li><strong>Command verification</strong> — the flight-controller discipline of never reporting a service successful merely because a command was <em>sent</em>: the node polls PX4’s own telemetry until the vehicle’s state actually reflects the change, or times out and reports failure.</li>
+<li><strong>Communication topology</strong> — the graph of who can exchange messages with whom — star, mesh, ring, fully connected — whose connectivity determines both a fleet’s failure modes and, for consensus algorithms, how fast agreement spreads.</li>
+<li><strong>Companion computer</strong> — a general-purpose Linux computer (Raspberry Pi, Jetson Nano, Jetson Orin NX) mounted on the airframe and wired to the flight controller, which runs the autonomy software — mission logic, computer vision, planning — that the flight controller’s real-time microcontroller cannot.</li>
+<li><strong>Complementary filter</strong> — the simplest useful fusion algorithm for attitude: a weighted blend <span class="math inline">\(\hat\theta = \alpha(\hat\theta + \omega\,\Delta t) + (1-\alpha)\,\theta_{\text{accel}}\)</span> that trusts the gyroscope at short timescales and lets the accelerometer’s absolute gravity reference slowly remove the gyroscope’s accumulated drift.</li>
+<li><strong>Confidence threshold</strong> — the score cutoff below which a detection is discarded at inference time; an operating-point choice that trades precision against recall and belongs to the system designer, not the model.</li>
+<li><strong>Confirmed target</strong> — the higher of the Target message’s two truth levels: <code>valid</code> means a detection arrived recently (within a 2.0 s staleness window); <code>confirmed</code> means the full confirmation criteria — enough recent detections, spatially clustered — are also met, and only a confirmed target may begin a new engagement.</li>
+<li><strong>Consensus protocol</strong> — a distributed update rule in which each agent nudges its own state toward its neighbors’ states, provably driving a connected network to agreement on a shared value with no central coordinator.</li>
+<li><strong>Convolution kernel</strong> — a small grid of learned weights slid across the image; at each position the kernel is multiplied element-wise with the window beneath it and summed to one output value, so the same few weights examine every neighbourhood in the frame.</li>
+<li><strong>Coverage algorithm</strong> — a path planner whose goal is not to reach a point but to pass a sensor’s footprint over <em>every</em> point of a region; its output is judged by completeness of coverage, not by path length to a destination.</li>
+<li><strong>Cross product</strong> (<span class="math inline">\(\mathbf{a} \times \mathbf{b}\)</span>) — the vector perpendicular to both of its operands, with magnitude <span class="math inline">\(\lVert\mathbf{a}\rVert \lVert\mathbf{b}\rVert \sin\theta\)</span>; the constructor of perpendicular escape directions, and identically zero when its operands are parallel — the degenerate case the code must catch.</li>
+<li><strong>Cross-track error</strong> (<span class="math inline">\(e_{ct}\)</span>) — the perpendicular distance from the vehicle’s actual position to the straight line of its current leg; the along-track coordinate measures progress, the cross-track coordinate measures straying.</li>
+<li><strong>Cumulative stress</strong> — stress that accumulates across repeated exposures rather than resetting between them; the review evidence indicates repeated drone exposure carries cumulative physiological cost, while the long-term consequences remain the field’s largest acknowledged unknown <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>.</li>
+<li><strong>Data augmentation</strong> — synthetically varying training images (flips, crops, color shifts, mosaics) each time they are shown to the model, so a small dataset teaches invariances — lighting, viewpoint, scale — that it is too small to demonstrate with real examples.</li>
+<li><strong>Deadband</strong> — a small zone around zero error inside which the controller commands nothing, so that a target already near-centered does not keep the aircraft hunting against detector noise.</li>
+<li><strong>Decentralized coordination</strong> — an architecture in which each agent decides from local information and peer-to-peer exchange, with no global authority; robust to individual loss and scalable, at the cost of harder-to-verify global behavior.</li>
+<li><strong>Derivative gain</strong> (<span class="math inline">\(K_d\)</span>) — the weight on the error’s <em>rate of change</em>. It acts like a damper, opposing rapid motion toward or away from the setpoint, which is what suppresses overshoot.</li>
+<li><strong>Deterrent pattern</strong> — a parametric flight trajectory designed to move wildlife out of an area by applying controlled, bounded pressure: enough presence to trigger the animals’ escape behavior, constrained enough never to endanger them.</li>
+<li><strong>Disc loading</strong> — thrust per unit rotor disc area, in newtons per square metre. It is the single strongest predictor of hover efficiency: low disc loading means a large mass of air accelerated gently, which is cheap, and high disc loading means a small mass of air accelerated hard, which is expensive.</li>
+<li><strong>Distribution shift</strong> — the statistical name for that drift: the deployed input distribution no longer matches the distribution the training and validation data were drawn from, so the validation score silently stops predicting field performance.</li>
+<li><strong>Disturbance response</strong> — the measurable behavioral reaction of animals to an approaching aircraft, from raised-head vigilance to flushing (the whole flock taking flight); a function of altitude and approach distance that field studies quantify and flight plans must respect.</li>
+<li><strong>Dry run</strong> — a complete end-to-end mission executed with the full system live, in the deployment environment where possible, before the flights that count; the unit of field validation.</li>
+<li><strong>Dual-permission model</strong> — a regulatory structure, used in several conservation jurisdictions, requiring two separate approvals before a drone flies near wildlife: an aviation authority’s operational permit <em>and</em> a wildlife-management agency’s conservation-specific approval; the aviation permit alone — the Part 107 layer — says nothing about the animals.</li>
+<li><strong>Dynamic re-routing</strong> — re-planning in flight when the world model changes — a new obstacle, a moved target, an updated cost map — either by re-running the planner or by incremental methods that repair the previous solution instead of discarding it.</li>
+<li><strong>Edge Impulse</strong> — a hosted end-to-end platform for embedded ML that carries a project from data acquisition through signal processing, training, and testing to an exported, compiled C++ library for a target microcontroller.</li>
+<li><strong>End-to-end latency</strong> — the age of the information at the moment it is acted on: the wall-clock time from the instant light left the scene to the instant the pipeline’s output is available to the consumer, summed across every stage in between — of which model inference is only one.</li>
+<li><strong>ESC</strong> (Electronic Speed Controller) — the power-electronic stage between battery and motor. It switches a set of MOSFETs to synthesize the three-phase waveform that spins the rotor, and it regulates the effective voltage applied to the motor in response to a throttle command from the flight controller.</li>
+<li><strong>Escalation pressure</strong> — the structural pull on any deterrence program to intensify its stimulus as effectiveness fades; not a character flaw of the operators but a predictable system dynamic, and one the wildlife-management literature treats as an ethically live decision point rather than a routine tuning step.</li>
+<li><strong>Escape corridor</strong> — the deliberately unobstructed direction left open for the flock; herding works by making one route feel safest, and a design that closes every direction produces scatter, not dispersal.</li>
+<li><strong>Escape-route preservation</strong> — the design rule, taught with the herding corridor in Part IV, that a deterrent must always leave the animals one open, unpressured direction; pressure with no exit produces scatter and injury risk rather than dispersal.</li>
+<li><strong>Evasion vector</strong> — the commanded escape direction: perpendicular to the threat’s trajectory when the threat is fast, opposite the approach when the drone can outrun it, and always biased away from the side on which the threat will pass.</li>
+<li><strong>Extrinsic calibration</strong> — the fixed rigid transform between the camera and the airframe — where the camera sits and how it is tilted — measured once at build time; an error here biases every detection the system will ever make, in the same direction.</li>
+<li><strong>Failsafe</strong> — a pre-programmed automatic response to a detected fault or rule violation — link loss, low battery, boundary breach — designed so that the vehicle’s default behavior under failure is a safe one rather than a continuation of the mission.</li>
+<li><strong>Failsafe monitor</strong> — a supervisory process that watches a small set of safety-critical quantities and can override whatever is currently commanding the vehicle. Its defining property is independence: it must not share a failure mode with the logic it supervises.</li>
+<li><strong>Failure signature</strong> — a named, recognizable pattern in logged data that points to a specific cause: setpoint/actual divergence for mechanical failure, satellite-count drops for GPS glitches, throttle-correlated magnetometer drift for compass interference, abrupt mid-air log truncation for a brownout.</li>
+<li><strong>False negative (missed detection)</strong> — an animal present but not detected; in a survey it biases the count low, in the running example’s mission it leaves a goose undeterred.</li>
+<li><strong>False positive (false alarm)</strong> — a detection with no animal behind it — a rock, a fence post, a shed roof; in a survey it biases the count high, in the running example’s mission it spends a flight leg harassing grass.</li>
+<li><strong>Feature map</strong> — the output plane a kernel produces: a map, aligned with the image, whose value at each position measures how strongly the kernel’s pattern is present there.</li>
+<li><strong>Field validation</strong> — the final validation stage, conducted in the real deployment environment, aimed specifically at the conditions simulation cannot faithfully produce: real GNSS propagation, real lighting, real radio behavior, real wind, and real animals.</li>
+<li><strong>Figure of merit</strong> (FM) — the ratio of the ideal induced hover power predicted by momentum theory to the actual shaft power a real rotor requires, typically 0.4 to 0.6 for small multirotor propellers and 0.7 or better for a full-size helicopter rotor.</li>
+<li><strong>Finite state machine</strong> (FSM) — a program structure consisting of a set of discrete states, exactly one active at a time, and transitions between them that fire when guard conditions become true; the standard shape of mission logic.</li>
+<li><strong>Five Domains model</strong> — a structured animal-welfare assessment framework spanning nutrition, physical environment, health, and behavior, all feeding a fifth, integrative domain of mental state; developed to replace checklist-style welfare thinking with an account of what the animal actually experiences <span class="citation" data-cites="mellor2016fivedomains">(<a href="#ref-mellor2016fivedomains" role="doc-biblioref">Mellor 2016</a>)</span>.</li>
+<li><strong>Flashing</strong> — writing a complete operating-system image onto a device’s boot medium (SD card, eMMC, or NVMe), as opposed to running an interactive installer; the standard first step in commissioning any single-board computer.</li>
+<li><strong>Flight log</strong> — the record an autopilot writes of its own flight: for PX4, one <code>.ulg</code> file per arming session, holding timestamped sensor data, state estimates, parameter values, mode changes, and text diagnostics in a single binary stream.</li>
+<li><strong>Flight-initiation distance</strong> (FID) — the distance at which an animal begins to flee an approaching threat; the behavioral quantity underneath every deterrence separation number, measurable, individually repeatable, and context-dependent in geese <span class="citation" data-cites="katsis2025greylag">(<a href="#ref-katsis2025greylag" role="doc-biblioref">Katsis 2025</a>)</span>.</li>
+<li><strong>Formation control</strong> — maintaining designed geometric relationships between flying agents; classically approached by leader-follower control, virtual rigid structures, or blended local behaviors.</li>
+<li><strong>FPS</strong> (frames per second) — the throughput of a perception pipeline: how many frames complete processing per second of wall-clock time, sustained; set by the pipeline’s slowest stage, not by the sum of its stages.</li>
+<li><strong>FRD</strong> (Forward-Right-Down) — PX4’s body frame convention: x out the nose, y out the right side, z down through the belly; attached to the airframe and rotating with it, so a fixed world point has constantly changing FRD coordinates in flight.</li>
+<li><strong>Gain scheduling</strong> — adjusting a controller gain as an operating condition changes; here, scaling the translational centering gain with the depth estimate so the loop behaves the same at 3 m as at 12 m.</li>
+<li><strong>Gazebo</strong> — the physics simulator paired with PX4 SITL: it integrates the vehicle’s rigid-body dynamics, models propeller thrust and (optionally) wind, and synthesizes the IMU, GPS, magnetometer, and barometer streams the firmware expects.</li>
+<li><strong>Geofence</strong> — a boundary polygon (or circle) the vehicle must respect, stored alongside the mission; crossing it triggers a configured failsafe such as RTL. Introduced here as a <code>.plan</code> ingredient; the Geofencing and Fail-Safes chapter treats it fully.</li>
+<li><strong>Gimbal lock</strong> — the degeneracy of Euler-angle representations in which two of the three rotation axes align (at ±90° pitch), collapsing a degree of freedom; the classical argument for carrying attitude as a quaternion.</li>
+<li><strong>Ground sample distance</strong> (GSD) — the real-world length on the ground represented by one pixel of an aerial image, in centimetres per pixel; the primary specification a mapping client cares about and the quantity that fixes flight altitude.</li>
+<li><strong>Ground-truth annotation</strong> — the labeled fact a training example carries: for detection, a hand-drawn bounding box plus a class identity for every object of interest in the image, treated by training and evaluation alike as the truth against which the model is measured.</li>
+<li><strong>Guard condition</strong> — the boolean test, computed from observed and estimated data, that gates a transition; a well-written guard is deterministic (same inputs, same answer), reads a consistent snapshot of the world, and never tests elapsed time when it could test state.</li>
+<li><strong>Gyroscope</strong> — a sensor that measures angular rate. MEMS gyroscopes drive a proof mass into resonant vibration and detect the Coriolis force that rotation couples into an orthogonal sense axis; the output is degrees per second, which must be integrated to yield an angle.</li>
+<li><strong>Habituation</strong> — the progressive weakening of a behavioral response to a stimulus that repeated exposure has taught the animal is harmless; the failure mode of every static deterrent, and the reason a deterrence pattern is designed to be varied rather than fixed.</li>
+<li><strong>Hard failsafe</strong> — a failsafe that seizes authority when it fires: the triggering condition changes the flight mode itself (RTL, land, hold), and the mission software’s consent is neither requested nor required.</li>
+<li><strong>Headless OS</strong> — an operating-system installation administered entirely over the network (typically SSH), with no monitor, keyboard, or graphical desktop attached — the only sensible configuration for a computer whose chassis is an aircraft.</li>
+<li><strong>Herding vector</strong> — the direction along which the drone applies pressure: the line from a hold point <em>behind</em> the flock, through the flock’s center, toward the designated exit; the drone steers the flock by holding position on this line, not by chasing individuals.</li>
+<li><strong>Home position</strong> — the reference location the autopilot records at arming: the origin of relative altitudes and the destination of Return-to-Launch. It is set where the vehicle <em>actually</em> armed, which is not always where the plan assumed it would.</li>
+<li><strong>Homogeneous transformation</strong> — a 4 × 4 matrix <span class="math inline">\(T = \begin{bmatrix} R &amp; t \\ 0 &amp; 1 \end{bmatrix}\)</span> packaging a rotation and a translation so that chains of frame changes compose by ordinary matrix multiplication.</li>
+<li><strong>Hover-in-place</strong> — the gentlest hard response: the vehicle stops and holds its current position (PX4’s Hold mode, a commanded loiter), buying time for a human decision without moving through any more of the world.</li>
+<li><strong>Hyperspectral imaging</strong> — imaging in hundreds of contiguous narrow bands (a few nanometres each) rather than a handful of discrete filtered bands, so each pixel carries an essentially continuous spectrum; heavier, costlier, and hungrier for calibration than multispectral, but able to resolve diagnostic wavelengths a five-band filter set was not designed to isolate.</li>
+<li><strong>Hysteresis</strong> — the use of separate trigger and release thresholds around a decision boundary, so that a noisy signal crossing the boundary cannot chatter a transition on and off many times a second.</li>
+<li><strong>I’M SAFE checklist</strong> — a pilot self-assessment mnemonic — Illness, Medication, Stress, Alcohol, Fatigue, Emotion — that operationalizes the “Pilot” leg of PAVE by asking six concrete questions about the pilot’s own fitness to fly on this particular day.</li>
+<li><strong>I2C</strong> (Inter-Integrated Circuit, often written I²C) — a two-wire, shared, addressed serial bus: many devices on one data line and one clock line, each selected by a 7-bit address. Wiring-cheap and convenient at modest data rates (100 kbit/s standard, 400 kbit/s fast mode).</li>
+<li><strong>Image-based visual servoing</strong> (IBVS) — the scheme that treats the camera as a 2D sensor: the control error is computed directly in the image plane, as the offset between where a feature is and where it should be, with no 3D reconstruction inside the loop — “put the goose back in the middle of the picture.”</li>
+<li><strong>IMU</strong> (Inertial Measurement Unit) — the packaged combination of a three-axis accelerometer and a three-axis gyroscope (sometimes with a magnetometer added, making nine axes), sampled together and timestamped as the primary input to attitude estimation.</li>
+<li><strong>Incremental delivery</strong> — building a system as a sequence of stages, each independently a working, demonstrable system, so that integration risk is spent a little at a time and every new failure arrives with a one-layer suspect list rather than a whole-system one.</li>
+<li><strong>Inference</strong> — running a trained model forward on a new input to produce an output, as distinct from training; the operation the companion computer performs on every frame, and the only one it performs in flight.</li>
+<li><strong>Inference latency</strong> — the wall-clock time from presenting an input tensor to receiving the model’s output, the quantity a control loop actually waits on; measured, never assumed, and the central subject of the Real-Time Inference on the Edge chapter.</li>
+<li><strong>Integral gain</strong> (<span class="math inline">\(K_i\)</span>) — the weight on the <em>accumulated</em> error. It builds up a corrective command as long as any error persists, which is what removes steady offsets caused by unmodeled forces such as a payload shift or a weak motor.</li>
+<li><strong>Integration-time failure</strong> — a failure that exists only in the interaction between modules that each pass their own tests: a units or frame convention two nodes read differently, an ordering assumption each side believes the other satisfies, a race at a state boundary, a resource two correct processes both consume.</li>
+<li><strong>Integrator windup</strong> — the failure mode in which the integral term keeps accumulating while the actuators are saturated and cannot act on it, then discharges as a large overshoot once the vehicle finally catches up; prevented by clamping the integrator.</li>
+<li><strong>Interaction matrix</strong> (image Jacobian) — the matrix <span class="math inline">\(\mathbf{L}\)</span> relating the velocity of image features to the camera’s velocity, <span class="math inline">\(\dot{\mathbf{s}} = \mathbf{L}\,\mathbf{v}_c\)</span>; its entries depend on the target’s depth, which is why translational visual-servo channels need at least a rough range estimate to scale their gains.</li>
+<li><strong>Internal resistance</strong> — the effective series resistance of a cell, typically a few milliohms when new. It sets the voltage sag under load and the internal heating rate, rises irreversibly as the cell ages, and is the single most useful measurable indicator of pack health.</li>
+<li><strong>IoU</strong> (Intersection over Union) — the overlap score between two boxes: the area of their intersection divided by the area of their union, ranging from 0 (disjoint) to 1 (identical); a predicted box <em>matches</em> a ground-truth box when their IoU clears a chosen threshold, conventionally 0.5.</li>
+<li><strong>Knowledge distillation</strong> — training a small <em>student</em> model to reproduce the outputs of a large <em>teacher</em> model, transferring capability into a deployable size; the teacher stays on the workstation, the student flies.</li>
+<li><strong>KV rating</strong> — the motor’s speed constant, in revolutions per minute per volt of back-electromotive force, measured with no load on the shaft. It is a property of the winding, not of the battery, and it fixes the trade between speed and torque for a given amount of motor.</li>
+<li><strong>LAANC</strong> (Low Altitude Authorization and Notification Capability) — the automated system through which FAA-approved service providers grant near-real-time authorization for drone operations in controlled airspace, using pre-loaded grids that specify the maximum altitude approvable at each location without individual air traffic control coordination.</li>
+<li><strong>Lawnmower search pattern</strong> (parallel sweep, boustrophedon) — the canonical coverage path: long parallel legs spaced at most one sensor swath apart, joined by short row steps, flown in alternating directions so each leg begins where the last one ended.</li>
+<li><strong>Layer separation</strong> (delamination) — the characteristic failure mode of fused-filament 3D-printed parts, in which the part splits along the weld planes between deposited layers. Interlayer welds are diffusion bonds formed in the seconds before the plastic cools, and typically reach only 30–70 % of the bulk material’s strength.</li>
+<li><strong>LiPo</strong> (Lithium Polymer battery) — a lithium-ion cell built as a laminated foil pouch with a gel-polymer electrolyte, rather than as a rigid metal cylinder. The pouch format saves case mass and permits very high discharge currents, at the price of no mechanical protection: a LiPo that generates internal gas visibly swells.</li>
+<li><strong>Magnetometer</strong> — a sensor measuring the local magnetic field vector, used to reference the vehicle’s heading (yaw) against the Earth’s field — the one attitude axis that neither the gyroscope nor the accelerometer can stabilize long-term.</li>
+<li><strong>mAP</strong> (mean Average Precision) — the standard single-number summary of a detector: for each class, the area under the precision–recall curve swept out by varying the confidence threshold (that class’s AP), averaged over all classes; reported at a fixed IoU threshold (mAP@0.5) or averaged over a range (mAP@0.5:0.95).</li>
+<li><strong>Market vertical</strong> — an industry segment whose drone operations share a payload, a data product, and a regulatory profile distinct enough that hardware and software are specialized for it (surveying, aerial application, public safety).</li>
+<li><strong>MAVLink</strong> (Micro Air Vehicle Link) — the lightweight binary message protocol spoken among flight controllers, ground stations, and companion computers: framed packets carrying typed payloads, addressed by system and component ID, over any serial or network transport.</li>
+<li><strong>MAVLink heartbeat</strong> — the small status message every MAVLink participant broadcasts at about 1 Hz announcing its presence, type, and mode; receiving a steady stream of heartbeats is the standard proof that a telemetry link is alive end to end.</li>
+<li><strong>MAVProxy</strong> — a lightweight command-line MAVLink ground station that can attach to any serial or network link; used here as a diagnostic instrument, because pointing it at a serial device and seeing heartbeats verifies wiring, baud rate, and protocol configuration in one step.</li>
+<li><strong>MAVSDK</strong> — a library (with Python, C++, and other language bindings) that wraps MAVLink in high-level calls — <code>arm()</code>, <code>takeoff()</code>, <code>land()</code> — so a single linear program can command a vehicle without composing protocol messages by hand.</li>
+<li><strong>Maximum takeoff weight</strong> (MTOW) — the greatest mass at which the aircraft is certified to leave the ground, including airframe, battery, and payload; the difference between MTOW and empty weight is the entire payload budget an engineer has to spend.</li>
+<li><strong>MEMS</strong> (Micro-Electro-Mechanical Systems) — the fabrication technology of etching microscopic mechanical structures — springs, masses, membranes — into silicon alongside the electronics that read them, which is what makes gram-scale, milliwatt-scale inertial sensors possible at consumer prices.</li>
+<li><strong>METAR</strong> — the internationally standardized coded format for routine surface weather observations, reporting station, time, wind, visibility, present weather, sky condition, temperature/dew point, and altimeter setting in a fixed field order that a pilot decodes during the pre-flight weather briefing.</li>
+<li><strong>Micro XRCE-DDS</strong> — the bridge protocol between PX4 and ROS 2: a lightweight client inside the firmware serializes uORB topics across the UART to an agent process on the companion computer, which republishes them as ordinary ROS 2 topics.</li>
+<li><strong>Minimum approach distance</strong> — the hard floor on separation between aircraft and animal, held outside the collision-and-panic envelope and enforced by the trajectory generator as a constraint; its <em>value</em> must be anchored to measured species-specific response data, not to convenience.</li>
+<li><strong>Mission execution flow</strong> — the end-to-end sequence of states, service calls, and topic-triggered transitions that carries one mission from an operator’s start request to a landed, disarmed aircraft; the system-level artifact a full architecture walkthrough traces from start to finish.</li>
+<li><strong>Mission item</strong> — one entry in a mission’s ordered list: a MAVLink command identifier, a coordinate frame, and up to seven parameters. Every waypoint is a mission item, but not every mission item is a waypoint — speed changes and camera triggers ride the same list.</li>
+<li><strong>Mission Planner</strong> — ArduPilot’s companion ground-control station, Windows-first and denser, exposing more of the firmware’s features at the cost of a steeper interface.</li>
+<li><strong>Mission time budget</strong> — the usable flight time remaining after a reserve is set aside, allocated in advance across the phases of a mission, and the quantity against which an autonomous vehicle’s decision to continue or return is actually made.</li>
+<li><strong>Model footprint</strong> — the storage a deployed model occupies (its weights plus metadata), as distinct from the RAM its execution consumes; the number quoted on a model card, and never the whole bill.</li>
+<li><strong>Model size trade-off</strong> — the family-wide pattern that detection accuracy rises with parameter count while latency rises with it too, at sharply diminishing accuracy returns; choosing a variant is choosing a point on that frontier, not maximizing either axis.</li>
+<li><strong>Monolithic integration</strong> — the point at which every module runs together as a single coherent system: vision, safety, and control merged, all rates live, all resources shared. The word describes the <em>test scope</em>, not the software structure — the running example remains seven independent processes; what becomes monolithic is the thing being verified.</li>
+<li><strong>Multi-agent system</strong> (MAS) — a system of multiple autonomous agents, each able to sense its environment, make local decisions, and communicate with peers, cooperating toward a shared mission objective rather than being driven as remote effectors of one program.</li>
+<li><strong>NDRE</strong> (Normalized Difference Red Edge) — the normalized-difference index formed from NIR and red-edge reflectance, <span class="math inline">\((\rho_{\text{NIR}} - \rho_{\text{RE}})/(\rho_{\text{NIR}} + \rho_{\text{RE}})\)</span>; identical in form to Part I’s NDVI with the red band swapped for the red-edge band, less prone to saturating over dense canopy and more sensitive to early chlorophyll loss.</li>
+<li><strong>NED</strong> (North-East-Down) — the local world frame in which PX4 navigates: x North, y East, z Down, origin at the point where the state estimator initialized (the launch point); the frame of every Offboard position setpoint, where altitude appears as negative z.</li>
+<li><strong>Noise density</strong> — a sensor’s white-noise floor normalized per unit bandwidth (e.g.&nbsp;µg/√Hz or °/s/√Hz); multiplied by the square root of the measurement bandwidth it predicts the RMS noise of the delivered signal, which is why low-pass filtering buys noise reduction at the price of latency.</li>
+<li><strong>NOTAM</strong> (Notice to Airmen) — a time-critical bulletin distributed through the FAA system announcing a condition or restriction not reflected on published charts; a restriction NOTAM specifies an effective time window, a defined area and altitude, the reason for the restriction, and the coordinating FAA facility with contact information.</li>
+<li><strong>Object tracking</strong> — associating per-frame detections across time so that the same physical object keeps a stable identity from frame to frame; the output is tracks — object histories with IDs, positions, and motion — rather than isolated boxes.</li>
+<li><strong>Off-the-shelf hardware</strong> — a commercially manufactured, mass-produced airframe and sensor package purchased complete rather than designed and fabricated for one operator, whose unit economics derive from production volume across many verticals.</li>
+<li><strong>Offboard control</strong> — a flight-controller mode in which the autopilot stops taking direction from a human pilot or a preloaded waypoint list and instead follows a continuous stream of position, velocity, or attitude setpoints supplied by an external computer, reverting to a safe behavior if that stream stops.</li>
+<li><strong>Offboard mode</strong> — the PX4 flight mode in which the autopilot follows position, velocity, or attitude setpoints streamed by an external computer, entered only while a setpoint stream is already flowing and abandoned, in favor of a failsafe behavior, the moment the stream stalls.</li>
+<li><strong>Onboard detection</strong> — running the detector on the aircraft’s own computer rather than on the ground or in the cloud; the deployment mode Part III has argued for throughout, and the stated (but not demonstrated) goal of the sheep study.</li>
+<li><strong>Orbit pattern</strong> — a circular trajectory flown at fixed radius and altitude around the flock’s tracked center, maintaining continuous lateral presence and directional pressure without direct pursuit.</li>
+<li><strong>Orthomosaic</strong> — a single large image assembled from hundreds of overlapping aerial photographs and geometrically corrected so that every pixel is viewed as if from directly overhead, making the result measurable like a map rather than merely viewable like a photograph.</li>
+<li><strong>Override authority</strong> — the explicit ordering of who may preempt whom in a multi-node system — safety pilot above firmware, firmware above watchdog, watchdog above mission logic, mission logic above behaviors — with overrides flowing strictly downward.</li>
+<li><strong>Overshoot</strong> — the amount by which the response passes beyond the setpoint before settling back, a symptom of too little damping relative to stiffness.</li>
+<li><strong>Part 107</strong> — the FAA’s Small UAS Rule (14 CFR Part 107), the baseline regulatory framework for civil operation of uncrewed aircraft under 55 pounds for any business or non-recreational purpose; it defines pilot certification, aircraft registration, and the standard operating limits (400-foot ceiling, visual line of sight, restrictions on flight over people) from which waivers may be sought.</li>
+<li><strong>Part 107 operator</strong> — in the United States, a person holding the Federal Aviation Administration (FAA) Remote Pilot Certificate issued under 14 CFR Part 107, the baseline authority for commercial small-uncrewed-aircraft flight.</li>
+<li><strong>PAVE checklist</strong> — a four-category pre-flight risk-assessment framework — Pilot, Aircraft, enVironment, External pressures — that forces a structured review of every major hazard source before a go/no-go decision, rather than leaving the assessment to unstructured intuition.</li>
+<li><strong>Payload</strong> — everything the aircraft carries that is not required to fly it: sensors, gimbals, spray tanks, lights, radios, and released cargo. Payload mass competes directly with battery mass for the same lift budget.</li>
+<li><strong>Persistence threshold</strong> — the number of consecutive frames (or the duration) a track must survive before the system treats it as real and acts on it; the standard defense against acting on one spurious detection, purchased at a computable delay.</li>
+<li><strong>Pitch</strong> (propeller) — the axial distance a propeller would advance in one revolution if it moved through a solid medium without slip, quoted in inches alongside the diameter. Pitch sets the aggressiveness of the blade’s angle of attack and therefore the airspeed at which the propeller stops producing useful thrust.</li>
+<li><strong>Pixel</strong> (picture element) — one cell of the image grid: a single spatial sample of the scene, holding one intensity value per channel.</li>
+<li><strong>Pixel error</strong> (centering error) — the image-plane offset <span class="math inline">\((e_x, e_y)\)</span> between a detected feature’s pixel coordinates and its desired location, here the image centre; the error signal of the centering loop, and the only measurement it needs.</li>
+<li><strong>Plant</strong> — the physical system a controller acts on. Here, the quadrotor’s rigid-body dynamics: four motor thrusts in, translational and rotational motion out.</li>
+<li><strong>Point-in-polygon test</strong> — the geometric core of a polygonal fence check: cast a ray from the test position and count polygon-edge crossings — an odd count means inside, an even count outside.</li>
+<li><strong>Pose (keypoint) estimation</strong> — the task of locating named anatomical or structural points — head, joints, extremities — as pixel coordinates, recovering geometry <em>within</em> a detected object rather than just its extent.</li>
+<li><strong>Position-based visual servoing</strong> (PBVS) — the scheme that treats the camera as a 3D sensor: image measurements are first converted into a Cartesian position or pose estimate of the target, and the control error is computed in that 3D task space — “fly to where the goose is.”</li>
+<li><strong>Post-training quantization</strong> (PTQ) — quantizing an already-trained float model by measuring the ranges of its weights and activations on a small <em>calibration</em> dataset and choosing scale factors from them; no retraining required.</li>
+<li><strong>Potential field</strong> — a control technique that sums a repulsive gradient pushed out by each threat with an attractive gradient pulled toward a goal, and commands the net downhill direction; the standard first answer when the threat <em>pursues</em> rather than flying a straight line.</li>
+<li><strong>Precision</strong> — of all the detections the model reported, the fraction that were real: <span class="math inline">\(\text{TP}/(\text{TP}+\text{FP})\)</span>; low precision means false alarms.</li>
+<li><strong>Precision agriculture</strong> — farm management that treats a field as a spatially varying system, measuring and applying inputs at sub-field resolution rather than uniformly, so that the value of an aerial sensor lies in its resolution rather than merely in its coverage.</li>
+<li><strong>Preemption</strong> — the interruption of the active behavior by a higher-priority one, with enough context saved — the stashed state and leg index here — that the interrupted work can later resume rather than restart.</li>
+<li><strong>Proportional gain</strong> (<span class="math inline">\(K_p\)</span>) — the weight on the <em>present</em> error. It acts like a spring stiffness: the command it produces is proportional to how far the vehicle currently is from the setpoint.</li>
+<li><strong>Pruning</strong> — removing weights, channels, or whole neurons that contribute little to a network’s output; shrinks the parameter count, but yields speed only when the runtime and hardware can exploit the resulting sparsity or reduced structure.</li>
+<li><strong>Publish/subscribe</strong> — the decoupled communication pattern behind topics: publishers do not know who is listening and subscribers do not know who is talking, so nodes can be added, restarted, or removed without any other node’s code changing.</li>
+<li><strong>PX4</strong> — an open-source autopilot firmware, licensed BSD 3-clause, that implements the estimator, the cascaded control loops, the flight modes, and the failsafe logic on Pixhawk-class flight controllers; the firmware this book’s platform runs.</li>
+<li><strong>QGroundControl</strong> — the cross-platform ground-control station developed alongside PX4: mission upload, live telemetry, parameter editing, sensor calibration, and firmware flashing through one MAVLink-speaking interface.</li>
+<li><strong>Quantization</strong> — replacing a model’s high-precision numbers (typically 32-bit floats) with low-precision ones (typically 8-bit integers) related by a stored scale factor, cutting memory, memory bandwidth, and usually latency at a small cost in accuracy.</li>
+<li><strong>Quantization-aware training</strong> (QAT) — training (or fine-tuning) a model with simulated quantization in the loop, so the weights settle into values that survive rounding; costlier than PTQ but recovers most of its accuracy loss.</li>
+<li><strong>Quaternion</strong> — a four-component representation of 3D orientation, written <span class="math inline">\([w, x, y, z]\)</span> in PX4’s convention, that encodes an axis and an angle of rotation without the singularities of three-angle representations; the native attitude output of the flight controller’s estimator.</li>
+<li><strong>Race condition</strong> — a situation in which two or more triggers become true within the same update interval, so the outcome depends on the order or timing of their evaluation; defused by making that order explicit and singular rather than accidental.</li>
+<li><strong>Radiometric calibration</strong> — the conversion of a camera’s raw digital numbers into surface reflectance: a downwelling irradiance sensor records the illumination striking the scene, a panel of known reflectance imaged on the ground anchors the scale, and the ratio of reflected to incident light becomes a property of the <em>plant</em> rather than of the weather.</li>
+<li><strong>Recall</strong> — of all the objects actually present, the fraction the model found: <span class="math inline">\(\text{TP}/(\text{TP}+\text{FN})\)</span>; low recall means misses.</li>
+<li><strong>Reciprocal collision avoidance</strong> (RVO/ORCA) — a decentralized scheme in which each of two conflicting agents takes responsibility for half of the needed correction; ORCA expresses each pairwise obligation as a half-plane of permitted velocities, so avoiding all neighbors is a small linear program.</li>
+<li><strong>Red edge</strong> — the steep transition in vegetation reflectance between strong chlorophyll absorption in the red and strong leaf-structure scattering in the near-infrared, roughly 700–740 nm; its position and slope shift with chlorophyll content and cell condition, which makes it the recurring diagnostic region for crop disease.</li>
+<li><strong>REDSI</strong> (Red Edge Disease Stress Index) — a purpose-built disease index computed from red and two red-edge bands, designed around the specific way wheat yellow rust distorts the red-edge region; the index with the clearest published head-to-head win over NDVI on the same plots.</li>
+<li><strong>Relative velocity</strong> (<span class="math inline">\(\mathbf{v}_{rel}\)</span>) — the threat’s velocity minus the drone’s, <span class="math inline">\(\mathbf{v}_{rel} = \mathbf{v}_t - \mathbf{v}_d\)</span>; it collapses two moving trajectories into one straight-line track flown past a drone pinned at the origin.</li>
+<li><strong>Responsible AI</strong> — the engineering obligation that follows from deploying a model whose errors move a physical machine through public airspace: privacy, safety, bias, and accountability treated as design requirements rather than afterthoughts.</li>
+<li><strong>Robustness</strong> — a deployed model’s ability to keep performing as conditions drift away from those of its training data: different lighting, motion blur, partial occlusion, new backgrounds.</li>
+<li><strong>ROS 2</strong> (Robot Operating System 2) — the middleware, introduced with the running example’s architecture at the close of Part I, in which independent nodes exchange typed messages over named topics and services; here, the scalable alternative to MAVSDK for mission software.</li>
+<li><strong>ROS 2 node</strong> (Robot Operating System 2) — an independent operating-system process in the ROS 2 middleware that performs one job and exchanges data with other nodes only through named, typed channels, so that nodes can be developed, tested, restarted, and replaced independently.</li>
+<li><strong>Rotation matrix</strong> — a 3 × 3 orthogonal matrix with determinant +1 that re-expresses a vector in a rotated frame without changing its length; its inverse is its transpose, which makes reversing any frame transformation computationally free.</li>
+<li><strong>RPIC</strong> (Remote Pilot in Command) — the certificated individual with final authority over, and responsibility for, a given UAS flight; under Part 107 an RPIC holds an FAA Remote Pilot Certificate earned by passing the Aeronautical Knowledge Test, and no commercial flight is legal without one either at the controls or directly supervising the person at them.</li>
+<li><strong>RTL</strong> (Return-to-Launch) — the autonomous recovery behavior that climbs to a safe altitude, flies back to the home position, descends, and lands; both a mission’s normal ending and the standard failsafe response.</li>
+<li><strong>S rating</strong> — the number of lithium-polymer cells wired in series in a battery pack, each contributing 3.7 V nominal, 4.2 V fully charged, and about 3.5 V at the practical discharge floor.</li>
+<li><strong>Safe altitude</strong> — a designated altitude, above the encounter, that the escape maneuver climbs toward; giving the evasion state a fixed destination turns “flee” into a bounded, resumable behavior.</li>
+<li><strong>Safety radius</strong> (<span class="math inline">\(R_{safe}\)</span>) — the minimum separation the mission is willing to accept between the drone and any uncooperative mover; a predicted miss distance below it is the evasion trigger.</li>
+<li><strong>Scale variation</strong> — the change in a target’s apparent pixel size with altitude and terrain: the same animal spans a few pixels or tens of pixels depending on range, so a detector must either see all scales in training or have the scale pinned by flight discipline.</li>
+<li><strong>Search bounding box</strong> — the axis-aligned rectangle <span class="math inline">\([x_{\min}, x_{\max}] \times [y_{\min}, y_{\max}]\)</span>, expressed here in local NED coordinates, that defines the region a search must cover; together with the spacing, the complete parameterization of a lawnmower path.</li>
+<li><strong>Section 44809</strong> — the statutory exception (49 U.S.C. §44809) permitting strictly recreational flying without a Part 107 certificate, conditioned on passing the free TRUST exam, flying within visual line of sight, following the safety guidelines of an FAA-recognized community-based organization, and always yielding right-of-way to crewed aircraft.</li>
+<li><strong>Sense–think–act loop</strong> — the fundamental cycle of any autonomous system: measure the world, compute a decision from the measurement, command actuators that change the world, and measure again. Every layer of an autonomy stack is an instance of it, differing only in rate and in the consequence of missing a deadline.</li>
+<li><strong>Sensor fusion</strong> — the algorithmic combination of multiple imperfect sensors into one estimate better than any of them alone, by exploiting the fact that different sensors fail in different ways at different timescales.</li>
+<li><strong>Service</strong> — a ROS 2 request–response channel in which a caller asks one node to perform a discrete action and waits for its reply; the right mechanism when an action happens once and the caller must know it succeeded before proceeding.</li>
+<li><strong>Service (ROS 2)</strong> — a named request–response endpoint: a client sends one request, exactly one server processes it and returns a result, and the client can wait on that result; the right shape for actions that must be <em>acknowledged</em> before the mission logic dares proceed — arm, change flight mode, run a preflight check.</li>
+<li><strong>Setpoint</strong> — the reference value <span class="math inline">\(r(t)\)</span> a control loop is asked to achieve: a commanded altitude, attitude, or angular rate. In a cascaded controller, each loop’s output is the next inner loop’s setpoint.</li>
+<li><strong>SITL</strong> (Software-in-the-Loop) — running the unmodified autopilot firmware as a desktop process against a physics simulator such as Gazebo, so that missions, modes, and failsafes can be exercised — and crashed — with no aircraft at risk.</li>
+<li><strong>Small-object detection</strong> — the regime in which targets span roughly twenty pixels or fewer, too few to exhibit the internal detail general-purpose detectors rely on; the regime every high-altitude animal detector lives in.</li>
+<li><strong>Soft warning</strong> — an advisory response to an approaching limit — a margin fence, a battery caution — that informs the operator or mission logic while leaving authority where it is; the graceful layer that fires before the hard one must.</li>
+<li><strong>Spatial structure</strong> — the property that an image’s meaning lives in the <em>arrangement</em> of its values, not their distribution: neighbouring pixels sample neighbouring patches of the world, so edges, textures, and objects exist only as local patterns across the grid.</li>
+<li><strong>Specific stiffness</strong> — elastic modulus divided by density, in MJ/kg. For aircraft structure it usually matters more than specific strength, because frames fail their mission by flexing (vibration, resonance, sensor corruption) long before they fail by breaking.</li>
+<li><strong>Spectral signature</strong> (disease-specific sense) — beyond Part I’s general notion of a surface’s reflectance-versus-wavelength shape: the characteristic <em>perturbation</em> a particular stressor imposes on that shape — a fungal infection raising visible and red-edge reflectance while lowering NIR is a different signature from drought’s flatter, NIR-dominated depression, even when both depress NDVI equally.</li>
+<li><strong>SPI</strong> (Serial Peripheral Interface) — a four-wire, full-duplex serial bus with a dedicated chip-select line per device and clock rates commonly in the tens of megahertz, the usual choice where a single sensor must be read fast and often.</li>
+<li><strong>Spray drift</strong> — the movement of applied droplets off the intended target area by wind and turbulence before they deposit; the dominant environmental hazard of aerial application and the reason chemical labels specify droplet size and buffer distances.</li>
+<li><strong>Standoff distance</strong> — the working range a pattern holds <em>by design</em> — the orbit’s radius, the swoop’s approach hold — as distinct from the safety radius, which is the never-cross floor beneath it.</li>
+<li><strong>State of charge</strong> (SoC) — the fraction of a cell’s rated capacity currently stored, inferred in practice from resting voltage via the cell’s discharge curve.</li>
+<li><strong>State transition</strong> — the change of active state, taken when a guard becomes true; in a disciplined machine it is the <em>only</em> mechanism by which the vehicle’s behavior changes, which is what makes logged transitions a complete flight narrative.</li>
+<li><strong>Stator diameter</strong> and <strong>stator height</strong> — the two millimetre dimensions in a motor designation such as 2812 (28 mm diameter, 12 mm height). Together they set the volume of iron and copper, and therefore the torque the motor can produce continuously without overheating.</li>
+<li><strong>Steady-state error</strong> — the offset that remains after the transient response has died out. A proportional-only controller facing a constant disturbance always leaves one, because it needs a nonzero error to produce a nonzero command.</li>
+<li><strong>Storage charge</strong> — the state of charge at which a LiPo should be kept when not in use for more than a few days: roughly 50–60 % of capacity, corresponding to about 3.80–3.85 V per cell.</li>
+<li><strong>Strength-to-weight ratio</strong> (specific strength) — a material’s failure stress divided by its density, in kJ/kg when stress is in MPa and density in g/cm³. It ranks materials for structures whose mass budget, not whose volume, is the binding constraint — which is every airborne structure.</li>
+<li><strong>Stress response</strong> — the behavioral and physiological cascade a perceived threat triggers, from head-up vigilance through alarm to panicked flight; critically, the physiological component can be large while the behavioral component is invisible — animals have shown significant cardiac responses to drones without moving at all <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>.</li>
+<li><strong>Stress testing</strong> — deliberately operating the integrated system at and beyond its worst-case point — every module live, every rate at maximum, resources contended, failures injected — to surface behavior that appears only under load, where the margins that unit tests measured individually must all hold simultaneously.</li>
+<li><strong>Swarm</strong> — a fleet of cooperating drones treated as one collective; the term describes fleet behavior, <em>not</em> architecture — real swarms exist at both ends of the centralization axis.</li>
+<li><strong>Swath width</strong> (<span class="math inline">\(w\)</span>) — the width of ground a downward-looking sensor images along one leg, set by altitude and field of view; the physical quantity the sweep spacing must not exceed.</li>
+<li><strong>Sweep spacing</strong> (<span class="math inline">\(s\)</span>) — the perpendicular distance between adjacent legs; chosen as the swath width derated by a deliberate overlap fraction, so that imperfect flying still leaves no unseen strip.</li>
+<li><strong>Systems integration</strong> — the engineering phase in which separately developed, separately validated subsystems are combined into one running whole, and the <em>interactions</em> between them — rather than the subsystems themselves — become the object under test.</li>
+<li><strong>Tail latency</strong> — the high-percentile behavior of a latency distribution (the 95th or 99th percentile frame); the number a control deadline actually cares about, since a loop that misses its deadline one frame in twenty misses it every second at 20 FPS.</li>
+<li><strong>Target safety radius</strong> (minimum separation) — the distance floor around the target animal that no trajectory may enter under any circumstances; enforced as a hard geometric constraint on the pattern generator, not as a tuning preference.</li>
+<li><strong>Target-following control loop</strong> — the complete cycle detection → pixel error → velocity/yaw-rate command → aircraft motion → new detection; a closed loop whose total latency sets how hard its gains can be pushed.</li>
+<li><strong>Task allocation</strong> — deciding which agent performs which job — which sector to sweep, which flock to herd, which corridor to watch — and reassigning as the world changes; the fleet-level twin of the single drone’s state machine.</li>
+<li><strong>TELEM2 port</strong> — the Pixhawk-family telemetry connector conventionally assigned to the companion-computer link; a 6-pin JST-GH socket carrying 5 V power, 3.3 V-logic TX/RX signal lines, optional CTS/RTS flow-control lines, and ground.</li>
+<li><strong>Telemetry parsing</strong> — extracting specific fields from a recorded telemetry stream into an analyzable form — for a ULog, one <code>ulog2csv</code> invocation per topic of interest.</li>
+<li><strong>Telemetry sharing</strong> — the continuous exchange of vehicle state (position, velocity, heading, battery, mission status, detections) between aircraft or between aircraft and a ground station; the raw material of every coordination scheme that uses communication at all.</li>
+<li><strong>Tensor</strong> — a multidimensional array of numbers indexed along a fixed number of axes; a colour image is a rank-3 tensor of shape height × width × channels, and every intermediate result inside a vision network is a tensor too.</li>
+<li><strong>Tensor arena</strong> — in TFLM, the single statically allocated block of RAM from which all of a model’s activations and scratch buffers are carved at runtime; the developer sizes it by hand, and it is the practical measure of a model’s RAM appetite on an MCU.</li>
+<li><strong>TensorFlow Lite</strong> (TFLite) — the deployment-oriented branch of the TensorFlow ecosystem: a converter that emits a compact model file and a lean runtime that executes it on phones and single-board computers; its sibling <strong>TensorFlow Lite for Microcontrollers</strong> (TFLM) is a C++ library that runs the same models on bare-metal microcontrollers with no operating system and no dynamic memory allocation.</li>
+<li><strong>TFR</strong> (Temporary Flight Restriction) — a NOTAM-published, temporarily restricted volume of airspace established to protect persons or property from a hazard, to give disaster-relief aircraft a sterile operating environment, to prevent congestion of sightseeing aircraft over a newsworthy event, to protect the President and other public figures, or to support space operations.</li>
+<li><strong>Thermal runaway</strong> — the self-accelerating failure of a lithium cell in which internal heating drives exothermic decomposition reactions that generate more heat, culminating in venting or fire. It is the hazard that dictates fireproof charging and storage containers.</li>
+<li><strong>Thermal throttling</strong> — an embedded processor’s self-protection under sustained load: as die temperature rises, clock speeds are cut and latency rises, minutes into exactly the kind of continuous inference a mission demands and a short benchmark never sees.</li>
+<li><strong>Threat vector</strong> (<span class="math inline">\(\mathbf{r}\)</span>) — the position of the threat relative to the drone, <span class="math inline">\(\mathbf{r} = P_{threat} - P_{drone}\)</span>, expressed in local NED; a single vector carrying both the bearing and the range of the danger.</li>
+<li><strong>Thrust-to-weight ratio</strong> (TWR) — total static thrust at full throttle divided by all-up weight. Values below about 2 leave inadequate control authority; 2 to 3 suits stable survey work; 8 and above characterizes racing aircraft.</li>
+<li><strong>Tick</strong> — one periodic evaluation cycle of the mission logic — the FSM’s loop iteration or the BT’s root-to-leaf traversal — during which triggers are checked in a fixed order and exactly one behavior acts.</li>
+<li><strong>Tiered descent protocol</strong> — the review literature’s recommended engagement pattern: begin at a distance the animal tolerates and close only as observed behavior permits, rather than committing to a single fixed close-range geometry <span class="citation" data-cites="afridi2025wildlife">(<a href="#ref-afridi2025wildlife" role="doc-biblioref">Afridi et al. 2025</a>)</span>.</li>
+<li><strong>TinyML</strong> — the discipline of designing, compressing, and deploying machine-learning models to run under tight physical constraints — memory in kilobytes to megabytes, power in milliwatts to watts — on hardware at or near the sensor that produces the data.</li>
+<li><strong>Topic</strong> — a ROS 2 publish–subscribe channel carrying a continuous stream of messages from one publisher to any number of subscribers, with no acknowledgment; the right mechanism when data is always flowing and only the latest value matters.</li>
+<li><strong>Topic (ROS 2)</strong> — a named, typed channel for continuous one-to-many data streaming: publishers send messages at their own rate, subscribers receive whatever arrives, and no reply ever flows back; the right shape for state that is continuously <em>true</em> — position, status, a target estimate.</li>
+<li><strong>Train/validation split</strong> — the division of a dataset into images the optimizer learns from and images reserved for measurement only; the validation side exists to estimate performance on data the model has never seen, and is honest only if nothing resembling it leaked into training.</li>
+<li><strong>Transfer learning</strong> — initializing a model from weights pretrained on a large general dataset and fine-tuning on a small task-specific one, so the early layers’ general visual features (edges, textures, shapes) are inherited rather than relearned from scratch.</li>
+<li><strong>Transition latency</strong> — the elapsed time between a guard’s condition becoming true in the world and the first command of the new state reaching the flight controller; the reflex time of the whole autonomy stack, and a quantity worth logging on every transition.</li>
+<li><strong>UART</strong> (Universal Asynchronous Receiver-Transmitter) — the serial-communication peripheral, and by extension the wiring convention, that moves bytes between two devices over a dedicated transmit line, a dedicated receive line, and a shared ground, with no clock wire; each end recovers bit timing from its own oscillator plus the frame’s start bit.</li>
+<li><strong>ULog format</strong> — PX4’s self-describing binary log format: the file carries its own message-type definitions, so a parser needs no external schema; header, definitions, and data sections in sequence, little-endian throughout, every message stamped in microseconds.</li>
+<li><strong>uORB</strong> — PX4’s internal publish–subscribe message bus, over which the firmware’s own modules (estimator, controllers, commander) exchange data; the DDS bridge exposes these same topics to ROS 2 rather than translating them.</li>
+<li><strong>Velocity obstacle</strong> (VO) — for agent <span class="math inline">\(A\)</span> facing agent <span class="math inline">\(B\)</span>, the set of velocities that, if held, lead to collision within a time horizon; the geometric object that turns “will we hit?” into a question about a region in velocity space.</li>
+<li><strong>Vibration metric</strong> — a computed summary of high-frequency IMU disturbance; PX4 logs an accelerometer metric (m/s²) and a gyroscope metric (rad/s) in <code>vehicle_imu_status</code>, alongside raw per-axis clipping counts.</li>
+<li><strong>Visual servoing</strong> — controlling a robot’s motion by closing a feedback loop directly on live camera measurements, as opposed to <em>look-then-move</em>, in which vision is consulted once to plan a motion that then executes open-loop.</li>
+<li><strong>Voltage sag</strong> — the transient drop in a battery’s terminal voltage under load, equal to the drawn current times the pack’s internal resistance; it tracks the current trace and recovers when load drops, which is exactly how a log distinguishes it from depletion.</li>
+<li><strong>Waiver</strong> — a case-by-case FAA authorization to deviate from a specific Part 107 operating rule (visual line of sight, operations over people, night operation, one pilot per aircraft), granted on a demonstrated safety case rather than by right.</li>
+<li><strong>Watchdog</strong> — an independent process that monitors a system it does not control, holding no mission state and sharing no failure mode with the logic it supervises; the running example’s <code>failsafe_monitor</code> node is one.</li>
+<li><strong>Waypoint</strong> — a single target position in a mission: latitude, longitude, and altitude, plus per-point details such as hold time and acceptance radius; the atomic unit of a flight plan.</li>
+<li><strong>Wheelbase</strong> — the motor-shaft-to-motor-shaft distance across the frame’s longest diagonal, in millimetres, and the number that names most commercial frames. It bounds the propeller diameter the aircraft can swing.</li>
+<li><strong>Wildlife dispersal</strong> — the mission outcome: the flock leaves the protected area, intact and by its own locomotion, and does not immediately return; measured by displacement toward the exit and by return time, not by how dramatic the flight paths looked.</li>
+<li><strong>Wildlife disturbance</strong> — any change a drone induces in an animal’s behavior or physiology — vigilance, alarm calling, interrupted feeding, flight, elevated heart rate — whether or not the operator observes it; the quantity the drone-impact literature measures, and the quantity a deterrence mission deliberately produces within bounds.</li>
+<li><strong>YOLO format</strong> — the plain-text label convention used by the YOLO family: one <code>.txt</code> file per image, one line per object, each line a class index followed by the box’s center coordinates, width, and height, all normalized to the range <span class="math inline">\([0,1]\)</span> by dividing by the image’s dimensions.</li>
+</ul>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-afridi2025wildlife" class="csl-entry" role="listitem">
+Afridi, S., L. Laporte-Devylder, G. Maalouf, J. M. Kline, S. G. Penny, K. Hlebowicz, D. Cawthorne, and U. P. S. Lundquist. 2025. <span>“Impact of Drone Disturbances on Wildlife: A Review.”</span> <em>Drones</em> 9 (4): 311. <a href="https://doi.org/10.3390/drones9040311">https://doi.org/10.3390/drones9040311</a>.
+</div>
+<div id="ref-katsis2025greylag" class="csl-entry" role="listitem">
+Katsis, Andrew C. 2025. <span>“Flight Initiation Distance Is Repeatable and Geographically Flexible in Greylag Geese <span>A</span>nser Anser.”</span> <em>Journal of Avian Biology</em>. <a href="https://doi.org/10.1111/jav.03288">https://doi.org/10.1111/jav.03288</a>.
+</div>
+<div id="ref-mellor2016fivedomains" class="csl-entry" role="listitem">
+Mellor, David J. 2016. <span>“Updating Animal Welfare Thinking: Moving Beyond the <span>‘<span>F</span>ive <span>F</span>reedoms’</span> Towards <span>‘<span>A</span> <span>L</span>ife <span>W</span>orth <span>L</span>iving’</span>.”</span> <em>Animals</em> 6 (3): 21. <a href="https://doi.org/10.3390/ani6030021">https://doi.org/10.3390/ani6030021</a>.
+</div>
+</div>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="pagination-link" aria-label="Full-System Integration: The Goose Management System End to End">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../appendices/appendix-b-labs.html" class="pagination-link" aria-label="Appendix B: Lab Assignments">
+        <span class="nav-page-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

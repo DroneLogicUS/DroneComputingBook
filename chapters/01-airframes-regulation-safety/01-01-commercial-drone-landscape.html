@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>2&nbsp; The Commercial Drone Landscape – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" rel="next">
+<link href="../../index.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html">Part I — Airframes, Regulation &amp; Flight Safety</a></li><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">2.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">2.2</span> Key Vocabulary</a></li>
+  <li><a href="#five-questions-that-define-a-vertical" id="toc-five-questions-that-define-a-vertical" class="nav-link" data-scroll-target="#five-questions-that-define-a-vertical"><span class="header-section-number">2.3</span> Five Questions That Define a Vertical</a></li>
+  <li><a href="#mapping-and-surveying" id="toc-mapping-and-surveying" class="nav-link" data-scroll-target="#mapping-and-surveying"><span class="header-section-number">2.4</span> Mapping and Surveying</a></li>
+  <li><a href="#infrastructure-inspection" id="toc-infrastructure-inspection" class="nav-link" data-scroll-target="#infrastructure-inspection"><span class="header-section-number">2.5</span> Infrastructure Inspection</a></li>
+  <li><a href="#agriculture-sensing" id="toc-agriculture-sensing" class="nav-link" data-scroll-target="#agriculture-sensing"><span class="header-section-number">2.6</span> Agriculture: Sensing</a></li>
+  <li><a href="#agriculture-aerial-application-a-worked-case-study" id="toc-agriculture-aerial-application-a-worked-case-study" class="nav-link" data-scroll-target="#agriculture-aerial-application-a-worked-case-study"><span class="header-section-number">2.7</span> Agriculture: Aerial Application — A Worked Case Study</a>
+  <ul class="collapse">
+  <li><a href="#why-aircraft-at-all" id="toc-why-aircraft-at-all" class="nav-link" data-scroll-target="#why-aircraft-at-all"><span class="header-section-number">2.7.1</span> Why aircraft at all</a></li>
+  <li><a href="#the-mass-budget" id="toc-the-mass-budget" class="nav-link" data-scroll-target="#the-mass-budget"><span class="header-section-number">2.7.2</span> The mass budget</a></li>
+  <li><a href="#coverage-rate-and-duty-cycle" id="toc-coverage-rate-and-duty-cycle" class="nav-link" data-scroll-target="#coverage-rate-and-duty-cycle"><span class="header-section-number">2.7.3</span> Coverage rate and duty cycle</a></li>
+  <li><a href="#droplet-physics-and-the-flight-envelope" id="toc-droplet-physics-and-the-flight-envelope" class="nav-link" data-scroll-target="#droplet-physics-and-the-flight-envelope"><span class="header-section-number">2.7.4</span> Droplet physics and the flight envelope</a></li>
+  <li><a href="#the-regulatory-stack" id="toc-the-regulatory-stack" class="nav-link" data-scroll-target="#the-regulatory-stack"><span class="header-section-number">2.7.5</span> The regulatory stack</a></li>
+  <li><a href="#alternate-uses-of-the-same-platform" id="toc-alternate-uses-of-the-same-platform" class="nav-link" data-scroll-target="#alternate-uses-of-the-same-platform"><span class="header-section-number">2.7.6</span> Alternate uses of the same platform</a></li>
+  </ul></li>
+  <li><a href="#security-and-public-safety" id="toc-security-and-public-safety" class="nav-link" data-scroll-target="#security-and-public-safety"><span class="header-section-number">2.8</span> Security and Public Safety</a></li>
+  <li><a href="#wildlife-management" id="toc-wildlife-management" class="nav-link" data-scroll-target="#wildlife-management"><span class="header-section-number">2.9</span> Wildlife Management</a></li>
+  <li><a href="#why-off-the-shelf-hardware-plus-custom-software-won" id="toc-why-off-the-shelf-hardware-plus-custom-software-won" class="nav-link" data-scroll-target="#why-off-the-shelf-hardware-plus-custom-software-won"><span class="header-section-number">2.10</span> Why Off-the-Shelf Hardware Plus Custom Software Won</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">2.11</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">2.12</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html">Part I — Airframes, Regulation &amp; Flight Safety</a></li><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Small uncrewed aircraft stopped being novelties roughly a decade ago. They are now ordinary industrial instruments — closer in role to a total station, a borescope, or a soil probe than to a hobby aircraft — and the reason is economic rather than aeronautical. A surveyor does not buy a drone because it flies; the surveyor buys it because it produces a centimetre-accurate site model in ninety minutes instead of two days. An agronomist does not buy a spray drone for its rotors; the agronomist buys it because it puts chemical on a waterlogged field that a ground rig cannot enter. In every case the aircraft is a delivery mechanism for a <em>data product</em> or a <em>physical payload</em>, and the engineering question that decides whether a mission is viable is never “can it fly?” but “what does it have to carry, how close to the ground must it fly, how long may it stay there, and which rule forbids that?”</p>
+<p>This chapter surveys the commercial verticals in which that calculation currently comes out positive: mapping and surveying, infrastructure inspection, agriculture, security and public safety, and wildlife management. It then argues why the dominant architecture in all of them — a mass-produced airframe carrying custom autonomy software — displaced the bespoke platforms of the 2010s. The agricultural spraying vertical receives extended treatment as a worked case study, because it is the cleanest example in commercial aviation of a design driven end to end by its payload: the tank size sets the mass budget, the mass budget sets the regulatory category, the regulatory category sets the certification burden, and the droplet physics sets the flight envelope. Everything the rest of Part I develops — airframe structure, propulsion and power budgets, the regulatory framework, and field safety practice — is visible in miniature in that one case.</p>
+<section id="learning-objectives" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">2.1</span> Learning Objectives</h2>
+<ul>
+<li>Survey the major commercial drone application sectors — mapping and surveying, infrastructure inspection, agriculture, security and public safety, and wildlife management — and state for each the characteristic payload, the binding regulatory constraint, and the deliverable handed to the client.</li>
+<li>Explain why commodity off-the-shelf airframes combined with custom autonomy software displaced bespoke commercial platforms, in terms of where the marginal engineering value now sits in the stack.</li>
+<li>Apply the ground-sample-distance relation to select a survey altitude, and propagate that choice through image overlap, coverage rate, and number of flights required.</li>
+<li>Use agricultural spraying drones as a worked case study of payload-driven design: derive the mass budget from tank capacity, the coverage rate from swath and ground speed, the mission duty cycle from application rate, and the flight envelope from droplet-drift physics.</li>
+<li>Explain how specific regulatory thresholds — the 55-pound weight limit, the 400-foot altitude ceiling, and the visual-line-of-sight requirement — act as hard engineering constraints rather than administrative overhead.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">2.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Market vertical</strong> — an industry segment whose drone operations share a payload, a data product, and a regulatory profile distinct enough that hardware and software are specialized for it (surveying, aerial application, public safety).</li>
+<li><strong>Off-the-shelf hardware</strong> — a commercially manufactured, mass-produced airframe and sensor package purchased complete rather than designed and fabricated for one operator, whose unit economics derive from production volume across many verticals.</li>
+<li><strong>Payload</strong> — everything the aircraft carries that is not required to fly it: sensors, gimbals, spray tanks, lights, radios, and released cargo. Payload mass competes directly with battery mass for the same lift budget.</li>
+<li><strong>Part 107 operator</strong> — in the United States, a person holding the Federal Aviation Administration (FAA) Remote Pilot Certificate issued under 14 CFR Part 107, the baseline authority for commercial small-uncrewed-aircraft flight.</li>
+<li><strong>BVLOS</strong> (Beyond Visual Line of Sight) — operation in which the remote pilot cannot continuously see the aircraft unaided; prohibited under baseline Part 107 and permitted only under a specific waiver or exemption, and the single largest regulatory gate on drone economics.</li>
+<li><strong>Waiver</strong> — a case-by-case FAA authorization to deviate from a specific Part 107 operating rule (visual line of sight, operations over people, night operation, one pilot per aircraft), granted on a demonstrated safety case rather than by right.</li>
+<li><strong>Maximum takeoff weight</strong> (MTOW) — the greatest mass at which the aircraft is certified to leave the ground, including airframe, battery, and payload; the difference between MTOW and empty weight is the entire payload budget an engineer has to spend.</li>
+<li><strong>Ground sample distance</strong> (GSD) — the real-world length on the ground represented by one pixel of an aerial image, in centimetres per pixel; the primary specification a mapping client cares about and the quantity that fixes flight altitude.</li>
+<li><strong>Orthomosaic</strong> — a single large image assembled from hundreds of overlapping aerial photographs and geometrically corrected so that every pixel is viewed as if from directly overhead, making the result measurable like a map rather than merely viewable like a photograph.</li>
+<li><strong>Aerial application</strong> — the dispensing of a substance (pesticide, fertilizer, seed, biological control agent) from an aircraft in flight; in the United States it is a separately certificated class of operation under 14 CFR Part 137, distinct from ordinary flight.</li>
+<li><strong>Precision agriculture</strong> — farm management that treats a field as a spatially varying system, measuring and applying inputs at sub-field resolution rather than uniformly, so that the value of an aerial sensor lies in its resolution rather than merely in its coverage.</li>
+<li><strong>Spray drift</strong> — the movement of applied droplets off the intended target area by wind and turbulence before they deposit; the dominant environmental hazard of aerial application and the reason chemical labels specify droplet size and buffer distances.</li>
+</ul>
+</section>
+<section id="five-questions-that-define-a-vertical" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="five-questions-that-define-a-vertical"><span class="header-section-number">2.3</span> Five Questions That Define a Vertical</h2>
+<p>Commercial drone work looks heterogeneous from the outside — a thermographer, a crop consultant, and a police sergeant appear to have nothing in common — but every deployment answers the same five questions, and the answers are what make a vertical a vertical.</p>
+<ol type="1">
+<li><strong>What must the aircraft carry?</strong> A visible-light red-green-blue (RGB) camera, a long-wave infrared (LWIR) thermal sensor, a multispectral array, a light detection and ranging (LiDAR) scanner, a 40-litre chemical tank. Payload mass and power draw determine airframe class; payload optics determine altitude.</li>
+<li><strong>Which rule binds?</strong> Every mission runs into one regulatory limit before the others. For a pipeline patrol it is visual line of sight; for a stadium overflight it is operations over people; for a spray aircraft it is the 55-pound weight threshold. Identifying the binding constraint first prevents designing a vehicle that is illegal to operate.</li>
+<li><strong>What physics corrupts the data?</strong> Sensors measure the world, not the quantity of interest, and the gap between them is where expertise lives. Solar loading masks thermal contrast; low sun angle exaggerates surface texture; wind displaces spray droplets; vegetation reflectance shifts with leaf moisture. Flight timing is a data-quality parameter, not a scheduling convenience.</li>
+<li><strong>How is the flight executed?</strong> Manual piloting, a two-dimensional lawnmower grid, a three-dimensional double grid for structure reconstruction, an orbit around a vertical asset, or a terrain-following path that holds altitude above ground rather than above launch. The pattern is chosen to satisfy a data-integrity requirement, most often uniform resolution and guaranteed image overlap.</li>
+<li><strong>What does the client receive?</strong> Not raw imagery. A radiometric orthomosaic with annotated coordinates, a point cloud with volumetric cut-and-fill figures, a prescription map a spreader can execute, a written report. The final translation from telemetry to decision is the product being sold.</li>
+</ol>
+<p>The remainder of this survey applies those five questions vertical by vertical.</p>
+</section>
+<section id="mapping-and-surveying" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="mapping-and-surveying"><span class="header-section-number">2.4</span> Mapping and Surveying</h2>
+<p>Aerial mapping is the largest commercial vertical by flight hours and the one whose engineering is most fully reduced to arithmetic. The payload is a calibrated RGB camera, often supplemented by a real-time kinematic (RTK) global navigation satellite system receiver that tags each exposure with a centimetre-accurate position, or by a LiDAR scanner where vegetation must be penetrated to reach bare earth. The deliverable is an orthomosaic, a digital surface model, and — for construction and mining clients — volumetric measurements of stockpiles and excavations.</p>
+<p>The governing relation is ground sample distance. For a camera with pixel pitch <span class="math inline">\(p\)</span> (metres), focal length <span class="math inline">\(f\)</span> (metres), flown at height <span class="math inline">\(H\)</span> above the terrain,</p>
+<p><span class="math display">\[\text{GSD} = \frac{p\,H}{f}.\]</span></p>
+<p>This is nothing more than similar triangles: the sensor plane and the ground plane are related by the ratio of their distances from the lens node.</p>
+<p><strong>Worked example.</strong> Consider a 20-megapixel camera on a Four Thirds sensor, 17.4 mm wide across 5280 pixels, so <span class="math inline">\(p = 17.4\ \text{mm}/5280 = 3.30\ \mu\text{m}\)</span>, with a 12.3 mm lens. Flying at <span class="math inline">\(H = 100\)</span> m above ground level,</p>
+<p><span class="math display">\[
+\begin{aligned}
+\text{GSD} &amp;= \frac{(3.30 \times 10^{-6}\,\text{m})(100\,\text{m})}{12.3 \times 10^{-3}\,\text{m}} \\
+           &amp;= 2.68 \times 10^{-2}\ \text{m} = 2.68\ \text{cm/pixel}.
+\end{aligned}
+\]</span></p>
+<p>The image footprint is then <span class="math inline">\(5280 \times 2.68\ \text{cm} = 141\)</span> m across the flight line and <span class="math inline">\(3956 \times 2.68\ \text{cm} = 106\)</span> m along it. Photogrammetric reconstruction needs redundant views of every ground point; a standard specification is 75 % side overlap between adjacent flight lines and 80 % forward overlap between successive exposures. Side overlap of 75 % means adjacent lines are spaced <span class="math inline">\(0.25 \times 141 = 35.3\)</span> m apart, so at a ground speed of 10 m/s the aircraft sweeps <span class="math inline">\(35.3 \times 10 = 353\ \text{m}^2\)</span> per second — that is, <span class="math inline">\(353 \times 60 = 21{,}180\ \text{m}^2\)</span>, or 2.12 hectares (5.2 acres), per minute. A 20-minute working flight therefore covers <span class="math inline">\(353 \times 1200 = 423{,}600\ \text{m}^2 \approx 42\)</span> hectares, about 105 acres, before any allowance for turns, transit, and boundary lines. Forward overlap of 80 % means successive exposures are <span class="math inline">\(0.20 \times 106 = 21\)</span> m apart, which at 10 m/s demands a shutter interval of 2.1 seconds — a constraint that in practice caps ground speed, because the camera’s write cycle, not the airframe, becomes the bottleneck.</p>
+<p>Now invert the relation, because clients specify resolution rather than altitude. A client requiring 1 cm/pixel forces</p>
+<p><span class="math display">\[H = \frac{\text{GSD}\cdot f}{p} = \frac{(0.01)(12.3\times10^{-3})}{3.30\times10^{-6}} = 37.3\ \text{m}.\]</span></p>
+<p>Area covered per flight scales as <span class="math inline">\(H^2\)</span>, so tightening the specification from 2.68 cm to 1 cm shrinks per-flight coverage by a factor of <span class="math inline">\((37.3/100)^2 \approx 0.14\)</span> — seven times as many flights, seven times the battery cycles, seven times the processing load. This single line of algebra is the most commercially consequential calculation in the vertical, and it explains why an experienced operator interrogates a client’s stated accuracy requirement before quoting a price.</p>
+<p>The binding regulation for mapping is usually the 400-foot (122 m) ceiling above ground level, which puts an upper bound on coverage per flight, together with the visual-line-of-sight requirement, which bounds the <em>radius</em> of the survey area around the pilot. Corridor mapping — roads, rail, transmission lines, pipelines — is the case where line of sight binds hardest, since the asset is by definition longer than any pilot can see, and it is therefore the vertical with the strongest commercial interest in BVLOS authorization.</p>
+</section>
+<section id="infrastructure-inspection" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="infrastructure-inspection"><span class="header-section-number">2.5</span> Infrastructure Inspection</h2>
+<p>Inspection substitutes a thermal or high-zoom optical payload for the mapping camera and substitutes an orbital or facade-following flight pattern for the grid. Its distinguishing feature is that the useful signal is a <em>contrast</em> rather than a shape, and contrast is fragile.</p>
+<p>The canonical example is commercial roof inspection. Flat commercial roofs fail when water penetrates the membrane and saturates the insulation beneath; the water is invisible from above and expensive to find by cutting test squares. Saturated insulation, however, has a far higher volumetric heat capacity than dry insulation, so it stores more energy during the day and releases it more slowly at night. An LWIR sensor flown after sunset sees the wet regions as warm anomalies against a roof that has already radiated its heat to the sky. Fly the same roof at midday and the signal vanishes: direct solar loading swamps the few-degree subsurface difference under tens of degrees of surface heating, and the thermal image reports the roof’s albedo pattern instead of its moisture. The environmental variable and the flight schedule are, here, the same engineering decision.</p>
+<p>The flight workflow is an autonomous grid at fixed altitude — fixed so that GSD, and therefore the apparent size of an anomaly, is uniform across the mosaic — with roughly 70 % thermal overlap, since LWIR sensors have far lower pixel counts than RGB sensors and need proportionally more frames to build a coherent mosaic. The deliverable is a <em>radiometric</em> orthomosaic, one in which each pixel retains a calibrated temperature rather than a display colour, delivered with an annotated report giving the coordinates of each suspected intrusion so that a roofing crew can cut precisely where the water is. The general lesson generalizes to every inspection vertical: the client is not buying pixels, and a map of colours without an interpretation is not a deliverable.</p>
+<div id="fig-thermal-roof-orthomosaic" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A false-colour aerial thermal mosaic of a large industrial building complex viewed from directly overhead, rendered in a black-through-purple-to-yellow palette in which roof surfaces and parking areas appear as bright and dark bands. An enlarged detail view of one roof section is inset at the upper left, and a vertical colour key at the lower left runs from cold 15 degrees Fahrenheit at the top to hot 110 degrees Fahrenheit at the bottom.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-thermal-roof-orthomosaic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/photos/uas-thermal-orthomosaic-roofs.png" class="img-fluid figure-img" style="width:80.0%" alt="A false-colour aerial thermal mosaic of a large industrial building complex viewed from directly overhead, rendered in a black-through-purple-to-yellow palette in which roof surfaces and parking areas appear as bright and dark bands. An enlarged detail view of one roof section is inset at the upper left, and a vertical colour key at the lower left runs from cold 15 degrees Fahrenheit at the top to hot 110 degrees Fahrenheit at the bottom.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-thermal-roof-orthomosaic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.1: A thermal mosaic of a commercial building complex, assembled from hundreds of overlapping long-wave infrared frames flown at a single altitude and rendered with a calibrated temperature scale. The inset is one roof section at full sensor resolution.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-thermal-roof-orthomosaic" class="quarto-xref">Figure&nbsp;<span>2.1</span></a> is what a thermal survey actually hands over: not a photograph of a roof but a temperature field over one, uniform in scale because altitude was held constant, and readable only against the colour bar that fixes what each shade means.</p>
+<p>Adjacent inspection applications — wind-turbine blades, cell towers, bridge soffits, electrical substations, and industrial flare stacks — swap the physics but keep the structure. Blade inspection needs an orbital pattern with the camera normal to a curved surface; bridge inspection needs upward-looking cameras and often loses satellite navigation entirely under the deck, forcing reliance on visual-inertial odometry of the kind Part II develops; substation work adds electromagnetic interference to the magnetometer and a strict operations-over-people question if the site is near a public right of way.</p>
+<div id="fig-bridge-inspection-drone" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A small blue and black quadcopter hovering close beneath the underside of a concrete bridge deck, photographed looking upward from below. Weathered concrete panels with staining and drainage fittings fill most of the frame, with a wedge of blue sky at the lower right.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-bridge-inspection-drone-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/photos/bridge-inspection-drone-under-deck.jpg" class="img-fluid figure-img" style="width:80.0%" alt="A small blue and black quadcopter hovering close beneath the underside of a concrete bridge deck, photographed looking upward from below. Weathered concrete panels with staining and drainage fittings fill most of the frame, with a wedge of blue sky at the lower right.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bridge-inspection-drone-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.2: A small multirotor holding station a few metres beneath a bridge deck to photograph the soffit. The concrete overhead is simultaneously the inspection target, the obstacle that blocks the satellite signals the aircraft would otherwise navigate by, and the surface it must not drift into.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-bridge-inspection-drone" class="quarto-xref">Figure&nbsp;<span>2.2</span></a> shows why that vertical is harder than it looks from the specification sheet: the camera points up, the pilot is looking at a structure rather than at the aircraft, and the same slab that must be photographed is what denies the receiver a satellite fix.</p>
+</section>
+<section id="agriculture-sensing" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="agriculture-sensing"><span class="header-section-number">2.6</span> Agriculture: Sensing</h2>
+<p>Agriculture splits cleanly into two drone businesses that share a field but almost nothing else. The first is sensing, and it is a specialization of mapping. A multispectral camera records reflectance in several narrow bands — typically blue, green, red, a red-edge band near 720 nm, and near-infrared around 840 nm — chosen because healthy vegetation reflects near-infrared strongly while absorbing red for photosynthesis. The normalized difference vegetation index,</p>
+<p><span class="math display">\[\text{NDVI} = \frac{\rho_{\text{NIR}} - \rho_{\text{red}}}{\rho_{\text{NIR}} + \rho_{\text{red}}},\]</span></p>
+<p>compresses that contrast into a single scalar per pixel, and its spatial variation across a field reveals stress — drought, nutrient deficiency, disease, pest damage — days to weeks before it is visible to a person walking the rows. The deliverable is not the index map itself but a <em>prescription map</em>: a georeferenced instruction file that a variable-rate spreader or sprayer executes, applying more input where the crop is stressed and less where it is not. That is what makes the practice <em>precision agriculture</em> rather than aerial photography — the sensing output drives a machine.</p>
+<div id="fig-ndvi-field-map" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A false-colour vegetation index map of a roughly rectangular farm field seen from directly above, mostly orange and pink with dark streaks and blotches running in parallel rows across it and along its left edge. A stepped colour key at the lower left is labelled with index values from 0.16 at the bottom to 0.40 at the top.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ndvi-field-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/photos/uas-ndvi-field-map.png" class="img-fluid figure-img" style="width:85.0%" alt="A false-colour vegetation index map of a roughly rectangular farm field seen from directly above, mostly orange and pink with dark streaks and blotches running in parallel rows across it and along its left edge. A stepped colour key at the lower left is labelled with index values from 0.16 at the bottom to 0.40 at the top.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ndvi-field-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.3: A vegetation-index map of a single field computed from a low-altitude multispectral survey at roughly 4 cm per pixel. Individual machinery passes and bare or stressed rows resolve as dark streaks against the vegetated background, and the colour key fixes the index value each shade represents.
+</figcaption>
+</figure>
+</div>
+<p>The resolution is the point. <a href="#fig-ndvi-field-map" class="quarto-xref">Figure&nbsp;<span>2.3</span></a> is flown low enough that a single row of stressed plants is several pixels wide, which is what lets the prescription file it generates address a part of a field rather than the whole of one; the same index computed from a satellite pass at ten metres per pixel would average that structure away.</p>
+<p>The measurement is harder than the formula suggests, because reflectance is a ratio of reflected to incident radiance and the incident term varies with sun angle, cloud, and haze between one flight line and the next. Correcting for it requires a downwelling irradiance sensor on top of the aircraft, a calibrated reflectance panel imaged before and after the flight, and a flight window near solar noon to minimize shadow. The Remote Sensing at Scale chapter later in this book develops multispectral radiometry, calibration, and index construction in full; for now the point is only that the agricultural sensing vertical is the mapping vertical with a much less forgiving relationship between flight timing and data validity.</p>
+</section>
+<section id="agriculture-aerial-application-a-worked-case-study" class="level2" data-number="2.7">
+<h2 data-number="2.7" class="anchored" data-anchor-id="agriculture-aerial-application-a-worked-case-study"><span class="header-section-number">2.7</span> Agriculture: Aerial Application — A Worked Case Study</h2>
+<p>The second agricultural business is aerial application, and it is worth studying in detail because nothing in the commercial drone world is so completely determined by its payload.</p>
+<section id="why-aircraft-at-all" class="level3" data-number="2.7.1">
+<h3 data-number="2.7.1" class="anchored" data-anchor-id="why-aircraft-at-all"><span class="header-section-number">2.7.1</span> Why aircraft at all</h3>
+<p>Ground-based sprayers are cheaper per acre than anything that flies, and where they work they win. They stop working in identifiable conditions: when soil is too wet to carry a rig without compaction or rutting, when terrain is too steep or too broken for a boom, when the crop canopy has closed and wheel traffic would destroy standing plants, and when the treated block is small or irregular enough that a crewed agricultural aircraft cannot economically be dispatched to it. Crewed aerial application solves the first three but is capital-intensive, requires a suitable airstrip and a certificated pilot, and is often simply unavailable in a narrow treatment window. The drone occupies the remaining niche: fields too wet, too steep, too small, or too oddly shaped for the alternatives, plus any application where reducing human contact with the chemical is itself the objective. The same logic recurs whenever a targeted intervention must be delivered to a bounded area — including wildlife deterrence, where the goal is to affect one field rather than a county.</p>
+<div id="fig-spray-drone-paddy" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A multirotor drone with a white spray tank hovering low above a bright green paddy field, releasing a fine mist that shows as a pale haze below the airframe. The crop directly under the aircraft is flattened in a circular pattern, and dense palms and broadleaf vegetation close in behind the field.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-spray-drone-paddy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/photos/spray-drone-paddy-field.jpg" class="img-fluid figure-img" style="width:85.0%" alt="A multirotor drone with a white spray tank hovering low above a bright green paddy field, releasing a fine mist that shows as a pale haze below the airframe. The crop directly under the aircraft is flattened in a circular pattern, and dense palms and broadleaf vegetation close in behind the field.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-spray-drone-paddy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.4: A spray drone working a flooded paddy plot, the discharge visible as a haze under the aircraft and the downwash flattening the crop beneath it. Saturated ground, an irregular boundary, and a block hemmed in by trees are precisely the conditions that rule out both a ground rig and a crewed agricultural aircraft.
+</figcaption>
+</figure>
+</div>
+<p><a href="#fig-spray-drone-paddy" class="quarto-xref">Figure&nbsp;<span>2.4</span></a> also shows the two features of the aircraft that the rest of this case study is about: almost all of its visible bulk is tank, and the rotor wash it uses to drive droplets into the canopy is the same flow that will carry them off the field when the wind is wrong.</p>
+<p>The economics turn on utilization rather than on price per acre in isolation. Published extension comparisons put drone custom-hire application at roughly $16 per acre against roughly $12.50 per acre for a crewed crop duster, so on unit cost alone the drone loses. What changes the answer is ownership: the fixed capital cost of a platform amortizes over every acre it treats, so total cost per acre falls steeply with annual acreage and flattens once the machine is well used. An illustrative amortization makes the shape concrete. A $15,000 platform depreciated over a five-year service life contributes</p>
+<p><span class="math display">\[\frac{\$15{,}000}{5\ \text{yr} \times 680\ \text{acre/yr}} = \$4.41\ \text{per acre}\]</span></p>
+<p>at 680 acres per year, but only $1.50 per acre at 2000 acres per year. Below a few hundred acres per year the capital charge dominates and custom hire is the rational choice; above roughly a thousand acres per year, ownership wins and the operator’s real constraints become labour hours and the length of the agronomic application window rather than the purchase price. Battery replacement, pump and nozzle wear, and applicator recertification are recurring costs that this simple model omits and that a serious business case must include.</p>
+</section>
+<section id="the-mass-budget" class="level3" data-number="2.7.2">
+<h3 data-number="2.7.2" class="anchored" data-anchor-id="the-mass-budget"><span class="header-section-number">2.7.2</span> The mass budget</h3>
+<p>Spray drones are large multirotors built around a tank, and their published specifications reveal the design logic immediately. Representative platforms at the time of writing include the DJI Agras T50, with a 40-litre tank, a 4–11 m spray swath, 114.64 lb empty weight, 202.8 lb maximum takeoff weight, and <span class="math inline">\(\pm10\)</span> cm hovering accuracy with RTK; the ABZ L50, with a 50-litre tank, 114.4 lb empty weight, 238 lb MTOW, and a claimed 62 acres per hour; and the EAVision J150, at 175 lb with a 20-gallon tank, a 10.5 gal/min maximum flow rate, 30 mph maximum spraying speed, and up to 65 acres per hour. Modular tank attachments — the XAG RevoSpray series for the XAG P100 platform, for instance — swap capacity and nozzle sets on an existing airframe. Specific models turn over quickly; the structural relationships among the numbers do not, and those are what follow.</p>
+<p>Look at what those numbers do together. Water has a density of 1 kg/L, and most agricultural tank mixes are within a few percent of it. For the 40-litre machine, the payload allowance is</p>
+<p><span class="math display">\[202.8\ \text{lb} - 114.64\ \text{lb} = 88.16\ \text{lb} = 39.99\ \text{kg},\]</span></p>
+<p>which is, to within a rounding error, exactly the mass of a full 40-litre tank. This is not a coincidence and it is the central fact about the vertical: <strong>the airframe is sized so that a full tank consumes the entire payload margin.</strong> There is no spare lift for a heavy sensor, a second battery, or a redundant computer. Every kilogram of autonomy hardware an engineer wants to add must be traded against a litre of chemical, and the customer buys litres. The 50-litre platform shows the same structure with a small reserve: 238 lb MTOW less 114.4 lb empty gives 123.6 lb, or 56 kg, against a 50 kg full tank.</p>
+<p>This mass budget then decides the regulatory category, because every one of these aircraft is far above the 55-pound (25 kg) ceiling that defines a small unmanned aircraft system under Part 107. A 55-pound total budget cannot accommodate a useful tank: even a 10-litre tank costs 10 kg of the roughly 25 kg total, leaving 15 kg for airframe, motors, and a battery pack that must lift 25 kg. Commercial spraying therefore lives permanently outside baseline Part 107 — a regulatory fact that follows directly from the density of water.</p>
+</section>
+<section id="coverage-rate-and-duty-cycle" class="level3" data-number="2.7.3">
+<h3 data-number="2.7.3" class="anchored" data-anchor-id="coverage-rate-and-duty-cycle"><span class="header-section-number">2.7.3</span> Coverage rate and duty cycle</h3>
+<p>Coverage rate is swath width times ground speed. Working backward from the 20-gallon platform’s published figures — up to 65 acres per hour at up to 30 mph — gives an implied effective swath:</p>
+<p><span class="math display">\[65\ \frac{\text{acre}}{\text{hr}} \times 4046.9\ \frac{\text{m}^2}{\text{acre}} = 263{,}000\ \frac{\text{m}^2}{\text{hr}} = 73.1\ \frac{\text{m}^2}{\text{s}},\]</span></p>
+<p><span class="math display">\[w = \frac{73.1\ \text{m}^2/\text{s}}{13.4\ \text{m/s}} = 5.5\ \text{m}.\]</span></p>
+<p>That is a physically sensible number: a nozzle boom of two to three metres, widened by rotor downwash that carries droplets outward and downward before they deposit. It also shows that the manufacturer’s headline coverage figure is an instantaneous spraying rate, not a field rate.</p>
+<p>The field rate is set by the tank, and the arithmetic is unforgiving. Drone application is deliberately low-volume — typically 10 to 20 litres per hectare, against 100 or more for a ground rig — because carrying water is the whole cost. At 15 L/ha, a 40-litre tank treats</p>
+<p><span class="math display">\[\frac{40\ \text{L}}{15\ \text{L/ha}} = 2.67\ \text{ha} = 6.6\ \text{acres}\]</span></p>
+<p>before it is empty. To sustain the advertised 62 acres per hour, the operator must complete about 9.4 tank cycles per hour, one every 6.4 minutes, each including the return leg, the refill, and — since a fully loaded spray drone’s flight endurance is on the order of eight to ten minutes — a battery swap. <strong>The binding constraint on a spraying operation is not flight time or software; it is ground logistics.</strong> A crew running one aircraft with a mix tank, a generator, and a bank of charging batteries is the actual production system, and the aircraft is one component of it. This is the operational reality behind an otherwise innocuous specification sheet, and it is the kind of second-order consequence that only appears when the numbers are propagated.</p>
+</section>
+<section id="droplet-physics-and-the-flight-envelope" class="level3" data-number="2.7.4">
+<h3 data-number="2.7.4" class="anchored" data-anchor-id="droplet-physics-and-the-flight-envelope"><span class="header-section-number">2.7.4</span> Droplet physics and the flight envelope</h3>
+<p>The dominant environmental hazard of aerial application is drift: droplets that leave the nozzle but never reach the target, carried away by wind. Drift wastes chemical, damages neighbouring crops, contaminates water, and exposes people. It is also almost entirely a function of droplet size, and that is a parameter the operator sets through nozzle selection and pressure.</p>
+<p>A droplet falling at terminal velocity in still air has reached the speed at which drag balances weight. For a small droplet, where the Reynolds number is below about one and viscous drag dominates, Stokes’ law gives</p>
+<p><span class="math display">\[v_t = \frac{\rho_l\, d^2\, g}{18\,\mu_a},\]</span></p>
+<p>with <span class="math inline">\(\rho_l\)</span> the liquid density, <span class="math inline">\(d\)</span> the droplet diameter, <span class="math inline">\(g\)</span> gravitational acceleration, and <span class="math inline">\(\mu_a\)</span> the dynamic viscosity of air. For a 100 <span class="math inline">\(\mu\)</span>m water droplet at sea level (<span class="math inline">\(\rho_l = 1000\)</span> kg/m³, <span class="math inline">\(\mu_a = 1.81 \times 10^{-5}\)</span> Pa·s),</p>
+<p><span class="math display">\[
+\begin{aligned}
+v_t &amp;= \frac{(1000)(100\times10^{-6})^2(9.81)}{18\,(1.81\times10^{-5})} \\
+    &amp;= \frac{9.81\times10^{-5}}{3.26\times10^{-4}} = 0.30\ \text{m/s}.
+\end{aligned}
+\]</span></p>
+<p>A check on the assumption: <span class="math inline">\(\mathrm{Re} = \rho_a v_t d/\mu_a = (1.2)(0.30)(10^{-4})/(1.81\times10^{-5}) \approx 2\)</span>. Stokes’ law is strictly valid only for <span class="math inline">\(\mathrm{Re} \ll 1\)</span>, so a 100 <span class="math inline">\(\mu\)</span>m droplet sits at the upper edge of the regime rather than safely inside it: drag is already mildly nonlinear, and the 0.30 m/s figure overestimates the true settling velocity by roughly 20 % (a standard nonlinear-drag correction puts the actual value near 0.25 m/s). The estimate is good enough to reason with, but it is optimistic, and the drift distance computed from it below is correspondingly a lower bound.</p>
+<p>Now propagate that into a drift estimate. Released from <span class="math inline">\(h = 3\)</span> m above the canopy, the droplet needs <span class="math inline">\(t = h/v_t = 3/0.30 = 10\)</span> s to settle. In a 3 m/s crosswind — a gentle breeze, well inside conditions an operator would consider flyable — it travels</p>
+<p><span class="math display">\[x = U\,t = (3\ \text{m/s})(10\ \text{s}) = 30\ \text{m}\]</span></p>
+<p>downwind before it lands. Thirty metres of displacement means the chemical is not on the target field at all.</p>
+<p>Coarsen the spray to a 300 <span class="math inline">\(\mu\)</span>m volume median diameter and the picture changes qualitatively. Stokes’ law would predict <span class="math inline">\(v_t\)</span> scaling as <span class="math inline">\(d^2\)</span>, giving 2.7 m/s, but at that size <span class="math inline">\(\mathrm{Re} \approx 50\)</span> and drag is no longer linear in velocity; the measured terminal velocity of a 300 <span class="math inline">\(\mu\)</span>m water droplet is closer to 1.2 m/s. Settling time falls to 2.5 s and drift to about 7.5 m — roughly a fourfold reduction from a threefold change in diameter, and nearer fivefold once the Stokes overestimate at 100 <span class="math inline">\(\mu\)</span>m noted above is corrected. This is precisely why chemical labels specify droplet-size categories rather than leaving nozzle choice to the operator, and why they pair those categories with downwind buffer distances and maximum wind speeds. It is also why release height is a controlled parameter: drift is linear in <span class="math inline">\(h\)</span>, so flying a metre lower cuts drift by a third.</p>
+<p>The competing pressure is that very coarse droplets bounce off leaves and reach the canopy floor without depositing, and that fewer, larger droplets give sparser coverage for the same volume. Aerial application is therefore an optimization between drift and efficacy, conducted through nozzle selection, boom pressure, release height, ground speed, and the wind window in which flight is permitted at all. Rotor downwash complicates it further by adding a strong induced flow that drives droplets into the canopy — an advantage for penetration and a hazard for drift when the aircraft banks or turns and the wake tilts.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="For More">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>For More
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The single-droplet Stokes calculation above is a first-order estimate. Regulatory drift assessment uses Lagrangian dispersion models that track a full droplet-size spectrum through the aircraft’s wake, accounting for evaporation of the droplet during descent (which shrinks it and therefore worsens drift as it falls), atmospheric stability class, and the rotor-induced velocity field. Readers who intend to work in aerial application should study a spray-drift model such as AGDISP alongside the droplet-size classification standards that chemical labels reference, and should note that the wake structure of a multirotor differs substantially from the fixed-wing wake for which most of that modelling literature was developed.</p>
+</div>
+</div>
+</section>
+<section id="the-regulatory-stack" class="level3" data-number="2.7.5">
+<h3 data-number="2.7.5" class="anchored" data-anchor-id="the-regulatory-stack"><span class="header-section-number">2.7.5</span> The regulatory stack</h3>
+<p>Aerial application is the vertical with the deepest regulatory stack in commercial drone work, because two independent federal regimes apply simultaneously: aviation law governs the aircraft, and pesticide law governs the substance.</p>
+<p>On the aviation side, the operator needs the Part 107 remote pilot certificate as a baseline. Dispensing itself is a separate class of operation, certificated under 14 CFR Part 137 (Agricultural Aircraft Operations), which covers the dispensing of chemicals and agricultural products from aircraft and was written for crewed agricultural aviation. Because every practical spray drone exceeds 55 pounds, the aircraft falls outside Part 107 entirely and requires an exemption issued under 49 U.S.C. § 44807, the statutory authority under which the FAA permits operations by uncrewed aircraft that do not fit the small-UAS rule. Aircraft registration is required, and Part 137 operations have historically carried a medical-certificate expectation inherited from crewed agricultural flying, which operators of uncrewed agricultural aircraft address through the terms of their exemption. Operators commonly seek further waivers for night operation and, in fleet operations, for one remote pilot supervising multiple aircraft. Rulemaking in this area is active — a dedicated framework for routine BVLOS operations has been under development — so any specific operation must be planned against the currently effective rule set rather than against a textbook.</p>
+<p>On the chemical side, federal pesticide law imposes an entirely separate certification. Applicators are classified as <em>private</em> (applying restricted-use pesticides on land they own or rent, in the production of an agricultural commodity) or <em>commercial</em> (applying for hire, or on land they do not control), a distinction that turns on land tenure rather than on business size. Federal certification standards define ten categories of applicator classification by application setting — agricultural pest control, forest, ornamental and turf, seed treatment, aquatic, right-of-way, industrial and institutional, public health, regulatory, and demonstration and research — and an applicator must be certified in each category in which they work. Certification requires passing written examinations and completing training, and it must be renewed on a recurring schedule. States, territories, and tribes add their own certification and licensing requirements on top of the federal standard, so an operator working across a state line generally needs a second certification. Underlying all of it is the principle that the pesticide label is legally binding: the label’s stated application rate, droplet size, buffer, wind limits, and re-entry interval are enforceable requirements, not guidance.</p>
+<p>The engineering consequence is that the certification burden — cost, examination time, and recurring recertification — is a real fixed cost of the business that belongs in the amortization model above, and that the fastest way to make a technically excellent spray system commercially worthless is to design it so that it cannot be operated legally.</p>
+</section>
+<section id="alternate-uses-of-the-same-platform" class="level3" data-number="2.7.6">
+<h3 data-number="2.7.6" class="anchored" data-anchor-id="alternate-uses-of-the-same-platform"><span class="header-section-number">2.7.6</span> Alternate uses of the same platform</h3>
+<p>The tank is a general-purpose dispensing mechanism, and once an operator holds the certifications, the same airframe supports adjacent work: liquid fertilizer, fungicide, and herbicide application; dry-material spreading of seed, granular fertilizer, and cover crop with a swapped spreader module; targeted invasive-species and brush control on terrain no ground rig can enter; mosquito and public-health vector control over standing water; release of biological control agents; and forestry and reforestation seeding. Non-agricultural adaptations of the same payload include firefighting gel application and de-icing. Each of these changes the substance, the applicator category, and often the label requirements, but not the aircraft — which is the strongest possible illustration of the off-the-shelf-plus-software thesis developed in the next section.</p>
+</section>
+</section>
+<section id="security-and-public-safety" class="level2" data-number="2.8">
+<h2 data-number="2.8" class="anchored" data-anchor-id="security-and-public-safety"><span class="header-section-number">2.8</span> Security and Public Safety</h2>
+<p>Security work substitutes persistence for coverage. The payload is typically a stabilized RGB camera with strong optical zoom paired with a thermal sensor, since the operationally interesting hours are at night, and the flight profile is a slow orbit or a hover at altitude rather than a grid. Three regulatory constraints dominate. First, meaningful patrol coverage requires BVLOS authorization, without which the aircraft cannot leave the pilot’s sight. Second, security flying frequently occurs over people, which is separately restricted and gated on the aircraft’s category and its demonstrated injury risk. Third, night operation is now permitted under Part 107 subject to anti-collision lighting and training requirements, which is what made the vertical viable at all.</p>
+<p>The distinctive operational pattern is <em>drone as first responder</em>: an aircraft stationed on a rooftop dock launches automatically on a dispatched call, arrives ahead of ground units, and streams live video to responders en route so that the nature of the incident is known before anyone arrives. This requires BVLOS authorization, an automated launch and recovery enclosure, redundant command and control links, and detect-and-avoid capability adequate to satisfy the safety case. Tethered aircraft occupy an adjacent niche, trading mobility for effectively unlimited endurance by drawing power up a cable, which suits fixed-point event and perimeter overwatch.</p>
+<p>Privacy is the constraint most likely to be underestimated by an engineer. Federal aviation rules govern how an aircraft may fly, not what it may record; recording is governed by a patchwork of state surveillance statutes, municipal ordinances, constitutional limits on government searches, and institutional policy. Remote identification requirements mean the aircraft broadcasts its identity and position to anyone with a receiver, which cuts both ways: it constrains covert operation and it provides accountability. The correct engineering posture is to treat data retention, access control, and redaction as system requirements designed in from the start, a theme Part V returns to at length.</p>
+</section>
+<section id="wildlife-management" class="level2" data-number="2.9">
+<h2 data-number="2.9" class="anchored" data-anchor-id="wildlife-management"><span class="header-section-number">2.9</span> Wildlife Management</h2>
+<p>Wildlife work uses drones in three distinct modes, and it is the vertical this book returns to most often.</p>
+<p>The first is <strong>survey and census</strong>. A thermal sensor flown at night detects endothermic animals against a cooled background far more reliably than a daytime RGB camera detects them against vegetation, and an automated detection model turns a mosaic into a population count. The engineering problems are resolution — an animal must span enough pixels for a detector to classify it, which fixes altitude through the same GSD relation used in mapping — and double counting, which is why survey grids specify overlap and why detections must be deduplicated in a common geographic frame.</p>
+<p>The second is <strong>behavioural and habitat monitoring</strong>: repeat multispectral or RGB survey of nesting sites, wetlands, or herd ranges, where the deliverable is change over time rather than a single snapshot.</p>
+<p>The third is <strong>active management</strong>, in which the aircraft does not merely observe but intervenes — hazing birds from an airfield or a crop, moving a herd, or dispersing a flock from a protected area. This mode raises the sharpest questions in the vertical, because the same disturbance that makes deterrence effective is a documented stressor on the animals involved, and wildlife-harassment law in most jurisdictions requires a permit for exactly this reason. Protected species add federal restrictions on approach distance and disturbance regardless of intent.</p>
+<p>This third mode is where the book’s running example lives. The <strong>Goose Management System</strong> sketched in the preface — a Robot Operating System 2 (ROS 2) vehicle that searches a protected area, detects geese with onboard computer vision, and executes an autonomous deterrence maneuver — is precisely the wildlife-management vertical in miniature, with every one of the five defining questions instantiated: the payload is a depth camera and a companion computer; the binding constraint is visual line of sight plus wildlife-disturbance permission; the corrupting physics is illumination and background clutter in the detector; the flight workflow is an autonomous search grid transitioning to a pursuit behaviour; and the deliverable is the deterrence itself rather than a report. That mapping is worth carrying forward: the chapter that closes this Part assembles the system end to end, and every subsequent Part builds one of those five answers.</p>
+</section>
+<section id="why-off-the-shelf-hardware-plus-custom-software-won" class="level2" data-number="2.10">
+<h2 data-number="2.10" class="anchored" data-anchor-id="why-off-the-shelf-hardware-plus-custom-software-won"><span class="header-section-number">2.10</span> Why Off-the-Shelf Hardware Plus Custom Software Won</h2>
+<p>The final structural observation of this chapter concerns architecture. Around 2015, a commercial drone operation with unusual requirements built its own aircraft. Today, in every vertical surveyed above, the dominant pattern is a mass-produced airframe carrying custom software. Four forces produced that shift.</p>
+<p><strong>The airframe commoditized.</strong> Brushless motors, electronic speed controllers, carbon-fibre structure, and lithium-polymer cells are high-volume commodities whose price and quality are set by markets far larger than aviation. A team fabricating its own airframe pays more for worse components and inherits a maintenance and spares problem, while gaining nothing a customer can perceive. Airframe design remains genuinely necessary only where the payload is unusual enough that no product exists — which is exactly the spray-drone case, where tank geometry drives the whole vehicle.</p>
+<p><strong>Flight control became a solved, open commodity.</strong> Mature open-source autopilot firmware running on inexpensive standardized flight-controller hardware provides state estimation, stabilization, failsafe logic, and mission execution that no small team could match from scratch. Attitude control — the innermost loop of the sense–think–act hierarchy laid out at the end of this Part, and the quantitative subject of Part II — is now something an engineer configures rather than invents.</p>
+<p><strong>Companion compute became cheap and small.</strong> A single-board computer with a hardware neural-network accelerator, drawing a few watts and weighing under a hundred grams, can run real-time object detection onboard. This is the enabling change for autonomy: the aircraft no longer needs to send video to a ground station and wait for an answer. Part III develops exactly this capability.</p>
+<p><strong>Value migrated up the stack.</strong> Because everyone can buy the same airframe, sensor, and autopilot, no operator differentiates on hardware. Differentiation comes from the flight-planning logic that guarantees data integrity, the processing pipeline that turns imagery into a measurement, the domain model that interprets the measurement, and the deliverable that makes it actionable. Those are all software and expertise. An operator’s defensible advantage is knowing that a roof must be flown after dusk, that a 1 cm GSD specification costs seven times as many flights, and that a 100 <span class="math inline">\(\mu\)</span>m droplet drifts thirty metres in a gentle breeze.</p>
+<p>The consequence for a student of drone computing is direct: the interesting engineering is no longer in making the vehicle fly, but in the layer that decides where it flies, what it measures, and what the measurement means. That layer is the subject of the rest of this book — and it is why the Goose Management System is built on a purchased airframe and a purchased flight controller, with every original line of work living in the autonomy stack above them. The chapters that follow work upward from exactly that purchased hardware, beginning with the airframe and its propulsion: what those components have to do, and how an engineer chooses them competently enough to earn the right to ignore them afterwards.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="2.11">
+<h2 data-number="2.11" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">2.11</span> Check Your Understanding</h2>
+<ol type="1">
+<li>A client requires a 1.5 cm/pixel orthomosaic of a 40-hectare site. Using the camera from the worked example (<span class="math inline">\(p = 3.30\ \mu\)</span>m, <span class="math inline">\(f = 12.3\)</span> mm, 5280 × 3956 pixels), find the required flight altitude and estimate the number of 20-minute flights needed at 75 % side overlap and 10 m/s ground speed.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Altitude follows from inverting the GSD relation: <span class="math inline">\(H = \text{GSD}\cdot f/p = (0.015)(12.3\times10^{-3})/(3.30\times10^{-6}) = 56.0\)</span> m. The footprint width is <span class="math inline">\(5280 \times 0.015\ \text{m} = 79.2\)</span> m, so at 75 % side overlap the line spacing is <span class="math inline">\(0.25 \times 79.2 = 19.8\)</span> m. Coverage rate is <span class="math inline">\(19.8 \times 10 = 198\ \text{m}^2/\text{s}\)</span>, or <span class="math inline">\(198 \times 1200 = 237{,}600\ \text{m}^2 = 23.8\)</span> ha per 20-minute flight. Forty hectares therefore needs <span class="math inline">\(40/23.8 = 1.7\)</span>, so two flights — plus margin in practice for turns at the end of each line, transit to and from the launch point, and the extra lines needed to overfly the site boundary.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Explain why a commercial roof inspection is flown after sunset rather than at midday, and state what physical property of the target makes the anomaly detectable at all.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The detectable signal is a temperature difference between saturated and dry insulation, which exists because water has a much higher volumetric heat capacity than dry roofing material and therefore stores more energy and releases it more slowly. At midday, direct solar loading heats the whole roof surface by tens of degrees and swamps the few-degree subsurface contrast; the thermal image then reports variation in surface absorptivity rather than subsurface moisture. After sunset the dry roof radiates its heat to the sky and cools quickly while the wet regions release stored energy slowly, so they appear as distinct warm anomalies. Timing is a data-quality parameter, not a convenience.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>A spray drone has an empty weight of 52 kg and a maximum takeoff weight of 92 kg. Its manufacturer offers a 40 L tank. An engineer proposes adding a 3 kg multispectral sensing package so the aircraft can map and spray on the same sortie. Evaluate the proposal quantitatively.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The payload budget is <span class="math inline">\(92 - 52 = 40\)</span> kg, which a full 40 L tank of water-density mix consumes exactly. Adding 3 kg of sensor forces the tank to be filled to at most 37 L — a 7.5 % reduction in chemical per sortie. At a 15 L/ha application rate, area treated per tank falls from 2.67 ha to 2.47 ha, so covering a given field requires about 8 % more tank cycles, and since ground logistics (refill plus battery swap) is the binding constraint on field rate, the whole operation slows by roughly that fraction. The proposal is not impossible, but it trades production capacity for a capability the operator may be able to obtain more cheaply by flying a separate small mapping aircraft. This is the general form of the payload argument: on a spray platform, every kilogram of added hardware is paid for in litres.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>Using Stokes’ law, compare the downwind drift of a 150 <span class="math inline">\(\mu\)</span>m droplet released 2 m above the canopy in a 2 m/s crosswind with that of the same droplet released at 4 m in a 4 m/s crosswind. What does the comparison say about which operational parameter an operator should control first?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Terminal velocity is <span class="math inline">\(v_t = \rho_l d^2 g/(18\mu_a) = (1000)(150\times10^{-6})^2(9.81)/(18 \times 1.81\times10^{-5}) = 0.68\)</span> m/s. In the first case the settling time is <span class="math inline">\(2/0.68 = 2.9\)</span> s and the drift is <span class="math inline">\(2 \times 2.9 = 5.9\)</span> m. In the second, the settling time is <span class="math inline">\(4/0.68 = 5.9\)</span> s and the drift is <span class="math inline">\(4 \times 5.9 = 23.5\)</span> m — four times as far, because drift <span class="math inline">\(x = Uh/v_t\)</span> is linear in both release height and wind speed, so doubling both quadruples the result. Wind speed is not under the operator’s control, only the decision whether to fly; release height is directly controllable, and is the parameter to reduce first. Droplet diameter is even more powerful, since <span class="math inline">\(v_t\)</span> scales as roughly <span class="math inline">\(d^2\)</span> in the Stokes regime, which is why label-specified droplet-size categories exist. Note that at 150 <span class="math inline">\(\mu\)</span>m the droplet Reynolds number is already about 7, so Stokes’ law somewhat overestimates <span class="math inline">\(v_t\)</span> and therefore <em>underestimates</em> both drift figures; the ranking of the two cases is unaffected, but the absolute numbers should be treated as optimistic.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>Why does essentially every commercial spraying drone fall outside baseline Part 107, and what does that imply about the regulatory work required before the first flight?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Part 107 applies to small unmanned aircraft with a maximum takeoff weight below 55 lb (25 kg), and that budget cannot accommodate a commercially useful tank: agricultural mix has roughly the density of water, so even a 10 L tank consumes 10 kg of the 25 kg total, leaving too little for an airframe and battery capable of lifting the result. Real platforms have MTOWs of 200 lb and above. The consequence is that the operator needs an exemption under 49 U.S.C. § 44807 for the over-55-pound aircraft, plus certification under Part 137 for the dispensing operation itself, plus a Part 107 remote pilot certificate as a baseline, plus aircraft registration — and separately, under pesticide law, applicator certification in the correct private-or-commercial classification and in each relevant federal category, along with any state, territorial, or tribal certification that applies. The regulatory pathway is measured in months and is a fixed cost of entering the business.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>The chapter argues that commercial operators no longer differentiate on hardware. Given that everyone can buy the same airframe, sensor, and autopilot, identify three places where an operator’s engineering work still creates advantage, and connect each to a later Part of this book.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Acceptable answers include: (a) flight-planning and mission logic that guarantees data integrity — correct altitude for the specified GSD, guaranteed overlap, terrain following, and the search or coverage pattern itself, which Part II and Part IV develop; (b) onboard perception, since running detection on the aircraft rather than on a ground station changes what behaviours are possible in flight, developed in Part III; (c) the processing and interpretation pipeline that converts raw sensor data into a measurement and then into an actionable deliverable, together with the integration, diagnostic, and ethical judgement needed to make it work in the field, which Part V addresses. The common thread is that all three are software and domain expertise layered above commodity hardware.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="2.12">
+<h2 data-number="2.12" class="anchored" data-anchor-id="try-it"><span class="header-section-number">2.12</span> Try It</h2>
+<p>Pick one commercial vertical that this chapter did <em>not</em> treat in depth — options include wind-turbine blade inspection, bridge and dam inspection, cell-tower audit, mine stockpile volumetrics, search and rescue, film and broadcast, delivery of medical samples, or maritime and port survey — and write a one-page specification that answers the five defining questions in order.</p>
+<p>Be quantitative wherever the chapter was quantitative. State the payload and, if your vertical is imaging-based, use the GSD relation to compute the flight altitude your resolution requirement implies, then propagate it to coverage per flight. Name the <em>single</em> binding regulation, not a list, and justify why that one binds before the others. Identify one environmental variable that could corrupt your data and explain the physics of how it does so, including what time of day or season you would fly to avoid it. Specify the flight pattern and say what data-integrity requirement forces it. Finally, describe the deliverable in the form a non-specialist client would act on — and state explicitly what decision it lets them make.</p>
+<p>Then perform the test that separates a specification from a wish: find one number in your answer that, if the client tightened it by a factor of two, would change your aircraft, your regulatory pathway, or your price. In the mapping vertical that number is GSD; in aerial application it is tank capacity. Knowing which number is load-bearing in your own vertical is the whole skill this chapter is trying to build.</p>
+<p><strong>Related Lab:</strong> <em>No lab currently maps to this chapter.</em></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../index.html" class="pagination-link" aria-label="Preface">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="pagination-link" aria-label="Anatomy of a Multirotor: Frames, Motors, and Propulsion">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>14&nbsp; TinyML: Deploying Neural Networks on Embedded Hardware – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" rel="next">
+<link href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html">Part III — Perception at the Edge: TinyML &amp; Computer Vision</a></li><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">14.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">14.2</span> Key Vocabulary</a></li>
+  <li><a href="#the-placement-problem" id="toc-the-placement-problem" class="nav-link" data-scroll-target="#the-placement-problem"><span class="header-section-number">14.3</span> The Placement Problem</a></li>
+  <li><a href="#the-memory-bill-weights-activations-buffers" id="toc-the-memory-bill-weights-activations-buffers" class="nav-link" data-scroll-target="#the-memory-bill-weights-activations-buffers"><span class="header-section-number">14.4</span> The Memory Bill: Weights, Activations, Buffers</a></li>
+  <li><a href="#quantization-trading-precision-for-feasibility" id="toc-quantization-trading-precision-for-feasibility" class="nav-link" data-scroll-target="#quantization-trading-precision-for-feasibility"><span class="header-section-number">14.5</span> Quantization: Trading Precision for Feasibility</a></li>
+  <li><a href="#the-rest-of-the-toolbox-pruning-distillation-and-system-level-tricks" id="toc-the-rest-of-the-toolbox-pruning-distillation-and-system-level-tricks" class="nav-link" data-scroll-target="#the-rest-of-the-toolbox-pruning-distillation-and-system-level-tricks"><span class="header-section-number">14.6</span> The Rest of the Toolbox: Pruning, Distillation, and System-Level Tricks</a></li>
+  <li><a href="#from-trained-model-to-flying-model" id="toc-from-trained-model-to-flying-model" class="nav-link" data-scroll-target="#from-trained-model-to-flying-model"><span class="header-section-number">14.7</span> From Trained Model to Flying Model</a></li>
+  <li><a href="#two-toolkits-for-the-smallest-tier" id="toc-two-toolkits-for-the-smallest-tier" class="nav-link" data-scroll-target="#two-toolkits-for-the-smallest-tier"><span class="header-section-number">14.8</span> Two Toolkits for the Smallest Tier</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">14.9</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">14.10</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html">Part III — Perception at the Edge: TinyML &amp; Computer Vision</a></li><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The Images as Data chapter closed on a promise with two halves: how a network’s kernel weights are learned, and how a network of them is compressed until it runs, at frame rate, inside a 10-watt computer bolted to a 2.2-kilogram aircraft. This chapter takes the second half first, and the order is deliberate. Learning the weights — the data, the labels, the training loop — is the business of the next chapter, on building a detection pipeline; but what can usefully be trained is dictated by where the result must run, and an engineer who trains first and asks deployment questions afterward routinely produces a model that is accurate, elegant, and unflyable. The discipline that takes the deployment constraints as the <em>starting point</em> of model design has a name: <strong>TinyML</strong> — machine learning made useful under physical constraints of memory, compute, power, and time. Its founding observation is a mismatch. Mainstream deep learning grows by every axis at once — more parameters, more data, more accelerator hours — while an aircraft’s budget is fixed by battery chemistry and payload mass before any model is chosen. Someone must move, and it will not be the battery.</p>
+<p>The constraints themselves are not new to this book. Part I priced the wireless link and found it could not carry the camera stream, which is why the pixels are understood onboard at all; the Anatomy of a Multirotor chapter allotted roughly 12 W to the entire avionics complement and showed that every added gram reappears as lost loiter time; and the previous chapter left a warning on the table: the tensors flowing <em>between</em> a network’s layers often cost more memory than the network’s own weights. What this chapter adds is the machinery that lives inside those constraints. It maps the three places a model can run and why the choice among them precedes every other choice; it itemizes the real memory bill of onboard inference — weights, activations, buffers — rather than the datasheet’s flattering summary; it develops <strong>quantization</strong>, the single most consequential compression technique, from its arithmetic up through a worked accounting of what it saves; it surveys pruning and distillation, the other members of the compression toolbox; and it follows a trained model down the deployment pipeline — convert, optimize, deploy — through the runtimes that execute it, ending with a comparison of the two toolkits that dominate the smallest tier of that pipeline, TensorFlow Lite for Microcontrollers and Edge Impulse.</p>
+<section id="learning-objectives" class="level2" data-number="14.1">
+<h2 data-number="14.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">14.1</span> Learning Objectives</h2>
+<ul>
+<li>Place a given computation on the right tier of the drone compute hierarchy — cloud, companion computer, or microcontroller — by arguing from latency, bandwidth, power, link reliability, and privacy, and explain why training and inference almost never share a tier.</li>
+<li>Itemize the memory bill of onboard inference as weights, activations, and buffers, estimate each from a model’s architecture and input shape, and identify which term dominates on each hardware tier.</li>
+<li>Explain what int8 quantization does mechanically — the scale factor, the rounding, the 256 levels — and compute the memory saving for a specific layer and a whole model at float32 versus int8.</li>
+<li>State why quantization typically improves latency and energy per inference, not just footprint, and what accuracy cost it exacts and how calibration and quantization-aware training contain that cost.</li>
+<li>Describe pruning and knowledge distillation, and state the runtime-support caveat that separates a smaller model file from a faster model.</li>
+<li>Compare Edge Impulse and TensorFlow Lite for Microcontrollers as deployment toolkits — who owns each pipeline stage, what each is optimized for, and which engineering situations favor each.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="14.2">
+<h2 data-number="14.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">14.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>TinyML</strong> — the discipline of designing, compressing, and deploying machine-learning models to run under tight physical constraints — memory in kilobytes to megabytes, power in milliwatts to watts — on hardware at or near the sensor that produces the data.</li>
+<li><strong>Quantization</strong> — replacing a model’s high-precision numbers (typically 32-bit floats) with low-precision ones (typically 8-bit integers) related by a stored scale factor, cutting memory, memory bandwidth, and usually latency at a small cost in accuracy.</li>
+<li><strong>Post-training quantization</strong> (PTQ) — quantizing an already-trained float model by measuring the ranges of its weights and activations on a small <em>calibration</em> dataset and choosing scale factors from them; no retraining required.</li>
+<li><strong>Quantization-aware training</strong> (QAT) — training (or fine-tuning) a model with simulated quantization in the loop, so the weights settle into values that survive rounding; costlier than PTQ but recovers most of its accuracy loss.</li>
+<li><strong>Pruning</strong> — removing weights, channels, or whole neurons that contribute little to a network’s output; shrinks the parameter count, but yields speed only when the runtime and hardware can exploit the resulting sparsity or reduced structure.</li>
+<li><strong>Knowledge distillation</strong> — training a small <em>student</em> model to reproduce the outputs of a large <em>teacher</em> model, transferring capability into a deployable size; the teacher stays on the workstation, the student flies.</li>
+<li><strong>Model footprint</strong> — the storage a deployed model occupies (its weights plus metadata), as distinct from the RAM its execution consumes; the number quoted on a model card, and never the whole bill.</li>
+<li><strong>Activation memory</strong> — the RAM occupied at inference time by the intermediate tensors flowing between layers; it scales with input resolution and often exceeds the weights, especially on memory-poor devices.</li>
+<li><strong>Inference latency</strong> — the wall-clock time from presenting an input tensor to receiving the model’s output, the quantity a control loop actually waits on; measured, never assumed, and the central subject of the Real-Time Inference on the Edge chapter.</li>
+<li><strong>TensorFlow Lite</strong> (TFLite) — the deployment-oriented branch of the TensorFlow ecosystem: a converter that emits a compact model file and a lean runtime that executes it on phones and single-board computers; its sibling <strong>TensorFlow Lite for Microcontrollers</strong> (TFLM) is a C++ library that runs the same models on bare-metal microcontrollers with no operating system and no dynamic memory allocation.</li>
+<li><strong>Edge Impulse</strong> — a hosted end-to-end platform for embedded ML that carries a project from data acquisition through signal processing, training, and testing to an exported, compiled C++ library for a target microcontroller.</li>
+<li><strong>Tensor arena</strong> — in TFLM, the single statically allocated block of RAM from which all of a model’s activations and scratch buffers are carved at runtime; the developer sizes it by hand, and it is the practical measure of a model’s RAM appetite on an MCU.</li>
+</ul>
+</section>
+<section id="the-placement-problem" class="level2" data-number="14.3">
+<h2 data-number="14.3" class="anchored" data-anchor-id="the-placement-problem"><span class="header-section-number">14.3</span> The Placement Problem</h2>
+<p>Every machine-learning system that touches a robot answers one question before any question of architecture: <em>where does the model run?</em> The candidate answers form a hierarchy of three tiers, separated by orders of magnitude in every resource that matters, and <a href="#fig-drone-compute-ladder" class="quarto-xref">Figure&nbsp;<span>14.1</span></a> lays them side by side.</p>
+<div id="fig-drone-compute-ladder" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Three-column comparison diagram titled the deployment gap. The left column, cloud or server GPU, off the aircraft entirely, shows a server rack icon and lists memory of tens of gigabytes, power of hundreds of watts, gigahertz clocks with thousands of cores, reached via a variable wireless link; it runs training, retraining, heavy review, mapping, labeling, and long-term learning well, with a red italic warning that it is never the only path for a decision the mission needs in the next hundred milliseconds. The middle column, companion computer on the airframe, Jetson-class single-board computer, shows a board icon with CPU, GPU, and shared RAM blocks and lists a few gigabytes of memory shared between CPU and GPU, about ten watts drawn from the battery, gigahertz clocks with about one hundred GPU cores, reached via onboard bus with no radio; it runs vision models at frame rate, ROS 2 nodes, logging, and the running example's detector, with a note that every watt of compute is subtracted from flight time. The right column, microcontroller, always-on STM32 or Arduino class, shows a chip icon and lists SRAM in the kilobyte range, milliwatt power, megahertz single-core clocks, wired to its sensor; it runs always-on IMU and audio triggers, window classifiers, and wake-up cascades, with a note that activations count against SRAM as hard as the weights do. Below, a log-scale axis marks 256 kilobytes of MCU SRAM, 4 gigabytes for a Jetson Nano, and 40 gigabytes for a server GPU, with arrows labeled times ten down and times sixteen thousand down. A banner states that deployment is a placement problem, choose where the model runs before choosing the model, keep urgent sensing local and offload only what can wait, and that the running example's goose detector is trained in the cloud tier and flown in the companion tier.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-drone-compute-ladder-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/drone-compute-ladder.svg" class="img-fluid figure-img" style="width:95.0%" alt="Three-column comparison diagram titled the deployment gap. The left column, cloud or server GPU, off the aircraft entirely, shows a server rack icon and lists memory of tens of gigabytes, power of hundreds of watts, gigahertz clocks with thousands of cores, reached via a variable wireless link; it runs training, retraining, heavy review, mapping, labeling, and long-term learning well, with a red italic warning that it is never the only path for a decision the mission needs in the next hundred milliseconds. The middle column, companion computer on the airframe, Jetson-class single-board computer, shows a board icon with CPU, GPU, and shared RAM blocks and lists a few gigabytes of memory shared between CPU and GPU, about ten watts drawn from the battery, gigahertz clocks with about one hundred GPU cores, reached via onboard bus with no radio; it runs vision models at frame rate, ROS 2 nodes, logging, and the running example's detector, with a note that every watt of compute is subtracted from flight time. The right column, microcontroller, always-on STM32 or Arduino class, shows a chip icon and lists SRAM in the kilobyte range, milliwatt power, megahertz single-core clocks, wired to its sensor; it runs always-on IMU and audio triggers, window classifiers, and wake-up cascades, with a note that activations count against SRAM as hard as the weights do. Below, a log-scale axis marks 256 kilobytes of MCU SRAM, 4 gigabytes for a Jetson Nano, and 40 gigabytes for a server GPU, with arrows labeled times ten down and times sixteen thousand down. A banner states that deployment is a placement problem, choose where the model runs before choosing the model, keep urgent sensing local and offload only what can wait, and that the running example's goose detector is trained in the cloud tier and flown in the companion tier.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-drone-compute-ladder-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;14.1: The three tiers a model can run on — cloud GPU, companion computer, microcontroller — separated by orders of magnitude in memory and power, with the wireless link severed from the decision path at the first step onboard.
+</figcaption>
+</figure>
+</div>
+<p>At the top sits the <strong>cloud tier</strong> — server GPUs with tens of gigabytes of memory, drawing hundreds of watts, reachable from the aircraft only through a wireless link. Part I already disqualified that link as a <em>pipe</em> for imagery on bandwidth grounds; the placement argument adds two counts to the indictment. The first is <strong>latency and its variance</strong>: a round trip over a real wireless link takes tens to hundreds of milliseconds when it works, and an unbounded time when it degrades — and a deterrence maneuver steering toward a moving animal consumes a fresh target position every frame. A decision loop is only as fast as its slowest hop, and a hop through a radio makes the loop’s worst case the radio’s worst case. The second is <strong>power</strong>: transmitting data costs battery just as computing does, and streaming sensor data to remote compute spends the energy budget twice — once to send the question, once to fly while waiting for the answer. The cloud tier is not thereby useless; it is where everything that <em>can wait</em> belongs — training and retraining, heavy post-flight analysis, mapping, labeling, the long-term learning loop. The design rule the hierarchy enforces is exactly that split: <em>keep urgent sensing local; offload only what can wait.</em></p>
+<p>The middle tier is the <strong>companion computer</strong>, and it is where this book has been heading since Part I bolted one to the airframe. A Jetson-class single-board computer offers a few gigabytes of RAM shared between CPU and GPU, roughly a hundred GPU cores, and a power appetite near 10 W — a budget the Companion Computers chapter showed already strains the ~12 W avionics allowance. It runs a full Linux stack, ROS 2 nodes, and — decisively — GPU-shaped inference at frame rate, with no radio between the camera and the decision. This is the tier the running example’s detector occupies, and the tier whose constraints shape most of this chapter.</p>
+<p>The bottom tier is the <strong>microcontroller</strong> (MCU) — an STM32- or Arduino-class chip clocked in megahertz, holding SRAM measured in kilobytes, drawing milliwatts. No deep vision model fits here, and none should be forced to; the tier’s genius is different. An MCU can afford to be <em>always on</em>: a 1-D convolutional classifier watching an accelerometer window for anomalous vibration, or an audio trigger listening for a signature, can run continuously for the cost of a status LED and wake heavier machinery only when something warrants it. The source constraint that defines this tier is worth internalizing as a single figure of merit: a MobileNet-class vision model occupies about 16.9 MB as trained, while a realistic MCU memory budget is 256 KB — a factor of sixty-six before a single activation or buffer is counted. Deployment at this tier is not a matter of trimming a model; it is a matter of designing a different, far smaller one, which is why the toolkits examined at this chapter’s end exist.</p>
+<p>Two consequences of the hierarchy organize everything that follows. First, <strong>training and inference split across tiers</strong>. Training a network — thousands of gradient-descent passes over a dataset — is exactly the bursty, deadline-free, compute-hungry workload the cloud tier exists for, and it happens once; inference happens on every frame, forever, under a deadline, and must live onboard. The pipeline connecting the two tiers — train on a workstation, convert, optimize, deploy, infer — is this chapter’s final subject. Second, <strong>placement precedes architecture</strong>. The question “what is the smallest model and sensor configuration that is useful enough for the mission?” has a different answer on each tier, so an engineer who has not chosen the tier cannot meaningfully choose the model. The tier fixes the budget; the budget is mostly memory and time; and the memory budget deserves to be itemized before anything is compressed to fit it.</p>
+</section>
+<section id="the-memory-bill-weights-activations-buffers" class="level2" data-number="14.4">
+<h2 data-number="14.4" class="anchored" data-anchor-id="the-memory-bill-weights-activations-buffers"><span class="header-section-number">14.4</span> The Memory Bill: Weights, Activations, Buffers</h2>
+<p>Ask what a model costs to run and the usual answer is its parameter count — “a 3.2-million-parameter detector” — converted at four bytes per float32 weight to a <strong>model footprint</strong> of 12.8 MB. That number is real, but treating it as the memory requirement is the embedded-ML equivalent of budgeting a vehicle by its sticker price. What the device must actually hold at the moment of inference is closer to</p>
+<p><span class="math display">\[
+\text{RAM peak} \approx \text{activations} + \text{input buffers} + \text{runtime workspace} + \text{application state},
+\]</span></p>
+<p>with the weights alongside — and on most platforms the largest term is not the weights. It is the <strong>activations</strong>: the intermediate tensors flowing between layers, which the Images as Data chapter flagged as the hidden cost of input resolution and which can now be made precise. Consider the first convolutional layer of a detector taking a 640 × 640 × 3 input: a bank of 32 kernels at stride 2 produces a 320 × 320 × 32 feature map. The layer’s weights are trivial — <span class="math inline">\(3 \times 3 \times 3 \times 32 = 864\)</span> of them, under 4 KB as float32. Its <em>output</em> is not:</p>
+<p><span class="math display">\[
+\begin{aligned}
+320 \times 320 \times 32 &amp;= 3{,}276{,}800\ \text{values} \\
+\text{as float32:}\quad 3{,}276{,}800 \times 4\ \text{B} &amp;\approx 13.1\ \text{MB}.
+\end{aligned}
+\]</span></p>
+<p>One layer, near the top of the network, transiently holds more than three thousand times its own weight in activations — and at least two such tensors are alive at any moment, since a layer’s input must persist while its output is written. Activation memory decays as the network’s spatial dimensions shrink deeper in, so the <em>peak</em> usually sits in these wide early layers, and the peak is what must fit. To the weights and activations add the <strong>buffers</strong> an application owns because it is a robot and not a benchmark: the camera frames themselves (at the 640 × 480 mode of the Images as Data chapter, 921,600 bytes each, and a capture pipeline holds more than one), the runtime’s scratch workspace, and the state of the application around the model. <a href="#fig-onboard-memory-bill" class="quarto-xref">Figure&nbsp;<span>14.2</span></a> draws the full bill for an illustrative small detector, and its shape explains most of embedded-ML practice.</p>
+<div id="fig-onboard-memory-bill" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bar chart titled the onboard memory bill, the weights are not the bill, with the formula RAM peak approximately equals activations plus input buffers plus runtime workspace plus application state. Three bars share one vertical scale of about four pixels per megabyte. The left bar, labeled what the datasheet mindset counts, shows weights alone: 12.8 megabytes, from 3.2 million parameters at 4 bytes each in float32. The middle bar, labeled what the device must actually hold with a float32 model and 640 by 640 input, stacks weights of 12.8 megabytes, activations of about 36 megabytes annotated as scaling with input resolution, camera frame buffers of about 3 megabytes, and runtime workspace plus application state of about 6 megabytes, for a peak of about 58 megabytes, 4.5 times the datasheet number. The right bar, labeled after the chapter's two levers with an int8 model and 320 by 320 input, stacks weights 3.2 megabytes, activations about 2.3 megabytes, frame buffers about 3 megabytes, and workspace about 2 megabytes for a peak of about 10.5 megabytes, noting frame buffers barely move because camera frames are uint8 already. An annotation between bars reads the levers multiply, divide by four from precision going float32 to int8 and divide by four from pixels going 640 squared to 320 squared. A red dashed line one pixel above the baseline is labeled as an entire 256 kilobyte MCU SRAM at this scale, with the note that even the optimized companion-computer budget is about forty times a microcontroller's whole memory. A footnote states activation figures are representative, not exact.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-onboard-memory-bill-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/onboard-memory-bill.svg" class="img-fluid figure-img" style="width:95.0%" alt="Bar chart titled the onboard memory bill, the weights are not the bill, with the formula RAM peak approximately equals activations plus input buffers plus runtime workspace plus application state. Three bars share one vertical scale of about four pixels per megabyte. The left bar, labeled what the datasheet mindset counts, shows weights alone: 12.8 megabytes, from 3.2 million parameters at 4 bytes each in float32. The middle bar, labeled what the device must actually hold with a float32 model and 640 by 640 input, stacks weights of 12.8 megabytes, activations of about 36 megabytes annotated as scaling with input resolution, camera frame buffers of about 3 megabytes, and runtime workspace plus application state of about 6 megabytes, for a peak of about 58 megabytes, 4.5 times the datasheet number. The right bar, labeled after the chapter's two levers with an int8 model and 320 by 320 input, stacks weights 3.2 megabytes, activations about 2.3 megabytes, frame buffers about 3 megabytes, and workspace about 2 megabytes for a peak of about 10.5 megabytes, noting frame buffers barely move because camera frames are uint8 already. An annotation between bars reads the levers multiply, divide by four from precision going float32 to int8 and divide by four from pixels going 640 squared to 320 squared. A red dashed line one pixel above the baseline is labeled as an entire 256 kilobyte MCU SRAM at this scale, with the note that even the optimized companion-computer budget is about forty times a microcontroller's whole memory. A footnote states activation figures are representative, not exact.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-onboard-memory-bill-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;14.2: The real RAM bill of onboard inference: for a representative small detector the weights are the smallest major line item, activations dominate and scale with input resolution, and the two levers — precision and pixels — multiply to shrink the bill roughly fivefold.
+</figcaption>
+</figure>
+</div>
+<p>Three lessons fall out of the figure. First, the two big levers <strong>multiply</strong>: quantizing values from float32 to int8 divides both weights and activations by four, and halving the model’s input side divides activations (and compute) by four again — together taking the illustrative peak from ~58 MB to ~10 MB. The resolution lever is the same one the Images as Data chapter priced from the other side: every halving also halves the pixels on a distant goose, so the lever is pulled against the mission’s detection range, not freely. Second, some terms do not move: camera frames arrive as uint8 and cannot be quantized further, so a bill dominated by buffers responds to <em>pipeline</em> design (fewer copies, smaller queues, streaming windows instead of stored histories) rather than model compression. Third, the tiers reprice the bill. On a 4 GB Jetson sharing memory between CPU, GPU, and the whole operating system, a 58 MB peak is affordable and the bill’s real bite is <em>bandwidth</em> — every byte of weights and activations must move through memory for every frame, and moving bytes costs time and energy. On a 256 KB MCU the same accounting is existential: the entire stacked bar must fit in SRAM, which is why the canonical MCU vision demonstration is a 96 × 96 grayscale classifier occupying a few hundred kilobytes, and why the slide from megabytes to kilobytes cannot be walked by compression alone. It begins, on every tier, with the same first step: giving up 24 of the 32 bits every number is carrying.</p>
+</section>
+<section id="quantization-trading-precision-for-feasibility" class="level2" data-number="14.5">
+<h2 data-number="14.5" class="anchored" data-anchor-id="quantization-trading-precision-for-feasibility"><span class="header-section-number">14.5</span> Quantization: Trading Precision for Feasibility</h2>
+<p>A trained network’s weights are float32 values: 32 bits encoding a sign, an exponent, and 23 bits of mantissa, able to distinguish on the order of <span class="math inline">\(10^{38}\)</span> magnitudes with seven decimal digits of precision. Training genuinely uses that dynamic range — gradient updates are tiny nudges accumulated over thousands of steps, and they vanish if the representation cannot resolve them. Inference does not. A finished network is a fixed function being <em>evaluated</em>, not adjusted; its decisions rest on comparisons — which class score is largest, whether a confidence clears a threshold — and comparisons survive small perturbations of every number involved. Empirically, the weights of a trained layer huddle in a narrow, roughly bell-shaped band (a range like <span class="math inline">\([-0.4, +0.4]\)</span> is typical), occupying a sliver of float32’s range. Thirty-two bits are being spent to store values that a much coarser code could carry. <strong>Quantization</strong> is that coarser code.</p>
+<p>The standard scheme maps each float value <span class="math inline">\(r\)</span> to an 8-bit integer <span class="math inline">\(q\)</span> through an affine relation:</p>
+<p><span class="math display">\[
+r \approx S \,(q - Z),
+\]</span></p>
+<p>where the <strong>scale</strong> <span class="math inline">\(S\)</span> is a float32 constant and the <strong>zero point</strong> <span class="math inline">\(Z\)</span> is the integer to which the real value 0.0 maps. For weights, which are centered near zero, the symmetric special case <span class="math inline">\(Z = 0\)</span> suffices, and the scheme collapses to <span class="math inline">\(r \approx S q\)</span>: choose <span class="math inline">\(S\)</span> so that the largest-magnitude weight lands on the integer extreme, and every weight becomes <span class="math inline">\(q = \operatorname{round}(r/S)\)</span>, an integer in <span class="math inline">\([-128, 127]\)</span>. <a href="#fig-int8-quantization-mapping" class="quarto-xref">Figure&nbsp;<span>14.3</span></a> traces the mapping for a concrete layer — the measured weight range sets <span class="math inline">\(S\)</span>, one worked weight is quantized and dequantized, and the rounding error is bounded — and then presents the bill.</p>
+<div id="fig-int8-quantization-mapping" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two-part diagram. The top shows two horizontal number lines. The upper line, labeled float32 at 32 bits per value, spans minus 0.42 to plus 0.42 with a schematic bell curve above it labeled distribution of this layer's 294,912 trained weights, and a highlighted value r equals 0.186. The lower line, labeled int8 at 8 bits per value, spans minus 128 to plus 127 with discrete tick marks. Dashed arrows map the float line onto the integer line. A box on the left reads quantize, q equals round of r over S, with S equals 0.42 over 127, approximately 0.0033. A box on the right reads dequantize, r-hat equals S times q, with error at most S over 2, approximately 0.0017. The highlighted value maps to q equals 56, which dequantizes to 0.1852. A caption notes 256 representable levels, the same amplitude resolution the camera's own 8-bit pixels had on arrival. The bottom shows two memory bars for one layer, a 3 by 3 convolution from 128 to 256 channels with 294,912 weights: the float32 bar spans the full width at 294,912 times 4 bytes equals 1,179,648 bytes, about 1.18 megabytes; the int8 bar is one quarter the length at about 0.29 megabytes, with a thin sliver noting 256 per-channel scales of about 1 kilobyte, labeled the metadata is noise, and an arrow reading divide by four memory and divide by four bandwidth. A banner summarizes: kept, the relative structure of the weights; spent, rounding error bounded by S over 2 per weight, typically at most one to two percent accuracy; gained, four times less memory and memory traffic plus faster integer arithmetic; and notes the scale is chosen per layer or per channel from the trained weights.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-int8-quantization-mapping-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/int8-quantization-mapping.svg" class="img-fluid figure-img" style="width:95.0%" alt="Two-part diagram. The top shows two horizontal number lines. The upper line, labeled float32 at 32 bits per value, spans minus 0.42 to plus 0.42 with a schematic bell curve above it labeled distribution of this layer's 294,912 trained weights, and a highlighted value r equals 0.186. The lower line, labeled int8 at 8 bits per value, spans minus 128 to plus 127 with discrete tick marks. Dashed arrows map the float line onto the integer line. A box on the left reads quantize, q equals round of r over S, with S equals 0.42 over 127, approximately 0.0033. A box on the right reads dequantize, r-hat equals S times q, with error at most S over 2, approximately 0.0017. The highlighted value maps to q equals 56, which dequantizes to 0.1852. A caption notes 256 representable levels, the same amplitude resolution the camera's own 8-bit pixels had on arrival. The bottom shows two memory bars for one layer, a 3 by 3 convolution from 128 to 256 channels with 294,912 weights: the float32 bar spans the full width at 294,912 times 4 bytes equals 1,179,648 bytes, about 1.18 megabytes; the int8 bar is one quarter the length at about 0.29 megabytes, with a thin sliver noting 256 per-channel scales of about 1 kilobyte, labeled the metadata is noise, and an arrow reading divide by four memory and divide by four bandwidth. A banner summarizes: kept, the relative structure of the weights; spent, rounding error bounded by S over 2 per weight, typically at most one to two percent accuracy; gained, four times less memory and memory traffic plus faster integer arithmetic; and notes the scale is chosen per layer or per channel from the trained weights.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-int8-quantization-mapping-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;14.3: int8 quantization maps a layer’s trained weight distribution onto 256 integer levels through one stored scale factor; for a 3 × 3 convolution from 128 to 256 channels, the 1.18 MB of float32 weights become 0.29 MB of integers plus a kilobyte of scales.
+</figcaption>
+</figure>
+</div>
+<p>The accounting deserves to be walked once by hand, because it is the worked answer to a question the compression literature usually leaves qualitative. Take a mid-network detection layer: a 3 × 3 convolution from 128 input channels to 256 output channels. Its weight count and float32 cost are</p>
+<p><span class="math display">\[
+\begin{aligned}
+3 \times 3 \times 128 \times 256 &amp;= 294{,}912\ \text{weights} \\
+\text{as float32:}\quad 294{,}912 \times 4\ \text{B} &amp;= 1{,}179{,}648\ \text{B} \approx 1.18\ \text{MB}.
+\end{aligned}
+\]</span></p>
+<p>Quantized, each weight is one byte — 294,912 bytes, about 0.29 MB — plus the metadata that makes the integers meaningful: one scale per output channel (per-channel scaling tracks the fact that different kernels settle into different ranges), <span class="math inline">\(256 \times 4\ \text{B} \approx 1\)</span> KB. The overhead is a rounding error on the total; the saving is a clean factor of four, and it compounds across the model: the 16.9 MB MobileNet of the previous section is about 4.2 million float32 weights at four bytes each, and the same network quantized is about 4.2 MB. What was spent to earn it is bounded and small: each weight moved by at most <span class="math inline">\(S/2 \approx 0.0017\)</span> — noise at the scale of the weights themselves — and in practice a well-calibrated int8 model gives up on the order of a percentage point of accuracy, often less. There is a satisfying symmetry in where this lands: the camera’s samples arrived as 8-bit integers, 256 levels, in the first place. The float32 the pipeline inflated them into was a convenience of training, not a property of the information; quantization returns the <em>model</em> to the precision regime its <em>input</em> never left.</p>
+<p>Memory is only the first dividend. The second, less obvious and often larger, is <strong>latency and energy</strong>. The number of multiply-accumulate operations is unchanged by quantization, so a speedup cannot come from doing less arithmetic — it comes from <em>feeding</em> the arithmetic. Inference on an embedded processor is usually memory-bound: the cost of an operation is dominated by moving its operands from DRAM through the caches, not by the multiply itself (fetching a value from off-chip memory costs on the order of a hundred times the energy of multiplying it). Quartering every operand quarters that traffic, quadruples the number of weights that fit in cache, and — because a processor’s vector unit is a fixed number of <em>bits</em> wide — lets each instruction process four times as many int8 values as float32 ones. Embedded CPUs and the DSP extensions of Cortex-class MCUs are explicitly designed around this, which is why int8 inference commonly runs two to four times faster than float32 on the same silicon, at correspondingly lower energy per frame. For an aircraft whose compute is billed in watts against loiter time, quantization is not only how the model fits; it is how each inference costs less flight.</p>
+<p>What quantization asks in return is care with <strong>ranges</strong>, and this is where the two practical routes diverge. Weights are easy — they are known, fixed numbers, and their ranges can simply be read off. Activations are not: their ranges depend on what data flows through the network, so they must be <em>estimated</em> by running the trained float model over a small <strong>calibration dataset</strong> — a few hundred representative inputs — and recording the ranges each layer produces. That is <strong>post-training quantization</strong>: measure, choose scales, round, done, with no retraining. Its failure mode is a calibration set that misrepresents flight data — ranges set too narrow clip real activations at the integer extremes, ranges set too wide squander the 256 levels on values that never occur — which is one more reason the <em>dataset</em> work of the next chapter is deployment work, not preamble. When PTQ’s accuracy loss is too large — common for small models, which have less redundancy to absorb rounding — <strong>quantization-aware training</strong> closes the gap: the model is fine-tuned with simulated rounding inside the training loop, so the weights themselves learn to sit where quantization will not hurt them. The practical doctrine is to try the cheap route first and escalate: PTQ costs minutes, QAT costs a training run, and the running example’s detector — a small model, but not a tiny one — is a typical PTQ success.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="For More">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>For More
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>int8 is a resting point, not a floor. Mixed-precision schemes keep sensitive layers (often the first and last) at higher precision while quantizing the rest harder; 4-bit and even 1-bit (binary) networks push the same logic further at growing accuracy cost; and float16, halving memory with almost no accuracy risk, is the preferred cheap step on GPUs — including Jetson-class hardware — whose tensor units execute it natively. The engineering habit transfers unchanged: choose the coarsest representation the task’s accuracy floor tolerates, and measure rather than assume where that floor is.</p>
+</div>
+</div>
+</section>
+<section id="the-rest-of-the-toolbox-pruning-distillation-and-system-level-tricks" class="level2" data-number="14.6">
+<h2 data-number="14.6" class="anchored" data-anchor-id="the-rest-of-the-toolbox-pruning-distillation-and-system-level-tricks"><span class="header-section-number">14.6</span> The Rest of the Toolbox: Pruning, Distillation, and System-Level Tricks</h2>
+<p>Quantization shrinks every number; the remaining compression techniques shrink the <em>count</em> of numbers, and each carries a caveat that matters in practice.</p>
+<p><strong>Pruning</strong> exploits the redundancy of trained networks: many weights end up near zero and contribute almost nothing, and removing them — weight by weight, or channel by channel, typically by magnitude, with a brief fine-tune afterward to let the survivors compensate — can cut a model’s parameter count substantially at modest accuracy cost. The caveat is the gap between a smaller <em>file</em> and a faster <em>model</em>. Unstructured pruning turns dense weight matrices into sparse ones, and sparse arithmetic is only faster on hardware and runtimes built to skip zeros — which most embedded stacks are not; a dense matrix with zeros scattered through it multiplies in exactly the time the full matrix did. <em>Structured</em> pruning — removing whole channels or filters — keeps the arithmetic dense and delivers real speedups everywhere, at the price of coarser, more accuracy-costly cuts. The drone framing from the source material is the right discipline: prune until the model still catches the mission-critical cases, and validate that boundary on the mission’s own hard examples, not on average benchmarks.</p>
+<p><strong>Knowledge distillation</strong> attacks the problem from above. A large <em>teacher</em> model — too big to fly, living happily on the cloud tier — is trained first; a small <em>student</em>, sized for the aircraft, is then trained to match the teacher’s outputs rather than (or in addition to) the raw labels. The teacher’s full output distribution carries more information than a hard label — <em>how</em> confidently it rates each class, which alternatives it considers plausible — and students trained on it reliably outperform identical architectures trained on labels alone. For a drone program the technique has a clean division of labor: the teacher absorbs the expensive learning offline, the student carries a distilled copy of it onboard, and the two tiers of the placement hierarchy each hold the model shaped for them.</p>
+<p>The toolbox’s remaining members are system-level rather than model-level, and Part III has already met most of them. <strong>Input reduction</strong> is the resolution lever of the previous section, plus region-of-interest cropping — the Images as Data chapter’s trick of spending the input budget where the target was last seen. <strong>Cascades</strong> put a cheap model in front of an expensive one: an MCU-tier trigger or a small classifier runs always-on, and the heavyweight detector runs only when summoned — the architecture of the compute hierarchy expressed inside a single perception pipeline. <strong>Offloading</strong> completes the set by sending <em>summaries</em> — detections, thumbnails, hard cases — rather than raw data to the ground, keeping the safety path local while still feeding the cloud tier’s retraining loop. None of these is exclusive; a deployed system typically stacks quantization <em>and</em> an efficient architecture <em>and</em> a reduced input <em>and</em> a cascade, because the tiers’ budgets are not met by any single factor of four.</p>
+</section>
+<section id="from-trained-model-to-flying-model" class="level2" data-number="14.7">
+<h2 data-number="14.7" class="anchored" data-anchor-id="from-trained-model-to-flying-model"><span class="header-section-number">14.7</span> From Trained Model to Flying Model</h2>
+<p>The techniques above act on a model; a deployment moves one. The path from a training run to a decision on the aircraft is a pipeline with named stages, and every embedded-ML project walks it:</p>
+<p><span class="math display">\[
+\text{dataset} \rightarrow \text{train} \rightarrow \text{convert} \rightarrow \text{optimize} \rightarrow \text{deploy} \rightarrow \text{infer}.
+\]</span></p>
+<p>Training happens on the cloud tier, in a full framework — PyTorch or TensorFlow — whose comforts (autograd, dynamic graphs, a Python interpreter) exist for experimentation and are dead weight in flight. <strong>Conversion</strong> strips that weight: the trained network is exported to a compact, execution-oriented format — a <code>.tflite</code> flatbuffer, or the framework-neutral ONNX interchange format — that records just the graph of operations and the weights. <strong>Optimization</strong> is where this chapter’s techniques are applied to the converted artifact: quantization with a calibration set, pruning, operator fusion. <strong>Deployment</strong> hands the optimized artifact to a <em>runtime</em> on the target — and the runtime is chosen by the tier. On a Jetson, the natural road runs through TensorRT, the inference engine bundled with the JetPack image the Companion Computers chapter flashed: it ingests an ONNX or TFLite model, fuses and re-plans its layers for the specific GPU on the board, selects int8 or float16 kernels, and emits an engine tuned to the silicon. On a Raspberry Pi–class CPU, TFLite’s own interpreter with its optimized ARM kernels is the standard path. On an MCU, the runtime must fit in kilobytes, which is the niche the next section’s toolkits occupy.</p>
+<p>Two doctrines govern the walk. The first is <strong>portability before efficiency</strong>: prototype in the portable formats with clear interfaces, measure on the real target, and reach for hardware-specific machinery only where profiling shows it pays — <em>prototype, measure, optimize, then verify safety behavior on hard cases</em>. Premature hand-optimization welds a project to one board and one vendor before the design has settled. The second is that <strong>the model is a component, not the system</strong>. On the aircraft, the ML runtime sits in a stack — application logic above it, ROS 2 middleware and MAVLink beside it, Linux or an RTOS below — and competes with flight control, telemetry, and logging for the same cores, memory bandwidth, and watts. A model that benchmarks beautifully in isolation can still fail in integration: a blocking call in the wrong thread drops camera frames; an unthrottled logger steals the bus; a memory spike evicts the very buffers the capture pipeline needs. The perception system the running example is building is, in the end, <em>software engineering with a model inside it</em> — and the measurement discipline that proves the assembled stack meets its deadline is the subject of the Real-Time Inference on the Edge chapter.</p>
+</section>
+<section id="two-toolkits-for-the-smallest-tier" class="level2" data-number="14.8">
+<h2 data-number="14.8" class="anchored" data-anchor-id="two-toolkits-for-the-smallest-tier"><span class="header-section-number">14.8</span> Two Toolkits for the Smallest Tier</h2>
+<p>On the companion tier, deployment tooling is a menu of interchangeable parts. On the MCU tier — kilobytes of SRAM, no operating system, no allocator — the tooling <em>is</em> the project, and two names dominate it. They are best understood not as competitors on a feature checklist but as two answers to the question of who owns the pipeline, and <a href="#fig-edge-impulse-vs-tflite-micro" class="quarto-xref">Figure&nbsp;<span>14.4</span></a> walks both roads stage by stage.</p>
+<div id="fig-edge-impulse-vs-tflite-micro" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Side-by-side workflow comparison titled two roads to the same microcontroller. The left column, TensorFlow Lite for Microcontrollers, an open-source C plus plus inference library where you build the pipeline, shows six steps all shaded amber to mark your work, your code: collect and label data with your scripts and storage; train in TensorFlow or Keras on your workstation or cloud account; convert and quantize to int8 as a dot-tflite file, supplying the calibration dataset yourself; embed the model as a C array in firmware with no filesystem and no operating system; integrate the interpreter, registering only the operators used and sizing the static tensor arena by hand with no malloc at inference time; and profile on target with your own benchmarks. An italic note reads full control, no vendor dependency, any compilable target, and every one of the six steps is on your shoulders. The right column, Edge Impulse, a hosted end-to-end platform where the pipeline is the product, shows five steps shaded light to mark the tool does it for you: acquire data through the studio via browser, phone, or connected dev board; compose a DSP block and model in the browser with visual defaults or Keras expert mode; train on the platform's cloud with quantization and calibration handled as defaults; test in the browser then on the device; export a compiled C plus plus library where the EON compiler emits the network as source code with no interpreter and meaningfully less RAM and flash; followed by one amber step, integrate the exported library and profile, with per-target latency and RAM estimates provided. An italic note reads days to a working prototype, guided estimates, easiest on supported boards, and the pipeline lives on someone else's servers. A banner states same destination, different contract: both roads end in an int8 model executing C plus plus on the same silicon, Edge Impulse itself builds on TensorFlow and the TFLite format, choose by who should own the pipeline; and notes that for the running example this is the MCU tier's decision, while the Jetson-class detector takes a third road through TFLite or ONNX to TensorRT with no MCU limits.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-edge-impulse-vs-tflite-micro-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/edge-impulse-vs-tflite-micro.svg" class="img-fluid figure-img" style="width:95.0%" alt="Side-by-side workflow comparison titled two roads to the same microcontroller. The left column, TensorFlow Lite for Microcontrollers, an open-source C plus plus inference library where you build the pipeline, shows six steps all shaded amber to mark your work, your code: collect and label data with your scripts and storage; train in TensorFlow or Keras on your workstation or cloud account; convert and quantize to int8 as a dot-tflite file, supplying the calibration dataset yourself; embed the model as a C array in firmware with no filesystem and no operating system; integrate the interpreter, registering only the operators used and sizing the static tensor arena by hand with no malloc at inference time; and profile on target with your own benchmarks. An italic note reads full control, no vendor dependency, any compilable target, and every one of the six steps is on your shoulders. The right column, Edge Impulse, a hosted end-to-end platform where the pipeline is the product, shows five steps shaded light to mark the tool does it for you: acquire data through the studio via browser, phone, or connected dev board; compose a DSP block and model in the browser with visual defaults or Keras expert mode; train on the platform's cloud with quantization and calibration handled as defaults; test in the browser then on the device; export a compiled C plus plus library where the EON compiler emits the network as source code with no interpreter and meaningfully less RAM and flash; followed by one amber step, integrate the exported library and profile, with per-target latency and RAM estimates provided. An italic note reads days to a working prototype, guided estimates, easiest on supported boards, and the pipeline lives on someone else's servers. A banner states same destination, different contract: both roads end in an int8 model executing C plus plus on the same silicon, Edge Impulse itself builds on TensorFlow and the TFLite format, choose by who should own the pipeline; and notes that for the running example this is the MCU tier's decision, while the Jetson-class detector takes a third road through TFLite or ONNX to TensorRT with no MCU limits.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-edge-impulse-vs-tflite-micro-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;14.4: The two dominant MCU deployment toolkits walked stage by stage: with TensorFlow Lite for Microcontrollers the developer owns every step from data collection to on-target profiling; with Edge Impulse the hosted platform owns the middle of the pipeline and hands back a compiled C++ library for integration.
+</figcaption>
+</figure>
+</div>
+<p><strong>TensorFlow Lite for Microcontrollers</strong> is a library — an open-source C++ inference engine, a few tens of kilobytes compiled, designed for bare metal. It assumes nothing: no operating system, no filesystem, no dynamic allocation. The model arrives as a byte array compiled into the firmware; the developer instantiates an interpreter, registers <em>only</em> the operators the model actually uses (unused kernels never cost flash), and hands it a <strong>tensor arena</strong> — one statically allocated block, sized by hand through trial and profiling, from which every activation and scratch buffer is carved. Everything upstream of that integration — collecting data, training, converting, calibrating the quantization — is the developer’s own pipeline, in ordinary TensorFlow. The contract is maximal control and maximal responsibility: any target with a C++ toolchain, no vendor in the loop, and every one of the six pipeline stages on the team’s shoulders.</p>
+<p><strong>Edge Impulse</strong> is a platform — a hosted service in which the pipeline itself is the product. Data is acquired into a browser studio (uploaded, or streamed from a phone or a supported development board); a signal-processing block and a model are composed visually, with a Keras “expert mode” underneath for teams that outgrow the defaults; training runs on the platform’s cloud with quantization handled as a default; and the export is a compiled C++ library for the chosen target, with per-target latency and RAM estimates attached. Two details make it more than a convenience wrapper. Its DSP-block-first design reflects real MCU practice, where a feature extractor (a spectrogram, a filter bank) in front of a tiny network routinely beats a bigger network on raw samples. And its EON compiler emits the network as generated source code rather than a flatbuffer walked by an interpreter, saving meaningful RAM and flash on chips where both are counted in kilobytes. The contract is the mirror image of TFLM’s: a working prototype in days and guided resource estimates, in exchange for a pipeline that lives on someone else’s servers, is easiest on supported hardware, and yields deep customization reluctantly.</p>
+<p>The choice between them is an engineering-situation question, not a quality ranking — the more so because the roads share pavement: Edge Impulse builds on TensorFlow and the TFLite model format, and both roads end in int8 C++ on the same silicon. A team that must own, reproduce, and audit every stage — a research group whose experiment <em>is</em> the pipeline, a product team with compliance obligations, a project targeting an unsupported chip — takes the library. A team whose scarce resource is embedded-ML engineering time — a field-robotics group that needs a vibration trigger working this month, a classroom, a prototype racing a funding deadline — takes the platform, and graduates to the library if and when its needs outgrow the defaults. For the running example, this entire comparison lives at the MCU tier — the always-on trigger of a cascade, should the system grow one. The goose detector itself, resident on the Jetson, takes the third road already described: trained in PyTorch, exported, quantized, and handed to TensorRT, with no MCU ceiling in sight.</p>
+<p>That closes the frame this chapter opened. The placement hierarchy assigns the detector to the companion tier; the memory bill says what fitting there means; quantization and its siblings are how the fit is achieved; and the pipeline and its toolkits are how the result travels from a training run to a process consuming camera tensors inside the running example’s Detector node. What the frame still lacks is its center: the trained model itself — the dataset of geese and not-geese, the labeled boxes, the training runs and their failure modes. That is the next chapter, and it is where Part III stops preparing and starts building.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="14.9">
+<h2 data-number="14.9" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">14.9</span> Check Your Understanding</h2>
+<ol type="1">
+<li>A detection head ends in a 1 × 1 convolution from 512 input channels to 21 output channels. Compute its weight count and its memory at float32 and at int8 (ignore biases). Per-channel quantization adds one float32 scale per output channel: compute the metadata overhead as a percentage of the int8 weight memory, and state why the overhead was negligible for the chapter’s 128-to-256-channel example but is less so here.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Weights: <span class="math inline">\(1 \times 1 \times 512 \times 21 = 10{,}752\)</span>. At float32: <span class="math inline">\(10{,}752 \times 4 = 43{,}008\)</span> B ≈ 43 KB; at int8: 10,752 B ≈ 10.8 KB — the factor of four as always. Metadata: 21 scales × 4 B = 84 B, about 0.8 % of the int8 weights. The chapter’s example carried 256 scales against 294,912 int8 weights (≈ 0.35 %). The general rule: per-channel overhead is (4 B × output channels) against (1 B × weights per channel × channels), so it grows as layers get <em>thinner</em> — fewer weights per output channel. For very small layers the metadata fraction rises, which is one reason tiny models benefit proportionally less from quantization than their headline parameter counts suggest.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Quantization does not reduce the number of multiply-accumulate operations a model performs, yet int8 inference commonly runs two to four times faster than float32 on the same embedded CPU. Give the two main mechanisms, and explain why the same reasoning predicts that quantization speeds up a memory-bound workload more than a compute-bound one.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>First, memory traffic: embedded inference is usually limited by moving weights and activations through DRAM and cache, not by arithmetic; int8 quarters every operand, so the memory system delivers the same layer in a quarter of the bytes, and four times as much of the model stays cache-resident. Second, vector width: a SIMD unit is a fixed number of bits wide, so each instruction processes 4× as many int8 values as float32 values. Both mechanisms accelerate the <em>supply and throughput of operands</em>, not the operation count — so a workload already bottlenecked on memory gains nearly the full factor, while a compute-bound workload (small model, fast memory) gains only what wider integer SIMD provides. This is also why the energy saving tracks the speedup: the dominant energy cost is data movement, and quantization is a data-movement optimization.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Assign each task to a tier of the compute hierarchy — cloud, companion computer, or MCU — and justify with the chapter’s criteria (latency, bandwidth, power, link reliability, privacy): (a) deciding, within one frame time, whether the deterrence target’s position has updated; (b) retraining the detector on last month’s hard cases; (c) monitoring motor vibration continuously for bearing wear, including while the main computer is under full perception load.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Companion computer: the decision is consumed at frame rate by the control loop, so it cannot tolerate a radio’s variable latency or failure modes — the urgent path stays local, and only this tier has the GPU to run the detector. (b) Cloud: retraining is compute-hungry, deadline-free, and needs the accumulated dataset — exactly the “can wait” workload; only summaries and hard cases need to cross the link, and in batch. (c) MCU: an always-on 1-D classifier on accelerometer windows costs milliwatts and kilobytes, runs regardless of what the companion computer is doing (a key point — the Jetson under full perception load is exactly when a competing monitor would be starved), and needs only to raise a flag when something is anomalous. The pattern is the chapter’s cascade: cheap and always-on at the bottom, capable and framewise in the middle, heavy and offline at the top.</li>
+</ol>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>Using the chapter’s accounting, estimate the RAM peak for the running example’s detector deployed as int8 with a 320 × 320 model input: weights 3.2 MB, peak activations 2.3 MB, a capture pipeline holding two 640 × 480 × 3 uint8 camera frames, and 1 MB of runtime workspace. Then explain why a further halving of the model input to 160 × 160 shrinks one term by four but two of the terms not at all — and which mission quantity, from the Images as Data chapter, the halving would damage.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Frames: <span class="math inline">\(2 \times 921{,}600 \approx 1.84\)</span> MB. Peak ≈ <span class="math inline">\(3.2 + 2.3 + 1.84 + 1.0 \approx 8.3\)</span> MB. Halving the input side to 160 × 160 divides activation memory (and per-frame compute) by four — activations scale with the model’s input pixel count — but the weights are fixed by the architecture, and the camera buffers are fixed by the <em>sensor’s</em> resolution, which does not change when the model’s input does. The damaged quantity is pixels on target: the Images as Data chapter showed the pixels a goose subtends scale with the model-input resolution the detector actually sees, so halving the input halves pixels-on-goose and with it the usable detection range — the resolution lever is always pulled against the mission’s geometry.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>Post-training quantization calibrates a layer’s activation scale from representative inputs. Suppose the calibration set for the goose detector was collected indoors, and a layer’s activations there span <span class="math inline">\([0, 6]\)</span>, so <span class="math inline">\(S\)</span> is chosen as <span class="math inline">\(6/255 \approx 0.024\)</span> — but in bright field conditions the same layer’s activations reach 24. What happens numerically to the flight-time activations, why does the damage <em>not</em> show up on the calibration data, and what does this imply about who should assemble the calibration set?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Every activation above 6 quantizes to <span class="math inline">\(q = 255\)</span> and is clipped: the top three-quarters of the layer’s real dynamic range collapses onto a single level, so exactly the strong responses — the layer’s most confident feature detections — become indistinguishable from one another, and the layers downstream inherit saturated, information-poor inputs. On the calibration data the model is bit-for-bit healthy, because no calibration input ever exceeds the measured range; the failure is invisible until deployment conditions diverge from calibration conditions. The implication: the calibration set is mission data, not convenience data — it must span the lighting, altitude, and scene conditions of flight, which makes calibration a dataset-engineering task belonging to the same discipline (and the same chapter, the next one) as the training set itself.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>A university field-robotics group wants an acoustic trigger on a drone that wakes the main perception stack when it hears geese; one member has embedded experience, none has ML-pipeline experience, and the demonstration is in six weeks on a supported development board. A second group is building a certifiable agricultural product on a custom STM32 board and must reproduce every build from version-controlled sources. Recommend a toolkit for each, and state why <em>neither</em> recommendation applies to the goose detector itself.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>First group: Edge Impulse — the constraint is embedded-ML engineering time, the board is supported, and the platform’s owned pipeline (acquisition, DSP block, training, compiled C++ export with resource estimates) converts six weeks into a plausible schedule; the DSP-first design suits an acoustic trigger particularly well. Second group: TensorFlow Lite for Microcontrollers — a custom board is outside any platform’s supported list, and certifiability demands that every pipeline stage (data, training, conversion, calibration, integration) be owned, version-controlled, and reproducible in-house, which is precisely the library’s contract. Neither applies to the goose detector because it runs on the companion tier, not an MCU: a Jetson-class board with gigabytes of RAM takes the TFLite/ONNX-to-TensorRT road, and the MCU toolkits’ defining constraints — kilobyte arenas, no OS, interpreter-free execution — are constraints it does not have.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="14.10">
+<h2 data-number="14.10" class="anchored" data-anchor-id="try-it"><span class="header-section-number">14.10</span> Try It</h2>
+<p><strong>Part 1 — quantize a real model and audit the damage.</strong> In a notebook, take any small trained vision model (a Keras MobileNet variant, or the small CNN you built for the previous chapter’s exercises) and walk it through post-training quantization with the TFLite converter: export it once as float32 and once as full-int8 with a calibration generator that yields a few hundred representative inputs. Compare the two files’ sizes on disk against this chapter’s factor-of-four prediction (and explain any shortfall — which parts of a <code>.tflite</code> file are not weights?). Then run both models over a held-out set and measure the damage directly: the maximum absolute difference in output scores, and the number of inputs on which the predicted class actually changes. Finally, sabotage the calibration deliberately — calibrate on a single image, or on blank frames — re-export, and watch the failure mode of Check question 5 appear in your own accuracy numbers.</p>
+<p><strong>Part 2 — itemize a memory bill.</strong> Using a model-summary tool (<code>torchinfo</code> in PyTorch, <code>model.summary()</code> in Keras), tabulate for the same model, layer by layer: parameter count, parameter bytes at float32 and int8, and output-activation bytes at float32 for a 640 × 640 input. Identify where the activation peak sits, and compare peak activations to total weights — then repeat at a 320 × 320 input and confirm the activations quarter while the weights do not move. Add realistic buffer terms (two camera frames at your sensor’s resolution, 1 MB of workspace) and produce your own version of this chapter’s memory-bill chart. Close with two sentences: one stating which single change most reduces <em>your</em> model’s RAM peak, and one stating what that change costs the mission, in the currency of the Images as Data chapter’s pixels-on-target arithmetic.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#edge-based-target-detection">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="pagination-link" aria-label="Images as Data: From Pixels to Tensors">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="pagination-link" aria-label="Building a Detection Pipeline: Data, Labeling, and Training">
+        <span class="nav-page-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>18&nbsp; Coordinate Frames: From Camera to World – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" rel="next">
+<link href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</a></li><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">18.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">18.2</span> Key Vocabulary</a></li>
+  <li><a href="#one-point-three-frames" id="toc-one-point-three-frames" class="nav-link" data-scroll-target="#one-point-three-frames"><span class="header-section-number">18.3</span> One Point, Three Frames</a></li>
+  <li><a href="#the-pipeline-in-one-equation" id="toc-the-pipeline-in-one-equation" class="nav-link" data-scroll-target="#the-pipeline-in-one-equation"><span class="header-section-number">18.4</span> The Pipeline in One Equation</a></li>
+  <li><a href="#optical-to-body-a-relabeling-and-a-tilt" id="toc-optical-to-body-a-relabeling-and-a-tilt" class="nav-link" data-scroll-target="#optical-to-body-a-relabeling-and-a-tilt"><span class="header-section-number">18.5</span> Optical to Body: A Relabeling and a Tilt</a></li>
+  <li><a href="#body-to-ned-the-quaternion-does-the-work" id="toc-body-to-ned-the-quaternion-does-the-work" class="nav-link" data-scroll-target="#body-to-ned-the-quaternion-does-the-work"><span class="header-section-number">18.6</span> Body to NED: The Quaternion Does the Work</a></li>
+  <li><a href="#from-relative-to-absolute" id="toc-from-relative-to-absolute" class="nav-link" data-scroll-target="#from-relative-to-absolute"><span class="header-section-number">18.7</span> From Relative to Absolute</a>
+  <ul class="collapse">
+  <li><a href="#the-same-chain-as-one-matrix" id="toc-the-same-chain-as-one-matrix" class="nav-link" data-scroll-target="#the-same-chain-as-one-matrix"><span class="header-section-number">18.7.1</span> The Same Chain as One Matrix</a></li>
+  </ul></li>
+  <li><a href="#the-module-in-code" id="toc-the-module-in-code" class="nav-link" data-scroll-target="#the-module-in-code"><span class="header-section-number">18.8</span> The Module in Code</a></li>
+  <li><a href="#where-the-centimetres-go" id="toc-where-the-centimetres-go" class="nav-link" data-scroll-target="#where-the-centimetres-go"><span class="header-section-number">18.9</span> Where the Centimetres Go</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">18.10</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">18.11</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</a></li><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Part III ended with a detector that works: a network on the companion computer that draws a box around a goose, and a depth camera whose aligned range image turns that box’s centre into a distance. The Building a Detection Pipeline chapter was explicit about what those two numbers buy — the box centre fixes a bearing, the depth value fixes a range along it, and together they pin the goose’s position in three dimensions. What that chapter deliberately left unexamined is the fine print on the word <em>position</em>. Position <strong>relative to what?</strong> The camera reports the goose relative to its own lens, in axes that tilt every time the airframe rolls and pivot every time it yaws. The autopilot, meanwhile, accepts Offboard setpoints in the local North-East-Down frame introduced in the PX4 Autopilot Stack chapter — axes nailed to the world, origin frozen at the launch point — and that chapter promised that the frame conventions behind its “z is down, so altitude is negative” sign discipline would get a chapter of their own in Part IV. This is that chapter.</p>
+<p>The gap it closes is not a technicality. A detection expressed in camera coordinates is <em>unusable</em> as a navigation target: “6 metres out along the lens axis” means a different world location every few milliseconds as the aircraft moves, and handing it raw to the flight controller would command the drone toward wherever its own nose happens to point. Between the perception system and the navigation system there must sit a piece of mathematics — small, exact, and utterly load-bearing — that re-expresses the same physical point in the world’s coordinates. In the running example that mathematics lives in one module, <code>frames.py</code>, whose entire public surface is eight short functions; this chapter derives what those functions compute. The material is the first genuinely <em>geometric</em> machinery of the book, and it will be spent again immediately: every planner in this Part consumes targets and waypoints in the NED frame this chapter learns to reach.</p>
+<section id="learning-objectives" class="level2" data-number="18.1">
+<h2 data-number="18.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">18.1</span> Learning Objectives</h2>
+<ul>
+<li>Name the three coordinate frames a vision-guided drone must reconcile — camera optical, body FRD, and local NED — and state each frame’s axis convention, what it is attached to, and why no two of them can be conflated.</li>
+<li>Derive the optical-to-body transformation for a forward-facing camera as an axis remapping composed with a mounting-pitch rotation, and verify that the remapping is a proper rotation rather than a reflection.</li>
+<li>Convert a PX4 attitude quaternion into a rotation matrix, and explain why quaternions rather than Euler angles carry the attitude across the body-to-NED step.</li>
+<li>Carry a real detection numerically through the complete chain — pixel and depth to camera point, to body frame, to relative NED, to absolute NED — and sanity-check the result against physical expectations.</li>
+<li>Express the full pipeline as a product of homogeneous transformations, and quantify the dominant error sources — extrinsic calibration, attitude error, synchronization latency, and depth uncertainty — as position error at the mission’s working ranges.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="18.2">
+<h2 data-number="18.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">18.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Camera optical frame</strong> — the coordinate frame attached to the camera lens under the ROS REP-103 convention: x to the right of the image, y downward in the image, z forward along the viewing direction; the frame in which a depth camera reports every detected point.</li>
+<li><strong>FRD</strong> (Forward-Right-Down) — PX4’s body frame convention: x out the nose, y out the right side, z down through the belly; attached to the airframe and rotating with it, so a fixed world point has constantly changing FRD coordinates in flight.</li>
+<li><strong>NED</strong> (North-East-Down) — the local world frame in which PX4 navigates: x North, y East, z Down, origin at the point where the state estimator initialized (the launch point); the frame of every Offboard position setpoint, where altitude appears as negative z.</li>
+<li><strong>Rotation matrix</strong> — a 3 × 3 orthogonal matrix with determinant +1 that re-expresses a vector in a rotated frame without changing its length; its inverse is its transpose, which makes reversing any frame transformation computationally free.</li>
+<li><strong>Quaternion</strong> — a four-component representation of 3D orientation, written <span class="math inline">\([w, x, y, z]\)</span> in PX4’s convention, that encodes an axis and an angle of rotation without the singularities of three-angle representations; the native attitude output of the flight controller’s estimator.</li>
+<li><strong>Gimbal lock</strong> — the degeneracy of Euler-angle representations in which two of the three rotation axes align (at ±90° pitch), collapsing a degree of freedom; the classical argument for carrying attitude as a quaternion.</li>
+<li><strong>Homogeneous transformation</strong> — a 4 × 4 matrix <span class="math inline">\(T = \begin{bmatrix} R &amp; t \\ 0 &amp; 1 \end{bmatrix}\)</span> packaging a rotation and a translation so that chains of frame changes compose by ordinary matrix multiplication.</li>
+<li><strong>Camera intrinsics</strong> — the parameters of the camera’s own projection (focal lengths <span class="math inline">\(f_x, f_y\)</span> and principal point <span class="math inline">\(c_x, c_y\)</span>, in pixels) that convert between a pixel coordinate and a direction in the optical frame.</li>
+<li><strong>Extrinsic calibration</strong> — the fixed rigid transform between the camera and the airframe — where the camera sits and how it is tilted — measured once at build time; an error here biases every detection the system will ever make, in the same direction.</li>
+</ul>
+</section>
+<section id="one-point-three-frames" class="level2" data-number="18.3">
+<h2 data-number="18.3" class="anchored" data-anchor-id="one-point-three-frames"><span class="header-section-number">18.3</span> One Point, Three Frames</h2>
+<p>Every sensor bolted to an aircraft measures in its own private coordinate system, and before any two measurements can be combined — or a measurement handed to a controller — they must be re-expressed in a common frame. The running example’s navigation pipeline threads exactly three. <a href="#fig-coordinate-frame-axes" class="quarto-xref">Figure&nbsp;<span>18.1</span></a> draws them side by side, and the differences among them are worth reading closely, because each difference is a transformation the software must perform.</p>
+<div id="fig-coordinate-frame-axes" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Three-panel diagram titled three frames, three axis conventions. Left panel, camera optical frame per ROS REP-103, attached to the lens: a camera icon with axes drawn from the lens centre, x pointing right in the image, y pointing down in the image, and a dashed z arrow pointing forward out of the lens along the viewing direction, with a note that depth Z arrives along this frame's z-axis and the detected point P sub C lives here first. Middle panel, drone body frame FRD, the PX4 convention that rotates with the aircraft, shown as a quadrotor from above with the nose up the page: x forward out the nose, y right, and z drawn as a circled cross meaning into the page, downward; a note says the camera bolts to this frame and the mounting pitch theta is the fixed extrinsic between the two. Right panel, local NED frame, fixed to the world and never rotating, shown as a map view with a home square: N up the page toward North, E right toward East, D into the page downward, with a note that the origin is where the EKF initialized, the launch point, that altitude is negative D so minus 5.5 metres means 5.5 metres up, and that PX4 setpoints live here. A footer states that all three frames are right-handed, that the optical and body frames differ only by a relabeling of axes plus the mounting tilt, and that the body and NED frames differ by the aircraft's full attitude, which changes every instant of flight.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-coordinate-frame-axes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/coordinate-frame-axes.svg" class="img-fluid figure-img" style="width:100.0%" alt="Three-panel diagram titled three frames, three axis conventions. Left panel, camera optical frame per ROS REP-103, attached to the lens: a camera icon with axes drawn from the lens centre, x pointing right in the image, y pointing down in the image, and a dashed z arrow pointing forward out of the lens along the viewing direction, with a note that depth Z arrives along this frame's z-axis and the detected point P sub C lives here first. Middle panel, drone body frame FRD, the PX4 convention that rotates with the aircraft, shown as a quadrotor from above with the nose up the page: x forward out the nose, y right, and z drawn as a circled cross meaning into the page, downward; a note says the camera bolts to this frame and the mounting pitch theta is the fixed extrinsic between the two. Right panel, local NED frame, fixed to the world and never rotating, shown as a map view with a home square: N up the page toward North, E right toward East, D into the page downward, with a note that the origin is where the EKF initialized, the launch point, that altitude is negative D so minus 5.5 metres means 5.5 metres up, and that PX4 setpoints live here. A footer states that all three frames are right-handed, that the optical and body frames differ only by a relabeling of axes plus the mounting tilt, and that the body and NED frames differ by the aircraft's full attitude, which changes every instant of flight.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-coordinate-frame-axes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;18.1: The three coordinate frames of the vision-to-navigation pipeline: the camera optical frame attached to the lens, the FRD body frame attached to the airframe, and the local NED frame fixed to the world at the launch point.
+</figcaption>
+</figure>
+</div>
+<p>The <strong>camera optical frame</strong> is the convention ROS standardizes in REP-103 and the one the running example’s Intel RealSense reports in: x points to the right of the image, y points <em>down</em> the image, and z points out of the lens along the viewing direction. The choice looks eccentric until it is set beside the image-coordinate convention from the Images as Data chapter — column index <span class="math inline">\(u\)</span> increasing rightward, row index <span class="math inline">\(v\)</span> increasing <em>downward</em> from a top-left origin. The optical frame is that screen convention extruded into 3D: x tracks <span class="math inline">\(u\)</span>, y tracks <span class="math inline">\(v\)</span>, and z carries the one thing a depth camera adds, range outward. A detected goose enters the pipeline as a point in this frame,</p>
+<p><span class="math display">\[
+P_C = \begin{bmatrix} x_C \\ y_C \\ z_C \end{bmatrix},
+\]</span></p>
+<p>and getting from the detector’s actual output — a pixel and a depth — to <span class="math inline">\(P_C\)</span> is the projection geometry that chapter deferred. A pinhole camera maps a 3D point to the pixel <span class="math inline">\(u = f_x \, (x_C / z_C) + c_x\)</span>, where <span class="math inline">\(f_x\)</span> is the focal length <em>measured in pixels</em> and <span class="math inline">\(c_x\)</span> the image centre; run backward, with the depth value supplying <span class="math inline">\(z_C = Z\)</span> directly (the RealSense reports perpendicular distance to the image plane, not slant range):</p>
+<p><span class="math display">\[
+x_C = \frac{(u - c_x)\, Z}{f_x}, \qquad y_C = \frac{(v - c_y)\, Z}{f_y}.
+\]</span></p>
+<p>The intrinsics come from the camera’s factory calibration, but a serviceable estimate falls out of geometry: a 90° horizontal field of view spread across 640 columns means the 320 columns on either side of centre span 45°, so <span class="math inline">\(f_x = 320/\tan 45^\circ = 320\)</span> pixels. Take the goose the Images as Data chapter boxed at <span class="math inline">\((u, v) = (400, 300)\)</span> in the 640 × 480 frame, and let the aligned depth lookup at that pixel return 6.00 m:</p>
+<p><span class="math display">\[
+\begin{aligned}
+x_C &amp;= \frac{(400 - 320)(6.00)}{320} = 1.50\ \text{m} \\
+y_C &amp;= \frac{(300 - 240)(6.00)}{320} \approx 1.13\ \text{m} \\
+P_C &amp;= [\,1.50,\ 1.13,\ 6.00\,]\ \text{m}.
+\end{aligned}
+\]</span></p>
+<p>The goose sits 6 m out along the lens axis, 1.5 m to the right of it, 1.13 m below it. That is a complete, correct 3D position — and it is useless to the autopilot, because every one of those numbers is measured against a lens that moves.</p>
+<p>The <strong>drone body frame</strong> is PX4’s FRD convention: x forward out the nose, y right, z down. It is rigidly attached to the airframe and rotates with it. The camera is bolted to this frame — in the running example, tilted downward so the search pattern’s forward flight keeps the ground in view — so the relationship between optical and body coordinates is <em>fixed at build time</em>: a constant rotation, part of the system’s extrinsic calibration, that never changes in flight.</p>
+<p>The <strong>local NED frame</strong> is the one the reader has been flying in since Part II: x North, y East, z Down, origin wherever the flight controller’s state estimator initialized — the launch point, which is why the very first Offboard example commanded <code>-5.0</code> to mean five metres <em>up</em>. Unlike the other two frames it never rotates; it is the closest thing the system has to “the world.” Every position the autopilot publishes, and every setpoint it accepts, lives here.</p>
+<p>Three frames, and two fundamentally different kinds of separation between them. Optical-to-body is a <em>constant</em> transform, knowable in advance to whatever precision the tape measure and the mounting jig allow. Body-to-NED is the aircraft’s <em>attitude</em> — it changes with every gust and every commanded turn, and no measurement made at build time can supply it. Something on the aircraft must estimate it continuously, and something does: the flight controller’s EKF, whose construction from gyroscope, accelerometer, and magnetometer evidence the Sensing the World chapter told in full. This chapter does not reopen that story. It stands on its result — the estimator publishes the vehicle’s attitude, as a quaternion, many times per second — and asks only what to <em>do</em> with it.</p>
+</section>
+<section id="the-pipeline-in-one-equation" class="level2" data-number="18.4">
+<h2 data-number="18.4" class="anchored" data-anchor-id="the-pipeline-in-one-equation"><span class="header-section-number">18.4</span> The Pipeline in One Equation</h2>
+<p>The complete journey from detection to navigation target is a single line of algebra:</p>
+<p><span class="math display">\[
+P_{NED} \;=\; P_{Drone} \;+\; R^{NED}_{Body}\, R^{Body}_{Camera}\, P_{Camera}.
+\]</span></p>
+<p>Read it right to left, the order in which the operations act. <span class="math inline">\(P_{Camera}\)</span> is the detected point in the optical frame — the <span class="math inline">\([1.50, 1.13, 6.00]\)</span> just computed. <span class="math inline">\(R^{Body}_{Camera}\)</span> is the fixed extrinsic rotation that re-expresses it in the body frame; the superscript–subscript notation names the frames, “from Camera coordinates into Body coordinates.” <span class="math inline">\(R^{NED}_{Body}\)</span> is the attitude rotation, built fresh from the EKF’s current quaternion, that re-expresses the body-frame vector in world axes. At that point the vector is world-<em>aligned</em> but still measured from the aircraft — a displacement, “the goose is 3.4 m East of me” — so the final step adds <span class="math inline">\(P_{Drone}\)</span>, the drone’s own EKF position, translating the origin from the aircraft to the launch point. Rotations first, translation last: rotations act on directions, and only after the directions are world-aligned does adding a world-frame position make sense. <a href="#fig-coordinate-frame-pipeline" class="quarto-xref">Figure&nbsp;<span>18.2</span></a> lays the chain out stage by stage, with the worked example’s numbers riding alongside; the two sections that follow derive its two rotations.</p>
+<div id="fig-coordinate-frame-pipeline" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Vertical flow diagram titled the transformation pipeline, one detection, camera to world, with six stages connected by labeled arrows and a numeric sidebar carrying a worked example through each stage. Stage one, goose detection: bounding-box centre in the image plus the aligned depth value at that pixel; sidebar shows u,v equals 400, 300 and depth Z equals 6.00 metres. Arrow: deprojection through the camera intrinsics, X equals u minus c x times Z over f x, Y equals v minus c y times Z over f y. Stage two, camera optical frame P C: x right, y down, z forward, attached to the lens, tilted with the mount; sidebar P C equals 1.50, 1.13, 6.00 metres, meaning 1.50 right, 1.13 below centre, 6.00 out. Arrow: axis remap plus mounting-pitch correction R y of theta, the optical to body function, fixed at build time as extrinsics. Stage three, drone body frame FRD, P B: x forward, y right, z down, rotates with the aircraft every instant; sidebar P B equals 3.44, 1.50, 5.04 metres with camera pitched down theta equals 45 degrees. Arrow: attitude rotation R of q from the EKF quaternion, the body to ned function, changes every flight-controller update. Stage four, local NED relative to the drone, P rel: axes now world-fixed North East Down but the origin still rides on the drone; sidebar P rel equals minus 1.50, 3.44, 5.04 metres, noting the nose points East at yaw 90 degrees so forward maps to East. Arrow: translation, add the drone's own EKF position P Drone; the optical to ned point function composes the whole chain. Stage five, absolute local NED, P Goose: origin at the launch point where the EKF initialized, the world coordinate PX4 flies in; sidebar shows 20.0, 5.0, minus 5.50 plus P rel equals 18.50, 8.44, minus 0.46 metres. Arrow: published as the target-position topic, consumed by the mission logic, streamed as Offboard setpoints. Stage six, navigation target: the mission logic steers toward the goose in the same frame PX4 already flies in; sidebar notes D equals minus 0.46 metres puts the computed goose half a metre above ground, a sanity check. Footer: the whole chain is one line of algebra, P NED equals P Drone plus R of q times R y of theta times Pi times P C, and every arrow is invertible; the ned point to optical function runs it backward, which is how simulation plants synthetic geese and how the transform is unit-tested.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-coordinate-frame-pipeline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/coordinate-frame-pipeline.svg" class="img-fluid figure-img" style="width:88.0%" alt="Vertical flow diagram titled the transformation pipeline, one detection, camera to world, with six stages connected by labeled arrows and a numeric sidebar carrying a worked example through each stage. Stage one, goose detection: bounding-box centre in the image plus the aligned depth value at that pixel; sidebar shows u,v equals 400, 300 and depth Z equals 6.00 metres. Arrow: deprojection through the camera intrinsics, X equals u minus c x times Z over f x, Y equals v minus c y times Z over f y. Stage two, camera optical frame P C: x right, y down, z forward, attached to the lens, tilted with the mount; sidebar P C equals 1.50, 1.13, 6.00 metres, meaning 1.50 right, 1.13 below centre, 6.00 out. Arrow: axis remap plus mounting-pitch correction R y of theta, the optical to body function, fixed at build time as extrinsics. Stage three, drone body frame FRD, P B: x forward, y right, z down, rotates with the aircraft every instant; sidebar P B equals 3.44, 1.50, 5.04 metres with camera pitched down theta equals 45 degrees. Arrow: attitude rotation R of q from the EKF quaternion, the body to ned function, changes every flight-controller update. Stage four, local NED relative to the drone, P rel: axes now world-fixed North East Down but the origin still rides on the drone; sidebar P rel equals minus 1.50, 3.44, 5.04 metres, noting the nose points East at yaw 90 degrees so forward maps to East. Arrow: translation, add the drone's own EKF position P Drone; the optical to ned point function composes the whole chain. Stage five, absolute local NED, P Goose: origin at the launch point where the EKF initialized, the world coordinate PX4 flies in; sidebar shows 20.0, 5.0, minus 5.50 plus P rel equals 18.50, 8.44, minus 0.46 metres. Arrow: published as the target-position topic, consumed by the mission logic, streamed as Offboard setpoints. Stage six, navigation target: the mission logic steers toward the goose in the same frame PX4 already flies in; sidebar notes D equals minus 0.46 metres puts the computed goose half a metre above ground, a sanity check. Footer: the whole chain is one line of algebra, P NED equals P Drone plus R of q times R y of theta times Pi times P C, and every arrow is invertible; the ned point to optical function runs it backward, which is how simulation plants synthetic geese and how the transform is unit-tested.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-coordinate-frame-pipeline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;18.2: The full transformation pipeline from goose detection to navigation target, with the chapter’s worked example carried through every stage.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="optical-to-body-a-relabeling-and-a-tilt" class="level2" data-number="18.5">
+<h2 data-number="18.5" class="anchored" data-anchor-id="optical-to-body-a-relabeling-and-a-tilt"><span class="header-section-number">18.5</span> Optical to Body: A Relabeling and a Tilt</h2>
+<p>Suppose first that the camera is mounted perfectly level, looking straight out the nose. Then the optical and body frames are the <em>same physical directions wearing different labels</em>, and the transformation is pure bookkeeping. Where does the camera’s z-axis point? Out of the lens — which is out of the nose: the body’s x. Where does the camera’s x point? Right in the image — the body’s y. The camera’s y? Down the image — the body’s z. Three questions, three answers, and the transformation is written:</p>
+<p><span class="math display">\[
+x_B = z_C, \qquad y_B = x_C, \qquad z_B = y_C,
+\]</span></p>
+<p>or as a matrix acting on <span class="math inline">\(P_C\)</span>,</p>
+<p><span class="math display">\[
+\Pi \;=\;
+\begin{bmatrix}
+0 &amp; 0 &amp; 1 \\
+1 &amp; 0 &amp; 0 \\
+0 &amp; 1 &amp; 0
+\end{bmatrix},
+\qquad
+P'_B = \Pi\, P_C .
+\]</span></p>
+<p><span class="math inline">\(\Pi\)</span> deserves one check before it is trusted: is it a rotation? Its columns are orthonormal, and its determinant is <span class="math inline">\(+1\)</span> — it is the <em>cyclic</em> permutation <span class="math inline">\((x, y, z) \to (z, x, y)\)</span>, and cyclic permutations of a right-handed triad are genuine rigid rotations. Had the mapping instead swapped exactly two axes, the determinant would be <span class="math inline">\(-1\)</span>: a reflection, which no physical mounting of a rigid camera can produce. A determinant check is thirty seconds of arithmetic that catches an entire class of frame bugs — coordinate systems accidentally mirrored — that otherwise surface as a drone that turns left toward geese on its right.</p>
+<p>Real mountings are not level. The running example’s camera is pitched downward by a fixed angle <span class="math inline">\(\theta\)</span> so that forward flight sweeps the ground; that tilt is a rotation about the body’s y-axis, applied after the relabeling:</p>
+<p><span class="math display">\[
+R_y(\theta) =
+\begin{bmatrix}
+\cos\theta &amp; 0 &amp; -\sin\theta \\
+0 &amp; 1 &amp; 0 \\
+\sin\theta &amp; 0 &amp; \cos\theta
+\end{bmatrix},
+\qquad
+P_B = R_y(\theta)\, P'_B .
+\]</span></p>
+<p>Sign conventions in rotation matrices are where frame code quietly goes wrong, so verify this one physically rather than trusting it. A goose dead ahead of the <em>camera</em> at distance <span class="math inline">\(d\)</span> has <span class="math inline">\(P'_B = [d, 0, 0]\)</span> after relabeling. If the camera is tilted down by <span class="math inline">\(\theta\)</span>, that goose is really below the aircraft’s horizontal plane — forward <em>and</em> down. Apply the matrix: <span class="math inline">\(R_y(\theta)\,[d, 0, 0]^T = [\,d\cos\theta,\ 0,\ d\sin\theta\,]^T\)</span>. Forward component <span class="math inline">\(d\cos\theta\)</span>, downward component <span class="math inline">\(d\sin\theta\)</span> — positive z, and z is down in FRD. The matrix passes: positive <span class="math inline">\(\theta\)</span> means a downward-looking camera, exactly the convention the mounting drawing uses. Together, <span class="math inline">\(R^{Body}_{Camera} = R_y(\theta)\,\Pi\)</span>, the fixed extrinsic rotation of the master equation.</p>
+<p>Now run the worked example through, with the camera pitched down <span class="math inline">\(\theta = 45^\circ\)</span> (<span class="math inline">\(\cos\theta = \sin\theta \approx 0.7071\)</span>). Relabeling first:</p>
+<p><span class="math display">\[
+P'_B = \Pi \begin{bmatrix} 1.50 \\ 1.13 \\ 6.00 \end{bmatrix}
+     = \begin{bmatrix} 6.00 \\ 1.50 \\ 1.13 \end{bmatrix},
+\]</span></p>
+<p>then the tilt:</p>
+<p><span class="math display">\[
+\begin{aligned}
+x_B &amp;= 0.7071\,(6.00) - 0.7071\,(1.13) = 0.7071 \times 4.87 \approx 3.44 \\
+y_B &amp;= 1.50 \\
+z_B &amp;= 0.7071\,(6.00) + 0.7071\,(1.13) = 0.7071 \times 7.13 \approx 5.04 \\
+P_B &amp;= [\,3.44,\ 1.50,\ 5.04\,]\ \text{m}.
+\end{aligned}
+\]</span></p>
+<p>The goose is 3.44 m ahead of the aircraft, 1.50 m to its right, and 5.04 m below it. Notice what the tilt did: most of what the camera called “forward” became, in the body’s honest axes, <em>depth below the aircraft</em> — which is exactly what a 45°-down camera looking at a ground target should report.</p>
+</section>
+<section id="body-to-ned-the-quaternion-does-the-work" class="level2" data-number="18.6">
+<h2 data-number="18.6" class="anchored" data-anchor-id="body-to-ned-the-quaternion-does-the-work"><span class="header-section-number">18.6</span> Body to NED: The Quaternion Does the Work</h2>
+<p>The second rotation cannot be measured with a jig, because it is the aircraft’s attitude and it changes continuously. The flight controller’s estimator publishes it as a unit <strong>quaternion</strong> <span class="math inline">\(q = [w, x, y, z]\)</span> — four numbers with <span class="math inline">\(w^2 + x^2 + y^2 + z^2 = 1\)</span>, encoding a single axis in space and a single angle of rotation about it (via <span class="math inline">\(w = \cos(\alpha/2)\)</span>, with <span class="math inline">\([x,y,z]\)</span> the rotation axis scaled by <span class="math inline">\(\sin(\alpha/2)\)</span>). The standard expansion converts it to the rotation matrix that carries body-frame vectors into NED:</p>
+<p><span class="math display">\[
+R(q) =
+\begin{bmatrix}
+1 - 2(y^2 + z^2) &amp; 2(xy - wz) &amp; 2(xz + wy) \\
+2(xy + wz) &amp; 1 - 2(x^2 + z^2) &amp; 2(yz - wx) \\
+2(xz - wy) &amp; 2(yz + wx) &amp; 1 - 2(x^2 + y^2)
+\end{bmatrix},
+\qquad
+P^{rel}_{NED} = R(q)\, P_B .
+\]</span></p>
+<p>Why a quaternion, when three Euler angles — roll, pitch, yaw — seem so much more legible? Four reasons, in ascending order of practical weight. <em>Singularity:</em> Euler angles represent attitude as three chained rotations, and at ±90° pitch two of the three axes align — <strong>gimbal lock</strong> — collapsing a degree of freedom, so the representation cannot even express which way the vehicle is turning; an acrobatic or wind-thrown multirotor visits that neighborhood, and estimator mathematics must not blow up when it does. <em>Numerical stability:</em> accumulated floating-point error pushes a quaternion slightly off unit length, and the fix is one renormalization — divide four numbers by their norm — whereas a drifting 3 × 3 matrix must be re-orthogonalized, an expensive and delicate repair. <em>Interpolation:</em> blending smoothly between two attitudes (needed whenever measurements must be aligned across time, as the error-budget section will want) is well defined for quaternions and badly behaved for Euler angles. And <em>nativeness:</em> the estimator the Sensing the World chapter described carries its attitude state <em>as</em> a quaternion; PX4 publishes it in exactly the <span class="math inline">\([w, x, y, z]\)</span> order used here, so consuming it directly avoids a conversion — and every conversion between attitude conventions is an opportunity for a sign error that flies the aircraft somewhere surprising.</p>
+<p>The matrix <span class="math inline">\(R(q)\)</span>, like every rotation matrix, is orthogonal: its inverse is its transpose. That property is worth pausing on because the software leans on it. Transforming a NED vector <em>back</em> to the body frame — which the mission logic needs whenever it asks “which way, in my own axes, is that world point?” — requires no matrix inversion at all, just <span class="math inline">\(R^T\)</span>, numerically exact and nearly free.</p>
+<p>Put the worked example’s aircraft in a definite attitude: level flight, nose due East — a yaw of <span class="math inline">\(\psi = 90^\circ\)</span>, so <span class="math inline">\(q = [\cos 45^\circ, 0, 0, \sin 45^\circ] = [0.7071, 0, 0, 0.7071]\)</span>. Substituting <span class="math inline">\(w = z = 0.7071\)</span>, <span class="math inline">\(x = y = 0\)</span> into <span class="math inline">\(R(q)\)</span>:</p>
+<p><span class="math display">\[
+R(q) =
+\begin{bmatrix}
+0 &amp; -1 &amp; 0 \\
+1 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 1
+\end{bmatrix},
+\]</span></p>
+<p>which reads as a sanity check in matrix form: body-forward <span class="math inline">\([1,0,0]\)</span> maps to <span class="math inline">\([0,1,0]\)</span> — East, where the nose points; body-right maps to <span class="math inline">\([-1,0,0]\)</span> — South, which is indeed to the right of an eastbound aircraft; body-down maps to down. Applying it:</p>
+<p><span class="math display">\[
+P^{rel}_{NED} = R(q) \begin{bmatrix} 3.44 \\ 1.50 \\ 5.04 \end{bmatrix}
+= \begin{bmatrix} -1.50 \\ 3.44 \\ 5.04 \end{bmatrix}.
+\]</span></p>
+<p>The goose is 3.44 m East of the drone, 1.50 m South of it (negative North), and 5.04 m below it — the same displacement as before, now expressed in axes that will not move when the aircraft does.</p>
+</section>
+<section id="from-relative-to-absolute" class="level2" data-number="18.7">
+<h2 data-number="18.7" class="anchored" data-anchor-id="from-relative-to-absolute"><span class="header-section-number">18.7</span> From Relative to Absolute</h2>
+<p>One step remains, and it is an addition. The vector just computed is world-aligned but drone-centred; the autopilot navigates toward <em>absolute</em> positions, measured from the EKF origin at the launch point. The drone knows its own position in that frame — the same estimate the Offboard examples of Part II consumed — so:</p>
+<p><span class="math display">\[
+P_{Goose} = P_{Drone} + P^{rel}_{NED}.
+\]</span></p>
+<p>Give the worked example’s aircraft the position <span class="math inline">\(P_{Drone} = [20.0,\ 5.0,\ -5.50]\)</span> — 20 m North and 5 m East of launch, at the 5.5 m mission altitude the Part II survey plan flew:</p>
+<p><span class="math display">\[
+P_{Goose} = \begin{bmatrix} 20.0 \\ 5.0 \\ -5.50 \end{bmatrix} + \begin{bmatrix} -1.50 \\ 3.44 \\ 5.04 \end{bmatrix}
+= \begin{bmatrix} 18.50 \\ 8.44 \\ -0.46 \end{bmatrix}.
+\]</span></p>
+<p>And here the chain hands back its first reward: a <em>physical</em> sanity check. <span class="math inline">\(D = -0.46\)</span> m puts the computed goose 0.46 m above the launch-pad ground plane — about the height of a standing goose’s body. Had a sign been wrong anywhere in the chain — the pitch matrix transposed, the quaternion order scrambled, the remap mirrored — this number would come out as a goose 10 m underground or hovering at altitude, and the error announces itself. Checking the D-component of transformed ground targets against “roughly zero” is the cheapest regression test the perception-to-navigation boundary has, and the running example’s integration tests use exactly it.</p>
+<section id="the-same-chain-as-one-matrix" class="level3" data-number="18.7.1">
+<h3 data-number="18.7.1" class="anchored" data-anchor-id="the-same-chain-as-one-matrix"><span class="header-section-number">18.7.1</span> The Same Chain as One Matrix</h3>
+<p>The pipeline was derived as rotate, rotate, add — but there is a standard notation that folds all three steps into products of a single object, and it is the notation every robotics text and every ROS transform library speaks. Append a 1 to each position vector, <span class="math inline">\(\tilde{P} = [x, y, z, 1]^T\)</span>, and package each frame change as a 4 × 4 <strong>homogeneous transformation</strong>:</p>
+<p><span class="math display">\[
+T = \begin{bmatrix} R &amp; t \\ \mathbf{0}^T &amp; 1 \end{bmatrix},
+\qquad
+T\,\tilde{P} = \begin{bmatrix} R P + t \\ 1 \end{bmatrix}.
+\]</span></p>
+<p>The appended 1 is the whole trick: it multiplies the translation column <span class="math inline">\(t\)</span>, so a single matrix–vector product now performs rotate-<em>and</em>-translate. Chains of frames compose by plain matrix multiplication, in the same right-to-left reading order as before:</p>
+<p><span class="math display">\[
+\tilde{P}_{W} = T^{World}_{Drone}\; T^{Drone}_{Camera}\; \tilde{P}_C,
+\]</span></p>
+<p>where <span class="math inline">\(T^{Drone}_{Camera}\)</span> carries the extrinsic rotation <span class="math inline">\(R_y(\theta)\,\Pi\)</span> together with the camera’s mounting offset from the vehicle centre (a few centimetres this chapter has quietly neglected — the homogeneous form is where it stops being neglectable), and <span class="math inline">\(T^{World}_{Drone}\)</span> carries the attitude rotation <span class="math inline">\(R(q)\)</span> together with <span class="math inline">\(P_{Drone}\)</span>. The subscript-cancellation reading — <em>Camera</em> cancels against <em>Camera</em>, <em>Drone</em> against <em>Drone</em> — makes long chains auditable at a glance, and inverting any link is mechanical: <span class="math inline">\(T^{-1} = \begin{bmatrix} R^T &amp; -R^T t \\ \mathbf{0}^T &amp; 1 \end{bmatrix}\)</span>. For a two-link chain the explicit form of this chapter and the homogeneous form are the same arithmetic; the homogeneous form wins the moment a third frame appears — a gimbal between camera and body, a second aircraft, a map frame above NED — which is precisely the direction this Part is headed.</p>
+</section>
+</section>
+<section id="the-module-in-code" class="level2" data-number="18.8">
+<h2 data-number="18.8" class="anchored" data-anchor-id="the-module-in-code"><span class="header-section-number">18.8</span> The Module in Code</h2>
+<p>All of the above compiles down to remarkably little software. The running example’s <code>frames.py</code> exposes the two rotations, their inverses, and the composed chain — eight functions, each a few lines of NumPy:</p>
+<div id="tbl-frames-functions" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-frames-functions-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;18.1: The frame-conversion module’s public surface.
+</figcaption>
+<div aria-describedby="tbl-frames-functions-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Computes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>quat_to_rot(q)</code></td>
+<td><span class="math inline">\(R(q)\)</span>: the body-to-NED rotation matrix from a PX4 <span class="math inline">\([w,x,y,z]\)</span> quaternion</td>
+</tr>
+<tr class="even">
+<td><code>optical_to_body(v, pitch)</code></td>
+<td><span class="math inline">\(R_y(\theta)\,\Pi\,v\)</span>: axis remap plus mounting-pitch correction</td>
+</tr>
+<tr class="odd">
+<td><code>body_to_ned(v, q)</code></td>
+<td><span class="math inline">\(R(q)\,v\)</span>: attitude rotation into world axes</td>
+</tr>
+<tr class="even">
+<td><code>body_to_optical(v, pitch)</code> / <code>ned_to_body(v, q)</code></td>
+<td>the inverses, via transposes — no matrix inversion anywhere</td>
+</tr>
+<tr class="odd">
+<td><code>optical_to_ned_point(p, q, drone, pitch)</code></td>
+<td>the full chain: <span class="math inline">\(P_{Drone} + R(q)\,R_y(\theta)\,\Pi\,p\)</span></td>
+</tr>
+<tr class="even">
+<td><code>ned_point_to_optical(p, q, drone, pitch)</code></td>
+<td>the full chain backward</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The composed forward function is the master equation verbatim:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> optical_to_ned_point(p_opt, q_wxyz, drone_ned, camera_pitch_rad<span class="op">=</span><span class="fl">0.0</span>):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Detected point (optical frame) -&gt; absolute local NED position."""</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    rel_ned <span class="op">=</span> body_to_ned(optical_to_body(p_opt, camera_pitch_rad), q_wxyz)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.asarray(drone_ned, dtype<span class="op">=</span><span class="bu">float</span>) <span class="op">+</span> rel_ned</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Two design choices in the module repay attention. First, every inverse is computed by <em>transpose</em>, never by <code>np.linalg.inv</code> — the orthogonality of rotation matrices, cashed in as both speed and numerical exactness. Second, the module ships its own inverse chain, <code>ned_point_to_optical()</code>, whose stated consumers are simulation and testing: plant a synthetic goose at a known NED position, run the inverse chain to compute what the camera <em>should</em> see, feed that to the pipeline as a fake detection, and the forward chain must reproduce the planted position to machine precision, for randomized attitudes and camera angles. A transform library that round-trips thousands of random points is trustworthy in a way no amount of staring at sign conventions can establish — geometry code fails silently, so it must be tested loudly.</p>
+<p>Where this module sits in the running system is a story for later: the Systems Architecture chapter in Part V draws the full ROS 2 node graph, with the frame conversion living between the Detector’s camera-frame output and the Mission Manager’s world-frame target topic — the position it must occupy, since it is the only component that consumes both the perception stream and the flight controller’s state estimate at once.</p>
+</section>
+<section id="where-the-centimetres-go" class="level2" data-number="18.9">
+<h2 data-number="18.9" class="anchored" data-anchor-id="where-the-centimetres-go"><span class="header-section-number">18.9</span> Where the Centimetres Go</h2>
+<p>The derivations above are exact; the numbers fed into them are not, and a frame chain is an error <em>amplifier</em> with a specific, predictable structure. The governing approximation: a small angular error <span class="math inline">\(\delta\theta\)</span> (in radians) anywhere in the rotation chain displaces a target at range <span class="math inline">\(r\)</span> by roughly <span class="math inline">\(r\,\delta\theta\)</span> — angle errors become position errors in proportion to distance. Four sources dominate, and each is worth pricing at the worked example’s 6 m range.</p>
+<p><strong>Extrinsic calibration error.</strong> If the mounting pitch entered as 45.0° is really 47.0°, every detection is rotated 2° wrong: <span class="math inline">\(6 \times 0.035 \approx 21\)</span> cm — and <em>systematically</em>, always the same direction, so no amount of averaging removes it. This is why extrinsics are calibrated rather than read off the CAD drawing, and why a camera knocked in a hard landing must be recalibrated.</p>
+<p><strong>Attitude estimation error.</strong> The EKF’s attitude is good but not perfect; a 1° error displaces the 6 m target by about 10 cm. This error the transform chain simply inherits — the Sensing the World chapter’s error budget, resurfacing as position error on every target the perception system reports.</p>
+<p><strong>Synchronization latency.</strong> The subtlest source: the attitude used must be the attitude <em>when the frame was exposed</em>, not when the transform runs. Detection inference takes tens of milliseconds; if the aircraft is yawing at 30°/s and the transform naively grabs the latest quaternion 60 ms after exposure, it applies an attitude 1.8° stale — <span class="math inline">\(6 \times 0.031 \approx 19\)</span> cm — and the drone’s own position is stale too: at 3 m/s, another 18 cm. The mitigation is bookkeeping, not mathematics: timestamp every image at exposure, buffer the state estimates, and transform with the attitude interpolated to the image’s timestamp (interpolation being one of the quaternion’s four advantages, now earning its keep).</p>
+<p><strong>Depth uncertainty.</strong> Stereo depth error grows roughly quadratically with range; at 6 m the running example’s camera is credibly a couple of percent off — 12 cm or more, along the ray.</p>
+<p>Stack the worst cases and the transformed goose position carries perhaps half a metre of error at 6 m — larger than the goose itself. Whether that is a crisis depends entirely on the consumer, and for the running example it is not: the mission requires flying <em>toward</em> a goose closely enough to deter it, a metre-scale task, and the errors shrink as range closes. But the budget explains two design facts. It is why the module’s documentation flags vision/PX4 synchronization and calibration as its leading limitations, ahead of anything algorithmic; and it is why a target position is treated downstream as an <em>estimate to be refined</em> — re-detected, re-transformed, and filtered as the aircraft approaches — rather than a coordinate to be trusted once. What the planner does with a stream of imperfect world-frame targets is exactly where this Part goes next.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="18.10">
+<h2 data-number="18.10" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">18.10</span> Check Your Understanding</h2>
+<ol type="1">
+<li>Name the three coordinate frames of the vision-to-navigation pipeline, state each one’s axis convention and what it is attached to, and explain in one sentence why a detection expressed in the first frame cannot be sent to the autopilot directly.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Camera optical frame (ROS REP-103): x right in the image, y down in the image, z forward out of the lens; attached to the camera. Body FRD frame (PX4): x forward, y right, z down; attached to the airframe and rotating with it. Local NED frame: x North, y East, z Down; fixed to the world with origin where the EKF initialized (the launch point). A detection in the optical frame is measured against axes that translate and rotate with the aircraft, so the same numbers describe a different world location every instant — while PX4’s Offboard setpoints are interpreted in the world-fixed NED frame; without the transformation the drone would be commanded toward wherever its lens happens to point.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>The optical-to-body relabeling maps <span class="math inline">\((x_C, y_C, z_C) \to (z_C, x_C, y_C)\)</span>. Show that this is a proper rotation, and explain what it would mean — mathematically and physically — if a proposed axis mapping had determinant <span class="math inline">\(-1\)</span>.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Write the mapping as the permutation matrix <span class="math inline">\(\Pi\)</span> with rows <span class="math inline">\([0,0,1]\)</span>, <span class="math inline">\([1,0,0]\)</span>, <span class="math inline">\([0,1,0]\)</span>. Its columns are orthonormal and its determinant is <span class="math inline">\(+1\)</span> (expanding along the first row: <span class="math inline">\(1 \times (1\cdot 1 - 0) = +1\)</span>), so it is orthogonal with determinant <span class="math inline">\(+1\)</span> — a proper rotation; equivalently it is a cyclic permutation of a right-handed triad, which is always achievable by rigid rotation. A determinant of <span class="math inline">\(-1\)</span> would make the map a reflection: it would turn a right-handed frame into a left-handed one, which no physical re-orientation of a rigid camera can do. In code, such a matrix signals a bug — typically two axes swapped or one sign dropped — and its symptom in flight is mirrored behavior, such as steering left toward a target on the right.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>A goose is detected dead centre in the image at depth 10.0 m, with the camera pitched down 30°. Compute its body-frame position and interpret each component.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Dead centre means <span class="math inline">\(P_C = [0, 0, 10.0]\)</span>. Relabeling: <span class="math inline">\(P'_B = [10.0, 0, 0]\)</span>. Pitch correction with <span class="math inline">\(\cos 30^\circ = 0.866\)</span>, <span class="math inline">\(\sin 30^\circ = 0.5\)</span>: <span class="math inline">\(x_B = 0.866 \times 10.0 = 8.66\)</span>, <span class="math inline">\(y_B = 0\)</span>, <span class="math inline">\(z_B = 0.5 \times 10.0 = 5.00\)</span>, so <span class="math inline">\(P_B = [8.66, 0, 5.00]\)</span> m. The goose is 8.66 m ahead of the aircraft along its nose, dead on the centreline, and 5.00 m below it — the 10 m of “camera forward” split by the 30° tilt into forward and down components, as a downward-pitched camera watching a ground target requires.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>The aircraft flies level with its nose due West, so <span class="math inline">\(q = [0.7071, 0, 0, -0.7071]\)</span>. Build <span class="math inline">\(R(q)\)</span>, transform <span class="math inline">\(P_B = [4, 1, 2]\)</span> m into relative NED, and check the result against compass intuition.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>With <span class="math inline">\(w = 0.7071\)</span>, <span class="math inline">\(z = -0.7071\)</span>, <span class="math inline">\(x = y = 0\)</span>: the off-diagonal terms give <span class="math inline">\(2(xy - wz) = -2wz = +1\)</span> and <span class="math inline">\(2(xy + wz) = -1\)</span>, so <span class="math inline">\(R(q) = \begin{bmatrix} 0 &amp; 1 &amp; 0 \\ -1 &amp; 0 &amp; 0 \\ 0 &amp; 0 &amp; 1 \end{bmatrix}\)</span>. Then <span class="math inline">\(P^{rel}_{NED} = [\,0\cdot4 + 1\cdot1,\ -4,\ 2\,] = [1, -4, 2]\)</span>. Intuition check: body-forward maps to <span class="math inline">\([0,-1,0]\)</span> — due West, where the nose points — so 4 m ahead becomes 4 m West (East <span class="math inline">\(= -4\)</span>) ✓; the right side of a westbound aircraft faces North, so 1 m right becomes 1 m North ✓; 2 m below stays 2 m down ✓.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>Give the two strongest practical reasons the body-to-NED rotation is carried as a quaternion rather than as roll-pitch-yaw Euler angles, and one reason specific to integrating with PX4.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>No singularities: Euler angles suffer gimbal lock at ±90° pitch, where two rotation axes align and a degree of freedom vanishes — an attitude a wind-thrown or aggressively maneuvering multirotor can reach, and one at which Euler-based mathematics degenerates. (2) Cheap numerical hygiene and well-defined interpolation: floating-point drift is repaired by renormalizing four numbers, and blending between two attitudes — needed when interpolating the attitude to an image’s exposure timestamp — is well behaved for quaternions and pathological for Euler angles. The PX4-specific reason: the flight controller’s EKF represents and publishes attitude natively as a <span class="math inline">\([w, x, y, z]\)</span> quaternion, so consuming it directly eliminates a convention conversion — and every attitude-convention conversion is a classic source of sign and ordering bugs.</li>
+</ol>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>The detector’s inference takes 80 ms, the transform uses the latest attitude rather than the attitude at exposure, and the aircraft is yawing at 45°/s while tracking a goose at 5 m range. Estimate the resulting position error, and name the fix.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The attitude is stale by <span class="math inline">\(45 \times 0.08 = 3.6^\circ = 0.063\)</span> rad; at 5 m range the target displaces by roughly <span class="math inline">\(r\,\delta\theta = 5 \times 0.063 \approx 31\)</span> cm — comparable to the whole goose, from timing alone (and if the aircraft is also translating, its stale position adds directly on top). The fix is synchronization, not better math: timestamp each frame at exposure, buffer the flight controller’s attitude and position estimates, and evaluate the transform with the state interpolated to the frame’s timestamp — quaternion interpolation making the attitude half of that well defined.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="18.11">
+<h2 data-number="18.11" class="anchored" data-anchor-id="try-it"><span class="header-section-number">18.11</span> Try It</h2>
+<p><strong>Part 1 — build the chain, then prove it round-trips.</strong> Implement the module from this chapter’s mathematics in NumPy: <code>quat_to_rot</code>, the remap-plus-pitch <code>optical_to_body</code>, <code>body_to_ned</code>, their transpose-based inverses, and the composed <code>optical_to_ned_point</code> / <code>ned_point_to_optical</code>. Verify the worked example: pixel <span class="math inline">\((400, 300)\)</span> at 6.00 m depth, <span class="math inline">\(f_x = f_y = 320\)</span>, camera pitch 45°, <span class="math inline">\(q = [0.7071, 0, 0, 0.7071]\)</span>, drone at <span class="math inline">\([20.0, 5.0, -5.50]\)</span> should land the goose at <span class="math inline">\([18.50, 8.44, -0.46]\)</span>. Then test the way transform libraries are actually validated: generate a few thousand random points and random unit quaternions (normalize a 4-vector of Gaussians), and assert that (a) every <span class="math inline">\(R(q)\)</span> satisfies <span class="math inline">\(R^T R = I\)</span> and <span class="math inline">\(\det R = 1\)</span> to machine precision, and (b) <code>ned_point_to_optical</code> followed by <code>optical_to_ned_point</code> reproduces every planted point to within <span class="math inline">\(10^{-9}\)</span>. Break one sign in the pitch matrix and watch which tests catch it — and note that the round-trip test does <em>not</em> (an inverse built from the same wrong matrix un-does the wrong rotation), which is why the ground-height sanity check of transformed ground targets earns its place beside it.</p>
+<p><strong>Part 2 — find the dominant error at mission range.</strong> Extend Part 1 into a sensitivity study of the error budget. Place a synthetic goose on the ground (<span class="math inline">\(D = 0\)</span>) at ranges of 3, 6, 12, and 20 m from a drone at 5.5 m altitude, generate the exact camera-frame observation with the inverse chain, then corrupt one input at a time before running the forward chain: mounting pitch off by 2°, attitude yawed 1.8° stale, depth off by 2%, and drone position off by 15 cm. Plot the resulting NED position error against range for each corruption on one chart. Two results should emerge: the angular errors grow linearly with range while the position offset does not, and one source dominates at the running example’s working ranges. Close with three sentences: which error dominates, at what range the total worst-case error exceeds one goose-length (0.35 m), and which mitigation from this chapter you would implement first.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#edge-based-target-detection">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="pagination-link" aria-label="Case Study: Wildlife Detection from the Air">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="pagination-link" aria-label="Path Planning on the Edge: Search Grids and Coverage Algorithms">
+        <span class="nav-page-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

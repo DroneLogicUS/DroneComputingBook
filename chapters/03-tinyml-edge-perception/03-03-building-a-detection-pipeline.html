@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>15&nbsp; Building a Detection Pipeline: Data, Labeling, and Training – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" rel="next">
+<link href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html">Part III — Perception at the Edge: TinyML &amp; Computer Vision</a></li><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">15.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">15.2</span> Key Vocabulary</a></li>
+  <li><a href="#the-shape-of-the-work" id="toc-the-shape-of-the-work" class="nav-link" data-scroll-target="#the-shape-of-the-work"><span class="header-section-number">15.3</span> The Shape of the Work</a></li>
+  <li><a href="#collecting-the-data" id="toc-collecting-the-data" class="nav-link" data-scroll-target="#collecting-the-data"><span class="header-section-number">15.4</span> Collecting the Data</a></li>
+  <li><a href="#labeling-drawing-the-ground-truth" id="toc-labeling-drawing-the-ground-truth" class="nav-link" data-scroll-target="#labeling-drawing-the-ground-truth"><span class="header-section-number">15.5</span> Labeling: Drawing the Ground Truth</a></li>
+  <li><a href="#splitting-the-data-the-honest-held-out-set" id="toc-splitting-the-data-the-honest-held-out-set" class="nav-link" data-scroll-target="#splitting-the-data-the-honest-held-out-set"><span class="header-section-number">15.6</span> Splitting the Data: The Honest Held-Out Set</a></li>
+  <li><a href="#training-borrowed-features-new-classes" id="toc-training-borrowed-features-new-classes" class="nav-link" data-scroll-target="#training-borrowed-features-new-classes"><span class="header-section-number">15.7</span> Training: Borrowed Features, New Classes</a></li>
+  <li><a href="#did-it-work-precision-recall-and-map" id="toc-did-it-work-precision-recall-and-map" class="nav-link" data-scroll-target="#did-it-work-precision-recall-and-map"><span class="header-section-number">15.8</span> Did It Work? Precision, Recall, and mAP</a></li>
+  <li><a href="#closing-the-loop" id="toc-closing-the-loop" class="nav-link" data-scroll-target="#closing-the-loop"><span class="header-section-number">15.9</span> Closing the Loop</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">15.10</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">15.11</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html">Part III — Perception at the Edge: TinyML &amp; Computer Vision</a></li><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The TinyML chapter left its own frame deliberately unfinished. It laid out the deployment pipeline — dataset → train → convert → optimize → deploy → infer — then spent all of its pages on the second half, on the grounds that what can usefully be trained is dictated by where the result must run. The constraints are now settled: the running example’s detector lives on the companion tier, quantized to int8, its input resolution negotiated against the pixels-on-target arithmetic of the Images as Data chapter. What is still missing is the center of the frame — the trained model itself, which means the dataset of geese and not-geese, the labeled boxes, the training run, and the numbers that say whether any of it worked. This chapter builds that center, and it is where Part III stops preparing and starts building.</p>
+<p>One reorientation is needed at the outset, because it decides where the effort goes. Every previous quantitative chapter of this book has been about <em>computation</em>: control laws, memory bills, quantization arithmetic. A detection pipeline is the first piece of the system whose behavior is fixed not by code but by <em>data</em> — the model’s kernels take whatever values the dataset teaches them, and no amount of downstream engineering recovers what the dataset failed to contain or, worse, mislabeled. The practical consequence is an inversion of where a newcomer expects the time to go. Training a small detector is minutes of rented GPU time and five lines of Python; collecting and labeling the images it learns from is days of unglamorous work, and it is the bottleneck of every real detection project. The chapter therefore walks the pipeline in the order the work actually happens — collect, label, split, train — and then dwells, longer than practical guides usually do, on the demand such guides state in three words and leave undefined: <em>show evaluation metrics</em>. Precision, recall, and mAP are the vocabulary in which a detector’s fitness for a mission is argued, and this chapter works all three from raw counts up.</p>
+<section id="learning-objectives" class="level2" data-number="15.1">
+<h2 data-number="15.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">15.1</span> Learning Objectives</h2>
+<ul>
+<li>Lay out the stages of a detection pipeline — collect, extract, label, split, train, evaluate — and identify which stages consume the effort and which the compute.</li>
+<li>Build a labeled object-detection dataset from raw video: extract and select frames, draw bounding-box annotations with a labeling tool, and express every label in normalized YOLO format by hand.</li>
+<li>Construct a train/validation split that measures generalization rather than memorization, and explain why video frames must be split by recording session, not shuffled individually.</li>
+<li>Fine-tune a pretrained YOLOv8 model on a small custom dataset, and explain what transfer learning contributes when the dataset is only a few hundred images.</li>
+<li>Define IoU-based detection matching, compute precision and recall from a small confusion matrix, and trace how sweeping the confidence threshold turns those counts into a precision–recall curve, AP, and mAP.</li>
+<li>Read a trained detector’s failure cases as a specification for the next round of data collection.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="15.2">
+<h2 data-number="15.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">15.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Ground-truth annotation</strong> — the labeled fact a training example carries: for detection, a hand-drawn bounding box plus a class identity for every object of interest in the image, treated by training and evaluation alike as the truth against which the model is measured.</li>
+<li><strong>YOLO format</strong> — the plain-text label convention used by the YOLO family: one <code>.txt</code> file per image, one line per object, each line a class index followed by the box’s center coordinates, width, and height, all normalized to the range <span class="math inline">\([0,1]\)</span> by dividing by the image’s dimensions.</li>
+<li><strong>Train/validation split</strong> — the division of a dataset into images the optimizer learns from and images reserved for measurement only; the validation side exists to estimate performance on data the model has never seen, and is honest only if nothing resembling it leaked into training.</li>
+<li><strong>Data augmentation</strong> — synthetically varying training images (flips, crops, color shifts, mosaics) each time they are shown to the model, so a small dataset teaches invariances — lighting, viewpoint, scale — that it is too small to demonstrate with real examples.</li>
+<li><strong>Transfer learning</strong> — initializing a model from weights pretrained on a large general dataset and fine-tuning on a small task-specific one, so the early layers’ general visual features (edges, textures, shapes) are inherited rather than relearned from scratch.</li>
+<li><strong>IoU</strong> (Intersection over Union) — the overlap score between two boxes: the area of their intersection divided by the area of their union, ranging from 0 (disjoint) to 1 (identical); a predicted box <em>matches</em> a ground-truth box when their IoU clears a chosen threshold, conventionally 0.5.</li>
+<li><strong>Precision</strong> — of all the detections the model reported, the fraction that were real: <span class="math inline">\(\text{TP}/(\text{TP}+\text{FP})\)</span>; low precision means false alarms.</li>
+<li><strong>Recall</strong> — of all the objects actually present, the fraction the model found: <span class="math inline">\(\text{TP}/(\text{TP}+\text{FN})\)</span>; low recall means misses.</li>
+<li><strong>mAP</strong> (mean Average Precision) — the standard single-number summary of a detector: for each class, the area under the precision–recall curve swept out by varying the confidence threshold (that class’s AP), averaged over all classes; reported at a fixed IoU threshold (mAP@0.5) or averaged over a range (mAP@0.5:0.95).</li>
+<li><strong>Confidence threshold</strong> — the score cutoff below which a detection is discarded at inference time; an operating-point choice that trades precision against recall and belongs to the system designer, not the model.</li>
+</ul>
+</section>
+<section id="the-shape-of-the-work" class="level2" data-number="15.3">
+<h2 data-number="15.3" class="anchored" data-anchor-id="the-shape-of-the-work"><span class="header-section-number">15.3</span> The Shape of the Work</h2>
+<p><a href="#fig-detection-pipeline-stages" class="quarto-xref">Figure&nbsp;<span>15.1</span></a> lays the whole pipeline out, with the two stages the TinyML chapter already built shown in outline at the far end. Reading it left to right gives the order of operations; reading where its emphasis falls gives the order of <em>importance</em>. The amber stages — labeling, training, evaluation — are this chapter’s center of mass, and the red return arrow along the bottom is its most important single edge: a deployed detector’s mistakes are not merely failures to be lamented but a precise, prioritized specification of what data to collect next. A detection pipeline is not a line; it is a loop that happens to be drawn as one.</p>
+<div id="fig-detection-pipeline-stages" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Flow diagram titled the detection pipeline, from raw footage to a flying detector. A dashed band labeled workstation or cloud tier, deadline-free, compute-hungry, done once per model, contains six numbered stages: collect (flight video, phone footage, public sets), extract frames (video to still images, sampled and deduplicated), label (draw boxes, assign classes, YOLO format, highlighted amber), split and augment (train and validation, no leakage), train (fine-tune YOLOv8n by transfer learning, highlighted amber), and evaluate (precision, recall, mAP on held-out validation, highlighted amber), followed by a dashed-outline stage labeled convert, optimize — export, quantize to int8, TensorRT, previous chapter. A separate teal band labeled companion tier, every frame, holds stage eight, infer onboard: Detector node, every frame, at frame rate. A dashed red arrow loops from infer onboard back to collect, captioned: the loop that matters — flight-time mistakes tell you what data to collect next; hard cases go back into stage one. A footer states that stages one to three, the dataset work, are the bottleneck of a real detection project, not stage five: training a small model takes minutes on a rented GPU, while collecting and labeling the data it learns from takes days.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-detection-pipeline-stages-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/detection-pipeline-stages.svg" class="img-fluid figure-img" style="width:95.0%" alt="Flow diagram titled the detection pipeline, from raw footage to a flying detector. A dashed band labeled workstation or cloud tier, deadline-free, compute-hungry, done once per model, contains six numbered stages: collect (flight video, phone footage, public sets), extract frames (video to still images, sampled and deduplicated), label (draw boxes, assign classes, YOLO format, highlighted amber), split and augment (train and validation, no leakage), train (fine-tune YOLOv8n by transfer learning, highlighted amber), and evaluate (precision, recall, mAP on held-out validation, highlighted amber), followed by a dashed-outline stage labeled convert, optimize — export, quantize to int8, TensorRT, previous chapter. A separate teal band labeled companion tier, every frame, holds stage eight, infer onboard: Detector node, every frame, at frame rate. A dashed red arrow loops from infer onboard back to collect, captioned: the loop that matters — flight-time mistakes tell you what data to collect next; hard cases go back into stage one. A footer states that stages one to three, the dataset work, are the bottleneck of a real detection project, not stage five: training a small model takes minutes on a rented GPU, while collecting and labeling the data it learns from takes days.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-detection-pipeline-stages-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.1: The detection pipeline from raw footage to a flying detector: this chapter builds collection, labeling, splitting, training, and evaluation; conversion, optimization, and deployment were the previous chapter’s subject; and flight-time mistakes feed the next round of data collection.
+</figcaption>
+</figure>
+</div>
+<p>The tier assignments come straight from the placement argument of the TinyML chapter and need no re-litigating: everything up to and including evaluation is bursty, deadline-free, compute-hungry work that belongs on a workstation or the cloud tier, and only the final inference stage runs on the aircraft. What the figure adds is a budget for attention. The stages that look like machine-learning work — picking an architecture, running the optimizer — are the most automated and least decisive parts of the pipeline. The stages that look like clerical work — choosing which frames to keep, drawing boxes tightly, deciding what counts as which class — are where the detector’s ceiling is set. The sections that follow take the stages in order, spending effort in proportion to that budget.</p>
+</section>
+<section id="collecting-the-data" class="level2" data-number="15.4">
+<h2 data-number="15.4" class="anchored" data-anchor-id="collecting-the-data"><span class="header-section-number">15.4</span> Collecting the Data</h2>
+<p>The raw material of a detection dataset is footage: recorded flight video from the platform’s own camera is best, because it samples the exact viewpoint, altitude, optics, and scene statistics the deployed model will face, but phone or action-camera footage of the same subjects, and public video of comparable scenes, all serve — particularly early, when the goal is a first working model rather than a final one. What matters far more than the source is the <em>spread</em>. A detector generalizes only across variation it has seen: a dataset collected in one session, at one altitude, under one sky, produces a model superbly calibrated to that hour and brittle everywhere else. The collection checklist is therefore written in the mission’s terms — multiple lighting conditions, multiple altitudes and therefore target scales (the pixels-on-target arithmetic of the Images as Data chapter says a goose at 20 m is a 7-pixel object in the 640-column mode, so if the mission will fly at 20 m the dataset must contain 7-pixel geese, not just the flattering close-ups), multiple backgrounds, and — easy to forget — frames containing <em>no</em> targets at all, plus frames containing the confusable near-misses the model must learn to reject. For the running example that last category has a name: other birds. A detector that has only ever seen geese labeled as geese has never been taught that a duck is not one.</p>
+<p>Video becomes a dataset by frame extraction, and the step carries one non-obvious decision: the sampling interval. Thirty frames per second of the same scene are not thirty examples; they are one example, photocopied. Consecutive frames are near-duplicates, and a dataset padded with them is smaller than it looks and — as the splitting section will show — dangerous in a specific way. Sampling every second or two of footage, then culling blurred and empty-sky frames by eye, turns an afternoon of flying into a few hundred genuinely distinct images:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>cap <span class="op">=</span> cv2.VideoCapture(<span class="st">"flight_a.mp4"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>fps <span class="op">=</span> cap.get(cv2.CAP_PROP_FPS)            <span class="co"># e.g. 30.0</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>step <span class="op">=</span> <span class="bu">int</span>(fps <span class="op">*</span> <span class="dv">2</span>)                        <span class="co"># keep one frame every 2 s</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> saved <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    ok, frame <span class="op">=</span> cap.read()</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> ok:</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> i <span class="op">%</span> step <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        cv2.imwrite(<span class="ss">f"raw_frames/flight_a_</span><span class="sc">{</span>saved<span class="sc">:04d}</span><span class="ss">.jpg"</span>, frame)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        saved <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    i <span class="op">+=</span> <span class="dv">1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>How many images are enough? A useful floor for a first fine-tuned model is a few dozen labeled images per contributor and a hundred-odd overall — enough, with transfer learning and augmentation carrying the rest, to demonstrate the workflow and produce a model that visibly works on footage like its training data. A model to <em>rely on</em> wants an order of magnitude more, gathered iteratively as the loop at the bottom of <a href="#fig-detection-pipeline-stages" class="quarto-xref">Figure&nbsp;<span>15.1</span></a> reveals what is missing. The number that matters is never the count; it is the coverage.</p>
+</section>
+<section id="labeling-drawing-the-ground-truth" class="level2" data-number="15.5">
+<h2 data-number="15.5" class="anchored" data-anchor-id="labeling-drawing-the-ground-truth"><span class="header-section-number">15.5</span> Labeling: Drawing the Ground Truth</h2>
+<p>Labeling is where a pile of images becomes a dataset: a human looks at each frame and records, in machine-readable form, what a perfect detector would have said about it. For object detection that record is a set of <strong>ground-truth annotations</strong> — one bounding box, as tight as the pixels allow, plus one class identity, for every object of interest in the frame. The tooling is mature and interchangeable: LabelImg (a lightweight desktop annotator), CVAT (a self-hostable web tool built for team-scale annotation), Roboflow (a hosted platform that adds dataset management, format conversion, and augmentation), and makesense.ai (a no-install browser tool) all present the same core interaction — drag a rectangle, pick a class — and all export the standard interchange formats. Which format is a detail worth pinning down precisely once, because every training framework speaks one of two dialects: COCO format, a single JSON file describing every image, box, and category in pixel coordinates; and <strong>YOLO format</strong>, the one this pipeline uses, which <a href="#fig-yolo-label-format" class="quarto-xref">Figure&nbsp;<span>15.2</span></a> specifies down to the arithmetic.</p>
+<div id="fig-yolo-label-format" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two-part diagram. On the left, a 640 by 480 image named field_0142.jpg shows a schematic scene of sky, grass, and a goose silhouette with an orange bounding box drawn around the goose, its center dot marked, and measurements annotated: center u equals 400 pixels, v equals 180 pixels, box width 112 pixels, height 72 pixels, with the origin labeled 0,0 at top left and 639,479 at bottom right. On the right, a dark terminal box named field_0142.txt, one line per object, shows the line 0 0.625 0.375 0.175 0.150 with a comment row naming the fields class, x c, y c, w, h. Callout arrows explain each field: class id 0 equals goose, 1 equals other bird; x c equals 400 over 640; y c equals 180 over 480; w equals 112 over 640; h equals 72 over 480. A green italic note states all four numbers live in 0 to 1, so the label survives any resize because it is stored as a fraction of the frame, not in pixels. A panel shows the dataset on disk: images slash train and labels slash train holding matching filenames, images slash val and labels slash val, and a data.yaml holding paths plus class names. A footer states: the label is the lesson — an image with no goose gets an empty or absent label file, that too is information; a frame with two geese gets two lines; a wrong or sloppy line is a wrong lesson, taught with full confidence, every epoch.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-yolo-label-format-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/yolo-label-format.svg" class="img-fluid figure-img" style="width:95.0%" alt="Two-part diagram. On the left, a 640 by 480 image named field_0142.jpg shows a schematic scene of sky, grass, and a goose silhouette with an orange bounding box drawn around the goose, its center dot marked, and measurements annotated: center u equals 400 pixels, v equals 180 pixels, box width 112 pixels, height 72 pixels, with the origin labeled 0,0 at top left and 639,479 at bottom right. On the right, a dark terminal box named field_0142.txt, one line per object, shows the line 0 0.625 0.375 0.175 0.150 with a comment row naming the fields class, x c, y c, w, h. Callout arrows explain each field: class id 0 equals goose, 1 equals other bird; x c equals 400 over 640; y c equals 180 over 480; w equals 112 over 640; h equals 72 over 480. A green italic note states all four numbers live in 0 to 1, so the label survives any resize because it is stored as a fraction of the frame, not in pixels. A panel shows the dataset on disk: images slash train and labels slash train holding matching filenames, images slash val and labels slash val, and a data.yaml holding paths plus class names. A footer states: the label is the lesson — an image with no goose gets an empty or absent label file, that too is information; a frame with two geese gets two lines; a wrong or sloppy line is a wrong lesson, taught with full confidence, every epoch.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-yolo-label-format-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.2: One labeled image in YOLO format: the image keeps its name, a sibling text file holds one line per object, and each line stores the class index and the box’s center, width, and height as fractions of the frame’s dimensions.
+</figcaption>
+</figure>
+</div>
+<p>The format rewards a close reading. Each line is five numbers: a class index (from a <code>data.yaml</code> file that maps <code>goose</code> to 0 and <code>other_bird</code> to 1), then the box’s <em>center</em> <span class="math inline">\((x_c, y_c)\)</span> and its width and height — the same center-plus-extent parameterization the Images as Data chapter introduced for detector outputs, which is no coincidence: the label format mirrors what the model must learn to produce. All four coordinates are normalized — divided by the image’s width or height — so the figure’s 112 × 72-pixel box centered at pixel <span class="math inline">\((400, 180)\)</span> in a 640 × 480 frame becomes the line <code>0 0.625 0.375 0.175 0.150</code>. Normalization is what lets the label survive the preprocessing gauntlet: the frame will be resized and letterboxed on its way into the model, and a label stored in fractions of the frame needs no rewriting when the frame changes size.</p>
+<p>The mechanical format is the easy half of labeling; the hard half is <em>consistency</em>, and it is worth three rules, prefaced by the blunt truth that motivates all of them: the model learns from the labels it is given, and if the labels are wrong, it learns the wrong lesson — with full confidence, every epoch. First, <strong>boxes are tight</strong>: the annotation convention is the smallest axis-aligned rectangle containing the visible object, and a labeler who leaves generous margins is teaching the model that geese include a halo of grass, which will surface months later as systematically loose predicted boxes and depressed mAP@0.5:0.95. Second, <strong>class boundaries are written down before labeling begins</strong>: is a swimming goose with a hidden body a goose? A bird too distant to identify? Two labelers who answer differently produce a dataset that disagrees with itself, and the model splits the difference. Third, <strong>nothing is skipped silently</strong>: an unlabeled goose in a training image is not a missing label — it is a <em>negative</em> label, an assertion that this patch of pixels is background, and every such assertion actively teaches the model to ignore exactly what it is supposed to find. Auditing a sample of teammates’ labels before training, tedious as it sounds, is the highest-leverage hour in the pipeline — and visualizing the dataset <em>with its boxes drawn</em> before any training run is the same discipline in single-person form.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="For More">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>For More
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Manual labeling costs about a minute per box, which prices a ten-thousand-image dataset in weeks of human attention — and that arithmetic is why <em>automated labeling pipelines</em> are the standard advanced extension of this material. Two foundation models changed the economics. <strong>Grounding DINO</strong> performs open-vocabulary detection: given an image and a text prompt (“goose”, “bird”), it proposes bounding boxes for the named concept without any task-specific training. <strong>SAM</strong> (Segment Anything Model) and its video-capable successor SAM2 do the complementary job: given a point, box, or rough prompt, they produce a pixel-precise mask of the indicated object, and SAM2 can propagate that mask through subsequent video frames — so one click on a goose in frame 1 can yield boxes for the next several hundred frames. Chained together — Grounding DINO proposes, SAM refines, a human <em>verifies and corrects</em> rather than draws — such semi-supervised pipelines reduce manual effort by an order of magnitude. The human is not removed: foundation-model proposals inherit their own biases (Grounding DINO will happily box gulls under the prompt “goose”), so the pipeline’s output is a set of <em>initial annotations for refinement</em>, and the audit step becomes the labeling job. The trade is the same one every chapter of this Part has priced: these models are enormous and run on the cloud tier — offline labeling assistance is precisely the deadline-free workload that tier exists for.</p>
+</div>
+</div>
+</section>
+<section id="splitting-the-data-the-honest-held-out-set" class="level2" data-number="15.6">
+<h2 data-number="15.6" class="anchored" data-anchor-id="splitting-the-data-the-honest-held-out-set"><span class="header-section-number">15.6</span> Splitting the Data: The Honest Held-Out Set</h2>
+<p>Before training, the labeled dataset is divided: most images (a customary 80%) become the <strong>training set</strong> the optimizer grinds against; the remainder becomes the <strong>validation set</strong>, which the optimizer never touches and which exists solely to answer one question — how does the model do on images it has not seen? The question matters because a neural network with millions of parameters and a few hundred training images can, in the limit, simply memorize the answers; performance on the training set is therefore evidence of nothing. Only the validation score estimates the quantity the mission cares about, which is performance on the next flight’s footage.</p>
+<p>That estimate is honest only if the split is, and video-derived datasets fail the honesty test in one specific, near-universal way. <a href="#fig-train-val-split-leakage" class="quarto-xref">Figure&nbsp;<span>15.3</span></a> shows it. Shuffle all extracted frames and split randomly, and every validation frame has near-duplicate siblings — same flock, same light, same background, seconds apart — sitting in the training set. The model is then graded on questions it has effectively already seen; validation scores come back gratifyingly high, and they are a lie, one that stays hidden until the first flight over new ground. The failure has a name — <strong>leakage</strong> — and a simple fix: the unit of splitting is the <em>recording session</em>, never the frame. Whole flights, whole sessions, ideally whole days and sites, are assigned to one side or the other, so the validation set is footage the model has never seen a neighbour of.</p>
+<div id="fig-train-val-split-leakage" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two stacked panels. The top panel, tinted red and labeled random split, frame by frame — leakage, shows a strip of twelve frames extracted from one flight video spanning t equals 0 to 11 seconds, with train and val assignments interleaved along the strip and the note: same flock, same light, same background throughout. A red italic caption reads: every val frame has a near-copy sitting in train — the model is graded on questions it has effectively already seen; the score measures memory, not generalization. The bottom panel, tinted green and labeled split by recording session — honest, shows three session blocks: Flight A, morning, low sun, all frames to train; Flight B, overcast, higher altitude, all frames to train; Flight C, different day, different site, all frames to validation. A green italic caption reads: the validation score now estimates what the mission cares about — performance on footage from a flight that has not happened yet. A footer states the rule: the unit of splitting is the recording session, not the frame; aim for roughly 80 to 20 by image count, and make the validation side as unlike the training side as flight conditions will be unlike the dataset.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-train-val-split-leakage-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/train-val-split-leakage.svg" class="img-fluid figure-img" style="width:95.0%" alt="Two stacked panels. The top panel, tinted red and labeled random split, frame by frame — leakage, shows a strip of twelve frames extracted from one flight video spanning t equals 0 to 11 seconds, with train and val assignments interleaved along the strip and the note: same flock, same light, same background throughout. A red italic caption reads: every val frame has a near-copy sitting in train — the model is graded on questions it has effectively already seen; the score measures memory, not generalization. The bottom panel, tinted green and labeled split by recording session — honest, shows three session blocks: Flight A, morning, low sun, all frames to train; Flight B, overcast, higher altitude, all frames to train; Flight C, different day, different site, all frames to validation. A green italic caption reads: the validation score now estimates what the mission cares about — performance on footage from a flight that has not happened yet. A footer states the rule: the unit of splitting is the recording session, not the frame; aim for roughly 80 to 20 by image count, and make the validation side as unlike the training side as flight conditions will be unlike the dataset.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-train-val-split-leakage-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.3: Two ways to split video frames: a random frame-level split leaks near-duplicate frames across the boundary and inflates the validation score; splitting by whole recording session keeps validation footage genuinely unseen.
+</figcaption>
+</figure>
+</div>
+<p>The session-level split usually <em>lowers</em> the validation score, sometimes sharply — and that drop is not a cost but a correction: the number was wrong before. The same reasoning, incidentally, has already appeared in this Part wearing different clothes: the TinyML chapter’s warning that a quantization calibration set must span flight conditions, not convenience conditions, is the same principle applied one pipeline stage later. Held-out data is a measuring instrument, and an instrument contaminated by its subject measures nothing.</p>
+<p>What the split takes away in flattery, <strong>data augmentation</strong> partially gives back in substance. Each time a training image is shown to the model, it is randomly perturbed — flipped horizontally, scaled and cropped, jittered in hue and brightness, or composited into a mosaic of four training images at once, a YOLO-family staple that manufactures scale variation and crowded scenes from sparse data. A hundred images become, in effect, an endless stream of variants, and the invariances the dataset is too small to demonstrate with real examples — geese face either way, sunlight is not part of goosehood — are taught synthetically. Two cautions keep the technique honest. Geometric augmentations must transform the <em>labels</em> along with the pixels (flip the image, flip every <span class="math inline">\(x_c\)</span> — the frameworks handle this, but only for the augmentations they know about), and augmentation applies to the training set only: a validation set that is also augmented is measuring performance on the augmenter, not the world.</p>
+</section>
+<section id="training-borrowed-features-new-classes" class="level2" data-number="15.7">
+<h2 data-number="15.7" class="anchored" data-anchor-id="training-borrowed-features-new-classes"><span class="header-section-number">15.7</span> Training: Borrowed Features, New Classes</h2>
+<p>With <code>images/</code>, <code>labels/</code>, and <code>data.yaml</code> in place, the training itself is almost anticlimactic — deliberately so, because the hard decisions were made upstream. The pipeline fine-tunes <strong>YOLOv8n</strong>, the nano variant of a widely used single-stage detector family: about 3.2 million parameters, which the alert reader will recognize as the previous chapter’s illustrative memory bill made flesh — roughly 12.8 MB of float32 weights, 3.2 MB after the int8 quantization that same chapter developed, comfortably inside the companion tier’s budget. “Single-stage” means the network maps the input tensor to boxes in one forward pass, predicting, at every position of its final feature maps, box coordinates and per-class scores directly — the output structure the Images as Data chapter’s task taxonomy assigned to detection, produced at the frame rates the aircraft needs.</p>
+<p>The decisive move is where the initial weights come from. Training a 3.2-million-parameter network from random initialization on a hundred-image dataset fails outright — there are vastly more parameters than facts to constrain them. <strong>Transfer learning</strong> sidesteps the arithmetic: training starts from weights pretrained on a large general-purpose detection dataset, and the small custom dataset only has to <em>adapt</em> them. The division of labor falls along the network’s depth, exactly as the Images as Data chapter’s feature-map story predicts: the early layers’ kernels — edge, texture, and shape detectors — are generic visual machinery that transfers unchanged, while the later layers and the detection head, which compose those features into class-specific evidence, are what fine-tuning actually rewrites. The pretrained model already knows a great deal about <em>birds</em>; the dataset’s job is only to teach the difference between <code>goose</code> and <code>other_bird</code>, and a few hundred images genuinely suffice for that. Running the pretrained model on the validation images <em>before</em> fine-tuning makes the point empirically — it boxes the birds competently and calls them all <code>bird</code>, class 14 of somebody else’s dataset — and provides the baseline against which the fine-tuned model’s improvement is the pipeline’s key teaching moment.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ultralytics <span class="im">import</span> YOLO</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> YOLO(<span class="st">"yolov8n.pt"</span>)        <span class="co"># pretrained weights: the borrowed features</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>model.train(data<span class="op">=</span><span class="st">"data.yaml"</span>, epochs<span class="op">=</span><span class="dv">50</span>, imgsz<span class="op">=</span><span class="dv">640</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>metrics <span class="op">=</span> model.val()             <span class="co"># precision, recall, mAP50, mAP50-95</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>What the optimizer minimizes is the composite loss the Images as Data chapter promised to return to: a <em>classification</em> term scoring the per-class predictions at each output position, and a <em>box-geometry</em> term scoring predicted rectangles against ground-truth ones by their overlap (some detector families carry a third, a standalone objectness/confidence term). The training run emits the curves of both falling epoch by epoch, alongside validation metrics rising — and the reflex for reading them is the one Part II taught for PID tuning: curves are diagnostics, not decoration. Training loss falling while validation metrics stall or reverse is overfitting, the memorization failure the held-out set exists to catch, and the standard responses — stop earlier, augment harder, collect more data — all amount to re-balancing parameters against facts. But “validation metrics rising” presumes the metrics mean something to the reader, and this is exactly the point where most practical treatments go quiet. The next section does not.</p>
+</section>
+<section id="did-it-work-precision-recall-and-map" class="level2" data-number="15.8">
+<h2 data-number="15.8" class="anchored" data-anchor-id="did-it-work-precision-recall-and-map"><span class="header-section-number">15.8</span> Did It Work? Precision, Recall, and mAP</h2>
+<p>A classifier is easy to score: its answer is right or wrong, and accuracy is a percentage. A detector’s answer is a <em>list of localized boxes</em>, and scoring it requires two decisions a classifier never faces: what counts as “found” (a box in roughly the right place? exactly the right place?), and how to trade the two distinct ways of being wrong — crying goose at empty grass, and staying silent over a real one. The standard machinery resolves both, and it is worth building from the ground up because every number a training framework prints is made of it.</p>
+<p>The first decision is settled by <strong>IoU</strong> — Intersection over Union — the overlap score between a predicted box and a ground-truth box: the area both cover divided by the area either covers. <a href="#fig-iou-detection-matching" class="quarto-xref">Figure&nbsp;<span>15.4</span></a> works one case through: a prediction and a truth box of 8,000 px² each, overlapping in a 4,900 px² region, giving</p>
+<p><span class="math display">\[
+\text{IoU} = \frac{4{,}900}{8{,}000 + 8{,}000 - 4{,}900} = \frac{4{,}900}{11{,}100} = 0.44.
+\]</span></p>
+<p>Against the conventional matching threshold of 0.5, that detection — which a human would call “basically right, a bit off” — does not count. The strictness is deliberate: for the running example, the box centre becomes a steering bearing and indexes the depth map, so a box half-off the goose is operationally a miss. With matching defined, every detection and every ground-truth object receives exactly one verdict. A detection matching an unclaimed truth box at IoU ≥ 0.5 with the correct class is a <strong>true positive</strong> (TP); a detection with no match — wrong place, wrong class, or a duplicate box on an already-claimed object — is a <strong>false positive</strong> (FP); a labeled object no detection matched is a <strong>false negative</strong> (FN). One verdict is conspicuously absent: the true negative, all the background correctly left unboxed, is uncountable — there are indefinitely many rectangles a detector correctly did not draw — which is why detection is scored by precision and recall rather than accuracy, and why the detection confusion matrix has a permanently empty cell.</p>
+<div id="fig-iou-detection-matching" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Three-part diagram. On the left, under the heading Intersection over Union, a dashed teal rectangle labeled ground truth overlaps a solid orange rectangle labeled prediction, their overlap shaded amber, with the arithmetic: each box 8,000 square pixels, intersection 4,900, union 8,000 plus 8,000 minus 4,900 equals 11,100, IoU equals 4,900 over 11,100 equals 0.44; a red italic note reads 0.44 is less than 0.50, so no match — this detection counts as a false positive and the goose it grazed as a false negative. In the middle, a panel states that every detection and every labeled object gets one verdict: true positive, detection matches a ground-truth box with IoU at least 0.5, correct class, box not already claimed; false positive, detection with no matching truth — low IoU, wrong class, or duplicate; false negative, a labeled goose no detection matched; and an italic note that true negative is undefined because background correctly left unboxed is uncountable. On the right, a worked validation pass at confidence at least 0.5, with 5 labeled geese and 6 detections kept, shown as a two-by-two confusion matrix: detector says goose and goose present, TP equals 4, geese found; detector says goose and background, FP equals 2, false alarms; detector says nothing and goose present, FN equals 1, goose missed; detector says nothing and background, TN dash, not counted. Below, precision equals TP over TP plus FP equals 4 over 6 equals 0.67, and recall equals TP over TP plus FN equals 4 over 5 equals 0.80, with the gloss: of every 3 alerts, 2 are geese; of every 5 geese, 4 are found. A footer adds that both counts depend on two evaluator-chosen thresholds, the IoU cutoff and the confidence cutoff — move either, and both numbers move.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-iou-detection-matching-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/iou-detection-matching.svg" class="img-fluid figure-img" style="width:95.0%" alt="Three-part diagram. On the left, under the heading Intersection over Union, a dashed teal rectangle labeled ground truth overlaps a solid orange rectangle labeled prediction, their overlap shaded amber, with the arithmetic: each box 8,000 square pixels, intersection 4,900, union 8,000 plus 8,000 minus 4,900 equals 11,100, IoU equals 4,900 over 11,100 equals 0.44; a red italic note reads 0.44 is less than 0.50, so no match — this detection counts as a false positive and the goose it grazed as a false negative. In the middle, a panel states that every detection and every labeled object gets one verdict: true positive, detection matches a ground-truth box with IoU at least 0.5, correct class, box not already claimed; false positive, detection with no matching truth — low IoU, wrong class, or duplicate; false negative, a labeled goose no detection matched; and an italic note that true negative is undefined because background correctly left unboxed is uncountable. On the right, a worked validation pass at confidence at least 0.5, with 5 labeled geese and 6 detections kept, shown as a two-by-two confusion matrix: detector says goose and goose present, TP equals 4, geese found; detector says goose and background, FP equals 2, false alarms; detector says nothing and goose present, FN equals 1, goose missed; detector says nothing and background, TN dash, not counted. Below, precision equals TP over TP plus FP equals 4 over 6 equals 0.67, and recall equals TP over TP plus FN equals 4 over 5 equals 0.80, with the gloss: of every 3 alerts, 2 are geese; of every 5 geese, 4 are found. A footer adds that both counts depend on two evaluator-chosen thresholds, the IoU cutoff and the confidence cutoff — move either, and both numbers move.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-iou-detection-matching-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.4: Scoring one detection: IoU against the ground-truth box decides whether it matches, every detection and labeled object receives a TP, FP, or FN verdict, and the counts fill a confusion matrix from which precision and recall are computed.
+</figcaption>
+</figure>
+</div>
+<p>The figure’s right panel runs the counts for a deliberately tiny worked example that the rest of this section will reuse: a validation set containing <strong>5 labeled geese</strong>, against which the detector, keeping only detections with confidence ≥ 0.5, reports 6 boxes — 4 of them matching geese, 2 of them false alarms, with 1 goose found by nothing. The confusion matrix holds TP = 4, FP = 2, FN = 1, and the two headline numbers follow:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\text{precision} &amp;= \frac{\text{TP}}{\text{TP}+\text{FP}} = \frac{4}{6} = 0.67, \\
+\text{recall} &amp;= \frac{\text{TP}}{\text{TP}+\text{FN}} = \frac{4}{5} = 0.80.
+\end{aligned}
+\]</span></p>
+<p>Read them as sentences, because that is how they are used in a design meeting: <em>when this detector cries goose, it is right two times in three</em> (precision), and <em>of the geese actually present, it finds four in five</em> (recall). Neither number alone characterizes the detector, because each can be bought at the other’s expense with a single knob — the <strong>confidence threshold</strong>. Raise it to 0.9 and only the surest detections survive: precision climbs, recall collapses. Lower it to 0.1 and everything vaguely birdlike gets a box: recall climbs, precision collapses. The threshold is an <em>operating point</em>, chosen by the system designer against mission costs — and for the running example the costs are asymmetric in an instructive way. A false positive sends the aircraft to harass an empty patch of grass: wasted battery, mild embarrassment. A false negative leaves a goose unharassed in a protected field: the mission’s entire purpose, unmet. The running example therefore operates deliberately down-threshold of the precision-recall balance point, accepting more false alarms to miss fewer geese — a choice no training framework can make, because it is written in the currency of the mission, not the model.</p>
+<p>Because the threshold is arbitrary, a <em>fair comparison between detectors</em> must not depend on it — and that requirement is exactly what <strong>AP</strong> exists to satisfy. The construction, worked in <a href="#fig-precision-recall-map" class="quarto-xref">Figure&nbsp;<span>15.5</span></a> on the same 5-goose validation set, is mechanical: take <em>every</em> detection the model offers, sorted by confidence descending, and walk down the list, treating each rank as an operating point and recording cumulative precision and recall there. The full ranking for the worked example — seven detections, the six already seen plus one low-confidence false positive at 0.42 — traces the table in the figure: recall rises stepwise as each TP is absorbed (topping out at 0.80, since the fifth goose is never detected at any threshold), while precision sawtooths, dropping at each FP and partially recovering at each TP. Plot precision against recall and the sawtooth becomes the <strong>precision–recall curve</strong>; AP is the area under it, computed against the curve’s upper envelope (at each recall level, the best precision achievable at that recall or beyond — the convention smooths the sawtooth and rewards what an optimally chosen threshold could get). For the worked example the envelope holds precision 1.0 out to recall 0.4, then 0.75 to recall 0.6, then 0.67 to recall 0.8, then falls to zero:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\text{AP}_{50} &amp;= (0.4)(1.0) + (0.2)(0.75) + (0.2)(0.67) \\
+               &amp;= 0.400 + 0.150 + 0.133 = 0.68.
+\end{aligned}
+\]</span></p>
+<div id="fig-precision-recall-map" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two-part diagram over the same five-goose validation set. On the left, a table titled sweep the confidence threshold down the ranking lists seven detections with columns rank, confidence, verdict, cumulative TP, precision, and recall: rank 1, 0.95, TP, precision 1.00, recall 0.20; rank 2, 0.91, TP, 1.00, 0.40; rank 3, 0.83, FP, 0.67, 0.40; rank 4, 0.78, TP, 0.75, 0.60; rank 5, 0.66, FP, 0.60, 0.60; rank 6, 0.54, TP, 0.67, 0.80; rank 7, 0.42, FP, 0.57, 0.80. Notes state that verdicts use IoU at least 0.5 against the five labeled geese, the fifth goose is never detected so recall never reaches 1.0, and each row is one operating point plotted as a dot on the right. On the right, a precision-recall plot shows the seven dots joined by a dashed sawtooth, a bold orange upper envelope holding precision 1.0 to recall 0.4, 0.75 to recall 0.6, and 0.67 to recall 0.8 before dropping to zero, and the area under the envelope shaded amber, annotated AP at IoU 0.5 approximately 0.68, computed as 0.4 times 1.0 plus 0.2 times 0.75 plus 0.2 times 0.67 equals 0.683. A footer states: AP summarizes one class across every confidence threshold; mAP averages AP over classes — goose 0.68, other bird 0.52 gives mAP at 0.5 of 0.60; and mAP at 0.5 to 0.95 repeats the whole computation at IoU thresholds from 0.5 to 0.95 in steps of 0.05 and averages, rewarding tight boxes rather than just found ones, which is why it is always the lower of the two numbers a trainer reports.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-precision-recall-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/precision-recall-map.svg" class="img-fluid figure-img" style="width:95.0%" alt="Two-part diagram over the same five-goose validation set. On the left, a table titled sweep the confidence threshold down the ranking lists seven detections with columns rank, confidence, verdict, cumulative TP, precision, and recall: rank 1, 0.95, TP, precision 1.00, recall 0.20; rank 2, 0.91, TP, 1.00, 0.40; rank 3, 0.83, FP, 0.67, 0.40; rank 4, 0.78, TP, 0.75, 0.60; rank 5, 0.66, FP, 0.60, 0.60; rank 6, 0.54, TP, 0.67, 0.80; rank 7, 0.42, FP, 0.57, 0.80. Notes state that verdicts use IoU at least 0.5 against the five labeled geese, the fifth goose is never detected so recall never reaches 1.0, and each row is one operating point plotted as a dot on the right. On the right, a precision-recall plot shows the seven dots joined by a dashed sawtooth, a bold orange upper envelope holding precision 1.0 to recall 0.4, 0.75 to recall 0.6, and 0.67 to recall 0.8 before dropping to zero, and the area under the envelope shaded amber, annotated AP at IoU 0.5 approximately 0.68, computed as 0.4 times 1.0 plus 0.2 times 0.75 plus 0.2 times 0.67 equals 0.683. A footer states: AP summarizes one class across every confidence threshold; mAP averages AP over classes — goose 0.68, other bird 0.52 gives mAP at 0.5 of 0.60; and mAP at 0.5 to 0.95 repeats the whole computation at IoU thresholds from 0.5 to 0.95 in steps of 0.05 and averages, rewarding tight boxes rather than just found ones, which is why it is always the lower of the two numbers a trainer reports.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-precision-recall-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15.5: From a ranked list of detections to AP: each rank down the confidence ordering is one operating point contributing a precision–recall pair; the area under the resulting curve’s upper envelope is that class’s average precision, and mAP averages AP over classes.
+</figcaption>
+</figure>
+</div>
+<p>Two averaging steps turn AP into the numbers a training run actually prints. Averaging AP over <em>classes</em> gives <strong>mAP</strong> — if <code>goose</code> scores 0.68 and <code>other_bird</code> a weaker 0.52, then mAP@0.5 is 0.60 — a convention that matters when classes are imbalanced, since a detector can post a handsome average on the abundant class while quietly failing the rare one, which is a reason to always read the per-class table, not just the mean. Averaging over <em>IoU thresholds</em> gives the stricter <strong>mAP@0.5:0.95</strong>: the entire computation repeated at matching thresholds from 0.5 to 0.95 in steps of 0.05 and averaged, so that a detector earns full credit only when its boxes are not merely on the object but tight — which is why this is always the lower of the two numbers reported, and why sloppy training labels, which teach loose boxes, damage it first. When the validation call in the training snippet returns its four columns — precision, recall, mAP50, mAP50-95 — every one of them is now legible as a specific computation over TP, FP, and FN counts, and a statement like “the fine-tuned model reached 0.85 mAP@0.5” has become checkable engineering rather than incantation.</p>
+</section>
+<section id="closing-the-loop" class="level2" data-number="15.9">
+<h2 data-number="15.9" class="anchored" data-anchor-id="closing-the-loop"><span class="header-section-number">15.9</span> Closing the Loop</h2>
+<p>The validation table says how good the model is; it does not say <em>why</em> it is bad where it is bad, and the last discipline of the pipeline is extracting that answer. The method is unglamorous: run the trained detector over the validation set and over fresh footage, and look at the failures one by one. They will cluster — and each cluster is a sentence in the specification for the next dataset. Misses at long range: the dataset lacks small-scale geese, or the input resolution is below the pixels-on-target floor of the Images as Data chapter — collect high-altitude footage, or revisit the resolution negotiation. Ducks boxed as geese: the <code>other_bird</code> class is underpopulated — collect confusers. Failures against a specific background or lighting: a coverage gap, named precisely by the failing frames themselves. Small datasets guarantee such mistakes, and the correct response is neither despair nor another architecture, but the red arrow of <a href="#fig-detection-pipeline-stages" class="quarto-xref">Figure&nbsp;<span>15.1</span></a>: mistakes are the cheapest, most accurate data-collection guidance the project will ever get. Even the deployed model keeps contributing — the TinyML chapter’s offloading pattern, shipping hard cases and low-confidence detections back from the aircraft as summaries, exists precisely to keep this loop turning after launch.</p>
+<p>The pipeline is now complete end to end, in the only sense that matters: every stage from raw footage to a validated, deployable model has been built, and the two stages beyond — quantize, hand to TensorRT, run inside the Detector node — were the previous chapter’s work. Two threads remain open, both deliberate. The numbers this chapter computed were a worked miniature; the Wildlife Detection from the Air case study, which closes this Part, holds the whole pipeline against the published record — a real research team detecting sheep from 80 m, and the waterfowl literature’s own goose detectors — reading their datasets, labeling compromises, and reported failures with exactly the instruments built here. And a model that is accurate is not yet a model that is <em>fast enough</em>: proving the deployed detector meets its frame-rate deadline inside the aircraft’s stack is a measurement discipline of its own, taken up in the Real-Time Inference on the Edge chapter.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="15.10">
+<h2 data-number="15.10" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">15.10</span> Check Your Understanding</h2>
+<ol type="1">
+<li>A labeler produces a box for a goose occupying pixels from <span class="math inline">\((u, v) = (200, 300)\)</span> to <span class="math inline">\((280, 360)\)</span> in a 640 × 480 frame. Write the YOLO-format label line (class <code>goose</code> = 0), showing the arithmetic for all four coordinates.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The box’s center is at <span class="math inline">\(u_c = (200+280)/2 = 240\)</span>, <span class="math inline">\(v_c = (300+360)/2 = 330\)</span>; its width is 80 px and height 60 px. Normalizing: <span class="math inline">\(x_c = 240/640 = 0.375\)</span>; <span class="math inline">\(y_c = 330/480 = 0.6875\)</span>; <span class="math inline">\(w = 80/640 = 0.125\)</span>; <span class="math inline">\(h = 60/480 = 0.125\)</span>. The line is <code>0 0.375 0.6875 0.125 0.125</code>. Note the divisor differs per axis — horizontal quantities are divided by the width (640), vertical by the height (480) — a mismatch here is a classic silent labeling bug that displaces every box vertically.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>On a validation set containing 40 labeled geese, a detector at confidence ≥ 0.5 reports 35 boxes, of which 28 match a goose at IoU ≥ 0.5. Fill in the confusion matrix (TP, FP, FN), compute precision and recall, and state — in mission terms for the running example — what each of the two error counts costs.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>TP = 28; FP = 35 − 28 = 7; FN = 40 − 28 = 12 (TN is undefined for detection). Precision = 28/35 = 0.80: one alert in five sends the aircraft to investigate something that is not a goose — wasted battery and flight time. Recall = 28/40 = 0.70: 12 of the 40 geese present go undetected and undeterred — a direct failure of the mission’s purpose. For a deterrence mission the FN cost dominates, which argues for lowering the confidence threshold (trading precision away to recover recall) rather than raising it.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Explain why a random frame-level split of video-derived data inflates validation metrics, why the inflation is invisible during development, and how the same failure mode reappeared in the previous chapter in a different pipeline stage.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Frames extracted seconds apart from one video are near-duplicates; a random split scatters them across both sides, so nearly every validation image has a close sibling in training and the model is scored partly on memorization. The inflation is invisible because every number the developer sees — computed on that contaminated validation set — is self-consistently high; the truth only surfaces on genuinely new footage, i.e., in the field. The TinyML chapter’s quantization-calibration failure is the same principle one stage later: a calibration set drawn from convenient (e.g., indoor) data yields activation ranges that look perfect on calibration data and clip catastrophically on flight data. In both cases held-out data is a measuring instrument, and it measures only what it was sampled from.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>A pretrained YOLOv8n detects the birds in the validation images but labels them all <code>bird</code>. Fine-tuning on 130 labeled images produces a model that reliably distinguishes <code>goose</code> from <code>other_bird</code>. Explain, in terms of which layers change and what they encode, why 130 images suffice here when training the same architecture from random initialization would fail.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The pretrained network’s early convolutional layers already encode general visual features — edges, textures, part-like patterns — learned from a large general dataset; these transfer to the new task essentially unchanged, because low-level visual structure is shared across image domains. Fine-tuning mainly has to adjust the later layers and detection head, which compose those features into class evidence — teaching the (comparatively few) parameters that separate goose-shaped feature combinations from other-bird-shaped ones. 130 images carry enough information for that small adaptation, but nowhere near enough to constrain all 3.2 million parameters from scratch: with random initialization the network must learn edge detectors and class boundaries simultaneously from a dataset thousands of times too small, and it memorizes instead of generalizing.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>A detector’s ranked output on a validation set with 4 ground-truth geese is: 0.92 TP, 0.85 TP, 0.71 FP, 0.63 TP, 0.50 FP. Compute cumulative precision and recall at each rank, then AP@0.5 using the upper-envelope convention. What is the maximum recall, and why does it fall short of 1.0?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Ranks: (1) P = 1/1 = 1.00, R = 1/4 = 0.25; (2) P = 2/2 = 1.00, R = 0.50; (3) P = 2/3 = 0.67, R = 0.50; (4) P = 3/4 = 0.75, R = 0.75; (5) P = 3/5 = 0.60, R = 0.75. Envelope: precision 1.00 holds for recall in (0, 0.50] (best precision at or beyond those recalls is 1.00); precision 0.75 for (0.50, 0.75]; zero beyond 0.75. AP = (0.50)(1.00) + (0.25)(0.75) = 0.50 + 0.1875 ≈ 0.69. Maximum recall is 0.75: the fourth goose is matched by no detection at any confidence, and no threshold choice can recover an object the model never proposed.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>mAP@0.5:0.95 for a trained model comes back much lower than its mAP@0.5, and inspection shows the predicted boxes systematically include a margin of grass around each goose. Trace the likely cause backward through the pipeline, and state which pipeline stage — not which hyperparameter — the fix belongs to.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>mAP@0.5:0.95 re-scores the same detections at IoU thresholds up to 0.95, so it punishes boxes that find the object but fit it loosely — precisely the symptom described. The model learned loose boxes because it was taught them: training annotations drawn with generous margins shift the box-geometry loss’s target, and the model reproduces the margin faithfully. The fix belongs to the labeling stage — re-audit the annotations against the tight-box convention and correct them — not to training hyperparameters, which would be tuning the optimizer to better fit wrong answers. The general lesson: metric pathologies whose pattern is systematic (every box loose in the same way) usually indict the dataset; random pathologies more often indict the model or the data volume.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="15.11">
+<h2 data-number="15.11" class="anchored" data-anchor-id="try-it"><span class="header-section-number">15.11</span> Try It</h2>
+<p><strong>Part 1 — build a labeled dataset and audit it.</strong> Collect two or three minutes of video containing a target class of your choosing (birds at a pond, cars from a footbridge — anything with multiple instances and confusers). Extract frames at a 2-second interval with the chapter’s snippet, cull the useless ones, and label 40–60 images in a browser tool (makesense.ai requires no installation), exporting in YOLO format. Before doing anything else, audit: write a short script that draws every label file’s boxes back onto its image, page through all of them, and count your own labeling errors — missed objects, loose boxes, class inconsistencies. Fix what you find, then write down your class-boundary rules (what did you decide about occluded, distant, or ambiguous instances?) as the labeling spec you should have written first. Finally, split by session, not by frame: hold out footage from a different time or vantage point if you have it, and state in one sentence what your validation set does and does not test.</p>
+<p><strong>Part 2 — train, evaluate, and compute one AP by hand.</strong> Fine-tune <code>yolov8n.pt</code> on your dataset for 50 epochs (any free GPU notebook service suffices) and run validation. First reproduce the baseline comparison: run the <em>pretrained</em> weights on your validation images, then your fine-tuned weights, and save one side-by-side pair that shows the difference. Then interrogate the metrics: from the validation output, read precision, recall, mAP@0.5, and mAP@0.5:0.95, and check the per-class table for imbalance. Finally, verify the machinery yourself: pick 8–10 of your model’s detections on a handful of validation images, determine each one’s TP/FP verdict at IoU ≥ 0.5 (compute one IoU by hand from box coordinates while you are at it), build the ranked table as in <a href="#fig-precision-recall-map" class="quarto-xref">Figure&nbsp;<span>15.5</span></a>, and compute AP with the envelope convention. Compare your hand-computed value against the framework’s per-class AP — and if they disagree wildly, find out which of you is matching detections to ground truth differently. That disagreement, run to ground, teaches more than the training run did.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#edge-based-target-detection">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="pagination-link" aria-label="TinyML: Deploying Neural Networks on Embedded Hardware">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="pagination-link" aria-label="Real-Time Inference on the Edge: Latency and Trade-offs">
+        <span class="nav-page-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

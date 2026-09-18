@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>21&nbsp; Finite State Machines and Behavior Trees for Mission Logic – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" rel="next">
+<link href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</a></li><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">21.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">21.2</span> Key Vocabulary</a></li>
+  <li><a href="#five-states-three-chapters-of-machinery" id="toc-five-states-three-chapters-of-machinery" class="nav-link" data-scroll-target="#five-states-three-chapters-of-machinery"><span class="header-section-number">21.3</span> Five States, Three Chapters of Machinery</a></li>
+  <li><a href="#the-diagram-is-the-design" id="toc-the-diagram-is-the-design" class="nav-link" data-scroll-target="#the-diagram-is-the-design"><span class="header-section-number">21.4</span> The Diagram Is the Design</a></li>
+  <li><a href="#guards-that-deserve-the-name" id="toc-guards-that-deserve-the-name" class="nav-link" data-scroll-target="#guards-that-deserve-the-name"><span class="header-section-number">21.5</span> Guards That Deserve the Name</a></li>
+  <li><a href="#races-edges-and-the-latency-budget" id="toc-races-edges-and-the-latency-budget" class="nav-link" data-scroll-target="#races-edges-and-the-latency-budget"><span class="header-section-number">21.6</span> Races, Edges, and the Latency Budget</a></li>
+  <li><a href="#the-machine-in-code" id="toc-the-machine-in-code" class="nav-link" data-scroll-target="#the-machine-in-code"><span class="header-section-number">21.7</span> The Machine in Code</a></li>
+  <li><a href="#when-the-flat-machine-runs-out" id="toc-when-the-flat-machine-runs-out" class="nav-link" data-scroll-target="#when-the-flat-machine-runs-out"><span class="header-section-number">21.8</span> When the Flat Machine Runs Out</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">21.9</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">21.10</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</a></li><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The previous chapter ended holding a velocity command and a question. The escape vector was built, verified, and bounded — and then the Vector-Based Threat Evasion chapter stopped, deliberately, at the observation that where control goes next — resume the abandoned search leg? return home? — is sequencing, not geometry. This chapter is the sequencing. The mission now owns three genuine competences, each built in its own chapter: it can sweep an area with coverage guarantees (the lawnmower generator of the Path Planning on the Edge chapter), it can flee along a mathematically sound escape vector (the previous chapter’s <code>evasion_command</code>), and — with the deterrence patterns the Harassment Pattern Generation chapter supplies — it will be able to work a detected goose once it finds one. It also still knows how to take off and land, machinery that has been solid since Part II. What it lacks is an arbiter: the piece of software that decides, twenty times a second, <em>which of these things the aircraft is doing right now</em>, and that changes the answer safely when the world changes it first.</p>
+<p>The reader has built that arbiter’s ancestor already. The Mission Scripting chapter rebuilt a waypoint mission as a finite state machine — IDLE, TAKEOFF, NAVIGATE, LAND, DONE, with a failsafe check evaluated before everything else — and closed with a promise: add a detection event and a pursuit state, add an evasion state guarded by a proximity test, and “the machine expresses the whole reactive repertoire of Part IV — every addition a new box and its arrows, every existing box untouched.” This chapter cashes that promise, and it is worth being clear about what is new. That earlier machine executed a <em>fixed list</em>; its guards asked “am I there yet?” The machine built here arbitrates among <em>behaviors that watch the world</em>; its guards ask “what matters most right now?” Same formalism, higher stakes — a wrong transition in the list-flying machine wastes a leg, while a wrong transition here can leave the aircraft harassing a goose while a threat closes on it. The chapter therefore spends its effort where mission machines actually fail: on guard conditions that deserve the name, on the race conditions that live at state boundaries, on what the machine does when its sensors go quiet, and — when the flat machine begins to creak under its own arrows — on the Behavior Tree, the architecture that scales past it.</p>
+<section id="learning-objectives" class="level2" data-number="21.1">
+<h2 data-number="21.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">21.1</span> Learning Objectives</h2>
+<ul>
+<li>Specify the five-state mission machine — IDLE/TAKEOFF, SEARCH_GRID, HARASS_TARGET, EVADE_THREAT, LAND/RETURN-TO-HOME — including each state’s single job, the data it owns, and the machinery from earlier chapters it wraps.</li>
+<li>Draw and read a state-transition diagram as a design contract: states, transitions, guard conditions, fail-safe exits, and the override transition that grants one state preemptive priority over every other.</li>
+<li>Write guard conditions that are deterministic and robust — hysteresis on thresholds, persistence on detections, staleness checks on telemetry — and match each technique to the specific failure it prevents.</li>
+<li>Identify race conditions at state boundaries, defuse them with a single-writer, priority-ordered tick, and bound and measure state-transition latency from logged telemetry.</li>
+<li>Explain how a Behavior Tree encodes priority and preemption structurally — through node types and child ordering — and why that yields cleaner modularity than a flat state machine as behaviors multiply.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="21.2">
+<h2 data-number="21.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">21.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Finite state machine</strong> (FSM) — mission logic structured as a set of discrete states with exactly one active at a time, plus transitions between them that fire when their guard conditions become true; everything not drawn as a transition is impossible by construction.</li>
+<li><strong>State transition</strong> — the change of active state, taken when a guard becomes true; in a disciplined machine it is the <em>only</em> mechanism by which the vehicle’s behavior changes, which is what makes logged transitions a complete flight narrative.</li>
+<li><strong>Guard condition</strong> — the boolean test, computed from observed and estimated data, that gates a transition; a well-written guard is deterministic (same inputs, same answer), reads a consistent snapshot of the world, and never tests elapsed time when it could test state.</li>
+<li><strong>Preemption</strong> — the interruption of the active behavior by a higher-priority one, with enough context saved — the stashed state and leg index here — that the interrupted work can later resume rather than restart.</li>
+<li><strong>Race condition</strong> — a situation in which two or more triggers become true within the same update interval, so the outcome depends on the order or timing of their evaluation; defused by making that order explicit and singular rather than accidental.</li>
+<li><strong>Hysteresis</strong> — the use of separate trigger and release thresholds around a decision boundary, so that a noisy signal crossing the boundary cannot chatter a transition on and off many times a second.</li>
+<li><strong>Transition latency</strong> — the elapsed time between a guard’s condition becoming true in the world and the first command of the new state reaching the flight controller; the reflex time of the whole autonomy stack, and a quantity worth logging on every transition.</li>
+<li><strong>Behavior Tree</strong> (BT) — a control architecture in which conditions and actions sit at the leaves of a tree, internal nodes sequence or select among their children, and the whole tree is re-evaluated from the root each tick; priority and preemption emerge from child ordering rather than explicit transition arrows.</li>
+<li><strong>Tick</strong> — one periodic evaluation cycle of the mission logic — the FSM’s loop iteration or the BT’s root-to-leaf traversal — during which triggers are checked in a fixed order and exactly one behavior acts.</li>
+</ul>
+</section>
+<section id="five-states-three-chapters-of-machinery" class="level2" data-number="21.3">
+<h2 data-number="21.3" class="anchored" data-anchor-id="five-states-three-chapters-of-machinery"><span class="header-section-number">21.3</span> Five States, Three Chapters of Machinery</h2>
+<p>The machine has five states, and the first useful observation is that none of them is new work. Each state is a thin wrapper around something a previous chapter already built and tested; the machine’s job is not to <em>do</em> anything but to decide which already-working thing runs. That division of labor — behaviors in their own functions, arbitration in one small loop — is the single most important structural decision in the chapter, because every pathology examined later (spaghetti transitions, races, lock-ups) is a symptom of letting the two mix.</p>
+<div id="tbl-five-states" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-five-states-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;21.1: The five mission states, the machinery each wraps, and their entry and exit events.
+</figcaption>
+<div aria-describedby="tbl-five-states-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>State</th>
+<th>Its one job</th>
+<th>Wraps</th>
+<th>Enters when</th>
+<th>Leaves when</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>IDLE/TAKEOFF</td>
+<td>Arm, establish Offboard, climb to mission altitude</td>
+<td>Part II’s warm-up and climb sequence</td>
+<td>Power-on</td>
+<td>Climb complete: <span class="math inline">\(\lvert z - z_{sp}\rvert &lt; 0.5\)</span> m</td>
+</tr>
+<tr class="even">
+<td>SEARCH_GRID</td>
+<td>Fly lawnmower waypoint <span class="math inline">\(i\)</span> of <span class="math inline">\(N\)</span> at constant altitude</td>
+<td>The Path Planning on the Edge chapter’s generated list and arrival test</td>
+<td>Climb complete, or sweep resumed</td>
+<td>Detection confirmed, sweep exhausted, or preempted</td>
+</tr>
+<tr class="odd">
+<td>HARASS_TARGET</td>
+<td>Close on the target and fly the deterrence pattern inside a standoff radius</td>
+<td>The Harassment Pattern Generation chapter’s pattern generators</td>
+<td>Detection confirmed</td>
+<td>Target dispersed or track lost, or preempted</td>
+</tr>
+<tr class="even">
+<td>EVADE_THREAT</td>
+<td>Slew onto the evasion vector, recomputed every tick; climb toward the safe altitude</td>
+<td>The previous chapter’s <code>evasion_command</code></td>
+<td>Threat trigger, from <strong>any</strong> flying state</td>
+<td>Threat cleared (resume) or will not clear (go home)</td>
+</tr>
+<tr class="odd">
+<td>LAND/RETURN-TO-HOME</td>
+<td>Climb to return altitude, fly home, descend, disarm</td>
+<td>Part II’s RTL machinery</td>
+<td>Sweep done, battery reserve, mission clock, or break-off</td>
+<td>Landed and disarmed</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Two of the state names are compound, and the merging is deliberate. IDLE/TAKEOFF fuses what the Mission Scripting chapter kept separate because, from the mission’s point of view, “getting airborne” is one job with one exit condition; the internal arm-then-climb sequence is the state’s private business. LAND/RETURN-TO-HOME fuses the two ways a flight ends for the same reason: whether the vehicle lands where it is or transits home first is a parameter of one recovery behavior, not two different situations the arbiter must distinguish. A state is a <em>job</em>, not a moment — the test for whether two candidate states should merge is whether the machine would ever need to make a different decision in one than in the other.</p>
+<p>The second observation is about data. Each state <em>owns</em> the variables it needs and no others: SEARCH_GRID owns the waypoint list and the index <span class="math inline">\(i\)</span>; HARASS_TARGET owns the target track; EVADE_THREAT owns the stash — the <code>(state, leg index)</code> pair recorded at the moment of preemption — and the safe-altitude setpoint. The Path Planning on the Edge chapter made the case that abandoning a coverage path costs nothing because the path is data, “a list and an index”: store the index, chase the goose, re-enter the list at the stored leg. The stash generalizes that trick to the whole machine. Preemption without a stash is amnesia — the drone that flees a threat and then hovers, mission forgotten, has a working evasion vector and a broken machine.</p>
+</section>
+<section id="the-diagram-is-the-design" class="level2" data-number="21.4">
+<h2 data-number="21.4" class="anchored" data-anchor-id="the-diagram-is-the-design"><span class="header-section-number">21.4</span> The Diagram Is the Design</h2>
+<p>For a mission machine, the state-transition diagram is not documentation drawn after the fact; it is the design artifact itself, and it earns that status through what it <em>excludes</em>. Every arrow in <a href="#fig-mission-fsm" class="quarto-xref">Figure&nbsp;<span>21.1</span></a> is a claim — “the system may change behavior here, under this condition” — and every absent arrow is a stronger one: this change of behavior cannot happen, no matter what the code’s author forgot. Reviewing a mission means reviewing this drawing. If a transition cannot be drawn without ambiguity — two arrows from one state whose guards can be true simultaneously, with no stated priority — the machine has a bug before a line of code exists.</p>
+<div id="fig-mission-fsm" class="quarto-float quarto-figure quarto-figure-center anchored" alt="State-transition diagram titled the five-state mission machine. Four rounded boxes run left to right along the top: IDLE / TAKEOFF, described as warm the stream, arm, enter Offboard, then climb to mission altitude; SEARCH_GRID, fly the lawnmower list waypoint i of N at constant altitude and watch the detector; HARASS_TARGET, close on the target and fly the deterrence pattern from the Harassment Pattern Generation chapter inside the standoff radius; and LAND / RETURN-TO-HOME, climb to return altitude, fly home, descend, land, disarm, ending at a terminal dot labeled landed and disarmed. Solid teal arrows connect them with guard labels: climb complete with altitude error under half a metre; detection confirmed persisting k frames, store leg index i; battery reserve or mission clock expired. Two teal arcs curve over the top: one from HARASS_TARGET back to SEARCH_GRID labeled target dispersed or lost more than three seconds, resume sweep at stored leg i, and a longer one from SEARCH_GRID to LAND labeled sweep exhausted, i equals N, nothing found, go home. Below the row sits an amber box, EVADE_THREAT: on entry stash the state and leg index, slew onto the evasion vector, recompute it every tick, climb toward the safe altitude. Dashed amber arrows drop into it from all three flying states, captioned as the override: the threat trigger, closing and time-to-closest-approach within the horizon and miss under the safety radius, may fire from any flying state and is evaluated before the state dispatch every tick. A dashed teal arrow returns from EVADE_THREAT up to SEARCH_GRID labeled threat cleared, opening and range beyond the safety radius plus margin, resume stored state at leg i; a solid arrow runs from EVADE_THREAT to LAND labeled threat will not clear or battery floor, break off, climb out, return home. A grey note box lists global fail-safes checked in every state: telemetry stale over half a second, hold position, over two seconds, land or return home; battery at reserve, land or return home whatever the state; geofence breach, PX4's own failsafe takes the aircraft and outranks this machine entirely. The footer reads: every tick, in order, telemetry health, the threat trigger, the active state's exit guard, the active state's one action; solid arrows advance the mission, dashed arrows defend it; anything not drawn cannot happen, which is the point of drawing it.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mission-fsm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/mission-fsm-state-diagram.svg" class="img-fluid figure-img" style="width:100.0%" alt="State-transition diagram titled the five-state mission machine. Four rounded boxes run left to right along the top: IDLE / TAKEOFF, described as warm the stream, arm, enter Offboard, then climb to mission altitude; SEARCH_GRID, fly the lawnmower list waypoint i of N at constant altitude and watch the detector; HARASS_TARGET, close on the target and fly the deterrence pattern from the Harassment Pattern Generation chapter inside the standoff radius; and LAND / RETURN-TO-HOME, climb to return altitude, fly home, descend, land, disarm, ending at a terminal dot labeled landed and disarmed. Solid teal arrows connect them with guard labels: climb complete with altitude error under half a metre; detection confirmed persisting k frames, store leg index i; battery reserve or mission clock expired. Two teal arcs curve over the top: one from HARASS_TARGET back to SEARCH_GRID labeled target dispersed or lost more than three seconds, resume sweep at stored leg i, and a longer one from SEARCH_GRID to LAND labeled sweep exhausted, i equals N, nothing found, go home. Below the row sits an amber box, EVADE_THREAT: on entry stash the state and leg index, slew onto the evasion vector, recompute it every tick, climb toward the safe altitude. Dashed amber arrows drop into it from all three flying states, captioned as the override: the threat trigger, closing and time-to-closest-approach within the horizon and miss under the safety radius, may fire from any flying state and is evaluated before the state dispatch every tick. A dashed teal arrow returns from EVADE_THREAT up to SEARCH_GRID labeled threat cleared, opening and range beyond the safety radius plus margin, resume stored state at leg i; a solid arrow runs from EVADE_THREAT to LAND labeled threat will not clear or battery floor, break off, climb out, return home. A grey note box lists global fail-safes checked in every state: telemetry stale over half a second, hold position, over two seconds, land or return home; battery at reserve, land or return home whatever the state; geofence breach, PX4's own failsafe takes the aircraft and outranks this machine entirely. The footer reads: every tick, in order, telemetry health, the threat trigger, the active state's exit guard, the active state's one action; solid arrows advance the mission, dashed arrows defend it; anything not drawn cannot happen, which is the point of drawing it.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mission-fsm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;21.1: The five-state mission machine: the normal sequence runs left to right, the return arcs resume the sweep, and the EVADE_THREAT override (dashed amber) may preempt any flying state — a transition evaluated before the state dispatch on every tick.
+</figcaption>
+</figure>
+</div>
+<p>Walk the drawing the way the mission runs. The solid left-to-right chain is the flight everything is supposed to be: climb, sweep, find, harass, and eventually home. The upper arcs are the loops that make it a <em>search</em> rather than a script — harassment that disperses its target hands control back to the sweep at the stored leg, and a sweep that exhausts its list with nothing found goes home with a clear conscience. So far this is the Mission Scripting chapter’s machine with better-traveled boxes.</p>
+<p>The dashed amber arrows are what is genuinely new, and they encode the requirement the previous chapter’s mathematics was built to serve: the threat trigger — closing, soon, and inside the safety radius, the three-part conjunction derived there — must be able to fire from <em>any</em> flying state and take the aircraft instantly. Structurally, this is the same move the Mission Scripting chapter made with its failsafe check: the question is evaluated <em>before</em> the state dispatch, every tick, so no state’s own logic can shadow it, including states added later by someone who never read the original design. One override, drawn once per state, evaluated in one place. When it fires, EVADE_THREAT’s entry action stashes the interrupted state and the sweep index; when the encounter clears — the previous chapter’s exit test, opening <em>and</em> beyond the safety radius with margin — the dashed teal arrow gives back what was taken. And when the encounter refuses to clear, or the battery reaches its floor mid-evasion, the machine does not loiter in a fight it cannot win: it breaks off for home, which is the arrow from EVADE_THREAT to LAND.</p>
+<p>One box is conspicuously absent: there is no FAILSAFE state, even though the Mission Scripting chapter’s machine had one. That is because this machine is the <em>middle</em> layer of authority, not the top. The geofence, battery, and link-loss failsafes of the Geofencing and Fail-Safes chapter live in PX4 itself and preempt this machine the way this machine preempts its own states — when they fire, the mission node’s opinion stops mattering entirely. The grey note in the figure records that hierarchy. Mission logic that pretends to be the last line of defense is mission logic that will one day fight its own autopilot; the correct posture is to <em>stay inside</em> the envelope those failsafes police, and to treat their firing as a verdict, not a negotiation.</p>
+</section>
+<section id="guards-that-deserve-the-name" class="level2" data-number="21.5">
+<h2 data-number="21.5" class="anchored" data-anchor-id="guards-that-deserve-the-name"><span class="header-section-number">21.5</span> Guards That Deserve the Name</h2>
+<p>The classic warning about mission machines — don’t build a spaghetti machine — is not about the number of states. Five states can be spaghetti; twenty can be clean. The difference is discipline about <em>transitions</em>, and the discipline has three parts.</p>
+<p><strong>One writer, one place, every change logged.</strong> The state variable is written by exactly one function, called from exactly one place — the tick — and never from a sensor callback, a timer, or a thread that happens to know better. Callbacks write <em>data</em> (positions, detections, timestamps); the tick reads that data and makes every decision. The corollary costs one line and pays for itself the first debugging session: every transition emits a log line — <code>[STATE CHANGE] SEARCH_GRID -&gt; HARASS_TARGET (detection)</code> — so the flight’s entire behavioral history is grep-able. A machine whose transitions are all logged can be debugged from a transcript; a machine that changes state silently, from three call sites, can only be debugged by luck.</p>
+<p><strong>Thresholds get hysteresis; events get persistence.</strong> Every guard in the diagram compares a noisy estimate against a threshold, and a noisy signal near a single threshold is a transition oscillator. The previous chapter computed miss distances against a 3 m safety radius using position estimates carrying half-metre-scale error; a predicted miss wobbling between 2.9 m and 3.1 m would enter and exit EVADE_THREAT several times a second, each entry re-stashing context and re-slewing the velocity command — chatter that is expensive in logic and violent in flight. The remedy is two thresholds with a gap wider than the noise: <em>trigger</em> the evasion when the predicted miss drops below 3 m, but <em>release</em> it only when the range exceeds the radius plus a margin — say 4 m — and the closing test has gone positive. The same idea, applied to events instead of thresholds, is persistence: a single-frame detection is noise until it survives <span class="math inline">\(k\)</span> consecutive frames (the SEARCH_GRID exit guard), and a target is not <em>lost</em> until the track has been silent for a dwell time (the 3 s in the HARASS_TARGET return arc), because a detector that misses two frames should not, by itself, end a deterrence run. Persistence trades a bounded, chosen delay for immunity to single-sample lies — and the delay is honest: a <span class="math inline">\(k\)</span>-frame confirmation at the detector’s frame rate still preempts the sweep within a few hundred milliseconds, immediate on the timescale of a mission, deliberate on the timescale of noise.</p>
+<p><strong>Dead data is worse than no data.</strong> The requirement that the machine “gracefully handle sensor drops without crashing the aircraft” is a design constraint on guards, and it starts with an observation: a guard evaluated against a stale estimate is not conservative, it is <em>wrong with confidence</em>. The telemetry stream stops; the last position says the drone is mid-leg; the arrival guard keeps failing; the machine happily streams setpoints computed from a world snapshot growing older by the second. The fix is to make freshness itself the first guard of the tick. Every message carries a timestamp; the tick begins by computing the age of the newest estimate, and the response is graded: beyond a short staleness bound (half a second, matching the Offboard dead-man’s-switch timescale from Part II), the machine stops trusting derived guards and simply holds position — freeze, don’t guess; beyond a longer bound (a couple of seconds), it gives up on the mission and goes home on the flight controller’s own navigation, which does not depend on the companion computer’s dying data path. The same logic applies per-stream: a threat whose track has gone stale is treated as <em>unknown</em>, not as <em>gone</em> — EVADE_THREAT holds its climb rather than declaring victory on silence.</p>
+</section>
+<section id="races-edges-and-the-latency-budget" class="level2" data-number="21.6">
+<h2 data-number="21.6" class="anchored" data-anchor-id="races-edges-and-the-latency-budget"><span class="header-section-number">21.6</span> Races, Edges, and the Latency Budget</h2>
+<p>The advice to <em>simulate the unexpected</em> comes with a specific scenario worth taking literally: inject the threat at the exact moment the drone is turning at the edge of the search grid. It is a well-chosen needle. At that instant three things are true at once — the arrival guard for waypoint <span class="math inline">\(i\)</span> has just fired, the leg index is mid-increment, and the threat trigger is newly true — and any looseness in how the machine orders its decisions becomes visible. Suppose detections arrive in one callback, positions in another, and both callbacks write <code>self.state</code> directly. The arrival callback advances the index and begins the turn; the threat callback, running between two lines of the other, stashes a state that is half-updated — an index pointing at a leg the machine never actually started. Weeks later, an evasion resumes the sweep one leg early and the coverage claim silently loses a swath. That is a <strong>race condition</strong>, and its defining cruelty is that it is invisible in every test where events arrive politely one at a time.</p>
+<p>The defense is architectural, and it was already stated as the first guard discipline: a single-threaded tick in which <em>all</em> triggers are evaluated, in a fixed priority order, and at most one transition is taken per tick. Priority resolves simultaneity by decree rather than by accident: health first, threat second, the active state’s own exit guard last. When the threat trigger and the arrival guard are both true on the same tick, the threat wins, the arrival is simply re-evaluated on the next tick after the encounter clears, and nothing about the outcome depends on which callback happened to run first — because callbacks no longer decide anything. Edge cases are where state machines love to lock up; the lock-ups almost always trace to two authorities disagreeing about the current state, and a machine with one authority cannot disagree with itself.</p>
+<p>Ordering makes the machine correct; the tick rate makes it <em>fast enough</em>, and that claim should be numbers, not adjectives. Define the reaction chain for the SEARCH_GRID → HARASS_TARGET transition: a goose enters the camera’s view; the detector, running at 5 Hz with 80 ms of inference latency (the kind of budget Part III’s edge-inference chapters made routine), reports it; the tick, at 20 Hz, evaluates the guard. The worst case stacks every wait end to end:</p>
+<p><span class="math display">\[
+\begin{aligned}
+t_{\text{react}} &amp;\le T_{\text{det}} + t_{\text{inf}} + T_{\text{tick}} \\
+                 &amp;= 200 + 80 + 50 = 330\ \text{ms},
+\end{aligned}
+\]</span></p>
+<p>plus <span class="math inline">\((k-1)\)</span> further detector periods if the guard demands <span class="math inline">\(k\)</span>-frame persistence — a deliberate, legible trade between reflex and false alarms. The same arithmetic run on the threat trigger explains why the evasion chapter insisted its assessment was cheap enough to re-run at the estimator’s full rate: the trigger rides the 50 Hz estimator, not the 5 Hz detector, so the override’s worst-case reaction is dominated by the tick alone. Logging turns the bound into a measurement: stamp the moment a guard’s input first satisfied it and the moment the new state’s first command left the node, and the difference — the <strong>transition latency</strong> — lands in the telemetry log next to position, velocity, and active state, where a histogram of it after each flight verifies that the machine’s reflexes match its design.</p>
+<p>One more physical reality belongs to transitions. A state change is a <em>command discontinuity</em>: SEARCH_GRID was streaming a gentle leg-following setpoint, and one tick later EVADE_THREAT wants 5 m/s toward the escape plane. The previous chapter’s warning applies at every boundary, not just the dramatic one — a commanded velocity that steps instantly exists only in simulation, and an aircraft asked to honor the step responds by saturating motors and shedding tracking accuracy exactly when precision matters most. Every state’s output therefore passes through the same slew limiter, the bounded-acceleration ramp built for the evasion command; transitions change the <em>target</em> of the ramp, never the command itself. The machine decides in discrete jumps; the airframe must never feel them.</p>
+</section>
+<section id="the-machine-in-code" class="level2" data-number="21.7">
+<h2 data-number="21.7" class="anchored" data-anchor-id="the-machine-in-code"><span class="header-section-number">21.7</span> The Machine in Code</h2>
+<p>The whole design compresses into one loop that reads like the diagram — which is the test of both:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> enum <span class="im">import</span> Enum, auto</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> MissionState(Enum):</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    IDLE_TAKEOFF <span class="op">=</span> auto()</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    SEARCH_GRID <span class="op">=</span> auto()</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    HARASS_TARGET <span class="op">=</span> auto()</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    EVADE_THREAT <span class="op">=</span> auto()</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    LAND_RTH <span class="op">=</span> auto()</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>FLYING <span class="op">=</span> {MissionState.IDLE_TAKEOFF, MissionState.SEARCH_GRID,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>          MissionState.HARASS_TARGET, MissionState.EVADE_THREAT}</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> transition(<span class="va">self</span>, new_state, reason):</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.log(<span class="ss">f"[STATE CHANGE] </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>state<span class="sc">.</span>name<span class="sc">}</span><span class="ss"> -&gt; </span><span class="sc">{</span>new_state<span class="sc">.</span>name<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>             <span class="ss">f" (</span><span class="sc">{</span>reason<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.t_guard_true <span class="op">=</span> <span class="va">self</span>.guard_stamp    <span class="co"># transition-latency bookkeeping</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.state <span class="op">=</span> new_state</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tick(<span class="va">self</span>):                             <span class="co"># 20 Hz; the only writer of state</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. never act on dead data</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    age <span class="op">=</span> <span class="va">self</span>.now() <span class="op">-</span> <span class="va">self</span>.last_estimate_stamp</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> age <span class="op">&gt;</span> <span class="fl">2.0</span>:</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.transition(MissionState.LAND_RTH, <span class="st">"telemetry stale"</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> age <span class="op">&gt;</span> <span class="fl">0.5</span>:</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.hold_position()                <span class="co"># freeze, don't guess</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. the override: evaluated before any state's own logic</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    cmd <span class="op">=</span> evasion_command(<span class="va">self</span>.pos, <span class="va">self</span>.vel,</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>                          <span class="va">self</span>.threat_pos, <span class="va">self</span>.threat_vel)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> cmd <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="kw">and</span> <span class="va">self</span>.state <span class="kw">in</span> FLYING <span class="kw">and</span> <span class="va">self</span>.airborne():</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.state <span class="op">!=</span> MissionState.EVADE_THREAT:</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.stash <span class="op">=</span> (<span class="va">self</span>.state, <span class="va">self</span>.leg_index)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.transition(MissionState.EVADE_THREAT, <span class="st">"threat trigger"</span>)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3. one state, one job; at most one transition per tick</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">match</span> <span class="va">self</span>.state:</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">case</span> MissionState.IDLE_TAKEOFF:</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.fly_takeoff()</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.at_mission_altitude():</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.transition(MissionState.SEARCH_GRID, <span class="st">"climb complete"</span>)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">case</span> MissionState.SEARCH_GRID:</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.fly_leg(<span class="va">self</span>.leg_index)    <span class="co"># lawnmower list + arrival test</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.detection_confirmed():  <span class="co"># k consecutive frames</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.transition(MissionState.HARASS_TARGET, <span class="st">"detection"</span>)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> <span class="va">self</span>.sweep_exhausted():</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.transition(MissionState.LAND_RTH, <span class="st">"sweep done"</span>)</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>        <span class="cf">case</span> MissionState.HARASS_TARGET:</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.fly_pattern()              <span class="co"># the Harassment Pattern Generation chapter's business</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.target_gone(dwell<span class="op">=</span><span class="fl">3.0</span>): <span class="co"># persistence, not one frame</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.transition(MissionState.SEARCH_GRID, <span class="st">"resume sweep"</span>)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>        <span class="cf">case</span> MissionState.EVADE_THREAT:</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.slew_toward(cmd <span class="kw">or</span> <span class="va">self</span>.last_evasion_cmd)</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.threat_cleared():       <span class="co"># opening AND far, with margin</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>                prev, <span class="va">self</span>.leg_index <span class="op">=</span> <span class="va">self</span>.stash</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> (prev <span class="op">==</span> MissionState.HARASS_TARGET</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>                        <span class="kw">and</span> <span class="va">self</span>.target_gone(dwell<span class="op">=</span><span class="fl">3.0</span>)):</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>                    prev <span class="op">=</span> MissionState.SEARCH_GRID   <span class="co"># stale track: sweep</span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.transition(prev, <span class="st">"threat cleared"</span>)</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>        <span class="cf">case</span> MissionState.LAND_RTH:</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.fly_home_and_land()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Every principle of the chapter is visible as a line. Freshness is step 1; the override is step 2, before the dispatch, stashing context on the way in; each state performs one action and tests its own exits; every transition passes through one function that logs and stamps it. The resume logic carries the chapter’s one subtle guard: EVADE_THREAT gives back the state it took <em>unless</em> that state’s own preconditions have rotted while the drone was busy fleeing — a harassment target not seen for the whole encounter is a track, not a target, and the honest resume is the sweep, from which a fresh detection will re-enter HARASS_TARGET through the front door. Guards compose; a resume is just a transition, and it gets guarded like one.</p>
+</section>
+<section id="when-the-flat-machine-runs-out" class="level2" data-number="21.8">
+<h2 data-number="21.8" class="anchored" data-anchor-id="when-the-flat-machine-runs-out"><span class="header-section-number">21.8</span> When the Flat Machine Runs Out</h2>
+<p>Look back at <a href="#fig-mission-fsm" class="quarto-xref">Figure&nbsp;<span>21.1</span></a> and count what the <em>override</em> costs: one dashed arrow per flying state. Now add the global concerns hiding in the grey note — staleness, battery, geofence margin — each of which is also, logically, an arrow from every state. A flat machine with <span class="math inline">\(S\)</span> states and <span class="math inline">\(G\)</span> always-on concerns owes <span class="math inline">\(S \times G\)</span> transitions, and every new state signs up for all <span class="math inline">\(G\)</span> of them while every new concern must be wired into all <span class="math inline">\(S\)</span> states. At five states and a handful of concerns the diagram is legible because this chapter cheated deliberately — hoisting the override and the health checks out of the states and into the tick’s preamble. That hoisting <em>is</em> the insight: priorities that apply everywhere want to be structure, not arrows. The <strong>Behavior Tree</strong> is what that insight looks like when it is taken all the way.</p>
+<p>A BT turns the arrangement inside out. There are no states and no transitions; there is a tree whose leaves are <em>conditions</em> (instant tests) and <em>actions</em> (behaviors that may run for many ticks), and whose internal nodes compose them: a <strong>sequence</strong> (→) ticks its children in order and needs all of them to succeed, a <strong>selector</strong> (?) ticks its children in order and takes the first that does not fail. Every tick, evaluation starts at the root and flows down. <a href="#fig-mission-bt" class="quarto-xref">Figure&nbsp;<span>21.2</span></a> rebuilds the whole mission this way: the root selector tries “defend” first (threat closing? then evade), “energy” second (battery at reserve? then return home), and only then the mission sequence — take off, then <em>harass if the goose is in view, else search</em>, then land. Preemption is no longer drawn anywhere, because it is not a feature — it is a consequence. The tick that finds “threat closing?” true never reaches the mission branch at all; whatever action was RUNNING there is halted by the traversal itself. The five-state machine needed one dashed arrow per state to say “the threat outranks you”; the tree says it once, by putting the defend branch first.</p>
+<div id="fig-mission-bt" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Tree diagram titled the same mission as a Behavior Tree. At the top, a box containing a question mark labeled root selector, ticked at twenty hertz, with three numbered edges to three sequence nodes drawn as boxes containing right arrows. Priority one, defend, in amber: its children are an ellipse condition reading threat closing and miss under the safety radius, and an amber action box EVADE_THREAT, slew onto escape vector. Priority two, energy: children are a condition ellipse battery at reserve and an action RETURN-TO-HOME, climb out, fly home, land. Priority three, the mission itself: a sequence of three children, an action TAKE OFF to mission altitude, a selector node, and an action LAND slash RTH, sweep done, go home. The inner selector's children are a sequence node and an action SEARCH_GRID, fly lawnmower leg i of N; the sequence's children are a condition ellipse goose in view for k frames and an action HARASS_TARGET, deterrence pattern from the Harassment Pattern Generation chapter. A legend box explains that each node returns SUCCESS, FAILURE, or RUNNING; a selector ticks children left to right and returns the first that does not fail; a sequence ticks children in order and every child must succeed; ellipses are conditions, instant tests, rounded boxes are actions that may return RUNNING for many ticks; and the amber branch is the reflex, first in priority order so it is checked first every tick. The footer states that when threat closing flips true the very next tick never reaches the mission branch, so the running search or harass action is preempted by construction; the flat machine drew one dashed arrow per state, while the tree gets the same behavior from ordering.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mission-bt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/mission-behavior-tree.svg" class="img-fluid figure-img" style="width:100.0%" alt="Tree diagram titled the same mission as a Behavior Tree. At the top, a box containing a question mark labeled root selector, ticked at twenty hertz, with three numbered edges to three sequence nodes drawn as boxes containing right arrows. Priority one, defend, in amber: its children are an ellipse condition reading threat closing and miss under the safety radius, and an amber action box EVADE_THREAT, slew onto escape vector. Priority two, energy: children are a condition ellipse battery at reserve and an action RETURN-TO-HOME, climb out, fly home, land. Priority three, the mission itself: a sequence of three children, an action TAKE OFF to mission altitude, a selector node, and an action LAND slash RTH, sweep done, go home. The inner selector's children are a sequence node and an action SEARCH_GRID, fly lawnmower leg i of N; the sequence's children are a condition ellipse goose in view for k frames and an action HARASS_TARGET, deterrence pattern from the Harassment Pattern Generation chapter. A legend box explains that each node returns SUCCESS, FAILURE, or RUNNING; a selector ticks children left to right and returns the first that does not fail; a sequence ticks children in order and every child must succeed; ellipses are conditions, instant tests, rounded boxes are actions that may return RUNNING for many ticks; and the amber branch is the reflex, first in priority order so it is checked first every tick. The footer states that when threat closing flips true the very next tick never reaches the mission branch, so the running search or harass action is preempted by construction; the flat machine drew one dashed arrow per state, while the tree gets the same behavior from ordering.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mission-bt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;21.2: The mission rebuilt as a Behavior Tree: a root selector tries defend, then energy, then the mission sequence, and child ordering alone gives the threat branch preemptive priority — no override arrows required.
+</figcaption>
+</figure>
+</div>
+<p>The tree’s second virtue is that recovery composes as naturally as preemption. Watch what happens after a successful deterrence run, with no special code: the goose leaves, so “goose in view?” starts returning FAILURE, so the inner selector falls through to SEARCH_GRID — which has kept its leg index, because actions own their data here exactly as states did — and the sweep resumes. The flat machine needed an explicit return arc with a resume guard; the tree gets the same behavior from a condition ceasing to hold. Adding a new always-on concern — say, a rule that icing conditions ground the mission — is one new branch inserted at the right priority, touching nothing else; in the flat machine it would be a visit to every state. This is what “cleaner modularity and preemption handling” means concretely, and it is why BTs displaced giant FSMs first in game AI and then across robotics.</p>
+<p>None of which retires the five-state machine. At this mission’s scale the FSM is arguably the better artifact: its diagram is a complete, auditable enumeration of everything the system can do, its stash-and-resume semantics are explicit rather than emergent, and its code is a page. The honest engineering rule is about derivatives, not absolutes: when each new behavior or concern costs a <em>constant</em> amount of drawing and wiring, the flat machine is fine; when the cost starts scaling with the number of existing states — when the arrows begin to multiply — the structure is asking to become a tree. The running example sits, by design, right at that boundary, which is why this chapter builds the machine flat and shows the tree beside it.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="For More">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>For More
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The graduate-track version of this mission replaces the flat FSM with a formal Behavior Tree outright, and the formalism rewards a closer look. Each node returns one of three statuses per tick — SUCCESS, FAILURE, or RUNNING — and RUNNING is the ingredient that makes the tree a <em>control</em> structure rather than a decision tree: a long action holds its branch across many ticks while the higher-priority branches keep being re-checked above it. Beyond sequence and selector, production trees add <strong>decorators</strong> (single-child modifiers: inverters, retry-N-times, rate limiters, timeouts) and a <strong>parallel</strong> node that ticks several children at once — a monitor-while-acting pattern, e.g.&nbsp;stream the deterrence pattern <em>while</em> a watchdog child tracks the target’s freshness. A subtlety worth knowing before writing one: classic sequence/selector nodes come in <em>reactive</em> and <em>with-memory</em> variants. A reactive sequence re-ticks its earlier children every tick (so “take off” must be idempotent — return SUCCESS instantly once airborne), while a with-memory sequence resumes at the child that was RUNNING (cheaper, but it gives up the continuous re-checking that makes preemption automatic); choosing wrongly produces either wasted work or a tree that cannot be interrupted, and the standard advice is reactive composites at the safety-critical top of the tree, memory where re-checking is genuinely redundant. The ecosystem is mature: <code>BehaviorTree.CPP</code> powers the ROS 2 Nav2 stack’s mission logic, with a graphical editor (Groot) for authoring and live tree inspection, and <code>py_trees</code> (with <code>py_trees_ros</code>) offers the same ideas in Python at prototyping speed. The companion graduate extension — a threat that actively pursues rather than flying straight — slots into this architecture cleanly: the evade action’s internals swap the one-shot escape vector for the potential-field or replanning methods sketched in the previous chapter’s For More, while the tree above it does not change at all. That separation — behaviors evolve, structure holds — is the whole argument.</p>
+</div>
+</div>
+</section>
+<section id="check-your-understanding" class="level2" data-number="21.9">
+<h2 data-number="21.9" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">21.9</span> Check Your Understanding</h2>
+<ol type="1">
+<li>The five-state machine merges IDLE with TAKEOFF and LAND with RETURN-TO-HOME, yet keeps SEARCH_GRID and HARASS_TARGET separate even though both are “fly a pattern and watch the sensors.” Using the chapter’s test for state identity, justify both decisions.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The test: two candidate states deserve to merge when the machine would never make a different decision in one than in the other. IDLE and TAKEOFF share every exit and every override response — nothing preempts differently mid-arm versus mid-climb, and both exist only to reach “airborne at mission altitude” — so they are one job with private phases. The same holds for LAND versus RETURN-TO-HOME: one recovery behavior, parameterized by whether a transit precedes the descent. SEARCH_GRID and HARASS_TARGET fail the test everywhere: different exit guards (detection versus dispersal/track-loss), different data owned (list and index versus target track), different resume semantics after an evasion (the sweep resumes unconditionally; harassment resumes only if the track is fresh). Merging them would force one state to carry flags distinguishing its two personalities — which is the flag-pile the FSM formalism exists to abolish.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>The threat trigger fires when the predicted miss drops below <span class="math inline">\(R_{safe} = 3\)</span> m, but the release guard demands range greater than 4 m <em>and</em> a positive closing test. The position estimate near the boundary carries roughly 0.5 m of noise. Explain what a single 3 m threshold for both directions would do in flight, and why the 1 m gap is sized correctly relative to the noise.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>With one threshold, an encounter hovering near 3 m would cross it many times a second as the noisy estimate wobbles: each crossing enters or exits EVADE_THREAT, re-stashing context, re-aiming the slew, and jerking the commanded velocity — chatter that degrades tracking exactly when margin is thinnest, and floods the log with meaningless transitions. Hysteresis works when the gap between trigger and release comfortably exceeds the noise: 1 m against 0.5 m-scale scatter means a genuine geometry change, not a noise excursion, is required to reverse the decision (roughly a two-sigma separation). The release also demands the closing test go positive because range alone is not safety — a threat can be far and inbound; requiring <em>opening and far</em> makes the release a statement about the encounter, not about one noisy sample.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>A teammate wires the detection callback to write <code>self.state = HARASS_TARGET</code> directly “to save a tick of latency.” Describe the race this creates at the search grid’s corner turn, and what the single-writer tick buys that the 50 ms costs.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>At a corner, the tick’s SEARCH_GRID case is mid-flight through advancing the leg index and issuing the turn when the callback, running asynchronously, overwrites the state. The tick’s remaining lines execute in a state they were not written for: the index may be half-updated (stashed or resumed wrong later), the turn setpoint may be issued <em>after</em> the state changed (a search command leaking into harassment), and if the threat trigger also fires that tick, the priority ordering is bypassed entirely — the callback’s write wins over the override that is supposed to outrank it. The single-writer tick makes every decision at one point in time, against one consistent snapshot, in one stated priority order; outcomes stop depending on callback scheduling. The cost is bounded and known — at most one 50 ms tick of added latency — and the reaction budget already carries far larger terms (the detector’s 200 ms period, 80 ms of inference), so the trade buys determinism for a marginal share of the total.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>A mission runs its tick at 20 Hz, its detector at 4 Hz with 120 ms inference latency, and requires 2-frame persistence before leaving SEARCH_GRID. Bound the worst-case time from a goose entering the camera’s view to the first HARASS_TARGET command, and identify which term dominates and what that implies about where engineering effort should go.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Worst case, the goose appears just after a frame is captured: wait one full detector period (250 ms), plus inference (120 ms) for the first report; persistence demands a second consecutive frame, adding one more period plus inference is not needed — the second report arrives one period after the first, so add 250 ms; then up to one tick (50 ms) before the guard is evaluated. Total: <span class="math inline">\(250 + 120 + 250 + 50 = 670\)</span> ms. The persistence and detector-period terms dominate — 500 of the 670 ms — so raising the tick rate is nearly worthless, while raising detector frame rate (or triggering the guard on the inference timestamp rather than arrival time) attacks the real budget. Reflex time lives in perception, not in the state machine; the machine’s job is merely not to add to it.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>During a harassment run, EVADE_THREAT preempts and the encounter takes 20 seconds to clear. Explain why the machine resumes SEARCH_GRID at the stored leg rather than HARASS_TARGET, and why this is a guard on the resume transition rather than a special case inside EVADE_THREAT’s escape logic.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The stash records where control <em>was</em>, but HARASS_TARGET’s precondition is a fresh target track, and twenty seconds of fleeing is far beyond the track’s dwell time — the goose has moved, possibly dispersed by the commotion itself. Resuming harassment would aim a deterrence pattern at a twenty-second-old coordinate. Resuming the sweep is honest: it re-covers the area, and if the goose is still present, a fresh confirmed detection re-enters HARASS_TARGET through its normal entry guard, with a current track. Placing the check on the resume transition keeps the architecture’s separation intact: EVADE_THREAT’s job is escape geometry, and it should know nothing about targets; the resume is a transition like any other, so it gets a guard like any other. Guards compose — that is the design’s whole economy.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>Express, in one sentence each, how the flat FSM and the Behavior Tree encode the rule “evasion outranks everything,” and then compute the wiring cost in each architecture of adding a new always-on concern (icing conditions ground the mission) to a system that has grown to 12 states or action branches.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The FSM encodes the rule as one dashed override arrow per flying state, all funneling into EVADE_THREAT, evaluated before the state dispatch; the BT encodes it by making the defend branch the root selector’s first child, so every tick checks it before any other branch can run. Adding the icing concern to the flat machine means a new guard reachable from all 12 states — either 12 new arrows or another hoisted preamble check, plus a review of every state’s resume/stash semantics against the new exit: cost proportional to <span class="math inline">\(S\)</span>. In the tree it is one new sequence — condition “icing?” then action “return home” — inserted at the appropriate priority between defend and the mission branch: cost constant, existing branches untouched. That derivative — per-addition cost constant versus proportional to system size — is the practical boundary where the tree earns its keep.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="21.10">
+<h2 data-number="21.10" class="anchored" data-anchor-id="try-it"><span class="header-section-number">21.10</span> Try It</h2>
+<p><strong>Part 1 — build the machine and hunt its races.</strong> Extend the Mission Scripting chapter’s state-machine node into the full five-state mission in SITL. Wire SEARCH_GRID to the lawnmower generator’s waypoint list and arrival test; stub HARASS_TARGET as a fixed-radius orbit about the reported target (the Harassment Pattern Generation chapter supplies the real patterns, closing the loop with the target-centering law the Target Tracking and Visual Servoing chapter supplies in between); wire the threat trigger and EVADE_THREAT around <code>evasion_command()</code>, evaluated in the tick’s preamble with the stash-and-resume bookkeeping of this chapter; route every state’s output through one shared slew limiter. Script the world: a simulated detection event partway through leg 3, a threat injected during the harassment orbit. Log every transition as <code>[STATE CHANGE] A -&gt; B (reason)</code> with a timestamp, and log telemetry — position, velocity, active state — at full rate. Fly the complete lifecycle: takeoff, sweep, detection, harassment, threat, evasion, resume or return, land. Then torture it: inject the threat on the exact tick the drone turns at a grid corner (script the injection off the arrival guard’s own log line to guarantee the collision) and confirm the stash resumes the correct leg; kill the detection stream mid-harassment and confirm the dwell guard, not a crash, ends the run; freeze the telemetry stream and confirm the staleness ladder holds, then goes home. Every torture case should end with the machine in a defensible state and a log that explains itself.</p>
+<p><strong>Part 2 — measure the reflexes, then grow the tree.</strong> From Part 1’s logs, compute transition latency for every transition in the flight — guard-true timestamp to first new-state command — and plot the histogram per transition type; check the threat override’s latency against the tick-period bound and the detection transition against the persistence arithmetic of this chapter, and explain any outlier. Then rebuild the same mission as a Behavior Tree in <code>py_trees</code>: root selector, defend branch, energy branch, mission sequence with the harass-else-search selector inside it, reusing Part 1’s behavior functions as action nodes unchanged. Verify the same scripted flight produces the same trajectory. Finally, run the chapter’s scaling argument as an experiment: add one new always-on concern — a wind limit that grounds the mission when estimated wind exceeds a threshold — to <em>both</em> implementations, and count the sites each change touched. Two sentences: which architecture would you trust a teammate to extend without you reviewing the diff, and what, concretely, made the difference?</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#autonomous-state-machine-control">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="pagination-link" aria-label="Vector-Based Threat Evasion: The Math of Escape">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="pagination-link" aria-label="Target Tracking and Visual Servoing">
+        <span class="nav-page-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

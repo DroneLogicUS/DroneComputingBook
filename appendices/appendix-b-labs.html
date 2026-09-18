@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Appendix B — Appendix B: Lab Assignments – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../appendices/appendix-c-toolchain-setup.html" rel="next">
+<link href="../appendices/appendix-a-glossary.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../appendices/appendix-a-glossary.html">Appendices</a></li><li class="breadcrumb-item"><a href="../appendices/appendix-b-labs.html"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#collaborative-drone-build" id="toc-collaborative-drone-build" class="nav-link active" data-scroll-target="#collaborative-drone-build"><span class="header-section-number">B.1</span> Collaborative Drone Build &amp; Flight Demonstration</a>
+  <ul class="collapse">
+  <li><a href="#project-overview" id="toc-project-overview" class="nav-link" data-scroll-target="#project-overview"><span class="header-section-number">B.1.1</span> Project Overview</a></li>
+  <li><a href="#learning-outcomes" id="toc-learning-outcomes" class="nav-link" data-scroll-target="#learning-outcomes"><span class="header-section-number">B.1.2</span> Learning Outcomes</a></li>
+  <li><a href="#project-requirements" id="toc-project-requirements" class="nav-link" data-scroll-target="#project-requirements"><span class="header-section-number">B.1.3</span> Project Requirements</a></li>
+  <li><a href="#graduate-student-expectations" id="toc-graduate-student-expectations" class="nav-link" data-scroll-target="#graduate-student-expectations"><span class="header-section-number">B.1.4</span> Graduate Student Expectations</a></li>
+  <li><a href="#how-this-lab-was-originally-scored" id="toc-how-this-lab-was-originally-scored" class="nav-link" data-scroll-target="#how-this-lab-was-originally-scored"><span class="header-section-number">B.1.5</span> How This Lab Was Originally Scored</a></li>
+  <li><a href="#practical-notes" id="toc-practical-notes" class="nav-link" data-scroll-target="#practical-notes"><span class="header-section-number">B.1.6</span> Practical Notes</a></li>
+  </ul></li>
+  <li><a href="#sitl-simulation-and-geofencing" id="toc-sitl-simulation-and-geofencing" class="nav-link" data-scroll-target="#sitl-simulation-and-geofencing"><span class="header-section-number">B.2</span> Software-in-the-Loop (SITL) Simulation &amp; Geofencing</a>
+  <ul class="collapse">
+  <li><a href="#project-overview-1" id="toc-project-overview-1" class="nav-link" data-scroll-target="#project-overview-1"><span class="header-section-number">B.2.1</span> Project Overview</a></li>
+  <li><a href="#learning-outcomes-1" id="toc-learning-outcomes-1" class="nav-link" data-scroll-target="#learning-outcomes-1"><span class="header-section-number">B.2.2</span> Learning Outcomes</a></li>
+  <li><a href="#project-requirements-1" id="toc-project-requirements-1" class="nav-link" data-scroll-target="#project-requirements-1"><span class="header-section-number">B.2.3</span> Project Requirements</a></li>
+  <li><a href="#graduate-student-expectations-1" id="toc-graduate-student-expectations-1" class="nav-link" data-scroll-target="#graduate-student-expectations-1"><span class="header-section-number">B.2.4</span> Graduate Student Expectations</a></li>
+  <li><a href="#how-this-lab-was-originally-scored-1" id="toc-how-this-lab-was-originally-scored-1" class="nav-link" data-scroll-target="#how-this-lab-was-originally-scored-1"><span class="header-section-number">B.2.5</span> How This Lab Was Originally Scored</a></li>
+  <li><a href="#practical-notes-1" id="toc-practical-notes-1" class="nav-link" data-scroll-target="#practical-notes-1"><span class="header-section-number">B.2.6</span> Practical Notes</a></li>
+  </ul></li>
+  <li><a href="#edge-based-target-detection" id="toc-edge-based-target-detection" class="nav-link" data-scroll-target="#edge-based-target-detection"><span class="header-section-number">B.3</span> Edge-Based Target Detection &amp; Deployment</a>
+  <ul class="collapse">
+  <li><a href="#project-overview-2" id="toc-project-overview-2" class="nav-link" data-scroll-target="#project-overview-2"><span class="header-section-number">B.3.1</span> Project Overview</a></li>
+  <li><a href="#learning-outcomes-2" id="toc-learning-outcomes-2" class="nav-link" data-scroll-target="#learning-outcomes-2"><span class="header-section-number">B.3.2</span> Learning Outcomes</a></li>
+  <li><a href="#project-requirements-2" id="toc-project-requirements-2" class="nav-link" data-scroll-target="#project-requirements-2"><span class="header-section-number">B.3.3</span> Project Requirements</a></li>
+  <li><a href="#graduate-student-expectations-2" id="toc-graduate-student-expectations-2" class="nav-link" data-scroll-target="#graduate-student-expectations-2"><span class="header-section-number">B.3.4</span> Graduate Student Expectations</a></li>
+  <li><a href="#how-this-lab-was-originally-scored-2" id="toc-how-this-lab-was-originally-scored-2" class="nav-link" data-scroll-target="#how-this-lab-was-originally-scored-2"><span class="header-section-number">B.3.5</span> How This Lab Was Originally Scored</a></li>
+  <li><a href="#practical-notes-2" id="toc-practical-notes-2" class="nav-link" data-scroll-target="#practical-notes-2"><span class="header-section-number">B.3.6</span> Practical Notes</a></li>
+  </ul></li>
+  <li><a href="#autonomous-state-machine-control" id="toc-autonomous-state-machine-control" class="nav-link" data-scroll-target="#autonomous-state-machine-control"><span class="header-section-number">B.4</span> Autonomous State Machine Control: Search Grids, Target Harassment, and Reactive Evasion</a>
+  <ul class="collapse">
+  <li><a href="#project-overview-3" id="toc-project-overview-3" class="nav-link" data-scroll-target="#project-overview-3"><span class="header-section-number">B.4.1</span> Project Overview</a></li>
+  <li><a href="#learning-outcomes-3" id="toc-learning-outcomes-3" class="nav-link" data-scroll-target="#learning-outcomes-3"><span class="header-section-number">B.4.2</span> Learning Outcomes</a></li>
+  <li><a href="#project-requirements-3" id="toc-project-requirements-3" class="nav-link" data-scroll-target="#project-requirements-3"><span class="header-section-number">B.4.3</span> Project Requirements</a></li>
+  <li><a href="#graduate-student-expectations-3" id="toc-graduate-student-expectations-3" class="nav-link" data-scroll-target="#graduate-student-expectations-3"><span class="header-section-number">B.4.4</span> Graduate Student Expectations</a></li>
+  <li><a href="#how-this-lab-was-originally-scored-3" id="toc-how-this-lab-was-originally-scored-3" class="nav-link" data-scroll-target="#how-this-lab-was-originally-scored-3"><span class="header-section-number">B.4.5</span> How This Lab Was Originally Scored</a></li>
+  <li><a href="#practical-notes-3" id="toc-practical-notes-3" class="nav-link" data-scroll-target="#practical-notes-3"><span class="header-section-number">B.4.6</span> Practical Notes</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../appendices/appendix-a-glossary.html">Appendices</a></li><li class="breadcrumb-item"><a href="../appendices/appendix-b-labs.html"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Appendix B — Appendix B: Lab Assignments</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The four lab assignments collected here are the hands-on counterparts to the book’s chapters. Every <strong>Related Lab</strong> line in the body of the book points to one of the sections below. Each lab is presented in a common format: a project overview, the learning outcomes it targets, the concrete technical requirements, graduate-level extension expectations where they exist, and — for completeness — the point breakdown under which the lab was originally scored. The grading tables are historical reference material from the labs’ origin; they are included so a reader can see how effort was weighted, not because this book imposes any grading structure of its own.</p>
+<p>The labs form a deliberate progression: build and fly real hardware, move to simulation and safety envelopes, add onboard perception, and finally close the loop with autonomous decision-making. A reader working through the book can attempt them in order, at either the baseline or the graduate-extension depth. Where an original lab specified a submission mechanism, that detail has been generalized: submit per your instructor’s current guidance, or simply keep the artifacts (videos, logs, reflections) as your own record of the work.</p>
+<section id="collaborative-drone-build" class="level2" data-number="B.1">
+<h2 data-number="B.1" class="anchored" data-anchor-id="collaborative-drone-build"><span class="header-section-number">B.1</span> Collaborative Drone Build &amp; Flight Demonstration</h2>
+<p>This lab applies the material of Part I — multirotor anatomy, materials and power, sensing, and companion computers.</p>
+<section id="project-overview" class="level3" data-number="B.1.1">
+<h3 data-number="B.1.1" class="anchored" data-anchor-id="project-overview"><span class="header-section-number">B.1.1</span> Project Overview</h3>
+<p>Teams assemble a functional drone from a provided kit, demonstrate controlled flight for a minimum of 10 seconds, and reflect individually on their contributions. The lab is deliberately hardware-first: before any autonomy is written, every participant should have handled a frame, a motor, an electronic speed controller, and a flight controller, and should have debugged at least one thing that refused to work.</p>
+</section>
+<section id="learning-outcomes" class="level3" data-number="B.1.2">
+<h3 data-number="B.1.2" class="anchored" data-anchor-id="learning-outcomes"><span class="header-section-number">B.1.2</span> Learning Outcomes</h3>
+<ul>
+<li>Develop hands-on experience with hardware assembly and systems integration.</li>
+<li>Practice teamwork, communication, and project coordination.</li>
+<li>Demonstrate problem-solving and troubleshooting skills.</li>
+<li>Reflect on individual contributions within a collaborative engineering task.</li>
+<li><em>(Graduate-level extension)</em> Exhibit leadership, mentorship, and advanced technical contribution.</li>
+</ul>
+</section>
+<section id="project-requirements" class="level3" data-number="B.1.3">
+<h3 data-number="B.1.3" class="anchored" data-anchor-id="project-requirements"><span class="header-section-number">B.1.3</span> Project Requirements</h3>
+<ol type="1">
+<li><strong>Team coordination.</strong> Coordinate outside scheduled session time as needed to complete the build. Exchange contact information or set up a shared communication channel early.</li>
+<li><strong>Drone assembly.</strong> Assemble the kit completely and correctly: frame, motors, propellers, wiring, and flight controller all installed properly. The team is responsible for troubleshooting the vehicle to a flight-ready state.</li>
+<li><strong>Flight demonstration</strong> (team requirement). At least 10 seconds of continuous, controlled flight — stable, intentional, and safely executed. Documentation: a video recording clearly showing takeoff, sustained flight of 10 seconds or more, and landing or a controlled end to the flight.</li>
+<li><strong>Individual reflection</strong> (one page maximum). Describe your specific contributions, the challenges you encountered and how you addressed them, what you learned, and how the team’s communication worked in practice.</li>
+</ol>
+</section>
+<section id="graduate-student-expectations" class="level3" data-number="B.1.4">
+<h3 data-number="B.1.4" class="anchored" data-anchor-id="graduate-student-expectations"><span class="header-section-number">B.1.4</span> Graduate Student Expectations</h3>
+<p>Graduate participants are expected to take on leadership roles within the team, guide and mentor less experienced teammates, contribute beyond baseline expectations (technically or organizationally), and help ensure project completion and team coordination.</p>
+</section>
+<section id="how-this-lab-was-originally-scored" class="level3" data-number="B.1.5">
+<h3 data-number="B.1.5" class="anchored" data-anchor-id="how-this-lab-was-originally-scored"><span class="header-section-number">B.1.5</span> How This Lab Was Originally Scored</h3>
+<p>The original point breakdown (100 points total) is reproduced for reference:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Component</th>
+<th>Points</th>
+<th>Criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Drone assembly quality (team)</td>
+<td>20</td>
+<td>Correct, complete, functional assembly</td>
+</tr>
+<tr class="even">
+<td>Flight performance (team)</td>
+<td>25</td>
+<td>At least 10 s of stable, controlled flight</td>
+</tr>
+<tr class="odd">
+<td>Video documentation (team)</td>
+<td>15</td>
+<td>Clear, complete, meets requirements</td>
+</tr>
+<tr class="even">
+<td>Team coordination (team)</td>
+<td>10</td>
+<td>Evidence of collaboration and organization</td>
+</tr>
+<tr class="odd">
+<td>Contribution quality (individual)</td>
+<td>15</td>
+<td>Meaningful, specific individual work</td>
+</tr>
+<tr class="even">
+<td>Reflection quality (individual)</td>
+<td>10</td>
+<td>Thoughtful, concrete reflection</td>
+</tr>
+<tr class="odd">
+<td>Professionalism (individual)</td>
+<td>5</td>
+<td>Clarity, formatting, one-page limit</td>
+</tr>
+</tbody>
+</table>
+<p>A graduate-level adjustment of up to ±10 points applied, based on leadership, mentorship, and level of contribution relative to expectations.</p>
+</section>
+<section id="practical-notes" class="level3" data-number="B.1.6">
+<h3 data-number="B.1.6" class="anchored" data-anchor-id="practical-notes"><span class="header-section-number">B.1.6</span> Practical Notes</h3>
+<p>Safety first: fly only in approved areas and keep safe distances from people and objects. If the aircraft crashes, do not grab it — let it crash (a tether, if available, is the safer containment). Start early; hardware issues take time to debug. Assign roles (builder, tester, coordinator, documenter), test incrementally before attempting the full flight, and communicate frequently.</p>
+</section>
+</section>
+<section id="sitl-simulation-and-geofencing" class="level2" data-number="B.2">
+<h2 data-number="B.2" class="anchored" data-anchor-id="sitl-simulation-and-geofencing"><span class="header-section-number">B.2</span> Software-in-the-Loop (SITL) Simulation &amp; Geofencing</h2>
+<p>This lab applies the material of Part II — closed-loop control, the PX4 autopilot stack, mission scripting, and geofencing and failsafes.</p>
+<section id="project-overview-1" class="level3" data-number="B.2.1">
+<h3 data-number="B.2.1" class="anchored" data-anchor-id="project-overview-1"><span class="header-section-number">B.2.1</span> Project Overview</h3>
+<p>Building on the hardware foundations of the first lab, this lab shifts to simulation-based autonomy and safety protocols. Teams configure a software-in-the-loop (SITL) environment using Gazebo and QGroundControl (QGC), then simulate a series of waypoint commands constrained by an active, automated geofence. The point is not merely to make a simulated vehicle move, but to watch a safety envelope do its job: the mission must include a deliberate encounter between the vehicle and the fence.</p>
+</section>
+<section id="learning-outcomes-1" class="level3" data-number="B.2.2">
+<h3 data-number="B.2.2" class="anchored" data-anchor-id="learning-outcomes-1"><span class="header-section-number">B.2.2</span> Learning Outcomes</h3>
+<ul>
+<li>Develop proficiency with SITL environments (Gazebo and QGC).</li>
+<li>Practice mission planning and waypoint navigation.</li>
+<li>Implement safety protocols through geofencing configurations.</li>
+<li>Demonstrate collaborative project management in a simulated environment.</li>
+<li><em>(Graduate-level extension)</em> Provide advanced technical troubleshooting and leadership in simulation architecture.</li>
+</ul>
+</section>
+<section id="project-requirements-1" class="level3" data-number="B.2.3">
+<h3 data-number="B.2.3" class="anchored" data-anchor-id="project-requirements-1"><span class="header-section-number">B.2.3</span> Project Requirements</h3>
+<ol type="1">
+<li><strong>Simulation setup.</strong> Configure Gazebo and QGroundControl to communicate via SITL. Teams coordinate outside scheduled session time to finalize simulation parameters.</li>
+<li><strong>Mission implementation.</strong> Define and execute a flight path with at least four distinct waypoints. Implement an active geofence in QGC that triggers a failsafe — for example, return-to-launch (RTL) — if the simulated aircraft breaches the defined perimeter.</li>
+<li><strong>Demonstration.</strong> The simulation must show the drone successfully traversing the waypoints and responding appropriately to the geofence constraints. Documentation: a screen recording clearly showing the QGC mission plan, the drone’s movement in Gazebo, and the geofence triggering. Submit per your instructor’s current guidance.</li>
+<li><strong>Individual reflection</strong> (one page maximum). Describe the simulation setup or mission planning work you did, the challenges you faced with SITL integration or geofencing logic, and how simulated behavior compares with what you would expect from real hardware.</li>
+</ol>
+</section>
+<section id="graduate-student-expectations-1" class="level3" data-number="B.2.4">
+<h3 data-number="B.2.4" class="anchored" data-anchor-id="graduate-student-expectations-1"><span class="header-section-number">B.2.4</span> Graduate Student Expectations</h3>
+<p>Graduate participants take the lead on setting up the simulation environment, mentor less experienced teammates on waypoint syntax and QGC failsafe settings, and provide advanced documentation demonstrating more sophisticated simulation features.</p>
+</section>
+<section id="how-this-lab-was-originally-scored-1" class="level3" data-number="B.2.5">
+<h3 data-number="B.2.5" class="anchored" data-anchor-id="how-this-lab-was-originally-scored-1"><span class="header-section-number">B.2.5</span> How This Lab Was Originally Scored</h3>
+<p>The original point breakdown (100 points total) is reproduced for reference:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Component</th>
+<th>Points</th>
+<th>Criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>SITL setup &amp; geofence</td>
+<td>20</td>
+<td>Correct Gazebo/QGC integration with an active failsafe</td>
+</tr>
+<tr class="even">
+<td>Waypoint navigation</td>
+<td>25</td>
+<td>Successful execution of the programmed flight path</td>
+</tr>
+<tr class="odd">
+<td>Video documentation</td>
+<td>15</td>
+<td>Clear recording showing the mission and the geofence trigger</td>
+</tr>
+<tr class="even">
+<td>Team coordination</td>
+<td>10</td>
+<td>Evidence of collaboration and organization</td>
+</tr>
+<tr class="odd">
+<td>Individual reflection</td>
+<td>30</td>
+<td>Thoughtful reflection and meaningful contribution</td>
+</tr>
+</tbody>
+</table>
+<p>A graduate-level adjustment of up to ±10 points applied, based on leadership and mentorship.</p>
+</section>
+<section id="practical-notes-1" class="level3" data-number="B.2.6">
+<h3 data-number="B.2.6" class="anchored" data-anchor-id="practical-notes-1"><span class="header-section-number">B.2.6</span> Practical Notes</h3>
+<p>Test incrementally — verify waypoint execution before enabling the geofence, so a failsafe trigger is unambiguous when it happens. Document issues (connectivity problems, parameter conflicts) as they occur, and keep the team synchronized by sharing configuration screenshots.</p>
+</section>
+</section>
+<section id="edge-based-target-detection" class="level2" data-number="B.3">
+<h2 data-number="B.3" class="anchored" data-anchor-id="edge-based-target-detection"><span class="header-section-number">B.3</span> Edge-Based Target Detection &amp; Deployment</h2>
+<p>This lab applies the material of Part III — images as data, TinyML deployment, detection pipelines, and real-time edge inference — along with the coordinate-frames chapter that opens Part IV.</p>
+<section id="project-overview-2" class="level3" data-number="B.3.1">
+<h3 data-number="B.3.1" class="anchored" data-anchor-id="project-overview-2"><span class="header-section-number">B.3.1</span> Project Overview</h3>
+<p>This lab transitions from simulation to real-world perception and deployment. Teams develop a complete computer vision pipeline: ingest live or recorded camera frames, train an optimized model to detect targets, and deploy that model onto physical drone hardware or an equivalent edge device. The lab bridges every stage that a deployed perception system passes through — data collection, labeling, model training, edge deployment, and real-time inference — and forces the trade-offs (accuracy versus speed, model size versus performance) that only appear once a model leaves the workstation.</p>
+</section>
+<section id="learning-outcomes-2" class="level3" data-number="B.3.2">
+<h3 data-number="B.3.2" class="anchored" data-anchor-id="learning-outcomes-2"><span class="header-section-number">B.3.2</span> Learning Outcomes</h3>
+<ul>
+<li>Develop a complete computer vision pipeline from raw data to deployment.</li>
+<li>Understand the constraints of edge computing: latency, memory, and power.</li>
+<li>Gain experience with model optimization techniques — quantization, pruning, and lightweight architectures.</li>
+<li>Work with real-world data collection and labeling workflows.</li>
+<li><em>(Graduate-level extension)</em> Design automated labeling pipelines and optimize deployment efficiency.</li>
+</ul>
+</section>
+<section id="project-requirements-2" class="level3" data-number="B.3.3">
+<h3 data-number="B.3.3" class="anchored" data-anchor-id="project-requirements-2"><span class="header-section-number">B.3.3</span> Project Requirements</h3>
+<ol type="1">
+<li><strong>Data collection.</strong> Collect or source a dataset relevant to the target detection task — recorded footage, or public datasets where their use is justified. Extract frames from video into an image dataset. Target roughly 20–30 labeled images per contributor at minimum.</li>
+<li><strong>Data labeling.</strong> Label the dataset with bounding boxes (or segmentation masks) using any standard labeling tool. Deliver the labeled dataset in a standard format such as YOLO or COCO.</li>
+<li><strong>Model training.</strong> Train a lightweight object-detection model suitable for edge deployment (YOLOv8 is a recommended starting point). Demonstrate the training process and report evaluation metrics: precision, recall, and mean average precision (mAP).</li>
+<li><strong>Edge deployment.</strong> Deploy the trained model onto physical hardware — a drone’s onboard computer or an equivalent edge device. Implement dynamic camera-frame ingestion (live feed or video stream) with real-time or near-real-time inference. The system must detect and identify targets in real time.</li>
+<li><strong>Optimization.</strong> Measure frames per second (FPS), latency, and accuracy trade-offs on the deployed hardware.</li>
+<li><strong>Demonstration.</strong> A video showing the live or recorded camera feed, the model detecting targets in real time, and the deployment running on edge hardware. Submit per your instructor’s current guidance.</li>
+<li><strong>Individual reflection</strong> (one page maximum). Describe your specific contribution (data, labeling, training, deployment, or another role), the challenges encountered (data quality, labeling consistency, model performance, hardware limitations), the trade-offs you observed (accuracy versus speed, model size versus performance), and what a production-ready version of the system would still need.</li>
+</ol>
+</section>
+<section id="graduate-student-expectations-2" class="level3" data-number="B.3.4">
+<h3 data-number="B.3.4" class="anchored" data-anchor-id="graduate-student-expectations-2"><span class="header-section-number">B.3.4</span> Graduate Student Expectations</h3>
+<ol type="1">
+<li><strong>Automated labeling pipeline.</strong> Build an automated or semi-supervised labeling pipeline — Segment Anything (SAM, SAM 2, or SAM 3 where available), Grounding DINO, or any comparable approach — that reduces manual labeling effort by generating initial annotations for human refinement.</li>
+<li><strong>Leadership and mentorship.</strong> Guide the team on model selection, training pipeline design, and deployment strategy, and assist in debugging hardware/software integration issues.</li>
+</ol>
+</section>
+<section id="how-this-lab-was-originally-scored-2" class="level3" data-number="B.3.5">
+<h3 data-number="B.3.5" class="anchored" data-anchor-id="how-this-lab-was-originally-scored-2"><span class="header-section-number">B.3.5</span> How This Lab Was Originally Scored</h3>
+<p>The original point breakdown (100 points total) is reproduced for reference:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Component</th>
+<th>Points</th>
+<th>Criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Data collection &amp; labeling</td>
+<td>20</td>
+<td>Sufficient, consistent, correctly formatted dataset</td>
+</tr>
+<tr class="even">
+<td>Model training &amp; evaluation</td>
+<td>20</td>
+<td>Demonstrated training with reported metrics</td>
+</tr>
+<tr class="odd">
+<td>Edge deployment</td>
+<td>25</td>
+<td>Successful real-time inference on hardware</td>
+</tr>
+<tr class="even">
+<td>Optimization</td>
+<td>10</td>
+<td>Demonstrated performance improvements</td>
+</tr>
+<tr class="odd">
+<td>Video demonstration</td>
+<td>15</td>
+<td>Clear evidence of the full pipeline running</td>
+</tr>
+<tr class="even">
+<td>Individual reflection</td>
+<td>10</td>
+<td>Thoughtful, specific reflection</td>
+</tr>
+</tbody>
+</table>
+<p>A graduate-level adjustment of up to ±10 points applied, based on automation-pipeline quality, optimization depth, and leadership contribution.</p>
+</section>
+<section id="practical-notes-2" class="level3" data-number="B.3.6">
+<h3 data-number="B.3.6" class="anchored" data-anchor-id="practical-notes-2"><span class="header-section-number">B.3.6</span> Practical Notes</h3>
+<p>Start early with data collection and labeling — it is the bottleneck of the whole pipeline. Use small models first (for example, YOLOv8n) before scaling up. Test inference on the target hardware before full training completes, so deployment surprises surface while there is still time to react, and track performance metrics as you iterate.</p>
+</section>
+</section>
+<section id="autonomous-state-machine-control" class="level2" data-number="B.4">
+<h2 data-number="B.4" class="anchored" data-anchor-id="autonomous-state-machine-control"><span class="header-section-number">B.4</span> Autonomous State Machine Control: Search Grids, Target Harassment, and Reactive Evasion</h2>
+<p>This lab applies the material of Part IV — search-grid path planning, vector-based evasion, finite state machines and behavior trees, target tracking, and harassment pattern generation — and exercises the integration and diagnostics practices of Part V. It is also the lab closest in spirit to the book’s running example.</p>
+<section id="project-overview-3" class="level3" data-number="B.4.1">
+<h3 data-number="B.4.1" class="anchored" data-anchor-id="project-overview-3"><span class="header-section-number">B.4.1</span> Project Overview</h3>
+<p>This lab transitions from passive perception to active, closed-loop autonomous decision-making. Teams design and implement a comprehensive, hierarchical state machine controlling a drone’s full mission lifecycle in simulation: systematically sweeping an area, executing a dynamic tactical pattern to disperse a target (a simulated goose), and rapidly computing and executing an evasion vector when a threat is encountered. The lab bridges algorithmic path planning, dynamic state switching, and reactive collision avoidance within one simulation environment.</p>
+</section>
+<section id="learning-outcomes-3" class="level3" data-number="B.4.2">
+<h3 data-number="B.4.2" class="anchored" data-anchor-id="learning-outcomes-3"><span class="header-section-number">B.4.2</span> Learning Outcomes</h3>
+<ul>
+<li>Design and implement deterministic finite state machines (FSMs) or behavior frameworks for complex robotic missions.</li>
+<li>Understand and implement systematic area-coverage algorithms, such as lawnmower search grids.</li>
+<li>Develop reactive, closed-loop control laws for dynamic target interaction and real-time evasion.</li>
+<li>Analyze state-transition latencies and safety guardrails under edge-case flight telemetry.</li>
+<li><em>(Graduate-level extension)</em> Implement hierarchical state structures or behavior trees and optimize dynamic path-replanning algorithms, or take on significant leadership responsibility within the team.</li>
+</ul>
+</section>
+<section id="project-requirements-3" class="level3" data-number="B.4.3">
+<h3 data-number="B.4.3" class="anchored" data-anchor-id="project-requirements-3"><span class="header-section-number">B.4.3</span> Project Requirements</h3>
+<ol type="1">
+<li><strong>State machine architecture.</strong> Build a robust control framework with explicitly defined states that gracefully handles unexpected sensor drops or telemetry anomalies without crashing the simulated aircraft. Required states: <code>IDLE/TAKEOFF</code>, <code>SEARCH_GRID</code>, <code>HARASS_TARGET</code>, <code>EVADE_THREAT</code>, and <code>LAND/RETURN_TO_HOME</code>. Deliverable: a clear state-transition diagram outlining every trigger, guard condition, and fail-safe.</li>
+<li><strong>Search grid execution.</strong> Implement a systematic area-coverage algorithm generating a parallel-sweep (lawnmower) path from a defined bounding box. Maintain constant altitude and target forward velocity while minimizing cross-track error, and trigger a state transition immediately upon a simulated detection of the target.</li>
+<li><strong>Goose harassment pattern.</strong> Once the simulated goose is detected, transition from navigation to an active disruption pattern: track the target’s position (which may be stationary or moving slowly); execute a dynamic harassment profile — an aggressive tracking orbit, close-proximity buzzing passes, or a coordinated herding vector; and maintain strict safety radii so the vehicle never “collides” with the target asset.</li>
+<li><strong>Evasion vector computation.</strong> During the harassment pattern, a sudden high-priority threat is introduced — an incoming rogue aircraft, a territorial bird, or a simulated geofence breach. The system must instantly override the harassment state upon threat injection, compute a real-time 3D evasion vector perpendicular or opposite to the threat’s trajectory, and execute an aggressive escape maneuver to a designated safe altitude or coordinate point.</li>
+<li><strong>Simulation and telemetry logging.</strong> Run the full mission loop in a designated simulation environment (Gazebo, AirSim, or ROS/PX4 SITL). Log high-frequency telemetry — <span class="math inline">\([x, y, z]\)</span> coordinates, the current active state, velocity vectors, and state-transition latency — and demonstrate that the vehicle stays within structurally stable flight envelopes during aggressive maneuvers.</li>
+<li><strong>Demonstration video.</strong> A screen-recorded video of the simulation executing the full mission lifecycle: a complete, uninterrupted run from takeoff through the search grid, the transition to harassment, threat injection, evasion-vector execution, and a safe return — with an overlaid telemetry terminal or GUI showing real-time state changes. Submit per your instructor’s current guidance.</li>
+<li><strong>Individual reflection</strong> (one page maximum). Describe your specific technical contribution to the team’s simulation pipeline; the challenges encountered (state-machine race conditions, tuning controller aggressiveness during evasion, simulation-to-reality considerations); the trade-offs you observed — state reactivity and sensitivity to threats versus flight stability and smoothness; and what architectural modifications would be strictly necessary to make the system safe enough to deploy on real hardware.</li>
+</ol>
+</section>
+<section id="graduate-student-expectations-3" class="level3" data-number="B.4.4">
+<h3 data-number="B.4.4" class="anchored" data-anchor-id="graduate-student-expectations-3"><span class="header-section-number">B.4.4</span> Graduate Student Expectations</h3>
+<ol type="1">
+<li><strong>Advanced framework architecture.</strong> Implement mission control as a formal behavior tree rather than a flat FSM, demonstrating cleaner modularity and preemption handling.</li>
+<li><strong>Stochastic threat evasion.</strong> Make the injected threat actively pursue the drone rather than remaining static, requiring dynamic, predictive evasion paths — for example, potential fields or rapid replanning — rather than a single fixed escape vector.</li>
+</ol>
+</section>
+<section id="how-this-lab-was-originally-scored-3" class="level3" data-number="B.4.5">
+<h3 data-number="B.4.5" class="anchored" data-anchor-id="how-this-lab-was-originally-scored-3"><span class="header-section-number">B.4.5</span> How This Lab Was Originally Scored</h3>
+<p>The original point breakdown (100 points total) is reproduced for reference:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Component</th>
+<th>Points</th>
+<th>Criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>State machine &amp; logic architecture</td>
+<td>20</td>
+<td>Clean code, robust transition conditions, architectural safety guardrails</td>
+</tr>
+<tr class="even">
+<td>Search grid &amp; coverage accuracy</td>
+<td>20</td>
+<td>Systematic execution with minimal cross-track error</td>
+</tr>
+<tr class="odd">
+<td>Harassment &amp; evasion algorithms</td>
+<td>25</td>
+<td>Successful closed-loop tracking and instantaneous, correct 3D escape-vector calculation</td>
+</tr>
+<tr class="even">
+<td>Simulation performance &amp; logs</td>
+<td>10</td>
+<td>Complete high-frequency telemetry, stable flight envelope</td>
+</tr>
+<tr class="odd">
+<td>Video demonstration</td>
+<td>15</td>
+<td>Full uninterrupted mission lifecycle with state overlay</td>
+</tr>
+<tr class="even">
+<td>Individual reflection</td>
+<td>10</td>
+<td>Thoughtful, specific reflection</td>
+</tr>
+</tbody>
+</table>
+<p>A graduate-level adjustment of up to ±20 points applied, based on behavior-tree complexity, dynamic-evasion capability, and peer leadership.</p>
+</section>
+<section id="practical-notes-3" class="level3" data-number="B.4.6">
+<h3 data-number="B.4.6" class="anchored" data-anchor-id="practical-notes-3"><span class="header-section-number">B.4.6</span> Practical Notes</h3>
+<p>Do not build a spaghetti machine: keep state transitions clean, deterministic, and isolated, with clear logging (for example, <code>[STATE CHANGE]: SEARCH -&gt; HARASS</code>) so misbehavior can be debugged visually. Mind the physics — an evasion vector commanding an instant large pitch change would stall or crash a real drone, so bound and smooth step commands even in simulation. And simulate the unexpected: test what happens if a threat is injected exactly as the drone is turning at the edge of the search grid, because edge cases are where state machines lock up.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../appendices/appendix-a-glossary.html" class="pagination-link" aria-label="Appendix A: Glossary">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../appendices/appendix-c-toolchain-setup.html" class="pagination-link" aria-label="Appendix C: Toolchain Setup Guide">
+        <span class="nav-page-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

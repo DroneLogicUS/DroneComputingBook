@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>6&nbsp; Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" rel="next">
+<link href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html">Part I — Airframes, Regulation &amp; Flight Safety</a></li><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">6.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">6.2</span> Key Vocabulary</a></li>
+  <li><a href="#two-doors-into-the-sky-part-107-versus-section-44809" id="toc-two-doors-into-the-sky-part-107-versus-section-44809" class="nav-link" data-scroll-target="#two-doors-into-the-sky-part-107-versus-section-44809"><span class="header-section-number">6.3</span> Two Doors into the Sky: Part 107 versus Section 44809</a></li>
+  <li><a href="#the-compliance-chain-certification-registration-airworthiness-records" id="toc-the-compliance-chain-certification-registration-airworthiness-records" class="nav-link" data-scroll-target="#the-compliance-chain-certification-registration-airworthiness-records"><span class="header-section-number">6.4</span> The Compliance Chain: Certification, Registration, Airworthiness, Records</a></li>
+  <li><a href="#the-pre-flight-information-environment-notams-and-tfrs" id="toc-the-pre-flight-information-environment-notams-and-tfrs" class="nav-link" data-scroll-target="#the-pre-flight-information-environment-notams-and-tfrs"><span class="header-section-number">6.5</span> The Pre-Flight Information Environment: NOTAMs and TFRs</a></li>
+  <li><a href="#reading-the-sky-in-code-metar" id="toc-reading-the-sky-in-code-metar" class="nav-link" data-scroll-target="#reading-the-sky-in-code-metar"><span class="header-section-number">6.6</span> Reading the Sky in Code: METAR</a></li>
+  <li><a href="#waivers-regulation-as-a-safety-case" id="toc-waivers-regulation-as-a-safety-case" class="nav-link" data-scroll-target="#waivers-regulation-as-a-safety-case"><span class="header-section-number">6.7</span> Waivers: Regulation as a Safety Case</a></li>
+  <li><a href="#the-pilot-as-component-aeronautical-decision-making" id="toc-the-pilot-as-component-aeronautical-decision-making" class="nav-link" data-scroll-target="#the-pilot-as-component-aeronautical-decision-making"><span class="header-section-number">6.8</span> The Pilot as Component: Aeronautical Decision-Making</a></li>
+  <li><a href="#why-stricter-than-the-faa-the-10-foot-ceiling" id="toc-why-stricter-than-the-faa-the-10-foot-ceiling" class="nav-link" data-scroll-target="#why-stricter-than-the-faa-the-10-foot-ceiling"><span class="header-section-number">6.9</span> Why Stricter Than the FAA: The 10-Foot Ceiling</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">6.10</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">6.11</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html">Part I — Airframes, Regulation &amp; Flight Safety</a></li><li class="breadcrumb-item"><a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The four preceding chapters treated the drone as a machine: a market artifact, a structure, a power system, a sensor platform. This chapter treats it as an <em>aircraft</em> — a legal category, not a mechanical one — and the shift matters more than it first appears. The moment a multirotor leaves the ground in the United States it enters the National Airspace System, a shared resource in which a 900-gram quadcopter and a medevac helicopter are, in the eyes of the law, peers with obligations to one another. The rules that govern that sharing are not administrative decoration around the engineering; they are engineering constraints of exactly the same standing as the thrust-to-weight ratio or the battery’s C-rating. A mission that violates the visual-line-of-sight rule is as infeasible as one that exceeds the motor’s thermal limit — the failure mode is legal rather than physical, but the flight does not happen either way. The Commercial Drone Landscape chapter previewed this claim when it treated the 55-pound threshold and the 400-foot ceiling as design inputs; this chapter supplies the framework those numbers came from.</p>
+<p>The chapter proceeds from rules to judgment. It first draws the single most consequential distinction in United States small-drone law — commercial operation under 14 CFR Part 107 versus recreational operation under 49 U.S.C. §44809 — and shows that the boundary is set by the <em>purpose</em> of a flight, not by the hardware or the pilot’s skill. It then follows the compliance chain a real program must maintain: pilot certification, aircraft registration, airworthiness declaration, and the inspection-ready paper trail behind them. It examines the pre-flight information environment — NOTAMs, TFRs, and the METAR weather code — as a set of formal message formats a pilot must be able to parse, and dissects a real Part 107 airspace authorization to show what a persuasive safety case looks like. Finally it turns to the human being at the controls: the aeronautical decision-making frameworks (PAVE, I’M SAFE, and the five hazardous attitudes) that aviation developed after decades of accident data showed that the pilot, not the aircraft, is the dominant failure mode. A closing section explains why a training program rationally imposes rules far stricter than the FAA minimum — a 10-foot ceiling under a 400-foot legal limit — and connects that layered-margin logic forward to the geofences and fail-safes that software will enforce in Part II.</p>
+<section id="learning-objectives" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">6.1</span> Learning Objectives</h2>
+<ul>
+<li>Distinguish commercial operation under FAA Part 107 from recreational operation under Section 44809, apply the FAA’s purpose-based test to classify a given flight scenario, and state the certification, registration, and operational requirements each framework imposes.</li>
+<li>Describe the compliance chain a drone program must maintain — remote pilot certification, FAA registration, airworthiness declaration, and continuous flight/battery/maintenance logging — and explain why the records must be inspection-ready at all times.</li>
+<li>Explain what NOTAMs and TFRs are, what information each carries, and why a remote pilot checks both (plus current airspace status via LAANC or B4UFLY) before every flight rather than relying on a chart alone.</li>
+<li>Decode a METAR surface-weather report field by field, and construct or interpret coded weather groups such as <code>+SHRA</code> from their intensity, descriptor, and phenomenon components.</li>
+<li>Apply the PAVE and I’M SAFE checklists to a pre-flight risk assessment, identify each of the five hazardous attitudes in a described scenario, and explain how the corresponding antidote interrupts the attitude’s failure mechanism.</li>
+<li>Justify, quantitatively and institutionally, why an organization imposes safety rules stricter than the FAA minimum, using a 10-foot institutional altitude cap versus the 400-foot regulatory ceiling as the worked example.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">6.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Part 107</strong> — the FAA’s Small UAS Rule (14 CFR Part 107), the baseline regulatory framework for civil operation of uncrewed aircraft under 55 pounds for any business or non-recreational purpose; it defines pilot certification, aircraft registration, and the standard operating limits (400-foot ceiling, visual line of sight, restrictions on flight over people) from which waivers may be sought.</li>
+<li><strong>RPIC</strong> (Remote Pilot in Command) — the certificated individual with final authority over, and responsibility for, a given UAS flight; under Part 107 an RPIC holds an FAA Remote Pilot Certificate earned by passing the Aeronautical Knowledge Test, and no commercial flight is legal without one either at the controls or directly supervising the person at them.</li>
+<li><strong>Section 44809</strong> — the statutory exception (49 U.S.C. §44809) permitting strictly recreational flying without a Part 107 certificate, conditioned on passing the free TRUST exam, flying within visual line of sight, following the safety guidelines of an FAA-recognized community-based organization, and always yielding right-of-way to crewed aircraft.</li>
+<li><strong>NOTAM</strong> (Notice to Airmen) — a time-critical bulletin distributed through the FAA system announcing a condition or restriction not reflected on published charts; a restriction NOTAM specifies an effective time window, a defined area and altitude, the reason for the restriction, and the coordinating FAA facility with contact information.</li>
+<li><strong>TFR</strong> (Temporary Flight Restriction) — a NOTAM-published, temporarily restricted volume of airspace established to protect persons or property from a hazard, to give disaster-relief aircraft a sterile operating environment, to prevent congestion of sightseeing aircraft over a newsworthy event, to protect the President and other public figures, or to support space operations.</li>
+<li><strong>METAR</strong> — the internationally standardized coded format for routine surface weather observations, reporting station, time, wind, visibility, present weather, sky condition, temperature/dew point, and altimeter setting in a fixed field order that a pilot decodes during the pre-flight weather briefing.</li>
+<li><strong>LAANC</strong> (Low Altitude Authorization and Notification Capability) — the automated system through which FAA-approved service providers grant near-real-time authorization for drone operations in controlled airspace, using pre-loaded grids that specify the maximum altitude approvable at each location without individual air traffic control coordination.</li>
+<li><strong>PAVE checklist</strong> — a four-category pre-flight risk-assessment framework — Pilot, Aircraft, enVironment, External pressures — that forces a structured review of every major hazard source before a go/no-go decision, rather than leaving the assessment to unstructured intuition.</li>
+<li><strong>I’M SAFE checklist</strong> — a pilot self-assessment mnemonic — Illness, Medication, Stress, Alcohol, Fatigue, Emotion — that operationalizes the “Pilot” leg of PAVE by asking six concrete questions about the pilot’s own fitness to fly on this particular day.</li>
+<li><strong>Aeronautical decision-making</strong> (ADM) — the systematic mental process aviation teaches for consistently determining the best course of action in response to a given set of circumstances; the discipline that turns risk management from a personality trait into a trainable procedure.</li>
+<li><strong>Waiver</strong> — a case-by-case FAA authorization to deviate from a specific Part 107 operating rule, granted not by right but on a demonstrated safety case showing how the applicant’s procedures deliver an equivalent level of safety to the rule being waived.</li>
+</ul>
+</section>
+<section id="two-doors-into-the-sky-part-107-versus-section-44809" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="two-doors-into-the-sky-part-107-versus-section-44809"><span class="header-section-number">6.3</span> Two Doors into the Sky: Part 107 versus Section 44809</h2>
+<p>United States law offers a small-drone operator exactly two legal frameworks, and the choice between them is not the operator’s to make: it is determined by the <em>purpose</em> of the flight. Any operation conducted for a business purpose, for compensation, or “in furtherance of a business” — a phrase the FAA interprets broadly enough to cover unpaid favors that advance someone’s commercial interest, non-profit organizational work, and video content that earns advertising revenue — falls under Part 107. Only flight conducted purely for personal enjoyment qualifies for the recreational exception of Section 44809. The test is intent and effect, not money changing hands. Photographing a house so that a friend can list it for sale is a Part 107 operation even if no fee is charged, because the flight furthers a real-estate transaction; the identical flight over the identical house, flown only because the pilot enjoys aerial photography and shares the images with no one, is recreational. Every flight in a university course, and every research flight, is non-recreational by definition — education and research are purposes, not hobbies — which is why an academic drone program operates under Part 107 and not under the rules most students first encountered as hobbyists.</p>
+<p>The two frameworks impose sharply different burdens. Part 107 requires the remote pilot to hold an FAA Remote Pilot Certificate, earned by passing the proctored Aeronautical Knowledge Test covering airspace classification, weather, loading and performance, and operating rules. The aircraft must be registered, and the standard operating limits apply — at or below 400 feet above ground level, within visual line of sight, clear of uninvolved people except as the operations-over-people categories permit; night flight, routine since a 2021 rule change, additionally demands anti-collision lighting visible for three statute miles and updated pilot training. Deviations from the remaining limits require a waiver supported by a safety case. Section 44809 asks far less: the recreational flyer passes TRUST (The Recreational UAS Safety Test), a free, untimed online course that cannot be failed in any permanent sense, and then must fly strictly for fun, within visual line of sight, under the safety guidelines of an FAA-recognized community-based organization, and always yielding right-of-way to crewed aircraft. The asymmetry is deliberate. The recreational exception is a carve-out preserving a hobby that predates the regulations; Part 107 is the actual regulatory regime, and the moment a flight acquires any purpose beyond enjoyment, the carve-out closes and the full regime applies.</p>
+<p>It is worth internalizing why the line is drawn at purpose rather than at hardware. A 249-gram camera drone and a 20-kilogram spray platform pose obviously different physical risks, and the regulations do account for mass elsewhere. But the <em>systemic</em> risk the purpose test manages is different: commercial pressure. An operator being paid to deliver imagery has an incentive to fly in marginal weather, to push past visual range, to skip the battery check — pressures a hobbyist flying for pleasure simply does not face, because a hobbyist facing bad conditions can shrug and go home. The purpose test routes every operation that carries external pressure into the framework with certification, accountability, and enforcement. This is the first appearance of a theme the ADM section will formalize: aviation regulation is, to a striking degree, applied psychology.</p>
+</section>
+<section id="the-compliance-chain-certification-registration-airworthiness-records" class="level2" data-number="6.4">
+<h2 data-number="6.4" class="anchored" data-anchor-id="the-compliance-chain-certification-registration-airworthiness-records"><span class="header-section-number">6.4</span> The Compliance Chain: Certification, Registration, Airworthiness, Records</h2>
+<p>A compliant drone program maintains an unbroken chain from pilot to aircraft to paperwork, and a break anywhere in the chain grounds the operation as surely as a failed motor. The chain has four links.</p>
+<p><strong>The pilot.</strong> Every operation requires a certificated RPIC — present and either flying or directly supervising the flight. The certificate is personal and non-delegable: the RPIC holds final authority over the flight and final responsibility for its outcome, a deliberate import of the crewed-aviation principle that accountability must rest on one named individual, never diffused across a team.</p>
+<p><strong>The aircraft.</strong> Every aircraft in the program must be registered with the FAA through the FAADroneZone portal, and its registration number must be displayed on the airframe. Registration is keyed to the aircraft’s actual weight, which for custom-built research vehicles means the vehicle must be physically weighed — not estimated from a bill of materials — because the mass budget analyses of the Materials and Power chapter showed how easily a build drifts from its spreadsheet. Program-built aircraft additionally obtain a Declaration of Compliance, the airworthiness attestation that the vehicle meets the applicable performance and safety requirements.</p>
+<p><strong>The records.</strong> Part 107 operations are expected to be auditable, and a research program must log flight time, battery usage and cycle counts, all maintenance, and every repair — and keep those records inspection-ready, because the FAA does not schedule its visits. The logging obligation dovetails exactly with engineering self-interest: the battery chapter established that lithium-polymer packs degrade with cycle count and abusive storage, and a battery log that satisfies an FAA inspector is the same log that tells the crew chief which pack is approaching retirement. Maintenance follows the same dual logic. Where a manufacturer publishes a maintenance schedule it must be followed; where none exists — the normal case for a custom research airframe — the program must write its own, with concrete intervals such as propeller replacement every fixed number of flight hours, and must track repairs, modifications, replacements, and firmware updates as maintenance events. Firmware belongs on that list for a reason worth pausing on: on an aircraft whose stability is entirely software-mediated, a firmware update changes the vehicle’s flight characteristics as surely as bending a propeller does, and an aircraft whose software state is unknown is unairworthy in every sense that matters.</p>
+<p><strong>The site.</strong> Before any operation, the crew confirms the operating area’s airspace status — controlled or uncontrolled, any active restrictions — using tools such as B4UFLY or a LAANC-enabled service provider, and a formal flight crew briefing establishes roles, boundaries, and emergency procedures before the first battery is connected. Prudent programs preserve evidence of these checks (a timestamped screenshot of the airspace briefing is the customary minimum), converting “we checked” from a recollection into a record.</p>
+</section>
+<section id="the-pre-flight-information-environment-notams-and-tfrs" class="level2" data-number="6.5">
+<h2 data-number="6.5" class="anchored" data-anchor-id="the-pre-flight-information-environment-notams-and-tfrs"><span class="header-section-number">6.5</span> The Pre-Flight Information Environment: NOTAMs and TFRs</h2>
+<p>An aeronautical chart is a snapshot; the airspace it depicts changes daily. The mechanism that keeps pilots current is the NOTAM, a formally structured bulletin distributed through the FAA system. A NOTAM establishing a flight restriction always carries the same five elements: an effective time period, a defined geographic area, a defined altitude block, the reason for the restriction, and the coordinating FAA facility with its contact information. The structure is the point — a pilot scanning a briefing is pattern-matching against known fields, asking of each NOTAM only <em>where, when, how high, why,</em> and <em>whom to call.</em></p>
+<p>The TFR is the NOTAM’s most operationally significant species: a temporary volume of restricted airspace, erected and dissolved as circumstances demand. The purposes enumerated in the regulations sketch the range — protecting persons and property from an existing or imminent hazard on the surface or in the air; providing a sterile environment for disaster-relief aircraft; preventing dangerous congestion of sightseeing aircraft over an incident generating public interest; protecting the President, Vice President, and other protected figures; and supporting space-agency launch and recovery operations. Two properties make TFRs the leading trap for drone operators. They are <em>invisible on charts</em>, existing only in the NOTAM system, so no amount of chart study reveals them. And they <em>correlate with exactly the events drones are drawn to</em> — the wildfire, the crash site, the stadium, the motorcade are simultaneously the most tempting camera subjects and the most likely TFR locations. A drone inside a wildfire TFR is not a paperwork violation; it grounds the retardant tankers, because low-altitude firefighting aircraft cannot share a smoke-obscured valley with an untracked quadcopter, and fire commanders have halted air operations over exactly this.</p>
+<p>Hence the procedural rule, stated flatly: current NOTAMs and TFRs are checked before <em>every</em> flight, through a briefing source such as 1800wxbrief.com, with chart services such as SkyVector for spatial context — and the check is documented. Yesterday’s clean briefing says nothing about today.</p>
+</section>
+<section id="reading-the-sky-in-code-metar" class="level2" data-number="6.6">
+<h2 data-number="6.6" class="anchored" data-anchor-id="reading-the-sky-in-code-metar"><span class="header-section-number">6.6</span> Reading the Sky in Code: METAR</h2>
+<p>The weather half of the briefing arrives as a METAR, the standardized surface-observation format whose terseness dates from teletype days and whose field order is fixed by international agreement. A remote pilot does not need to produce METARs, but must decode them fluently. Consider the canonical training example:</p>
+<pre><code>METAR KOKC 011955Z AUTO 22015G25KT 180V250 3/4SM R17L/2600FT
++TSRA BR OVC010CB 18/16 A2992 RMK AO2 TSB25 TS OHD MOV E SLP132</code></pre>
+<p>Read field by field: a routine report (<code>METAR</code>) from station <code>KOKC</code> (Will Rogers World Airport, Oklahoma City), taken on the 1st of the month at 1955 Zulu (<code>011955Z</code>) by an automated station (<code>AUTO</code>). Wind is from 220° true at 15 knots, gusting 25 (<code>22015G25KT</code>), with direction varying between 180° and 250° (<code>180V250</code>) — variability that itself signals convective activity. Visibility is three-quarters of a statute mile (<code>3/4SM</code>); runway visual range on runway 17L is 2600 feet (<code>R17L/2600FT</code>). Present weather is <code>+TSRA BR</code>. Sky condition <code>OVC010CB</code>: overcast at 1,000 feet, cumulonimbus. Temperature 18 °C, dew point 16 °C (<code>18/16</code>) — a 2-degree spread confirming near-saturated air. Altimeter 29.92 inches of mercury (<code>A2992</code>), followed by remarks: the thunderstorm began at 25 past the hour, is overhead, and is moving east.</p>
+<p>The weather group deserves its own decoding rule, because it is compositional. Each group concatenates up to three parts in fixed order: an <strong>intensity or proximity qualifier</strong> (<code>-</code> light, no symbol moderate, <code>+</code> heavy, <code>VC</code> in the vicinity), an optional <strong>descriptor</strong> (among them <code>SH</code> showers, <code>TS</code> thunderstorm, <code>FZ</code> freezing, <code>BL</code> blowing, <code>MI</code> shallow, <code>BC</code> patches, <code>DR</code> low drifting, <code>PR</code> partial), and the <strong>phenomenon</strong> — precipitation (<code>RA</code> rain, <code>SN</code> snow, <code>DZ</code> drizzle, <code>GR</code> hail, <code>PL</code> ice pellets, <code>SG</code> snow grains, <code>IC</code> ice crystals, <code>GS</code> small hail), obscuration (<code>BR</code> mist, <code>FG</code> fog, <code>FU</code> smoke, <code>HZ</code> haze, <code>DU</code> dust, <code>SA</code> sand, <code>VA</code> volcanic ash), or other (<code>SQ</code> squalls, <code>PO</code> dust whirls, <code>FC</code> funnel cloud, <code>+FC</code> tornado or waterspout, <code>SS</code> sandstorm, <code>DS</code> dust storm). The grammar composes predictably: a heavy rain shower is <code>+SHRA</code>; light freezing drizzle is <code>-FZDZ</code>; the example’s <code>+TSRA BR</code> is a heavy thunderstorm with rain, with mist as a separate obscuration group. For a multirotor whose wind limits, discussed in the Anatomy of a Multirotor chapter, sit far below those of crewed aircraft, the decoded wind and gust fields are usually the go/no-go number — and a gust spread like 15G25 is precisely the condition in which a small drone’s position controller saturates.</p>
+</section>
+<section id="waivers-regulation-as-a-safety-case" class="level2" data-number="6.7">
+<h2 data-number="6.7" class="anchored" data-anchor-id="waivers-regulation-as-a-safety-case"><span class="header-section-number">6.7</span> Waivers: Regulation as a Safety Case</h2>
+<p>Part 107’s standard limits are defaults, not walls. The regulation is <em>performance-based</em>: an operator may apply to deviate from specific rules — operations over people beyond the permitted categories, flight beyond visual line of sight, multiple aircraft under one remote pilot, flight in controlled airspace — by demonstrating that its particular procedures achieve an equivalent level of safety. The FAA’s grant is called a waiver or airspace authorization, and the application is, in engineering terms, a safety case: a structured argument, supported by evidence, that a system is acceptably safe for a specific use in a specific environment.</p>
+<p>A real example shows the anatomy. A state emergency-management agency sought authorization to operate drones in the Class D controlled airspace surrounding Dover Air Force Base (identifier KDOV) in support of first-responder operations — daylight and thermal imaging for fires, missing-person searches, mass gatherings, hazardous-materials events, and severe weather. The application specifies the operating area precisely (centered near 39°7′40″ N, 75°28′6″ W, defined as a wide-area authorization rather than a single point) and then lays out a layered mitigation procedure. Before any flight, the crew consults the LAANC grid for the Class D airspace, read through an FAA-approved service provider, to determine the maximum altitude approvable at the specific operating location. Having established that ceiling, a crew member telephones KDOV air traffic control directly, providing the takeoff location, anticipated takeoff time, and crew contact information, and requests permission for the flight. Every operation includes both an RPIC and at least one dedicated visual observer to guarantee that visual-line-of-sight and see-and-avoid obligations are met, and the emergency procedures explicitly include alerting ATC of in-flight emergencies such as flyaways. All other Part 107 rules remain in force.</p>
+<p>Notice what the argument does. It does not assert that the crews are skilled or the aircraft reliable — assertions the FAA cannot verify. It commits to <em>procedures</em>: a specific data source consulted, a specific phone call made, a specific minimum crew, a specific emergency notification path. Each mitigation is checkable, and each targets the specific hazard the Class D restriction exists to manage — conflict with crewed traffic near a runway. This is the template every waiver application follows, and it is the same template a student will meet again writing safety cases for autonomous systems: identify the hazard the rule addresses, then show, step by verifiable step, how the proposed operation controls that hazard by other means.</p>
+</section>
+<section id="the-pilot-as-component-aeronautical-decision-making" class="level2" data-number="6.8">
+<h2 data-number="6.8" class="anchored" data-anchor-id="the-pilot-as-component-aeronautical-decision-making"><span class="header-section-number">6.8</span> The Pilot as Component: Aeronautical Decision-Making</h2>
+<p>Decades of accident investigation converged on an uncomfortable statistic: in the large majority of aviation accidents, the failing component was the pilot. Aviation’s response was not exhortation to be careful — exhortation demonstrably does not work — but <em>aeronautical decision-making</em>: a set of explicit, trainable procedures that structure judgment the way a checklist structures a pre-flight inspection. Three of its instruments matter for drone operations, and they nest: PAVE structures the whole risk assessment, I’M SAFE expands one leg of it, and the hazardous-attitudes model addresses the failure mode that defeats both.</p>
+<p><strong>PAVE</strong> partitions every source of pre-flight risk into four bins — <strong>P</strong>ilot, <strong>A</strong>ircraft, en<strong>V</strong>ironment, <strong>E</strong>xternal pressures — and demands that each bin be examined before the go/no-go decision. The framework’s power is exhaustiveness: an unstructured “are we good to fly?” reliably surfaces whatever the pilot happened to think about, while the partition forces the questions the pilot would rather skip. Under <em>Pilot</em>: recency and currency (flights in the last weeks, familiarity with this airframe, this site, this airspace) and physical condition. Under <em>Aircraft</em>: is the energy reserve adequate for the mission plus margin — for a multirotor, battery state and health in place of the fuel-reserve lines on the crewed-aviation worksheet — is the performance margin sufficient at today’s weight and density altitude, is the equipment (RC link, ground station, firmware version) known-good and familiar? Under <em>enVironment</em>: wind and gusts against the platform’s limits, temperature against the battery’s, precipitation, visibility, obstacles, people, and the airspace status just discussed. And under <em>External pressures</em>, the bin that exists because it is the one nobody volunteers: the deadline, the client watching, the long drive to the site, the sunk cost of a rescheduled shoot. External pressure is the <em>E</em> that turns marginal entries in the other three bins into launches; the checklist’s contribution is to make the pilot say the pressure out loud, where it can be weighed instead of obeyed.</p>
+<p><strong>I’M SAFE</strong> expands the Pilot bin into six pointed self-assessment questions: <strong>I</strong>llness — am I showing any symptoms? <strong>M</strong>edication — am I taking prescription or over-the-counter drugs, and do I know their effects on judgment and alertness? <strong>S</strong>tress — am I under psychological pressure from work, money, health, or family? <strong>A</strong>lcohol — none within the mandated window, and honestly none lingering beyond it? <strong>F</strong>atigue — am I adequately rested, not merely awake? <strong>E</strong>motion — am I upset? The checklist’s design insight is that impairment is invisible from the inside — the fatigued pilot feels fine, which is what fatigue does — so the assessment cannot be a global self-rating. It must be six specific, factual questions whose answers the pilot cannot easily rationalize.</p>
+<p><strong>The five hazardous attitudes</strong> address a subtler problem: a pilot can run every checklist and still decide badly, because decisions pass through temperament. Aviation psychology identifies five recurring thought patterns that corrupt risk decisions, and pairs each with an antidote — a short counter-statement the pilot is trained to recite, literally, upon recognizing the attitude in their own thinking. The pairing is not a slogan exercise; each antidote is engineered to break the specific cognitive shortcut its attitude rides on.</p>
+<p><em>Anti-authority</em> (“Don’t tell me”) treats rules as impositions to be resisted — regulations regarded as unnecessary, procedures as bureaucratic friction. Its danger is that rules encode accident history the individual pilot has not personally lived: the 400-foot ceiling and the line-of-sight rule each exist because of collisions and near-misses the resenting pilot never saw. The antidote — <em>follow the rules; they are usually right</em> — concedes the qualifier deliberately. Pilots retain the prerogative to question a rule they believe erroneous, through channels; what the antidote interdicts is unilateral non-compliance in the field.</p>
+<p><em>Impulsivity</em> (“Do it quickly”) is the felt need to act immediately — any action, now — which forecloses the alternative-generation step on which good decisions depend; the impulsive pilot executes the first idea that arrives, not the best available. It is deadliest during anomalies, when a flyaway or a link loss creates real time pressure and the untrained response is to start flipping switches. The antidote — <em>not so fast; think first</em> — inserts a deliberate pause, and the fail-safe procedures a crew rehearses exist precisely so that the pause has something prepared to reach for.</p>
+<p><em>Invulnerability</em> (“It won’t happen to me”) is the abstract acceptance that accidents happen, paired with the concrete conviction that they happen to other people. Pilots carrying it take incremental risks — a little farther, a little windier — because the possible loss never feels real. The antidote — <em>it could happen to me</em> — works by forced personalization: converting the statistic back into a first-person possibility at the moment of decision.</p>
+<p><em>Macho</em> (“I can do it — I’ll show them”) converts flying into a performance for an audience, real or imagined, and risk-taking into proof of skill. It is historically caricatured as a male trait; the accident record shows it is not. Its mechanism is the substitution of a social payoff for an operational one: the flight’s success criterion silently shifts from “mission accomplished safely” to “onlookers impressed.” The antidote — <em>taking chances is foolish</em> — reframes the same act so that the risk itself, not the skill it displays, is what the audience sees.</p>
+<p><em>Resignation</em> (“What’s the use?”) is the abdication of agency: good outcomes attributed to luck, bad ones to fate or malice, and action left to others — including going along with unreasonable requests simply to be agreeable. In a crew setting this is the observer who notices the drifting drone and says nothing, assuming the pilot must know. The antidote — <em>I’m not helpless; I can make a difference</em> — restores the causal link between the pilot’s action and the outcome, which is the link resignation severs.</p>
+<p>These instruments assemble into a larger structure. Aviation safety doctrine pictures defenses in a chain — a culture of safety sustaining a safety management system, which enables crew resource management, which supports situational awareness, which feeds risk management, which informs aeronautical decision-making — with accident and injury waiting where the layers fail. The chain’s lesson is that ADM is the <em>last</em> layer, not the only one: the checklist run at the field is the final filter on hazards that culture, systems, and crew coordination should have been thinning all along.</p>
+</section>
+<section id="why-stricter-than-the-faa-the-10-foot-ceiling" class="level2" data-number="6.9">
+<h2 data-number="6.9" class="anchored" data-anchor-id="why-stricter-than-the-faa-the-10-foot-ceiling"><span class="header-section-number">6.9</span> Why Stricter Than the FAA: The 10-Foot Ceiling</h2>
+<p>Consider an organization that regularly puts novice pilots and prototype aircraft in the air near bystanders — a university research lab, a corporate training program, a student flying club. A rational rulebook for such a group sits well inside the FAA’s limits: no night flying, one aircraft airborne at a time, a certificated RPIC present and supervising every flight, operations only during scheduled flight sessions in airspace confirmed unrestricted — and a maximum altitude of <strong>10 feet</strong>, under a regulatory ceiling of 400. The 40-to-1 gap between the legal limit and the institutional limit is not timidity; it is the textbook example of how institutional rules relate to regulatory ones, and it repays a quantitative look. <a href="#fig-part107-altitude-ceiling" class="quarto-xref">Figure&nbsp;<span>6.1</span></a> draws both ceilings on a single linear altitude scale, and the picture makes the argument before the arithmetic does: the institutional cap barely clears the ground.</p>
+<div id="fig-part107-altitude-ceiling" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Vertical cross-section of low-altitude airspace with a linear altitude axis from 0 to beyond 500 feet above ground level. A hatched ground band sits at the bottom, labeled ground, 0 feet AGL datum. A large light-blue band from 0 to 400 feet is labeled small uncrewed aircraft under Part 107, standard limit at or below 400 feet above ground level, and contains a small quadcopter icon. A bold red line at 400 feet is labeled 400 feet AGL, Part 107 ceiling for small UAS. Above it, a gray hatched band from 400 to 500 feet is labeled 100 foot vertical buffer separating the two regimes. A dashed line at 500 feet is labeled typical crewed-aircraft minimum, and the amber band above it, containing a small airplane silhouette, is labeled crewed aircraft generally operate here, no lower than 500 feet AGL except near airports. Just above the ground, an orange line at 10 feet is labeled 10 feet, illustrative institutional ceiling from the worked example, one fortieth of the legal limit, drawn to scale. A dimension arrow on the right spans the 400 foot band, annotated as the FAA's air-to-air deconfliction ceiling that keeps small UAS below crewed traffic. A footer notes that the vertical scale is linear, so the 40-to-1 gap is drawn true to proportion and the institutional limit barely clears the ground.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-part107-altitude-ceiling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/part107-altitude-ceiling.svg" class="img-fluid figure-img" style="width:85.0%" alt="Vertical cross-section of low-altitude airspace with a linear altitude axis from 0 to beyond 500 feet above ground level. A hatched ground band sits at the bottom, labeled ground, 0 feet AGL datum. A large light-blue band from 0 to 400 feet is labeled small uncrewed aircraft under Part 107, standard limit at or below 400 feet above ground level, and contains a small quadcopter icon. A bold red line at 400 feet is labeled 400 feet AGL, Part 107 ceiling for small UAS. Above it, a gray hatched band from 400 to 500 feet is labeled 100 foot vertical buffer separating the two regimes. A dashed line at 500 feet is labeled typical crewed-aircraft minimum, and the amber band above it, containing a small airplane silhouette, is labeled crewed aircraft generally operate here, no lower than 500 feet AGL except near airports. Just above the ground, an orange line at 10 feet is labeled 10 feet, illustrative institutional ceiling from the worked example, one fortieth of the legal limit, drawn to scale. A dimension arrow on the right spans the 400 foot band, annotated as the FAA's air-to-air deconfliction ceiling that keeps small UAS below crewed traffic. A footer notes that the vertical scale is linear, so the 40-to-1 gap is drawn true to proportion and the institutional limit barely clears the ground.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-part107-altitude-ceiling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6.1: The two altitude ceilings on one linear scale. The FAA’s Part 107 limit holds small uncrewed aircraft at or below 400 ft AGL, keeping them separated from crewed aircraft, which generally operate no lower than 500 ft AGL away from airports; the illustrative 10 ft institutional ceiling of this chapter’s worked example, drawn to scale, sits at one-fortieth of the legal limit because it manages a different hazard entirely.
+</figcaption>
+</figure>
+</div>
+<p>The FAA’s 400-foot ceiling manages a specific hazard: conflict with crewed aircraft, which generally operate no lower than 500 feet except near airports. It says nothing about the hazards that dominate this organization’s operation — inexperienced pilots, prototype aircraft of unproven airworthiness, and bystanders in a shared space. For those hazards, altitude is stored lethality. The impact energy of a falling aircraft is its potential energy <span class="math inline">\(E = mgh\)</span>: a 1.5-kilogram quadcopter falling from the 10-foot ceiling (3.05 m) arrives with <span class="math inline">\(1.5 \times 9.81 \times 3.05 \approx 45\)</span> joules; the same aircraft from 400 feet (122 m) arrives with about <span class="math inline">\(1{,}795\)</span> joules — a fortyfold difference, spanning the range from “bruise and broken propellers” to energies comparable with a rifle round. The 10-foot rule also keeps a misbehaving prototype within reach of a supervisor’s intervention and within the benign part of the failure envelope: at 3 metres, a full motor-out arrives at the floor at <span class="math inline">\(v = \sqrt{2gh} \approx 7.7\)</span> m/s roughly 0.8 seconds after the failure, before the aircraft has translated far from where it was trusted to be.</p>
+<p>The general principle: the FAA sets the <em>floor</em> of safety for the whole airspace system, and every organization operating within it is expected to add rules matched to its own hazard profile — a film crew’s rules address sets and talent, an agricultural operator’s address chemicals and power lines, a training program’s address inexperience. Each of the example organization’s rules maps onto a specific local hazard (the night-flying ban onto degraded line of sight for pilots still learning orientation; one-aircraft-at-a-time onto the undivided attention a novice’s flight deserves; RPIC presence onto legal accountability and instant intervention). Compliance with the FAA minimum is where an operation’s safety analysis begins, not where it ends.</p>
+<p>There is a final translation to anticipate. Every rule in this chapter has so far been enforced by human discipline — the pilot checks the TFR, the pilot respects the ceiling, the pilot runs PAVE. Part II’s Geofencing and Fail-Safes chapter revisits these same constraints as <em>software</em>: geofences that encode the authorized volume as coordinates the autopilot refuses to leave, altitude limits compiled into firmware parameters, fail-safe behaviors that execute the rehearsed emergency procedure without waiting for a human to remember it. The legal and procedural framework of this chapter is, in that sense, the requirements document for the safety software to come — and understanding <em>why</em> each rule exists is what makes it possible to encode the rule without gutting its intent. Before any of it can be written, though, something on the aircraft has to be capable of running it. The next chapter supplies that: a general-purpose computer bolted to the airframe, and the three wires that let it talk to the autopilot.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="6.10">
+<h2 data-number="6.10" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">6.10</span> Check Your Understanding</h2>
+<ol type="1">
+<li>A student uses a personal drone on a weekend, purely for fun, to practice orbits over an empty field. The following week the same student flies the same drone to capture footage of a farmers’ market stall run by a roommate, who will use the clips in social-media advertising. No money changes hands either time. Classify each flight under the correct regulatory framework and state the test that decides it.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The weekend practice flight is recreational under Section 44809: its sole purpose is personal enjoyment, so the recreational exception applies (given TRUST completion, line of sight, and community-based-organization guidelines). The market flight is a Part 107 operation: the footage furthers a business — the roommate’s stall — and the FAA’s test is the flight’s purpose and effect, not compensation. That no payment occurred is irrelevant; an unpaid flight in furtherance of any business, non-profit activity, or monetized content requires a certificated remote pilot and a registered aircraft under Part 107.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>A 2.0 kg research quadcopter suffers total power loss at the 10-foot (3.05 m) institutional ceiling of this chapter’s worked example, and later — hypothetically — at the FAA’s 400-foot (122 m) ceiling. Compute the impact energy in each case, the ratio between them, and state which distinct hazard each of the two ceilings is designed to manage.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Impact energy is <span class="math inline">\(E = mgh\)</span>. From 3.05 m: <span class="math inline">\(2.0 \times 9.81 \times 3.05 \approx 60\)</span> J. From 122 m: <span class="math inline">\(2.0 \times 9.81 \times 122 \approx 2{,}394\)</span> J. The ratio is 122/3.05 = 40, matching the altitude ratio since energy is linear in height. The two ceilings manage different hazards: the FAA’s 400-foot limit keeps drones separated from crewed aircraft, which generally fly above 500 feet away from airports — it is an air-to-air deconfliction rule. The institutional 10-foot cap manages the ground hazards of an operation flying unproven prototypes and inexperienced pilots near bystanders, by capping the stored gravitational energy a failure can deliver, keeping a worst-case impact at bruise level rather than at energies comparable to a projectile.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>A crew reviewed the aeronautical chart for their operating area last month and found only uncontrolled airspace. Explain why this is insufficient for a flight today, naming the two categories of time-critical information the pre-flight briefing must add and the essential fields a restriction bulletin of this kind carries.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Charts are periodic snapshots; restrictions are erected and dissolved daily through the NOTAM system and never appear on the chart. The briefing must add (a) current NOTAMs affecting the area — each carrying an effective time window, a defined area, a defined altitude block, the reason, and the coordinating FAA facility with contact information — and (b) any TFRs, the temporary restricted volumes established for hazards, disaster-relief operations, public-interest events, protection of public figures, or space operations. TFRs are the characteristic drone trap because they exist only in the briefing system and cluster over exactly the newsworthy scenes drones are drawn to (wildfires, incident sites, large gatherings). Hence the procedural rule: NOTAMs and TFRs are checked through a briefing source before every flight, and the check is documented.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>Decode this METAR in plain language, then write the coded weather group for “light freezing rain”: <code>METAR KILG 281455Z 24012G22KT 2SM -SHRA BR BKN008 12/10 A2985</code></li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Routine observation from station KILG (Wilmington, Delaware), on the 28th at 1455 Zulu. Wind from 240° true at 12 knots gusting 22. Visibility 2 statute miles. Present weather: light rain showers (<code>-SHRA</code>: <code>-</code> light, <code>SH</code> showers, <code>RA</code> rain) with mist (<code>BR</code>). Sky: broken clouds at 800 feet. Temperature 12 °C, dew point 10 °C — a 2-degree spread indicating near-saturated air. Altimeter 29.85 inHg. For a small multirotor the decisive numbers are the 10-knot gust spread, the precipitation, and the low ceiling. “Light freezing rain” composes as intensity + descriptor + phenomenon: <code>-FZRA</code>.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>During a lab session, a student’s drone begins drifting toward the netting; the student announces “I’ve got it, watch this” and attempts a fast manual recovery instead of triggering the rehearsed land-now procedure. A second student sees the drift early but says nothing, reasoning that the pilot surely knows best. Identify the hazardous attitude each student is exhibiting, and give the antidote and its mechanism for each.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The pilot exhibits <em>macho</em> — converting an anomaly into a skill display for an audience, substituting the social payoff (“watch this”) for the operational goal of a safe outcome; an element of <em>impulsivity</em> is also defensible, since the first idea was executed without considering the rehearsed alternative. The antidote, “taking chances is foolish,” works by reframing the act so the risk itself, not the skill, is what onlookers see. The observer exhibits <em>resignation</em> — abdicating agency and leaving action to others despite holding safety-relevant information. Its antidote, “I’m not helpless; I can make a difference,” restores the causal link between speaking up and the outcome; in crew-resource-management terms, the observer’s report is exactly the redundancy the two-person crew exists to provide.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>The night before a scheduled data-collection flight, the RPIC sleeps four hours finishing a report due to the project sponsor, who will be on site to watch the flight. Walk this situation through PAVE and I’M SAFE: which bins and letters flag, and what makes this combination of flags more dangerous than either alone?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Under PAVE, the <em>Pilot</em> bin flags (physical condition: inadequate sleep in the last 24 hours) and the <em>External pressures</em> bin flags twice — the sponsor’s presence and the schedule commitment. Under I’M SAFE, <em>Fatigue</em> flags directly, and plausibly <em>Stress</em> (deadline pressure). The combination is worse than either flag alone because the two failures are coupled: fatigue degrades exactly the judgment needed to weigh the risk honestly, while external pressure supplies a motive to rationalize the degraded state away — the fatigued pilot “feels fine,” and the watching sponsor makes canceling feel costly. This is precisely why the frameworks force the assessment into explicit, factual questions answered before the pressure of the moment: the structured no-go criterion substitutes for the self-judgment that fatigue and pressure have compromised.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="6.11">
+<h2 data-number="6.11" class="anchored" data-anchor-id="try-it"><span class="header-section-number">6.11</span> Try It</h2>
+<p><strong>Part 1 — brief a real flight.</strong> Choose a plausible outdoor flying site near you and assemble an actual pre-flight information picture for tomorrow morning. Determine the airspace class over the site using a chart service such as SkyVector or the B4UFLY tool; check for NOTAMs and TFRs through a briefing source such as 1800wxbrief.com; and retrieve the current METAR from the nearest reporting station, decoding every field by hand before checking your work against a plain-language translator. Capture a timestamped screenshot of each check — the documentation habit is part of the exercise. Conclude with a written go/no-go: if the airspace is controlled, state the LAANC ceiling for the relevant grid square; if the METAR shows wind or gusts, compare them against the limits of a small multirotor and defend your decision in two or three sentences.</p>
+<p><strong>Part 2 — run the ADM instruments on yourself.</strong> Write out a PAVE assessment for the flight you briefed in Part 1, filling all four bins honestly, including at least one genuine external pressure from your own week (a deadline, an expectation, a sunk cost). Run I’M SAFE and record the answers. Then draft a one-paragraph “waiver application” in the style of the safety case dissected in this chapter: pick one institutional rule (for instance, the 10-foot ceiling) and argue for a specific, bounded deviation — say, 25 feet for a particular sensor test — by identifying the hazard the rule manages and committing to verifiable procedural mitigations that control the same hazard by other means. Trade drafts with a partner and review each other’s safety case the way a regulator would: for every claimed mitigation, ask whether an inspector could check it.</p>
+<p><strong>Related Lab:</strong> <em>No lab currently maps to this chapter.</em></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="pagination-link" aria-label="Sensing the World: IMUs, Magnetometers, and Barometers">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="pagination-link" aria-label="From Radio to Root Shell: Companion Computers and the UART Link">
+        <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

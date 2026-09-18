@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>13&nbsp; Images as Data: From Pixels to Tensors – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" rel="next">
+<link href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html">Part III — Perception at the Edge: TinyML &amp; Computer Vision</a></li><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">13.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">13.2</span> Key Vocabulary</a></li>
+  <li><a href="#from-photons-to-a-grid-of-numbers" id="toc-from-photons-to-a-grid-of-numbers" class="nav-link" data-scroll-target="#from-photons-to-a-grid-of-numbers"><span class="header-section-number">13.3</span> From Photons to a Grid of Numbers</a></li>
+  <li><a href="#the-image-as-a-tensor" id="toc-the-image-as-a-tensor" class="nav-link" data-scroll-target="#the-image-as-a-tensor"><span class="header-section-number">13.4</span> The Image as a Tensor</a></li>
+  <li><a href="#spatial-structure-why-the-grid-is-not-just-a-list" id="toc-spatial-structure-why-the-grid-is-not-just-a-list" class="nav-link" data-scroll-target="#spatial-structure-why-the-grid-is-not-just-a-list"><span class="header-section-number">13.5</span> Spatial Structure: Why the Grid Is Not Just a List</a></li>
+  <li><a href="#three-tasks-one-tensor" id="toc-three-tasks-one-tensor" class="nav-link" data-scroll-target="#three-tasks-one-tensor"><span class="header-section-number">13.6</span> Three Tasks, One Tensor</a>
+  <ul class="collapse">
+  <li><a href="#pixels-on-target" id="toc-pixels-on-target" class="nav-link" data-scroll-target="#pixels-on-target"><span class="header-section-number">13.6.1</span> Pixels on target</a></li>
+  </ul></li>
+  <li><a href="#from-camera-frame-to-model-input" id="toc-from-camera-frame-to-model-input" class="nav-link" data-scroll-target="#from-camera-frame-to-model-input"><span class="header-section-number">13.7</span> From Camera Frame to Model Input</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">13.8</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">13.9</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html">Part III — Perception at the Edge: TinyML &amp; Computer Vision</a></li><li class="breadcrumb-item"><a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Part II ended with a vehicle that can fly a scripted mission and, more importantly, end one safely: a state machine that sequences behaviors, a geofence that bounds them, and a failsafe ladder that outranks them all. But threaded through all of that machinery is a placeholder. The mission state machine of the Mission Scripting chapter was built to absorb a <em>detect</em> event from a perception node — the addition, that chapter promised, that would turn its lawnmower search into the running example’s search-then-deter behavior — yet its own closing exercise could only simulate that event with a hand-set flag; the watchdog of the previous chapter counts safe separation from an animal among its concerns; Part I’s closing chapter promised a target position, published at frame rate, that everything downstream consumes as a stream. Every one of those signals originates in one node that has so far been treated as a black box: the Detector. Part III opens the box.</p>
+<p>The reason the box must be opened onboard was settled by arithmetic in Part I: a 640 × 480 colour frame is 921,600 raw bytes, thirty of them a second is roughly 27 MB/s, and no link off the aircraft — not the 90 kB/s UART, not the telemetry radio — carries a fraction of that. Pixels stay where they are produced, so the Jetson must understand them where they are produced. Understanding begins with a question so basic it is easy to skip: when the depth camera delivers a frame over USB, what — exactly — does the companion computer receive? The answer is numbers, a great many of them, in a very particular arrangement, and everything in this Part follows from taking that arrangement seriously. This chapter establishes the representation: how light becomes a grid of quantized samples, why that grid is properly a <em>tensor</em> and what each of its axes encodes, why the grid’s spatial structure is the property a vision model must exploit rather than discard, and how the same input tensor supports three differently shaped answers — a label, a set of boxes, a skeleton of keypoints — of which the running example needs precisely one.</p>
+<section id="learning-objectives" class="level2" data-number="13.1">
+<h2 data-number="13.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">13.1</span> Learning Objectives</h2>
+<ul>
+<li>Trace how a camera converts light into a grid of quantized intensity samples, and state what spatial resolution and bit depth each control.</li>
+<li>Represent a digital image as a height × width × channels tensor, explain what each axis encodes, and compute the memory footprint of a frame from its shape and data type.</li>
+<li>Explain what spatial structure means — why neighbouring pixels are statistically related — and show, with a parameter-count argument, why a representation that flattens the grid into a vector discards exactly the property vision depends on.</li>
+<li>Describe what a convolution kernel does to an image tensor, define a feature map, and state why weight sharing makes convolutional processing both small and translation-tolerant.</li>
+<li>Distinguish classification, object detection, and pose/keypoint estimation as differently structured outputs computed from the same tensor input, and select the appropriate task for a stated mission requirement.</li>
+<li>Carry a camera frame through the standard preprocessing steps — resize, crop, normalize, re-layout — and quantify what input resolution costs in memory and compute, and what reducing it costs in pixels on target.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="13.2">
+<h2 data-number="13.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">13.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Pixel</strong> (picture element) — one cell of the image grid: a single spatial sample of the scene, holding one intensity value per channel.</li>
+<li><strong>Bit depth</strong> — the number of bits used to store one intensity sample, which fixes how many distinguishable levels it can take; 8 bits gives the 0–255 range of standard camera output.</li>
+<li><strong>Channel</strong> — one complete plane of the image grid measuring a single quantity across the whole scene: red, green, and blue planes for a colour camera, a single luminance plane for grayscale or thermal, a range plane for a depth camera.</li>
+<li><strong>Tensor</strong> — a multidimensional array of numbers indexed along a fixed number of axes; a colour image is a rank-3 tensor of shape height × width × channels, and every intermediate result inside a vision network is a tensor too.</li>
+<li><strong>Spatial structure</strong> — the property that an image’s meaning lives in the <em>arrangement</em> of its values, not their distribution: neighbouring pixels sample neighbouring patches of the world, so edges, textures, and objects exist only as local patterns across the grid.</li>
+<li><strong>Convolution kernel</strong> — a small grid of learned weights slid across the image; at each position the kernel is multiplied element-wise with the window beneath it and summed to one output value, so the same few weights examine every neighbourhood in the frame.</li>
+<li><strong>Feature map</strong> — the output plane a kernel produces: a map, aligned with the image, whose value at each position measures how strongly the kernel’s pattern is present there.</li>
+<li><strong>Bounding box</strong> — the axis-aligned rectangle a detector reports around an object, typically as a centre, width, and height in pixel coordinates, accompanied by a class label and a confidence score.</li>
+<li><strong>Pose (keypoint) estimation</strong> — the task of locating named anatomical or structural points — head, joints, extremities — as pixel coordinates, recovering geometry <em>within</em> a detected object rather than just its extent.</li>
+<li><strong>Inference</strong> — running a trained model forward on a new input to produce an output, as distinct from training; the operation the companion computer performs on every frame, and the only one it performs in flight.</li>
+</ul>
+</section>
+<section id="from-photons-to-a-grid-of-numbers" class="level2" data-number="13.3">
+<h2 data-number="13.3" class="anchored" data-anchor-id="from-photons-to-a-grid-of-numbers"><span class="header-section-number">13.3</span> From Photons to a Grid of Numbers</h2>
+<p>A camera is a sampling instrument, and it samples twice. Behind the lens sits a rectangular array of photosites — light-sensitive wells, a few micrometres across, one per pixel of the final image. During an exposure each photosite accumulates charge in proportion to the light striking it; at readout that charge is measured and converted to a number. The first sampling is <strong>spatial</strong>: the continuous pattern of light the lens projects is measured only at the discrete grid positions the photosites occupy, so a <em>640 × 480 mode</em> means the scene has been reduced to 480 rows of 640 samples — 307,200 point measurements of a continuous world. The second sampling is in <strong>amplitude</strong>: the measured charge, a continuous quantity, is rounded to one of a fixed set of levels set by the converter’s bit depth. Eight bits — the near-universal choice for camera output — gives <span class="math inline">\(2^8 = 256\)</span> levels, so each sample is an integer from 0 (no light) to 255 (photosite saturated).</p>
+<p>A grayscale image is therefore nothing more exotic than a matrix: a 480 × 640 array of small integers, indexable as <span class="math inline">\(I[v, u]\)</span> with row index <span class="math inline">\(v\)</span> and column index <span class="math inline">\(u\)</span>. Two conventions attach to that indexing and both matter later. The origin is the <strong>top-left</strong> corner, with <span class="math inline">\(v\)</span> increasing <em>downward</em> and <span class="math inline">\(u\)</span> increasing rightward — a screen-drawing inheritance, and one more coordinate convention to keep straight alongside the NED frame the reader has carried since Part I (image coordinates are their own frame; converting a pixel position into a vehicle-frame direction is camera geometry, taken up when the detection pipeline is built). And the pair is written <em>row first</em>: <span class="math inline">\(I[v, u]\)</span> is row <span class="math inline">\(v\)</span>, column <span class="math inline">\(u\)</span> — height before width — which is why image shapes are quoted as 480 × 640 while the same camera mode is marketed as 640 × 480.</p>
+<p>Colour requires a third dimension, because a photosite is colour-blind — it counts photons, not wavelengths. A colour camera lays a mosaic of tiny red, green, and blue filters over the photosite array, so each site measures only one colour band, and an interpolation step in the camera (<em>demosaicking</em>) fills in each pixel’s two unmeasured colours from its neighbours. What the camera delivers, after this processing, is three full planes: a red plane, a green plane, and a blue plane, each 480 × 640, together specifying every pixel’s colour as an additive mix. Those planes are the image’s <strong>channels</strong>, and they are the third axis of the object this chapter is named for.</p>
+</section>
+<section id="the-image-as-a-tensor" class="level2" data-number="13.4">
+<h2 data-number="13.4" class="anchored" data-anchor-id="the-image-as-a-tensor"><span class="header-section-number">13.4</span> The Image as a Tensor</h2>
+<p>The progression is familiar from linear algebra: a single number is a scalar, a line of numbers indexed by one subscript is a vector, a grid indexed by two is a matrix. A <strong>tensor</strong>, in the machine-learning sense of the word, simply continues the sequence — a multidimensional array indexed by any fixed number of axes. (Mathematicians reserve <em>tensor</em> for objects with specific transformation rules; deep-learning usage keeps only the shape and drops the rest, and this book follows the field.) A colour image is the canonical rank-3 example, with shape written <span class="math inline">\(H \times W \times C\)</span>:</p>
+<ul>
+<li><strong>Axis 0, height <span class="math inline">\(H\)</span></strong> — which row, top to bottom: 480 for the running example’s camera mode.</li>
+<li><strong>Axis 1, width <span class="math inline">\(W\)</span></strong> — which column, left to right: 640.</li>
+<li><strong>Axis 2, channels <span class="math inline">\(C\)</span></strong> — which measured quantity: 3, ordered red, green, blue.</li>
+</ul>
+<p><a href="#fig-image-as-tensor" class="quarto-xref">Figure&nbsp;<span>13.1</span></a> draws the whole object: the pixel grid a person would recognize as a picture on the left, and the same numbers arranged as three indexed planes on the right, with one sample pinned down as <span class="math inline">\(I[v, u, c]\)</span>.</p>
+<div id="fig-image-as-tensor" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two-part diagram. On the left, a pixel grid labeled what the camera delivers shows a schematic scene of sky, grass, and a goose silhouette, with the image coordinate axes drawn: column u running right from 0 to 639, row v running down from 0 to 479, and the origin marked at the top-left corner. One pixel is outlined and connected by zoom lines to a stack of three value boxes reading R equals 96, G equals 148, B equals 84, annotated as unsigned 8-bit integers from 0 dark to 255 saturated. On the right, labeled how software indexes it, three offset planes colored red, green, and blue represent channels c equals 0, 1, and 2, with one cell marked I of v, u, c. Axes label axis 0 as height H equals 480, axis 1 as width W equals 640, and axis 2 as channels C equals 3. A footer states the shape H, W, C equals 480, 640, 3, that the frame holds 921,600 values, occupying 921,600 bytes as uint8 or 3.7 megabytes as float32, and that a depth camera adds a fourth kind of plane while a thermal camera delivers one channel.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-image-as-tensor-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/image-as-tensor.svg" class="img-fluid figure-img" style="width:95.0%" alt="Two-part diagram. On the left, a pixel grid labeled what the camera delivers shows a schematic scene of sky, grass, and a goose silhouette, with the image coordinate axes drawn: column u running right from 0 to 639, row v running down from 0 to 479, and the origin marked at the top-left corner. One pixel is outlined and connected by zoom lines to a stack of three value boxes reading R equals 96, G equals 148, B equals 84, annotated as unsigned 8-bit integers from 0 dark to 255 saturated. On the right, labeled how software indexes it, three offset planes colored red, green, and blue represent channels c equals 0, 1, and 2, with one cell marked I of v, u, c. Axes label axis 0 as height H equals 480, axis 1 as width W equals 640, and axis 2 as channels C equals 3. A footer states the shape H, W, C equals 480, 640, 3, that the frame holds 921,600 values, occupying 921,600 bytes as uint8 or 3.7 megabytes as float32, and that a depth camera adds a fourth kind of plane while a thermal camera delivers one channel.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-image-as-tensor-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.1: One camera frame as a height × width × channels tensor: each pixel of the grid is three 8-bit intensities, and the frame is a single 480 × 640 × 3 array indexed by row, column, and channel.
+</figcaption>
+</figure>
+</div>
+<p>The shape is also a bill, and it is worth paying in full once. As delivered — one byte per value — a frame costs</p>
+<p><span class="math display">\[
+\begin{aligned}
+480 \times 640 \times 3 &amp;= 921{,}600\ \text{values} = 921{,}600\ \text{bytes} \approx 0.92\ \text{MB},\\
+\text{at 30 frames/s:}\quad 921{,}600 \times 30 &amp;\approx 27.6\ \text{MB/s}.
+\end{aligned}
+\]</span></p>
+<p>That 27 MB/s is the same number Part I used to prove the imagery cannot leave the aircraft; it now reappears as the load the onboard pipeline must absorb <em>continuously</em>. And the bill grows before the model ever sees the frame: networks compute in floating point, and converting each 1-byte integer to a 4-byte <code>float32</code> quadruples the footprint to about 3.7 MB per frame. Multiply by the buffering a real pipeline needs — the frame being captured, the frame being processed, the intermediate results — and image memory starts to compete for the companion computer’s RAM in earnest. The source constraint the next chapter makes precise is already visible in outline: in an embedded vision system, the <em>activations</em> — the tensors flowing between layers — often cost more memory than the model’s own weights, and every one of them scales with the input resolution chosen here.</p>
+<p>The channel axis is where the tensor view starts earning its generality. Nothing about axis 2 says “colour”; it says “measured quantities per pixel,” and the running example’s Intel RealSense D455 makes the point physically. Alongside the RGB stream it produces a <strong>depth</strong> stream — a plane of the same spatial layout whose value at <span class="math inline">\((v, u)\)</span> is the measured range, in millimetres, to whatever surface that pixel sees, delivered as 16-bit integers because 256 levels cannot span centimetre precision over tens of metres. Aligned to the colour frame, depth is simply a fourth channel a pipeline may stack on: <span class="math inline">\(C = 4\)</span>, shape 480 × 640 × 4. A thermal camera delivers <span class="math inline">\(C = 1\)</span> — one radiometric plane. The tensor formalism absorbs all of these without modification, which is exactly why every vision framework speaks it.</p>
+<p>Two bookkeeping conventions complete the picture, and both bite in practice. First, <strong>axis order</strong>: cameras and OpenCV deliver channels-last (<span class="math inline">\(H, W, C\)</span> — the three colour values of one pixel adjacent in memory), while PyTorch expects channels-first (<span class="math inline">\(C, H, W\)</span> — each colour plane contiguous), so every pipeline contains an explicit transpose, and supplying the wrong order fails silently or loudly but never correctly. Second, the <strong>batch axis</strong>: models process inputs in batches, adding a leading axis <span class="math inline">\(N\)</span> for “which image,” so the tensor a PyTorch model actually receives is rank-4 with shape <span class="math inline">\((N, C, H, W)\)</span> — for onboard inference, almost always <span class="math inline">\(N = 1\)</span>. A short exchange with a live frame makes all of this concrete:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cv2</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>frame <span class="op">=</span> cv2.imread(<span class="st">"field_frame.png"</span>)     <span class="co"># any 640x480 capture</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(frame.shape, frame.dtype)           <span class="co"># (480, 640, 3) uint8  -- H, W, C</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(frame[<span class="dv">240</span>, <span class="dv">320</span>])                    <span class="co"># centre pixel, e.g. [ 84 148  96]</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(frame.nbytes)                       <span class="co"># 921600 bytes</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> torch.from_numpy(frame).<span class="bu">float</span>() <span class="op">/</span> <span class="fl">255.0</span>   <span class="co"># uint8 -&gt; float32 in [0, 1]</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> x.permute(<span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">1</span>).unsqueeze(<span class="dv">0</span>)           <span class="co"># (H,W,C) -&gt; (1, C, H, W)</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(x.shape)                            <span class="co"># torch.Size([1, 3, 480, 640])</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(x.element_size() <span class="op">*</span> x.nelement())    <span class="co"># 3686400 bytes -- the float bill</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>(One trap for the record: OpenCV orders the channels blue–green–red for historical reasons, so <code>frame[240, 320]</code> above prints B, G, R — a pipeline mixing OpenCV capture with a model trained on RGB images must swap channels explicitly, and this single silent mismatch has degraded more deployed detectors than any exotic failure.)</p>
+</section>
+<section id="spatial-structure-why-the-grid-is-not-just-a-list" class="level2" data-number="13.5">
+<h2 data-number="13.5" class="anchored" data-anchor-id="spatial-structure-why-the-grid-is-not-just-a-list"><span class="header-section-number">13.5</span> Spatial Structure: Why the Grid Is Not Just a List</h2>
+<p>A 480 × 640 × 3 tensor holds 921,600 numbers, and nothing so far prevents treating it as a flat vector of that length — forgetting the grid, keeping the values. What would be lost? Everything, and the argument is worth making precisely, because it is the founding argument of convolutional processing.</p>
+<p>Consider a thought experiment. Take every frame the camera will ever produce and shuffle its pixels by one <em>fixed</em> permutation — the same scrambling applied to every frame. No information is destroyed: the permutation is invertible, and every pixel value survives. Yet the scrambled frames are meaningless to the eye, because what the eye reads is not the <em>set</em> of values but their <em>arrangement</em>: an edge is a coherent intensity change between neighbouring pixels, a texture is a repeating local pattern, a goose is a particular composition of curves and contrasts spanning a compact region. Adjacent pixels sample adjacent patches of the physical world, so nearby values are strongly correlated and jointly meaningful in a way that distant values are not. That is <strong>spatial structure</strong>, and the shuffle preserves the data while annihilating it.</p>
+<p>Now count what ignoring it costs. The generic way to wire a flattened image into a network is a fully-connected layer: every input value connected, with its own weight, to every unit of the next layer. Even a modest first layer of 1,000 units costs</p>
+<p><span class="math display">\[
+\begin{aligned}
+921{,}600 \times 1{,}000 &amp;= 9.216 \times 10^{8}\ \text{weights} \\
+\text{at 4 bytes each:}\quad &amp;\approx 3.7\ \text{GB},
+\end{aligned}
+\]</span></p>
+<p>which is essentially the Jetson Nano’s entire 4 GB of memory spent before the network has a second layer — for a layer that, by construction, could learn the scrambled images exactly as easily as the real ones, because it assigns independent weights to every position and encodes no notion of “neighbouring.” Worse, whatever it learns it learns <em>per location</em>: the weights that come to recognize a goose centred in the frame say nothing about a goose near the edge, so every appearance position must be learned separately, from separate examples. The fully-connected layer is simultaneously too large to fit and too weak to generalize, and both failures have the same cause — it treats the image as a list.</p>
+<p>The repair is to process the image the way its structure suggests: locally, and identically everywhere. A <strong>convolution</strong> takes a small grid of weights — a <em>kernel</em>, typically 3 × 3 per channel — and slides it across the image. At each position, the kernel is multiplied element-wise with the window of pixels beneath it and the products are summed to a single number; sliding over all positions produces a new plane, the <strong>feature map</strong>, aligned with the image, whose value at each location measures how strongly the kernel’s pattern is present there. <a href="#fig-convolution-feature-map" class="quarto-xref">Figure&nbsp;<span>13.2</span></a> traces one position through the operation with a classic hand-designed kernel that responds to vertical edges; in a network the kernel’s weights are not designed but <em>learned</em>, exactly as Part II’s reader learned that a PID gain is tuned rather than guessed — the mechanism is fixed, the numbers come from data.</p>
+<div id="fig-convolution-feature-map" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Three-part diagram. On the left, a nine-by-nine input grid labeled input image, one channel shown, contains a darker band on its right side representing a vertical intensity edge; a solid orange three-by-three window is highlighted, with a dashed second window elsewhere labeled later position, and a caption noting a pixel means little alone — the three-by-three neighbourhood is where the pattern lives. In the centre, a three-by-three kernel of learned weights shows the values minus one, zero, plus one; minus two, zero, plus two; minus one, zero, plus one, annotated as responding to vertical edges, with a note that a network learns its own kernels. Arrows read multiply element-wise, sum, one output value. On the right, a feature map grid shows a dark cell corresponding to the highlighted window position and a bright amber column where the input's edge lies, captioned: where the pattern occurs the map is bright — a map of pattern found here. A footer box titled weight sharing is the whole trick states that the same three-by-three-by-three kernel, 27 weights plus one bias equals 28 parameters, is used at every one of roughly 300,000 positions in a 640 by 480 frame; that a layer with F kernels maps an H by W by C tensor to an H-prime by W-prime by F tensor whose channel axis counts detected features rather than colours; and that because the kernel slides, a pattern learned once is recognized wherever it appears — translation equivariance.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-convolution-feature-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/convolution-feature-map.svg" class="img-fluid figure-img" style="width:95.0%" alt="Three-part diagram. On the left, a nine-by-nine input grid labeled input image, one channel shown, contains a darker band on its right side representing a vertical intensity edge; a solid orange three-by-three window is highlighted, with a dashed second window elsewhere labeled later position, and a caption noting a pixel means little alone — the three-by-three neighbourhood is where the pattern lives. In the centre, a three-by-three kernel of learned weights shows the values minus one, zero, plus one; minus two, zero, plus two; minus one, zero, plus one, annotated as responding to vertical edges, with a note that a network learns its own kernels. Arrows read multiply element-wise, sum, one output value. On the right, a feature map grid shows a dark cell corresponding to the highlighted window position and a bright amber column where the input's edge lies, captioned: where the pattern occurs the map is bright — a map of pattern found here. A footer box titled weight sharing is the whole trick states that the same three-by-three-by-three kernel, 27 weights plus one bias equals 28 parameters, is used at every one of roughly 300,000 positions in a 640 by 480 frame; that a layer with F kernels maps an H by W by C tensor to an H-prime by W-prime by F tensor whose channel axis counts detected features rather than colours; and that because the kernel slides, a pattern learned once is recognized wherever it appears — translation equivariance.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-convolution-feature-map-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.2: Convolution slides one small kernel across the whole image: at each position the 3 × 3 window is multiplied element-wise by the kernel and summed to a single value of the feature map, so 28 parameters examine every neighbourhood of a 307,200-pixel frame.
+</figcaption>
+</figure>
+</div>
+<p>The arithmetic reverses spectacularly. A 3 × 3 kernel spanning all three input channels holds <span class="math inline">\(3 \times 3 \times 3 = 27\)</span> weights plus one bias — 28 parameters — and those same 28 numbers examine every one of the roughly 300,000 window positions in the frame. Against the fully-connected layer’s <span class="math inline">\(9 \times 10^8\)</span> weights, that is a reduction of seven orders of magnitude, purchased by an assumption the thought experiment just validated: the patterns that matter are local, and a pattern worth detecting at one position is worth detecting at every position. The second half of that assumption buys the generalization the flat layer lacked — because the kernel slides, a goose-shaped response learned from geese in the training set’s frame centres fires just as well on a goose in the corner. The property is called <em>translation equivariance</em>: shift the input, and the feature map shifts with it, rather than the detection failing.</p>
+<p>One kernel yields one feature map, and one pattern detector does not make a perception system, so a convolutional layer learns a <em>bank</em> of <span class="math inline">\(F\)</span> kernels and stacks their maps: an <span class="math inline">\(H \times W \times C\)</span> input becomes an <span class="math inline">\(H' \times W' \times F\)</span> output. Read that shape carefully, because it is the moment the tensor formalism pays for itself: the output is again a rank-3 tensor of the same form as the input, but its channel axis no longer counts colours — it counts <em>features found</em>. Layer two convolves over layer one’s feature maps and finds patterns of patterns; by the depth of a real network the channels encode fragments like “textured round body” and “long curved neck,” still organized on a spatial grid that remembers <em>where</em>. Every tensor between the camera and the answer has the same three-axis anatomy established in <a href="#fig-image-as-tensor" class="quarto-xref">Figure&nbsp;<span>13.1</span></a> — which is why this chapter’s representation, and not any particular network, is the true foundation of Part III. How many layers, how many kernels, and how the whole stack is trained and squeezed into the Jetson’s power budget is the business of the next chapter, on TinyML; what cannot change, whatever those answers are, is the shape of the data flowing through.</p>
+</section>
+<section id="three-tasks-one-tensor" class="level2" data-number="13.6">
+<h2 data-number="13.6" class="anchored" data-anchor-id="three-tasks-one-tensor"><span class="header-section-number">13.6</span> Three Tasks, One Tensor</h2>
+<p>Everything so far concerns the input. The output side has its own taxonomy, and choosing from it is a mission decision, not a modelling detail. <strong>Inference</strong> — running the trained model forward on a live frame — always consumes the same <span class="math inline">\((1, 3, H, W)\)</span> tensor; what distinguishes the classical vision tasks is the <em>structure</em> of what comes back. <a href="#fig-vision-task-taxonomy" class="quarto-xref">Figure&nbsp;<span>13.3</span></a> puts the three that matter for this book side by side on the same scene.</p>
+<div id="fig-vision-task-taxonomy" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Three side-by-side panels, each showing the same schematic scene of sky, grass, and a goose silhouette. The first panel, classification, shows the untouched scene above an output box reading goose 0.94, no goose 0.06, described as one score per class for the whole frame, with a warning in red italics that it says a goose exists somewhere in 307,200 pixels — not where. The second panel, object detection, shows an orange bounding box drawn around the goose with the tag goose 0.91 and a dot at the box centre, above an output box reading a tuple of u, v, w, h, class, and confidence with example values, described as a list of boxes with zero, one, or many entries per frame, and a note in green italics that the box centre is a bearing to steer toward — what the Detector node needs. The third panel, pose slash keypoint estimation, shows four amber keypoints on the goose labeled head, neck, body, and tail joined by a red skeleton line, above an output box listing named u, v coordinates per detected animal, described as recovering geometry within the object — which way the bird is facing. A footer states that output structure is a mission decision, richer structure costs more computation and labelled data, and that the running example flies the middle column because deterrence needs a target to close on, not a yes or no.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-vision-task-taxonomy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/vision-task-taxonomy.svg" class="img-fluid figure-img" style="width:100.0%" alt="Three side-by-side panels, each showing the same schematic scene of sky, grass, and a goose silhouette. The first panel, classification, shows the untouched scene above an output box reading goose 0.94, no goose 0.06, described as one score per class for the whole frame, with a warning in red italics that it says a goose exists somewhere in 307,200 pixels — not where. The second panel, object detection, shows an orange bounding box drawn around the goose with the tag goose 0.91 and a dot at the box centre, above an output box reading a tuple of u, v, w, h, class, and confidence with example values, described as a list of boxes with zero, one, or many entries per frame, and a note in green italics that the box centre is a bearing to steer toward — what the Detector node needs. The third panel, pose slash keypoint estimation, shows four amber keypoints on the goose labeled head, neck, body, and tail joined by a red skeleton line, above an output box listing named u, v coordinates per detected animal, described as recovering geometry within the object — which way the bird is facing. A footer states that output structure is a mission decision, richer structure costs more computation and labelled data, and that the running example flies the middle column because deterrence needs a target to close on, not a yes or no.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-vision-task-taxonomy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13.3: Three vision tasks distinguished by output structure: classification returns one label and confidence for the whole frame, object detection returns a list of bounding boxes each with class and confidence, and pose estimation returns named keypoint coordinates within each detected animal.
+</figcaption>
+</figure>
+</div>
+<p><strong>Classification</strong> answers one question about the whole frame: <em>which class is this?</em> The model’s final output is a vector of scores, one per class — here perhaps just two, <em>goose</em> and <em>no goose</em> — normalized so they read as confidences. It is the least structured output, the cheapest to compute, and the cheapest to train, because labelling a training image requires only a word. Its limitation is exactly its economy: a classification of the running example’s frame asserts that a goose exists <em>somewhere</em> in 307,200 pixels. For a wildlife survey counting animals in archived imagery frame by frame, that can suffice. For a vehicle that must close on the animal, it is a fact without a direction.</p>
+<p><strong>Object detection</strong> answers <em>what is present, and where — for every instance</em>. The output is a variable-length list: for each object found, a <strong>bounding box</strong> — an axis-aligned rectangle, parameterized as a centre <span class="math inline">\((u, v)\)</span> with width and height, or equivalently by two corners, in pixel coordinates — plus a class label and a confidence. The structural leap from classification is real and it is the reason detection is harder to train and to run: the model must produce <em>zero, one, or many</em> answers per frame, each tied to a location, and its training data must contain drawn boxes, not just words. (The loss that trains such a model correspondingly combines a classification term, a box-geometry term, and a confidence term — a composite the next chapters return to; for now the point is that output structure dictates training structure.)</p>
+<p><strong>Pose estimation</strong> — keypoint detection — answers <em>how the object is arranged</em>: it locates named structural points as pixel coordinates, head and neck-base and tail for a bird, joints for a person. It recovers geometry <em>within</em> the object that a box discards — which way the animal faces, whether wings are spread — at the price of still more computation and far more expensive labels, every training image needing every keypoint clicked.</p>
+<p>The running example needs the middle column, and it is worth stating the reasoning as engineering rather than as taste, because the Building a Detection Pipeline chapter builds directly on it. The deterrence behavior of Part II’s state machine needs a <em>target to steer toward</em>: a direction, updated at frame rate. A detection’s box centre <span class="math inline">\((u, v)\)</span> provides exactly that — through camera geometry, a pixel position is a bearing from the camera — and this is where the D455’s fourth channel closes the loop Part I promised: the depth value at that same <span class="math inline">\((v, u)\)</span> supplies the missing range, and bearing plus range is a 3D target position in the vehicle’s frame. That triple — detect, look up depth, transform — <em>is</em> the target-position topic the mission logic has consumed since Part II, finally traced back to its pixels. Classification cannot feed it, for want of a location. Pose estimation could enrich it — a bird’s heading would help predict its escape direction — but it costs compute the Jetson’s budget will be shown (next chapter) to need elsewhere, and the deterrence maneuver as designed needs a position, not a posture. Richer output structure is bought with computation and labelled data; buy what the mission needs.</p>
+<section id="pixels-on-target" class="level3" data-number="13.6.1">
+<h3 data-number="13.6.1" class="anchored" data-anchor-id="pixels-on-target"><span class="header-section-number">13.6.1</span> Pixels on target</h3>
+<p>One more quantity binds the input representation to the task, and it was promised in Part I: the search altitude is “fixed from below by the pixels-on-target requirement.” That requirement can now be computed. The Commercial Drone Landscape chapter’s ground-sample-distance relation, <span class="math inline">\(\text{GSD} = pH/f\)</span>, says one pixel spans a ground distance set by pixel pitch, height, and focal length; the ratio <span class="math inline">\(p/f\)</span> is just the angle one pixel subtends, so for a camera viewing a target at range <span class="math inline">\(R\)</span> the same relation reads: one pixel covers <span class="math inline">\(R \, \theta_{\text{pix}}\)</span> metres, where <span class="math inline">\(\theta_{\text{pix}}\)</span> is the per-pixel angle. The D455’s colour camera spans a horizontal field of view of about <span class="math inline">\(90^\circ\)</span>; in the 640-column mode,</p>
+<p><span class="math display">\[
+\theta_{\text{pix}} = \frac{90^\circ}{640} = 0.141^\circ = 2.45\ \text{mrad per pixel}.
+\]</span></p>
+<p>A Canada goose’s body is roughly 0.35 m long. At a range of 20 m,</p>
+<p><span class="math display">\[
+\begin{aligned}
+\text{metres per pixel} &amp;= R\,\theta_{\text{pix}} = 20 \times 2.45\times 10^{-3} = 4.9\ \text{cm} \\
+\text{pixels on goose} &amp;= \frac{0.35}{0.049} \approx 7\ \text{pixels};
+\end{aligned}
+\]</span></p>
+<p>at 10 m the same goose spans about 14 pixels. Seven pixels is a smudge — a detector fed smudges produces confidences barely above its false alarms — while double that begins to be a bird, with a visible neck and body to compose features from. The number explains, quantitatively, why the running example’s search leg flies at a few tens of metres and not at the legal ceiling, and it plants a warning the preprocessing section is about to pay off: resolution spent at the camera can be silently un-spent before the model ever sees the frame.</p>
+</section>
+</section>
+<section id="from-camera-frame-to-model-input" class="level2" data-number="13.7">
+<h2 data-number="13.7" class="anchored" data-anchor-id="from-camera-frame-to-model-input"><span class="header-section-number">13.7</span> From Camera Frame to Model Input</h2>
+<p>Between the USB cable and the network sits a short, unglamorous, load-bearing stage the source pipeline names in one word: <em>preprocess</em> — resize, crop, normalize. A trained network’s first layer has a fixed input shape, almost never the camera’s: detection models commonly expect a square input such as 640 × 640 or smaller, chosen (next chapter) to fit a compute budget. The camera’s 640 × 480 frame must be <strong>resized</strong> to that shape — and because 640 × 480 is not square, either non-uniformly stretched (distorting every goose) or, standardly, scaled uniformly and padded with dead bands to fill the square (<em>letterboxing</em>), in which case every box the detector reports lives in the model’s coordinates and must be mapped back through the same scale and offset before it means anything in camera pixels. An alternative to shrinking everything is <strong>cropping</strong> a region of interest: once a target is being tracked, feeding the model a full-resolution crop around its last known position spends the whole input budget where the target is — more pixels on goose from the same camera — at the risk that a second bird outside the crop goes unseen. Finally the values are <strong>normalized</strong> — converted to float and scaled to <span class="math inline">\([0,1]\)</span>, often further shifted and scaled per channel to match the statistics the network was trained under — and the axes transposed to <span class="math inline">\((1, C, H, W)\)</span>, exactly the <code>permute</code>/<code>unsqueeze</code> lines of the earlier code block.</p>
+<p>The resize step deserves respect rather than habit, because it is where this chapter’s threads knot together. Computation and activation memory both scale with the pixel count of the <em>model’s</em> input — halve each side and both fall by four, which is the single most powerful lever the next chapter has for fitting perception into the Jetson’s budget. But the pixels-on-target arithmetic runs on the resolution the <em>model</em> sees, not the resolution the sensor captured: downsample a frame in which a goose spans 14 pixels by two, and the detector receives a 7-pixel smudge — the camera’s resolution silently discarded in a line of preprocessing. Input resolution is thus a genuine design variable with a constraint from each side: pushed down by power, memory, and frame-rate, pushed up by detection range at mission altitude. Setting it is not a preprocessing detail; it is the first negotiation between this chapter’s representation and the next chapter’s constraints, and the Building a Detection Pipeline chapter will settle it with measurements rather than defaults.</p>
+<p>That is the foundation laid. An image is a tensor; the tensor’s grid carries the spatial structure that convolution — a few shared weights, slid everywhere — is shaped to exploit; feature maps carry that structure through a network, layer by layer, in the same three-axis form; and out the far end comes an answer whose structure was a mission decision, made here: the running example detects, because deterrence needs a bearing. What remains is everything the word <em>trained</em> has been holding back — how the kernels’ numbers are learned, and how a network of them is compressed until it runs, at frame rate, inside a 10-watt computer bolted to a 2.2-kilogram aircraft. That is TinyML, and it is the next chapter.</p>
+</section>
+<section id="check-your-understanding" class="level2" data-number="13.8">
+<h2 data-number="13.8" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">13.8</span> Check Your Understanding</h2>
+<ol type="1">
+<li>The running example is considered for an upgrade to a camera mode of 1280 × 720 at 30 frames/s. Compute the per-frame memory as delivered (uint8, 3 channels) and after conversion to <code>float32</code>, and the raw delivered data rate. State one quantity in the perception pipeline that this upgrade quadruples <em>besides</em> the frame itself.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Per frame: <span class="math inline">\(720 \times 1280 \times 3 = 2{,}764{,}800\)</span> values — about 2.76 MB as uint8, and <span class="math inline">\(\times 4 = 11.1\)</span> MB as float32. At 30 frames/s the camera delivers <span class="math inline">\(2{,}764{,}800 \times 30 \approx 83\)</span> MB/s, three times the 640 × 480 mode’s ~27.6 MB/s. Beyond the frame itself, the activations — the feature-map tensors between network layers — scale with input pixel count, so if the model’s input resolution is raised to exploit the new camera, every layer’s activation memory and compute grow in proportion (quadrupling if both input sides are doubled). A sharper camera whose frames are downsampled back to the old model input, by contrast, buys nothing at all.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>Every frame the camera produces is scrambled by the same fixed, invertible pixel permutation before being stored. Exactly as much information survives as before. Explain why a fully-connected network could in principle learn to classify the scrambled frames as well as the originals, why a convolutional network could not, and what this asymmetry reveals about what convolution assumes.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>A fully-connected layer assigns an independent weight to every input position and encodes no notion of neighbourhood; relabelling the positions (which is all a fixed permutation does) just relabels the weights, so its learning problem is unchanged. A convolutional network, by contrast, hard-codes the assumption that meaningful patterns are <em>local</em> — its kernels only ever see small contiguous windows — and the permutation destroys locality: pixels that were neighbours in the world are scattered across the grid, so no small window contains a coherent pattern to detect. The asymmetry shows that convolution is not a generic function approximator but a structural commitment: it wins on images precisely because, and only because, images really do concentrate their meaning in local spatial arrangements. Where that assumption fails, so does the architecture’s advantage.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>Compute the parameter count of (a) a fully-connected layer from a flattened 480 × 640 × 3 image to 1,000 units, and (b) a convolutional layer of 32 kernels, each 3 × 3 spanning all 3 input channels, with one bias per kernel. State the output tensor shape of (b) (assume the spatial size is preserved) and what its channel axis now means.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li><span class="math inline">\(921{,}600 \times 1{,}000 = 9.216 \times 10^8\)</span> weights (plus 1,000 biases) — about 3.7 GB in float32. (b) Each kernel holds <span class="math inline">\(3 \times 3 \times 3 = 27\)</span> weights plus 1 bias, so 32 kernels hold <span class="math inline">\(32 \times 28 = 896\)</span> parameters — six orders of magnitude fewer, independent of image size. The output shape is <span class="math inline">\(480 \times 640 \times 32\)</span>: one feature map per kernel, spatially aligned with the input. The channel axis no longer indexes colours but <em>features</em> — each of the 32 planes maps where one learned local pattern occurs in the frame.</li>
+</ol>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>For each requirement, name the vision task (classification, detection, or pose estimation) whose output structure is the <em>minimum</em> sufficient, and say what the output supplies that the next-cheaper task cannot. (a) Post-flight review flags which archived frames contain any goose, for a human to audit. (b) The deterrence behavior steers toward the nearest goose in view. (c) A researcher asks whether deterred geese take off <em>away from</em> the aircraft’s approach direction.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="a">
+<li>Classification — a per-frame label and confidence is exactly the required output; location within the frame is unused because a human will look at flagged frames anyway. (b) Detection — steering needs a per-instance location; the box centre gives a bearing (and, with the depth channel, a range), and “nearest” requires distinguishing instances, which a whole-frame label cannot do. (c) Pose estimation — take-off direction relative to approach requires the animal’s orientation, geometry <em>within</em> the object; a bounding box records extent but not which end is the head, so detection cannot answer it. The pattern: each step up buys structure — location, then internal geometry — and should be bought only when the mission question actually consumes it.</li>
+</ol>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>Using the chapter’s numbers (90° across 640 columns, goose body 0.35 m), find the maximum range at which a goose still spans at least 15 pixels. The pipeline then letterboxes the 640-wide frame into a 320 × 320 model input. What does the effective per-pixel angle become, and what happens to your range?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>At <span class="math inline">\(\theta_{\text{pix}} = 2.45\)</span> mrad, the goose spans <span class="math inline">\(0.35/(R \times 2.45\times10^{-3})\)</span> pixels; setting that to 15 gives <span class="math inline">\(R = 0.35/(15 \times 2.45\times10^{-3}) \approx 9.5\)</span> m. Letterboxing 640 columns into 320 halves the horizontal pixel count across the same 90° field, so the effective per-pixel angle doubles to 4.9 mrad — and the 15-pixel range halves to about 4.8 m. The camera did not change; a preprocessing line halved the detection range. This is why input resolution is negotiated against the mission’s required detection range, not defaulted — and why the running example’s search altitude and its model input size are coupled decisions.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>The detection pipeline reports a goose with box centre <span class="math inline">\((u, v) = (400, 300)\)</span> in the 640 × 480 colour frame. Part I claimed the depth camera “earns its mass” at this moment. State precisely what the detector’s output alone determines about the goose’s position, what single additional lookup the aligned depth stream provides, and why a monocular (colour-only) camera would instead have to maneuver to recover the same information.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The box centre fixes only a <em>direction</em>: through the camera geometry, pixel <span class="math inline">\((400, 300)\)</span> corresponds to a ray from the camera — a bearing — with the goose lying somewhere along it at unknown range; a nearby goose and a distant large object can produce the same pixels. The aligned depth stream turns position into one array lookup: the depth value at <span class="math inline">\((v, u) = (300, 400)\)</span> is the range along that ray, and bearing plus range fixes the goose’s 3D position in the vehicle’s frame — the content of the target-position topic the mission logic consumes. A monocular camera measures no range, so it would have to triangulate: observe the goose from two or more separated viewpoints and intersect the bearings, which costs maneuvering time against a moving animal and couples perception accuracy to flight precision. The depth camera converts that flight problem into memory access.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="13.9">
+<h2 data-number="13.9" class="anchored" data-anchor-id="try-it"><span class="header-section-number">13.9</span> Try It</h2>
+<p><strong>Part 1 — hold the tensor in your hands.</strong> Take any outdoor photograph (a field with birds is ideal; failing that, any scene with a distinct subject) and open it in Python with OpenCV or PIL. Verify the claims of this chapter against it one by one: print the shape and dtype and identify <span class="math inline">\(H\)</span>, <span class="math inline">\(W\)</span>, and <span class="math inline">\(C\)</span>; index a pixel you can point to in the image and check the value ordering (is it RGB or BGR?); split and display the three channel planes separately and find a feature visible in one channel but weak in another. Then run the chapter’s thought experiment for real: build one fixed random permutation, apply it to the pixels, and display the result — then invert it and confirm the image returns. Finally, downsample the image by factors of 2, 4, 8, and 16 and find the factor at which <em>you</em> can no longer identify the subject; measure the subject’s size in pixels at that scale. You have just located your own pixels-on-target threshold — keep the number in mind when a detector’s is discussed.</p>
+<p><strong>Part 2 — convolve by hand, then size the mission.</strong> Implement 2D convolution yourself in a dozen lines of NumPy — loops are fine, clarity over speed — and apply the vertical-edge kernel from <a href="#fig-convolution-feature-map" class="quarto-xref">Figure&nbsp;<span>13.2</span></a> and its transpose to a grayscale version of your image. Display both feature maps and check they are bright where you predicted. Convince yourself of translation equivariance: shift the input a few pixels, re-convolve, and compare. Then put the chapter’s last relation to work for the running example: tabulate metres-per-pixel and pixels-on-goose (0.35 m body) at ranges of 5, 10, 20, and 40 m for the 640-column mode, and repeat for model input widths of 640, 416, and 320 after letterboxing. Pick the lowest model resolution that still keeps at least 15 pixels on a goose at your chosen search range, and write two sentences defending the choice — one about detection, one about what the saved computation buys, which the next chapter will make quantitative.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#edge-based-target-detection">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="pagination-link" aria-label="Geofencing and Fail-Safes: Designing for the Unexpected">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="pagination-link" aria-label="TinyML: Deploying Neural Networks on Embedded Hardware">
+        <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

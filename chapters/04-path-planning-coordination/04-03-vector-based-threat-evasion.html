@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>20&nbsp; Vector-Based Threat Evasion: The Math of Escape – Drone Computing: Autonomous Systems in the Field</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" rel="next">
+<link href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>
+/* Long display equations (chained worked-example arithmetic,
+   wide sizing chains) can exceed the content column's width.
+   MathJax does not wrap display math by default, so without
+   this the equation is clipped or blows out the page layout.
+   Universal fix: give math containers their own horizontal
+   scrollbar instead, so the page itself never overflows. */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+</style>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</a></li><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../">Drone Computing: Autonomous Systems in the Field</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Preface</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part I — Airframes, Regulation &amp; Flight Safety</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-01-commercial-drone-landscape.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Commercial Drone Landscape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-02-anatomy-of-a-multirotor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Anatomy of a Multirotor: Frames, Motors, and Propulsion</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-03-materials-and-power.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Materials and Power: Structural Choices and LiPo Battery Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-04-sensing-the-world.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sensing the World: IMUs, Magnetometers, and Barometers</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-05-airspace-law.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Airspace Law: FAA Part 107, Waivers, and Aeronautical Decision-Making</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-06-companion-computers-and-uart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">From Radio to Root Shell: Companion Computers and the UART Link</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/01-airframes-regulation-safety/01-07-the-autonomous-drone-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Putting It Together: The Autonomous Drone Stack</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part II — Flight Control &amp; Mission Scripting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-01-closed-loop-control-pid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Closed-Loop Control: PID Theory for Multirotors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-02-px4-autopilot-stack.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">PX4 and the Autopilot Stack: MAVLink, MAVSDK, and ROS 2</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-03-mission-scripting-waypoints-state-machines.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Mission Scripting: Waypoints, State Machines, and Software-in-the-Loop</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/02-flight-control-mission-scripting/02-04-geofencing-and-failsafes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Geofencing and Fail-Safes: Designing for the Unexpected</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part III — Perception at the Edge: TinyML &amp; Computer Vision</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-01-images-as-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Images as Data: From Pixels to Tensors</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-02-tinyml-embedded-deployment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">TinyML: Deploying Neural Networks on Embedded Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-03-building-a-detection-pipeline.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Building a Detection Pipeline: Data, Labeling, and Training</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-04-real-time-inference-on-the-edge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Real-Time Inference on the Edge: Latency and Trade-offs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/03-tinyml-edge-perception/03-05-wildlife-detection-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Case Study: Wildlife Detection from the Air</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Coordinate Frames: From Camera to World</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-05-target-tracking-visual-servoing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Target Tracking and Visual Servoing</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-06-harassment-pattern-generation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Harassment Pattern Generation: Designing Deterrent Flight Paths</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/04-path-planning-coordination/04-07-multi-agent-systems-coordination.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Multi-Agent Systems and Coordination</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part V — Systems Integration, Diagnostics &amp; Ethics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-01-system-architecture-ros2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">System Architecture: ROS 2 Nodes, Services, and Topics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-02-post-flight-diagnostics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Post-Flight Diagnostics: Reading Logs and Debugging Flight Behavior</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-03-remote-sensing-at-scale.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Remote Sensing at Scale: Multispectral Imaging in Agriculture</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-04-ethics-and-ecology.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">28</span>&nbsp; <span class="chapter-title">The Ethics and Ecology of Autonomous Wildlife Management</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../chapters/05-integration-diagnostics-ethics/05-05-full-system-integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">29</span>&nbsp; <span class="chapter-title">Full-System Integration: The Goose Management System End to End</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-a-glossary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Appendix A: Glossary</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-b-labs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Appendix B: Lab Assignments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-c-toolchain-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Appendix C: Toolchain Setup Guide</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../appendices/appendix-d-image-credits.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">Appendix D: Image Credits</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#learning-objectives" id="toc-learning-objectives" class="nav-link active" data-scroll-target="#learning-objectives"><span class="header-section-number">20.1</span> Learning Objectives</a></li>
+  <li><a href="#key-vocabulary" id="toc-key-vocabulary" class="nav-link" data-scroll-target="#key-vocabulary"><span class="header-section-number">20.2</span> Key Vocabulary</a></li>
+  <li><a href="#the-threat-vector-and-the-closing-test" id="toc-the-threat-vector-and-the-closing-test" class="nav-link" data-scroll-target="#the-threat-vector-and-the-closing-test"><span class="header-section-number">20.3</span> The Threat Vector and the Closing Test</a></li>
+  <li><a href="#predicting-the-near-miss" id="toc-predicting-the-near-miss" class="nav-link" data-scroll-target="#predicting-the-near-miss"><span class="header-section-number">20.4</span> Predicting the Near Miss</a></li>
+  <li><a href="#why-perpendicular-is-the-way-out" id="toc-why-perpendicular-is-the-way-out" class="nav-link" data-scroll-target="#why-perpendicular-is-the-way-out"><span class="header-section-number">20.5</span> Why Perpendicular Is the Way Out</a></li>
+  <li><a href="#building-the-escape-with-cross-products" id="toc-building-the-escape-with-cross-products" class="nav-link" data-scroll-target="#building-the-escape-with-cross-products"><span class="header-section-number">20.6</span> Building the Escape with Cross Products</a></li>
+  <li><a href="#from-vector-to-maneuver" id="toc-from-vector-to-maneuver" class="nav-link" data-scroll-target="#from-vector-to-maneuver"><span class="header-section-number">20.7</span> From Vector to Maneuver</a></li>
+  <li><a href="#check-your-understanding" id="toc-check-your-understanding" class="nav-link" data-scroll-target="#check-your-understanding"><span class="header-section-number">20.8</span> Check Your Understanding</a></li>
+  <li><a href="#try-it" id="toc-try-it" class="nav-link" data-scroll-target="#try-it"><span class="header-section-number">20.9</span> Try It</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-01-coordinate-frames.html">Part IV — Path Planning, Coordination &amp; Autonomous Behavior</a></li><li class="breadcrumb-item"><a href="../../chapters/04-path-planning-coordination/04-03-vector-based-threat-evasion.html"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Vector-Based Threat Evasion: The Math of Escape</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The previous chapter closed on the mission’s hinge: a detection preempts the search grid, the drone closes on its target, and the deterrence work begins. This chapter is about the moment that plan inverts — when something starts closing on the <em>drone</em>. A territorial goose breaking off from the flock to defend it, another aircraft blundering into the working volume, any object whose track ends where the drone is hovering: the roles of pursuer and pursued swap in a frame or two, and the vehicle that was maneuvering <em>at</em> a target must instantly maneuver <em>away from</em> one. The response has a hard real-time character that nothing earlier in this Part had. A coverage path is computed before takeoff; an A* query tolerates a few milliseconds of thought. An incoming threat at bird speeds allows roughly the time between two heartbeats to notice, decide, and move.</p>
+<p>That tempo dictates the mathematics. There is no grid, no graph, no search: the entire computation is a handful of dot products and cross products on six numbers — the threat’s position and velocity relative to the drone’s — cheap enough to re-run at the estimator’s full update rate. And every one of those numbers lives in the local North-East-Down frame the Coordinate Frames chapter established: the threat’s position arrives from the perception stack as a world-frame point (one more of the imperfect world-frame targets that chapter’s pipeline delivers), its velocity is estimated by differencing successive positions, and the escape command leaves as an NED velocity setpoint. Two questions organize the chapter. First, <em>is this thing actually going to hit me?</em> — a prediction problem, answered by a dot product. Second, <em>which way is out?</em> — a geometry problem, and the answer, perpendicular or opposite to the threat’s trajectory, is constructed with a cross product. Both answers are then handed to the state machinery of the next chapter, where they will live inside a state the Finite State Machines and Behavior Trees chapter names EVADE_THREAT — the highest-priority behavior in the mission, entitled to preempt everything else the drone is doing.</p>
+<section id="learning-objectives" class="level2" data-number="20.1">
+<h2 data-number="20.1" class="anchored" data-anchor-id="learning-objectives"><span class="header-section-number">20.1</span> Learning Objectives</h2>
+<ul>
+<li>Form the threat vector and the relative velocity from two position–velocity pairs in local NED, and apply the dot-product test <span class="math inline">\(\mathbf{r} \cdot \mathbf{v}_{rel} &lt; 0\)</span> to decide whether the threat is closing.</li>
+<li>Derive the time of closest approach <span class="math inline">\(t^*\)</span> by minimizing the squared separation, compute the miss vector and miss distance, and state the three-part trigger — closing, soon, and inside the safety radius — that starts an evasion.</li>
+<li>Explain, via the danger-cylinder picture, why a direction perpendicular to the threat’s trajectory is the geometrically sound escape when the threat is fast, and when a straight retreat (opposite the approach) is the better choice.</li>
+<li>Construct a full 3D evasion vector with two cross products — one perpendicular to both the track and the line of sight, one pointing away from the predicted passing side — including the NED sign check that prevents commanding a dive and the fallback when the geometry degenerates.</li>
+<li>Verify an escape by recomputing the closest approach under the commanded velocity, and state the two assumptions (instant velocity change, non-maneuvering threat) whose failure motivates bounded-acceleration commands and, for a pursuing threat, potential fields or rapid re-planning.</li>
+</ul>
+</section>
+<section id="key-vocabulary" class="level2" data-number="20.2">
+<h2 data-number="20.2" class="anchored" data-anchor-id="key-vocabulary"><span class="header-section-number">20.2</span> Key Vocabulary</h2>
+<ul>
+<li><strong>Threat vector</strong> (<span class="math inline">\(\mathbf{r}\)</span>) — the position of the threat relative to the drone, <span class="math inline">\(\mathbf{r} = P_{threat} - P_{drone}\)</span>, expressed in local NED; a single vector carrying both the bearing and the range of the danger.</li>
+<li><strong>Relative velocity</strong> (<span class="math inline">\(\mathbf{v}_{rel}\)</span>) — the threat’s velocity minus the drone’s, <span class="math inline">\(\mathbf{v}_{rel} = \mathbf{v}_t - \mathbf{v}_d\)</span>; it collapses two moving trajectories into one straight-line track flown past a drone pinned at the origin.</li>
+<li><strong>Collision course</strong> — an encounter that is closing (<span class="math inline">\(\mathbf{r} \cdot \mathbf{v}_{rel} &lt; 0\)</span>) <em>and</em> whose predicted point of closest approach falls inside the safety radius; either condition alone is not yet an emergency.</li>
+<li><strong>Closest point of approach</strong> (CPA) — the moment <span class="math inline">\(t^* = -(\mathbf{r} \cdot \mathbf{v}_{rel})/\lVert\mathbf{v}_{rel}\rVert^2\)</span> at which the separation between drone and threat is smallest, and the miss vector <span class="math inline">\(\mathbf{m} = \mathbf{r} + \mathbf{v}_{rel}\,t^*\)</span> describing where the threat passes and by how much.</li>
+<li><strong>Safety radius</strong> (<span class="math inline">\(R_{safe}\)</span>) — the minimum separation the mission is willing to accept between the drone and any uncooperative mover; a predicted miss distance below it is the evasion trigger.</li>
+<li><strong>Evasion vector</strong> — the commanded escape direction: perpendicular to the threat’s trajectory when the threat is fast, opposite the approach when the drone can outrun it, and always biased away from the side on which the threat will pass.</li>
+<li><strong>Cross product</strong> (<span class="math inline">\(\mathbf{a} \times \mathbf{b}\)</span>) — the vector perpendicular to both of its operands, with magnitude <span class="math inline">\(\lVert\mathbf{a}\rVert \lVert\mathbf{b}\rVert \sin\theta\)</span>; the constructor of perpendicular escape directions, and identically zero when its operands are parallel — the degenerate case the code must catch.</li>
+<li><strong>Safe altitude</strong> — a designated altitude, above the encounter, that the escape maneuver climbs toward; giving the evasion state a fixed destination turns “flee” into a bounded, resumable behavior.</li>
+<li><strong>Potential field</strong> — a control technique that sums a repulsive gradient pushed out by each threat with an attractive gradient pulled toward a goal, and commands the net downhill direction; the standard first answer when the threat <em>pursues</em> rather than flying a straight line.</li>
+</ul>
+</section>
+<section id="the-threat-vector-and-the-closing-test" class="level2" data-number="20.3">
+<h2 data-number="20.3" class="anchored" data-anchor-id="the-threat-vector-and-the-closing-test"><span class="header-section-number">20.3</span> The Threat Vector and the Closing Test</h2>
+<p>Everything begins by subtracting. The perception pipeline delivers the threat’s position <span class="math inline">\(P_t\)</span> in local NED — the same camera-to-world chain of the Coordinate Frames chapter, pointed now at something the mission fears instead of something it seeks — and the flight controller’s estimator supplies the drone’s own position <span class="math inline">\(P_d\)</span> and velocity <span class="math inline">\(\mathbf{v}_d\)</span>. The <strong>threat vector</strong></p>
+<p><span class="math display">\[
+\mathbf{r} = P_t - P_d
+\]</span></p>
+<p>compresses the situation into one arrow: its norm <span class="math inline">\(\lVert\mathbf{r}\rVert\)</span> is the range, its direction is the bearing. But a position, however close, is not yet a threat — a goose ten metres away flying <em>away</em> is scenery. Danger lives in the motion, and the motion that matters is relative. Estimate the threat’s velocity <span class="math inline">\(\mathbf{v}_t\)</span> (in practice by differencing its last few world-frame positions over their timestamps) and form the <strong>relative velocity</strong></p>
+<p><span class="math display">\[
+\mathbf{v}_{rel} = \mathbf{v}_t - \mathbf{v}_d .
+\]</span></p>
+<p>This subtraction performs a conceptual simplification worth pausing on: it pins the drone at the origin of a <em>relative frame</em> and lets the threat do all the moving. Two curved, coupled trajectories become one straight line — the threat travels along <span class="math inline">\(\mathbf{r} + \mathbf{v}_{rel}\,t\)</span> — and every question about the encounter becomes a question about how close that line passes to a fixed point.</p>
+<p>The first question is binary: is the gap shrinking? The separation’s rate of change has the sign of the dot product <span class="math inline">\(\mathbf{r} \cdot \mathbf{v}_{rel}\)</span> — differentiate <span class="math inline">\(\lVert\mathbf{r}(t)\rVert^2\)</span> and the term <span class="math inline">\(2\,\mathbf{r}\cdot\mathbf{v}_{rel}\)</span> is what comes out. The test reads directly:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathbf{r} \cdot \mathbf{v}_{rel} &amp;&lt; 0 \;\Rightarrow\; \text{closing}, \\
+\mathbf{r} \cdot \mathbf{v}_{rel} &amp;&gt; 0 \;\Rightarrow\; \text{opening}, \\
+\mathbf{r} \cdot \mathbf{v}_{rel} &amp;= 0 \;\Rightarrow\; \text{abeam}.
+\end{aligned}
+\]</span></p>
+<p>The intuition is the dot product’s usual one: it measures alignment. A negative value means the relative motion points back along the line of sight — the threat is eating range. Run continuously, this three-way test is the cheapest early-warning system in robotics: three multiplications, two additions, and a sign check per update.</p>
+<p>Numbers make it concrete, and the encounter they describe will run through the whole chapter. Mid-mission, the drone holds <span class="math inline">\(P_d = (30.0,\ 10.0,\ {-10.0})\)</span> — 10 m up, in NED’s negative-down convention — drifting north at <span class="math inline">\(\mathbf{v}_d = (1, 0, 0)\)</span> m/s. A goose breaks toward it from ahead and to the right: <span class="math inline">\(P_t = (38.0,\ 12.0,\ {-10.0})\)</span>, flying south at <span class="math inline">\(\mathbf{v}_t = (-3, 0, 0)\)</span> m/s, at the same altitude. Then</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathbf{r} &amp;= (8,\ 2,\ 0), \qquad \lVert\mathbf{r}\rVert = \sqrt{68} \approx 8.25\ \text{m}, \\
+\mathbf{v}_{rel} &amp;= (-3-1,\ 0,\ 0) = (-4,\ 0,\ 0)\ \text{m/s}, \\
+\mathbf{r} \cdot \mathbf{v}_{rel} &amp;= (8)(-4) + (2)(0) + (0)(0) = -32 \;&lt;\; 0 .
+\end{aligned}
+\]</span></p>
+<p>Closing — at <span class="math inline">\(-(\mathbf{r}\cdot\mathbf{v}_{rel})/\lVert\mathbf{r}\rVert = 32/8.25 \approx 3.9\)</span> m/s, the drone’s 1 m/s of northward drift and the goose’s 3 m/s of southward flight pooled into one number. (The speeds are deliberately leisurely so the arithmetic stays legible; the geometry, not the tempo, is the lesson, and it survives unchanged when the incomer is three times faster.)</p>
+</section>
+<section id="predicting-the-near-miss" class="level2" data-number="20.4">
+<h2 data-number="20.4" class="anchored" data-anchor-id="predicting-the-near-miss"><span class="header-section-number">20.4</span> Predicting the Near Miss</h2>
+<p>Closing is necessary but not sufficient: two aircraft can close for a while and still pass comfortably wide. The evasion decision needs the <em>future minimum</em> of the separation, and for a straight-line relative track that minimum has a closed form. The squared separation at time <span class="math inline">\(t\)</span> is</p>
+<p><span class="math display">\[
+d^2(t) = \lVert \mathbf{r} + \mathbf{v}_{rel}\,t \rVert^2
+       = \lVert\mathbf{r}\rVert^2 + 2\,(\mathbf{r}\cdot\mathbf{v}_{rel})\,t + \lVert\mathbf{v}_{rel}\rVert^2\,t^2,
+\]</span></p>
+<p>an upward-opening parabola in <span class="math inline">\(t\)</span>. Setting its derivative to zero gives the <strong>time of closest approach</strong></p>
+<p><span class="math display">\[
+t^* = -\,\frac{\mathbf{r}\cdot\mathbf{v}_{rel}}{\lVert\mathbf{v}_{rel}\rVert^2},
+\]</span></p>
+<p>which is positive exactly when the encounter is closing — the dot-product test and the CPA formula agree by construction. Substituting <span class="math inline">\(t^*\)</span> back gives the <strong>miss vector</strong>, the threat’s position relative to the drone at that worst moment:</p>
+<p><span class="math display">\[
+\mathbf{m} = \mathbf{r} + \mathbf{v}_{rel}\,t^* .
+\]</span></p>
+<p>Its norm is the predicted miss distance, and one property of <span class="math inline">\(\mathbf{m}\)</span> will earn its keep shortly: it is always perpendicular to <span class="math inline">\(\mathbf{v}_{rel}\)</span> (at the closest point, the relative motion is exactly sideways — that is what “closest” means).</p>
+<p>For the running encounter:</p>
+<p><span class="math display">\[
+\begin{aligned}
+t^* &amp;= \frac{32}{(-4)^2 + 0 + 0} = \frac{32}{16} = 2.0\ \text{s}, \\
+\mathbf{m} &amp;= (8,\ 2,\ 0) + (-4,\ 0,\ 0)(2.0) = (0,\ 2,\ 0), \\
+\lVert\mathbf{m}\rVert &amp;= 2.0\ \text{m}.
+\end{aligned}
+\]</span></p>
+<p>In two seconds, the goose passes 2.0 m to the drone’s east, at the same altitude. Whether that is an emergency is a mission parameter, not mathematics: the <strong>safety radius</strong> <span class="math inline">\(R_{safe}\)</span> encodes how much separation the operator demands from an uncooperative mover — 3 m here, roughly the drone’s rotor span plus a wingspan plus turbulence margin. The full trigger is a three-part conjunction, and each part guards against a different false alarm:</p>
+<ol type="1">
+<li><strong>Closing:</strong> <span class="math inline">\(\mathbf{r}\cdot\mathbf{v}_{rel} &lt; 0\)</span> — otherwise the threat is departing and any maneuver is wasted battery.</li>
+<li><strong>Soon:</strong> <span class="math inline">\(t^* \le T_{horizon}\)</span> (a few seconds) — a threat predicted to arrive in forty seconds will be re-predicted forty times before it matters; acting on distant extrapolations of a noisy velocity estimate produces a drone that flinches at everything.</li>
+<li><strong>Close:</strong> <span class="math inline">\(\lVert\mathbf{m}\rVert &lt; R_{safe}\)</span> — the pass must actually violate the radius.</li>
+</ol>
+<p>Here: closing (yes), <span class="math inline">\(t^* = 2.0\)</span> s (soon), miss <span class="math inline">\(2.0 &lt; 3\)</span> m (inside). Evade — with two seconds in hand. <a href="#fig-threat-closing-geometry" class="quarto-xref">Figure&nbsp;<span>20.1</span></a> lays the whole prediction out to scale.</p>
+<div id="fig-threat-closing-geometry" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Plan-view diagram titled the closing test and the predicted near miss, north up and east right, drawn to scale. A teal drone marker sits at lower left with a short north-pointing velocity arrow labeled v d equals 1 metre per second; an amber goose marker sits 8 metres north and 2 metres east of it with a longer south-pointing velocity arrow labeled v t equals 3 metres per second south. A grey arrow from drone to goose is labeled threat vector r equals 8, 2, 0, with magnitude 8.25 metres. A dashed teal line runs south from the goose through the point 2 metres east of the drone, labeled the threat's track relative to the drone, v rel equals minus 4, 0, 0; where it passes closest, a marked CPA point connects to the drone by a short amber double arrow labeled miss vector m equals 0, 2, 0, miss distance 2.0 metres. A dashed circle of radius 3 metres around the drone, labeled safety radius R safe, visibly contains the CPA point. A sidebar titled four numbers, one decision lists the arithmetic: r dot v rel equals minus 32, negative so closing; closing speed 3.9 metres per second; t star equals 32 over 16 equals 2.0 seconds; miss 2.0 metres less than 3 metres, so evade, with 2.0 seconds to act. Beneath, a three-line legend states the dot-product sign convention: negative closing, positive opening, zero abeam. The footer notes the test costs three multiplications, two additions, and a sign check per update, cheap enough to run at the estimator's full rate.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-threat-closing-geometry-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/threat-closing-geometry.svg" class="img-fluid figure-img" style="width:100.0%" alt="Plan-view diagram titled the closing test and the predicted near miss, north up and east right, drawn to scale. A teal drone marker sits at lower left with a short north-pointing velocity arrow labeled v d equals 1 metre per second; an amber goose marker sits 8 metres north and 2 metres east of it with a longer south-pointing velocity arrow labeled v t equals 3 metres per second south. A grey arrow from drone to goose is labeled threat vector r equals 8, 2, 0, with magnitude 8.25 metres. A dashed teal line runs south from the goose through the point 2 metres east of the drone, labeled the threat's track relative to the drone, v rel equals minus 4, 0, 0; where it passes closest, a marked CPA point connects to the drone by a short amber double arrow labeled miss vector m equals 0, 2, 0, miss distance 2.0 metres. A dashed circle of radius 3 metres around the drone, labeled safety radius R safe, visibly contains the CPA point. A sidebar titled four numbers, one decision lists the arithmetic: r dot v rel equals minus 32, negative so closing; closing speed 3.9 metres per second; t star equals 32 over 16 equals 2.0 seconds; miss 2.0 metres less than 3 metres, so evade, with 2.0 seconds to act. Beneath, a three-line legend states the dot-product sign convention: negative closing, positive opening, zero abeam. The footer notes the test costs three multiplications, two additions, and a sign check per update, cheap enough to run at the estimator's full rate.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-threat-closing-geometry-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;20.1: The threat vector, the closing test, and the predicted near miss for the chapter’s running encounter: a goose 8.25 m out closes at 3.9 m/s and will pass 2.0 m east of the drone in 2.0 s — inside the 3 m safety radius.
+</figcaption>
+</figure>
+</div>
+<p>The two-second warning is the entire argument for prediction over reaction, and it deserves the emphasis the numbers give it. A purely reactive system — one that maneuvers when the range gets small — would begin its escape with the goose a wingbeat away, spending its maneuver on desperation. The predictive system starts the same escape 2 s and 8 m earlier, which at quadrotor accelerations is the difference between a brisk sidestep and a stall-the-airframe emergency. The prediction costs almost nothing (the formulas above are a dozen floating-point operations) but it leans on estimates that do cost something: the threat’s position carries the half-metre-scale error the Coordinate Frames chapter budgeted at these ranges, and differencing noisy positions to get <span class="math inline">\(\mathbf{v}_t\)</span> amplifies that noise. A miss predicted at 2.9 m against a 3 m radius is not meaningfully different from one predicted at 3.1 m — which is why <span class="math inline">\(R_{safe}\)</span> is chosen with slack in it, and why the assessment re-runs every update rather than trusting any single prediction.</p>
+</section>
+<section id="why-perpendicular-is-the-way-out" class="level2" data-number="20.5">
+<h2 data-number="20.5" class="anchored" data-anchor-id="why-perpendicular-is-the-way-out"><span class="header-section-number">20.5</span> Why Perpendicular Is the Way Out</h2>
+<p>The trigger has fired; the drone owns 2.0 seconds. Which way should it go? The lab-honed rule of thumb — escape <em>perpendicular or opposite</em> to the threat’s trajectory — sounds like folklore until it is drawn in the relative frame, where it becomes a theorem about cylinders.</p>
+<p>Pin the drone at the origin. The threat travels the straight line <span class="math inline">\(\mathbf{r} + \mathbf{v}_{rel}\,t\)</span>; inflate that line by the safety radius and it becomes a <strong>danger cylinder</strong> of radius <span class="math inline">\(R_{safe}\)</span> around the threat’s relative track — the set of every position that will, at some moment, be within <span class="math inline">\(R_{safe}\)</span> of the threat. The drone is currently <em>inside</em> this cylinder (that is precisely what miss distance <span class="math inline">\(2.0 &lt; 3\)</span> m means), and escaping is now a literal geometric task: get outside the tube before the threat arrives.</p>
+<p>Seen this way, the candidate maneuvers sort themselves:</p>
+<ul>
+<li><strong>Motion parallel to the cylinder’s axis</strong> — directly away along the threat’s line of approach — never exits the tube at all. It changes <em>when</em> the threat arrives, not <em>where it passes</em>. If the drone can sustain a higher speed than the threat’s closing rate, this straight retreat opens the range forever and is a perfectly good escape; if it cannot, retreat merely postpones the same near miss. Running from a faster pursuer down its own track is the one provably losing move.</li>
+<li><strong>Motion perpendicular to the axis</strong> exits through the nearest wall, and converts <em>every</em> metre-per-second of drone speed into miss distance. Crucially, its effectiveness does not depend on the speed ratio: the threat’s velocity has no component in the perpendicular plane (that is what perpendicular means), so a straight-flying threat cannot contest the sidestep at all. This is the escape that still works when the incomer is faster — and the threats worth engineering for, a territorial goose in full flight or a rogue aircraft, generally are. Rerun the encounter with the goose replaced by a 12 m/s incomer on the same track: <span class="math inline">\(t^*\)</span> collapses to roughly 0.6 s and the miss distance stays 2.0 m (the miss depends on the track’s direction, not its speed); retreat at any achievable quadrotor speed loses, but the perpendicular exit — 1 m to the nearest wall, as computed next — remains a fraction of a second’s work.</li>
+</ul>
+<p>So “perpendicular or opposite” decodes to: <em>opposite</em> if you are faster (it maximizes range and buys time), <em>perpendicular</em> if you are not (it is the only direction the threat cannot defend). A small autonomous drone facing birds and aircraft should assume it is not.</p>
+<p>One question remains: perpendicular <em>which way</em>? The perpendicular directions form a whole plane — from inside a tube you can aim at any point of the wall — and they are far from equivalent. The drone sits 2.0 m from the cylinder’s axis (the miss distance is exactly the drone’s distance from the relative track), in a tube of radius 3 m. Exit toward the side the threat will pass on — east, through the axis — and the wall is <span class="math inline">\(R_{safe} + \lVert\mathbf{m}\rVert = 5.0\)</span> m away, crossing in front of the danger on the way. Exit away from the passing side — west — and the wall is <span class="math inline">\(R_{safe} - \lVert\mathbf{m}\rVert = 1.0\)</span> m away. Exit straight up, at right angles to the miss, and the chord gives <span class="math inline">\(\sqrt{R_{safe}^2 - \lVert\mathbf{m}\rVert^2} = \sqrt{9-4} \approx 2.24\)</span> m. The ranking is general: the cheapest exit is directly <em>away from the miss vector</em> — dodge away from the side on which the threat will pass, the matador’s move — with the perpendicular-to-the-miss directions (for a co-altitude encounter, straight up) a respectable second that buys vertical separation and ground clearance. <a href="#fig-escape-cylinder" class="quarto-xref">Figure&nbsp;<span>20.2</span></a> makes the picture exact.</p>
+<div id="fig-escape-cylinder" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two-panel diagram titled the danger cylinder: why perpendicular, and which perpendicular. Left panel, side view in the relative frame: the drone is pinned at the origin inside a long horizontal tube of radius 3 metres drawn around the threat's relative track, with the threat approaching from the right along the axis at v rel. A red arrow from the drone pointing left along the axis is labeled retreat, parallel to the axis, never exits the tube, only delays; it works only if the drone outruns the closing speed. A teal arrow from the drone pointing perpendicular to the axis crosses the tube wall and is labeled perpendicular, exits through the wall; the threat's velocity has no component in this plane, so a straight-flying threat cannot contest it. Right panel, the cross-section, drawn in the plane perpendicular to v rel with east right and up upward: a circle of radius 3 metres, labeled safety radius, centered on the point where the threat's track pierces the plane; the drone sits 2 metres west of the center, inside the circle. Three arrows leave the drone with wall distances labeled: west, away from the passing side, 1.0 metre to the wall, drawn boldest; straight up, 2.24 metres, the square root of 9 minus 4; east through the center, 5.0 metres, crossing directly in front of the threat, drawn red. The footer states the rule: dodge away from the side the threat will pass on; opposite is for when you are faster, perpendicular is for when you are not.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-escape-cylinder-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/escape-cylinder.svg" class="img-fluid figure-img" style="width:100.0%" alt="Two-panel diagram titled the danger cylinder: why perpendicular, and which perpendicular. Left panel, side view in the relative frame: the drone is pinned at the origin inside a long horizontal tube of radius 3 metres drawn around the threat's relative track, with the threat approaching from the right along the axis at v rel. A red arrow from the drone pointing left along the axis is labeled retreat, parallel to the axis, never exits the tube, only delays; it works only if the drone outruns the closing speed. A teal arrow from the drone pointing perpendicular to the axis crosses the tube wall and is labeled perpendicular, exits through the wall; the threat's velocity has no component in this plane, so a straight-flying threat cannot contest it. Right panel, the cross-section, drawn in the plane perpendicular to v rel with east right and up upward: a circle of radius 3 metres, labeled safety radius, centered on the point where the threat's track pierces the plane; the drone sits 2 metres west of the center, inside the circle. Three arrows leave the drone with wall distances labeled: west, away from the passing side, 1.0 metre to the wall, drawn boldest; straight up, 2.24 metres, the square root of 9 minus 4; east through the center, 5.0 metres, crossing directly in front of the threat, drawn red. The footer states the rule: dodge away from the side the threat will pass on; opposite is for when you are faster, perpendicular is for when you are not.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-escape-cylinder-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;20.2: The danger cylinder in the relative frame: motion along the axis never exits the tube, motion perpendicular does — and the cross-section shows the exits are not equivalent: 1.0 m away from the passing side, 2.24 m straight up, 5.0 m across the axis.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="building-the-escape-with-cross-products" class="level2" data-number="20.6">
+<h2 data-number="20.6" class="anchored" data-anchor-id="building-the-escape-with-cross-products"><span class="header-section-number">20.6</span> Building the Escape with Cross Products</h2>
+<p>The geometry says: move in the plane perpendicular to <span class="math inline">\(\mathbf{v}_{rel}\)</span>, biased away from the passing side, and preferably upward. The tool that <em>constructs</em> such directions from the vectors already in hand is the <strong>cross product</strong>. For <span class="math inline">\(\mathbf{a} \times \mathbf{b}\)</span>, the essentials: the result is perpendicular to both operands; its magnitude is <span class="math inline">\(\lVert\mathbf{a}\rVert\lVert\mathbf{b}\rVert\sin\theta\)</span>; its sign follows the right-hand rule and flips if the operands swap; and it vanishes when the operands are parallel — a failure mode, not a curiosity, that the implementation below must detect. Componentwise,</p>
+<p><span class="math display">\[
+\mathbf{a} \times \mathbf{b} =
+\big(a_y b_z - a_z b_y,\;\; a_z b_x - a_x b_z,\;\; a_x b_y - a_y b_x\big).
+\]</span></p>
+<p>The construction uses it twice, and each application answers one of the geometry’s demands.</p>
+<p><strong>First cross product — perpendicular to everything.</strong> The two vectors that define the encounter are the relative track <span class="math inline">\(\mathbf{v}_{rel}\)</span> and the line of sight <span class="math inline">\(\mathbf{r}\)</span>. Their cross product</p>
+<p><span class="math display">\[
+\mathbf{u}_1 = \mathbf{v}_{rel} \times \mathbf{r}
+\]</span></p>
+<p>is perpendicular to both: it leaves the collision plane entirely, at right angles to the track (so the threat cannot contest it) and at right angles to the line of sight (so every unit of motion is pure lateral separation). For the running encounter,</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathbf{u}_1 &amp;= (-4,\ 0,\ 0) \times (8,\ 2,\ 0) \\
+  &amp;= \big( (0)(0)-(0)(2),\;\; (0)(8)-(-4)(0),\;\; (-4)(2)-(0)(8) \big) \\
+  &amp;= (0,\ 0,\ -8), \qquad \hat{\mathbf{u}}_1 = (0,\ 0,\ -1).
+\end{aligned}
+\]</span></p>
+<p>Both defining vectors were horizontal, so their mutual perpendicular is vertical — and in NED, a <span class="math inline">\(D\)</span>-component of <span class="math inline">\(-1\)</span> points <em>up</em>. That sign was luck, and luck is not a control law: swap the operand order and the same arithmetic yields <span class="math inline">\((0, 0, +8)\)</span>, a command to dive at the ground. The implementation therefore checks the <span class="math inline">\(D\)</span>-component and negates the vector if it is positive — both <span class="math inline">\(\mathbf{u}_1\)</span> and <span class="math inline">\(-\mathbf{u}_1\)</span> are equally perpendicular, and the mission’s preference between them is not geometric but physical: <em>climb, never dive</em>. Climbing moves away from the ground, the obstacles, and (for an avian threat defending ground it considers its own) usually the contested airspace; it is also the direction of the designated <strong>safe altitude</strong> the maneuver ultimately makes for.</p>
+<p><strong>Second cross product — away from the passing side.</strong> <span class="math inline">\(\hat{\mathbf{u}}_1\)</span> solves the vertical axis of the escape plane; the horizontal axis should point away from the miss. Crossing the track with <span class="math inline">\(\hat{\mathbf{u}}_1\)</span> produces the remaining perpendicular direction:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathbf{u}_2 &amp;= \mathbf{v}_{rel} \times \hat{\mathbf{u}}_1
+= (-4, 0, 0) \times (0, 0, -1)
+= (0,\ -4,\ 0), \\
+\hat{\mathbf{u}}_2 &amp;= (0,\ -1,\ 0)
+\end{aligned}
+\]</span></p>
+<p>— due west, which is exactly <span class="math inline">\(-\hat{\mathbf{m}}\)</span>, the direction away from the goose’s predicted 2 m-east pass. That is not a numerical coincidence. The vector triple product identity <span class="math inline">\(\mathbf{a}\times(\mathbf{a}\times\mathbf{c}) = \mathbf{a}(\mathbf{a}\cdot\mathbf{c}) - \mathbf{c}\lVert\mathbf{a}\rVert^2\)</span>, applied with <span class="math inline">\(\mathbf{a} = \mathbf{v}_{rel}\)</span> and <span class="math inline">\(\mathbf{c} = \mathbf{r}\)</span>, gives</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathbf{v}_{rel}\times(\mathbf{v}_{rel}\times\mathbf{r})
+  &amp;= \mathbf{v}_{rel}\,(\mathbf{v}_{rel}\cdot\mathbf{r}) - \mathbf{r}\,\lVert\mathbf{v}_{rel}\rVert^2 \\
+  &amp;= -\lVert\mathbf{v}_{rel}\rVert^2 \left( \mathbf{r} - \mathbf{v}_{rel}\,
+      \frac{-(\mathbf{r}\cdot\mathbf{v}_{rel})}{\lVert\mathbf{v}_{rel}\rVert^2} \right)
+   = -\lVert\mathbf{v}_{rel}\rVert^2\, \mathbf{m},
+\end{aligned}
+\]</span></p>
+<p>since the parenthesized quantity is precisely <span class="math inline">\(\mathbf{r} + \mathbf{v}_{rel}\,t^*\)</span>. The double cross product is <em>always</em> anti-parallel to the miss vector: the construction does not merely find some perpendicular — it automatically finds the matador’s side, for any encounter geometry, with no case analysis. This is the quiet payoff of doing the escape with vector algebra instead of hand-tuned rules.</p>
+<p>One wrinkle rewards a careful look, because it is invisible in this example and a wrong-way dodge in others. The climb-never-dive negation propagates: negating <span class="math inline">\(\hat{\mathbf{u}}_1\)</span> negates <span class="math inline">\(\mathbf{v}_{rel} \times \hat{\mathbf{u}}_1\)</span> as well, which would land the sidestep on the <em>wrong</em> side precisely in the encounters where the climb check fired. The implementation therefore pins <span class="math inline">\(\hat{\mathbf{u}}_2\)</span> against the miss directly — negate it whenever <span class="math inline">\(\mathbf{u}_2 \cdot \mathbf{m} &gt; 0\)</span> — a check that is a no-op here (the climb check was too) but load-bearing in half of all geometries. Sign conventions compose, and every sign in a control law earns an explicit test.</p>
+<p><strong>The evasion vector.</strong> Sum the two unit directions and renormalize — an equal blend of “climb” and “away from the pass,” both lying in the plane the threat cannot contest — and scale by the escape speed <span class="math inline">\(v_{esc}\)</span> the airframe can honestly deliver:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\hat{\mathbf{e}} &amp;= \frac{\hat{\mathbf{u}}_1 + \hat{\mathbf{u}}_2}{\lVert \hat{\mathbf{u}}_1 + \hat{\mathbf{u}}_2 \rVert}
+= \left(0,\ -\tfrac{1}{\sqrt{2}},\ -\tfrac{1}{\sqrt{2}}\right), \\
+\mathbf{v}_{cmd} &amp;= 5\,\hat{\mathbf{e}} = (0,\ -3.54,\ -3.54)\ \text{m/s}.
+\end{aligned}
+\]</span></p>
+<p>The escape trajectory: from <span class="math inline">\((30, 10, -10)\)</span>, the drone breaks due west while climbing at 45°, perpendicular to the goose’s north–south track, opening toward the safe altitude (15 m, <span class="math inline">\(D = -15\)</span>) it will hold until the threat clears. <a href="#fig-evasion-vector-cross-product" class="quarto-xref">Figure&nbsp;<span>20.3</span></a> draws the full construction in three dimensions.</p>
+<div id="fig-evasion-vector-cross-product" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Axonometric three-dimensional diagram titled two cross products build the escape, drawn in the relative frame with axes north up-and-right, east right, and up vertical, and a note that up is minus D in NED. A light ground-plane parallelogram at the encounter altitude carries the horizontal geometry: the drone pinned at the origin, the goose 8 north and 2 east, a grey line-of-sight arrow r from drone to goose, and a dashed amber track from the goose running south past the drone through the CPA point 2 east of it, labeled v rel equals minus 4, 0, 0; a short amber segment from drone to CPA point is labeled miss m, 2.0 metres east. From the drone, three arrows leave the plane: a teal vertical arrow labeled u 1 equals v rel cross r equals 0, 0, minus 8, straight up, perpendicular to both the track and the line of sight, with a note that the NED sign check flips it if it ever points at the ground; a teal horizontal arrow due west labeled u 2 equals v rel cross u 1 hat, proportional to minus m, away from the passing side; and between them, completing a dashed parallelogram on the two unit directions, a bold double-width diagonal arrow labeled the evasion vector e proportional to u 1 hat plus u 2 hat, with v cmd equals 5 e equals 0, minus 3.54, minus 3.54 metres per second, visibly perpendicular to the dashed threat track. A dashed path continues from the evasion vector's tip up and west, labeled escape trajectory toward the safe altitude at D equals minus 15. A sidebar verifies the escape: under the commanded velocity the new time of closest approach is about 0.5 seconds and the new miss distance is 7.72 metres, up from 2.0, comfortably outside the 3 metre safety radius, with the threat passing 1.76 metres below the climbing drone. A second panel lists the three checks the code must make: the u 1 climb-never-dive sign check, the u 2 pin against the miss vector, and the dead-ahead degeneracy fallback. The footer notes the identity v rel cross open v rel cross r close equals minus the squared norm of v rel times m: the double cross product always points away from the miss, no case analysis required.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-evasion-vector-cross-product-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/images/diagrams/evasion-vector-cross-product.svg" class="img-fluid figure-img" style="width:100.0%" alt="Axonometric three-dimensional diagram titled two cross products build the escape, drawn in the relative frame with axes north up-and-right, east right, and up vertical, and a note that up is minus D in NED. A light ground-plane parallelogram at the encounter altitude carries the horizontal geometry: the drone pinned at the origin, the goose 8 north and 2 east, a grey line-of-sight arrow r from drone to goose, and a dashed amber track from the goose running south past the drone through the CPA point 2 east of it, labeled v rel equals minus 4, 0, 0; a short amber segment from drone to CPA point is labeled miss m, 2.0 metres east. From the drone, three arrows leave the plane: a teal vertical arrow labeled u 1 equals v rel cross r equals 0, 0, minus 8, straight up, perpendicular to both the track and the line of sight, with a note that the NED sign check flips it if it ever points at the ground; a teal horizontal arrow due west labeled u 2 equals v rel cross u 1 hat, proportional to minus m, away from the passing side; and between them, completing a dashed parallelogram on the two unit directions, a bold double-width diagonal arrow labeled the evasion vector e proportional to u 1 hat plus u 2 hat, with v cmd equals 5 e equals 0, minus 3.54, minus 3.54 metres per second, visibly perpendicular to the dashed threat track. A dashed path continues from the evasion vector's tip up and west, labeled escape trajectory toward the safe altitude at D equals minus 15. A sidebar verifies the escape: under the commanded velocity the new time of closest approach is about 0.5 seconds and the new miss distance is 7.72 metres, up from 2.0, comfortably outside the 3 metre safety radius, with the threat passing 1.76 metres below the climbing drone. A second panel lists the three checks the code must make: the u 1 climb-never-dive sign check, the u 2 pin against the miss vector, and the dead-ahead degeneracy fallback. The footer notes the identity v rel cross open v rel cross r close equals minus the squared norm of v rel times m: the double cross product always points away from the miss, no case analysis required.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-evasion-vector-cross-product-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;20.3: The cross-product construction of the 3D evasion vector for the running encounter: <span class="math inline">\(\mathbf{u}_1 = \mathbf{v}_{rel}\times\mathbf{r}\)</span> points straight up, <span class="math inline">\(\mathbf{u}_2 = \mathbf{v}_{rel}\times\hat{\mathbf{u}}_1\)</span> points west — exactly away from the predicted miss — and their blend sends the drone climbing west at 45°, in the plane the threat cannot contest.
+</figcaption>
+</figure>
+</div>
+<p><strong>Verify, don’t hope.</strong> The construction is only as good as its effect on the number that triggered it, so recompute the closest approach under the commanded velocity. The new relative velocity is <span class="math inline">\(\mathbf{v}_{rel}' = \mathbf{v}_t - \mathbf{v}_{cmd} = (-3,\ 3.54,\ 3.54)\)</span>, and with <span class="math inline">\(\mathbf{r}\)</span> unchanged at the moment the maneuver begins:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathbf{r}\cdot\mathbf{v}_{rel}' &amp;= (8)(-3) + (2)(3.54) + 0 = -16.93, \\
+t^{*\prime} &amp;= \frac{16.93}{(-3)^2 + (3.54)^2 + (3.54)^2} = \frac{16.93}{34.0} = 0.498\ \text{s}, \\
+\mathbf{m}' &amp;= (8, 2, 0) + (-3,\ 3.54,\ 3.54)(0.498) = (6.51,\ 3.76,\ 1.76), \\
+\lVert\mathbf{m}'\rVert &amp;= \sqrt{42.3 + 14.1 + 3.1} \approx 7.72\ \text{m}.
+\end{aligned}
+\]</span></p>
+<p>The predicted miss climbs from 2.0 m to 7.72 m — from well inside the safety radius to comfortably outside it — and the miss vector’s positive <span class="math inline">\(D\)</span>-component says the goose now passes 1.76 m <em>below</em> the climbing drone. The encounter still “closes” briefly (the geometry guarantees some approach), but its closest point is a non-event. One honest caveat rides along: this verification assumed the drone’s velocity changed instantly, which no airframe delivers. The next section pays that debt.</p>
+<p><strong>The degenerate case.</strong> The construction has one hole, and it is the most dangerous geometry of all: a dead-ahead collision. When the threat comes straight down the line of sight, <span class="math inline">\(\mathbf{r}\)</span> and <span class="math inline">\(\mathbf{v}_{rel}\)</span> are anti-parallel, <span class="math inline">\(\mathbf{u}_1 = \mathbf{v}_{rel}\times\mathbf{r} = \mathbf{0}\)</span>, and the miss vector is zero too — there is no “side it will pass on” because it will not pass, it will arrive. Geometrically the symmetry is real (every perpendicular is equally good), but code cannot normalize a zero vector, so the implementation substitutes an arbitrary perpendicular: <span class="math inline">\(\mathbf{v}_{rel} \times \hat{\mathbf{d}}\)</span>, with <span class="math inline">\(\hat{\mathbf{d}} = (0,0,1)\)</span> the NED down axis, gives a horizontal sidestep at right angles to the approach — and if the threat is coming straight down or straight up (making <em>that</em> cross product vanish as well), any horizontal direction serves.</p>
+</section>
+<section id="from-vector-to-maneuver" class="level2" data-number="20.7">
+<h2 data-number="20.7" class="anchored" data-anchor-id="from-vector-to-maneuver"><span class="header-section-number">20.7</span> From Vector to Maneuver</h2>
+<p>The mathematics compresses into a function small enough to audit line by line — and it must be auditable, because it will run inside the highest-priority behavior in the mission:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>D_HAT <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">1.0</span>])          <span class="co"># NED down axis</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> evasion_command(p_d, v_d, p_t, v_t,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>                    r_safe<span class="op">=</span><span class="fl">3.0</span>, horizon<span class="op">=</span><span class="fl">5.0</span>, v_esc<span class="op">=</span><span class="fl">5.0</span>):</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Assess a threat and, if it triggers, return an NED escape</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">    velocity command; return None if no evasion is required."""</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> np.asarray(p_t, <span class="bu">float</span>) <span class="op">-</span> np.asarray(p_d, <span class="bu">float</span>)   <span class="co"># threat vector</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    v_rel <span class="op">=</span> np.asarray(v_t, <span class="bu">float</span>) <span class="op">-</span> np.asarray(v_d, <span class="bu">float</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    closing <span class="op">=</span> r <span class="op">@</span> v_rel</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> closing <span class="op">&gt;=</span> <span class="fl">0.0</span>:</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span>                        <span class="co"># opening or abeam: no threat</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    t_star <span class="op">=</span> <span class="op">-</span>closing <span class="op">/</span> (v_rel <span class="op">@</span> v_rel)    <span class="co"># time of closest approach</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> t_star <span class="op">&gt;</span> horizon:</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span>                        <span class="co"># closing, but not soon</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    miss <span class="op">=</span> r <span class="op">+</span> v_rel <span class="op">*</span> t_star              <span class="co"># CPA miss vector (perp. to v_rel)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> np.linalg.norm(miss) <span class="op">&gt;=</span> r_safe:</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span>                        <span class="co"># passes outside the radius</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    u1 <span class="op">=</span> np.cross(v_rel, r)                <span class="co"># perp. to track and line of sight</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> np.linalg.norm(u1) <span class="op">&lt;</span> <span class="fl">1e-6</span>:          <span class="co"># dead-ahead: no unique side</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        u1 <span class="op">=</span> np.cross(v_rel, D_HAT)        <span class="co"># fall back: horizontal sidestep</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> np.linalg.norm(u1) <span class="op">&lt;</span> <span class="fl">1e-6</span>:      <span class="co"># threat vertical: any direction</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>            u1 <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>])</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> u1[<span class="dv">2</span>] <span class="op">&gt;</span> <span class="fl">0.0</span>:                        <span class="co"># NED sign check:</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        u1 <span class="op">=</span> <span class="op">-</span>u1                           <span class="co">#   climb, never dive</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    u1 <span class="op">/=</span> np.linalg.norm(u1)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    u2 <span class="op">=</span> np.cross(v_rel, u1)               <span class="co"># perp. to the track, in the escape plane</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> u2 <span class="op">@</span> miss <span class="op">&gt;</span> <span class="fl">0.0</span>:                    <span class="co"># flipping u1 above flips this product too:</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        u2 <span class="op">=</span> <span class="op">-</span>u2                           <span class="co">#   re-pin it away from the miss</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    n2 <span class="op">=</span> np.linalg.norm(u2)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    e <span class="op">=</span> u1 <span class="cf">if</span> n2 <span class="op">&lt;</span> <span class="fl">1e-6</span> <span class="cf">else</span> u1 <span class="op">+</span> u2 <span class="op">/</span> n2</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> v_esc <span class="op">*</span> e <span class="op">/</span> np.linalg.norm(e)   <span class="co"># commanded NED escape velocity</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Three implementation realities separate this function from a flying escape.</p>
+<p><strong>Bound the command the airframe can honor.</strong> The verification above assumed the commanded velocity took effect instantly; a real quadrotor must pitch over and accelerate, and an evasion command that demands an instant 5 m/s reversal — or worse, a naive implementation that converts the evasion vector into an extreme attitude target — will spend its two seconds of warning saturating motors instead of moving. The remedy is the same discipline the cascaded controllers of Part II imposed everywhere else: command <em>velocity</em>, let the position/velocity cascade generate attitudes, and slew the commanded velocity toward <span class="math inline">\(\mathbf{v}_{cmd}\)</span> under an acceleration cap rather than stepping it. The margin the prediction bought is exactly what pays for the ramp — which is one more argument for triggering on the forecast, not the flinch. One further bound belongs to the mission rather than the airframe: when the threat will pass <em>overhead</em>, the away-from-the-miss direction points downward, and the construction will honestly spend part of the escape descending — correct geometry that the mission’s minimum-altitude margin must be allowed to cap.</p>
+<p><strong>Re-run everything, every update.</strong> The escape vector is computed from one snapshot of a noisy world. The threat’s velocity estimate wobbles; the threat itself may turn. The evasion state therefore loops the entire assessment at the estimator rate — recompute <span class="math inline">\(\mathbf{r}\)</span>, <span class="math inline">\(\mathbf{v}_{rel}\)</span>, the trigger, and the vector; re-slew toward the fresh command — so that a curving threat faces a continuously re-aimed escape rather than a stale one. Against a straight-flying threat the recomputed vector barely moves and the loop costs nothing; against a maneuvering one, the loop is the difference between a control law and a wish.</p>
+<p><strong>Define done.</strong> A behavior that can preempt everything needs an exit condition as crisp as its entry: the encounter has <em>cleared</em> when the closing test goes positive and the range exceeds the safety radius with margin — the threat is behind, opening, and far — or when the drone reaches its safe altitude and the threat is no longer tracked. Where control goes next (resume the abandoned search leg? return home?) is sequencing, not geometry, and it is precisely the job of the next chapter: the Finite State Machines and Behavior Trees chapter builds the EVADE_THREAT state around this function — its preemption of every other state on trigger, its guard conditions, and the bookkeeping that lets the interrupted mission resume — turning this chapter’s arithmetic into the reflex arc of the whole system.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="For More">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>For More
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Everything above assumes the threat flies <em>straight</em>: the CPA formula extrapolates a line, and the perpendicular escape works because a non-maneuvering threat cannot contest the sideways plane. A <em>pursuing</em> threat breaks both assumptions at once — it re-aims at the drone every instant, so there is no fixed track to be perpendicular to, and any single precomputed escape vector is stale the moment the pursuer turns. The graduate-track extension of this problem replaces the one-shot vector with a continuously recomputed field or plan. The classic tool is the <strong>potential field</strong>: the threat emits a repulsive potential that grows steeply inside the safety radius, the safe altitude or rally point emits an attractive one, and the drone commands the negative gradient of the sum — recomputed every tick, so the escape direction automatically rotates as the pursuer curves. Potential fields are cheap (a few vector operations per threat, so multiple simultaneous threats just sum) but carry known pathologies: local minima where attraction and repulsion cancel, and oscillation in narrow passages. The heavier alternative is <strong>rapid re-planning</strong> — re-running a short-horizon planner several times a second over predicted threat positions, in the spirit of the dynamic re-routing discussed with A* in the previous chapter. Between the two sit <em>velocity obstacles</em>, which characterize the set of drone velocities that lead to collision with each mover and choose outside it, and upstream of all of them sits estimation: a pursuer’s future position deserves better than differenced detections, which is where a Kalman filter over the threat’s state earns its place. Against a <em>stochastic</em> pursuer — one that maneuvers unpredictably — the guarantees get weaker and the margins must get correspondingly fatter: the safety radius and trigger horizon absorb what the mathematics no longer promises.</p>
+</div>
+</div>
+</section>
+<section id="check-your-understanding" class="level2" data-number="20.8">
+<h2 data-number="20.8" class="anchored" data-anchor-id="check-your-understanding"><span class="header-section-number">20.8</span> Check Your Understanding</h2>
+<ol type="1">
+<li>A detected mover sits at <span class="math inline">\(\mathbf{r} = (12, -5, 0)\)</span> m with relative velocity <span class="math inline">\(\mathbf{v}_{rel} = (2, 1, 0)\)</span> m/s. Apply the closing test and state, in one sentence, what the drone should do about this object.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(\mathbf{r}\cdot\mathbf{v}_{rel} = (12)(2) + (-5)(1) + 0 = 24 - 5 = +19 &gt; 0\)</span>: the separation is growing — the object is departing. The drone should do nothing but keep watching: the test re-runs every update, and a mover that turns will announce itself with a sign change; maneuvering against an opening track wastes battery and interrupts the mission for scenery.</p>
+</div>
+</div>
+</div>
+<ol start="2" type="1">
+<li>A threat has <span class="math inline">\(\mathbf{r} = (10, 0, 0)\)</span> m and <span class="math inline">\(\mathbf{v}_{rel} = (-3, 1, 0)\)</span> m/s, with <span class="math inline">\(R_{safe} = 3\)</span> m. Compute <span class="math inline">\(t^*\)</span>, the miss vector, and the miss distance, and make the evade/no-evade call — then say why an engineer might distrust the call either way.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(\mathbf{r}\cdot\mathbf{v}_{rel} = -30\)</span> (closing); <span class="math inline">\(\lVert\mathbf{v}_{rel}\rVert^2 = 10\)</span>, so <span class="math inline">\(t^* = 3.0\)</span> s. <span class="math inline">\(\mathbf{m} = (10,0,0) + (-3,1,0)(3) = (1, 3, 0)\)</span>, giving <span class="math inline">\(\lVert\mathbf{m}\rVert = \sqrt{10} \approx 3.16\)</span> m. Strictly <span class="math inline">\(3.16 \ge 3\)</span>: no evade. But the margin is 16 cm against a position estimate carrying half-metre-scale error and a velocity estimate built by differencing it — well inside the noise. This is exactly why the safety radius is chosen with slack, why the prediction re-runs continuously rather than being trusted once, and why a mission designer might add hysteresis (trigger at 3 m, stand down at 4 m) so the decision doesn’t chatter across the boundary.</p>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>For the encounter of question 2, compute <span class="math inline">\(\mathbf{u}_1 = \mathbf{v}_{rel}\times\mathbf{r}\)</span> and <span class="math inline">\(\mathbf{u}_2 = \mathbf{v}_{rel}\times\hat{\mathbf{u}}_1\)</span> (after the NED sign check), and confirm that <span class="math inline">\(\mathbf{u}_2\)</span> points away from the miss vector you found.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(\mathbf{u}_1 = (-3,1,0)\times(10,0,0) = \big((1)(0)-(0)(0),\ (0)(10)-(-3)(0),\ (-3)(0)-(1)(10)\big) = (0,0,-10)\)</span>. The <span class="math inline">\(D\)</span>-component is already negative (up), so the sign check passes: <span class="math inline">\(\hat{\mathbf{u}}_1 = (0,0,-1)\)</span>. Then <span class="math inline">\(\mathbf{u}_2 = (-3,1,0)\times(0,0,-1) = \big((1)(-1)-0,\ 0-(-3)(-1),\ 0\big) = (-1,-3,0)\)</span> — exactly <span class="math inline">\(-\mathbf{m}\)</span> for the miss <span class="math inline">\(\mathbf{m} = (1,3,0)\)</span> of question 2, as the triple-product identity guarantees: the construction dodges away from the side the threat passes on, with no case analysis.</p>
+</div>
+</div>
+</div>
+<ol start="4" type="1">
+<li>A threat approaches with <span class="math inline">\(\mathbf{r} = (5, 5, 0)\)</span> and <span class="math inline">\(\mathbf{v}_{rel} = (-2, -2, 0)\)</span>. Compute the miss vector and <span class="math inline">\(\mathbf{v}_{rel}\times\mathbf{r}\)</span>, explain what has happened geometrically, and state what the implementation does about it.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><span class="math inline">\(t^* = 20/8 = 2.5\)</span> s and <span class="math inline">\(\mathbf{m} = (5,5,0) + (-2,-2,0)(2.5) = (0,0,0)\)</span>: a predicted dead-center collision. The cross product also vanishes — <span class="math inline">\(\mathbf{v}_{rel}\times\mathbf{r} = (0, 0, (-2)(5)-(-2)(5)) = \mathbf{0}\)</span> — because <span class="math inline">\(\mathbf{r}\)</span> and <span class="math inline">\(\mathbf{v}_{rel}\)</span> are anti-parallel: the threat is coming straight down the line of sight, so there is no “side it will pass on” and every perpendicular is equally good. Code cannot normalize a zero vector, so the implementation falls back to <span class="math inline">\(\mathbf{v}_{rel}\times\hat{\mathbf{d}}\)</span> (a horizontal sidestep perpendicular to the approach), and if the threat’s track is itself vertical, to any fixed horizontal direction. The most symmetric geometry is the most dangerous one, and it is handled by explicit fallback, not by hoping the norm is never small.</p>
+</div>
+</div>
+</div>
+<ol start="5" type="1">
+<li>The chapter’s escape blended “climb” and “away from the pass” equally, yielding a 7.72 m verified miss — yet a pure westward sidestep at the same 5 m/s yields about 7.9 m, slightly better. Why might the mission still prefer the blend?</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Because miss distance against <em>this</em> threat is not the only currency. The climb component buys vertical separation (the goose passes below, not beside), moves the drone away from the ground and low obstacles just as an aggressive lateral maneuver makes position error most likely, and makes progress toward the designated safe altitude that defines the maneuver’s endpoint — turning “flee” into a bounded behavior with a destination. The pure sidestep optimizes a single scalar; the blend spends a fraction of a metre of miss distance on robustness. Both live in the plane perpendicular to the threat’s track, which is the property that actually defeats the threat.</p>
+</div>
+</div>
+</div>
+<ol start="6" type="1">
+<li>Explain why the evasion vector is recomputed at the estimator’s full rate rather than executed once, giving one reason rooted in estimation and one rooted in the threat’s behavior — and name the class of threat for which even a recomputed <em>vector</em> is not enough.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled" title="Show answer">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Show answer
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Estimation: the threat’s velocity comes from differencing noisy world-frame positions, so any single snapshot can be badly wrong; re-running the assessment averages the decision over many estimates instead of betting the airframe on one. Behavior: the CPA extrapolation assumes a straight track, so if the threat turns, the old escape vector points the wrong way; the recomputation loop continuously re-aims the escape at the current geometry. The class that defeats both: a <em>pursuing</em> threat, which re-aims at the drone every instant — there is then no fixed track to be perpendicular to, and the tools become potential fields, velocity obstacles, or rapid re-planning, with a filter (e.g., Kalman) improving the threat-state estimate underneath all of them.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="try-it" class="level2" data-number="20.9">
+<h2 data-number="20.9" class="anchored" data-anchor-id="try-it"><span class="header-section-number">20.9</span> Try It</h2>
+<p><strong>Part 1 — implement, reproduce, then attack it with randomness.</strong> Implement <code>evasion_command()</code> exactly as specified, plus a helper <code>cpa(r, v_rel)</code> returning <span class="math inline">\((t^*, \mathbf{m})\)</span>. Reproduce the chapter’s encounter — drone <span class="math inline">\((30,10,-10)\)</span> at <span class="math inline">\((1,0,0)\)</span> m/s, threat <span class="math inline">\((38,12,-10)\)</span> at <span class="math inline">\((-3,0,0)\)</span> m/s — and confirm every intermediate: <span class="math inline">\(\mathbf{r}\cdot\mathbf{v}_{rel} = -32\)</span>, <span class="math inline">\(t^* = 2.0\)</span> s, miss 2.0 m, <span class="math inline">\(\mathbf{u}_1 = (0,0,-8)\)</span>, <span class="math inline">\(\mathbf{v}_{cmd} = (0,-3.54,-3.54)\)</span>, and a verified post-maneuver miss of 7.72 m. Then Monte Carlo it: generate ten thousand random encounters (positions in a 40 m cube, speeds up to 15 m/s), and assert three invariants on every triggering case — the returned command is perpendicular to <span class="math inline">\(\mathbf{v}_{rel}\)</span> to numerical precision; its sidestep opposes the predicted pass, <span class="math inline">\(\mathbf{v}_{cmd} \cdot \mathbf{m} \le 0\)</span>; and, for encounters that begin from hover, the recomputed miss under the command is never smaller than the unassisted miss. Then relax the hover restriction and <em>study the violations that appear</em> rather than suppressing them: a drone already moving fast in a favorable direction can lose ground when the command discards that velocity for a fixed-speed escape (a case for scaling <span class="math inline">\(v_{esc}\)</span>, not for trusting momentum), and a threat passing far overhead draws a descending dodge that a mission altitude floor must cap. Log the near-degenerate geometries (smallest <span class="math inline">\(\lVert\mathbf{u}_1\rVert\)</span> before fallback) and check the fallback fired. A control law that survives ten thousand random geometries — including the ones that expose its assumptions — is trustworthy in a way a worked example alone is not.</p>
+<p><strong>Part 2 — close the loop in simulation.</strong> Move the function into a simulated encounter: propagate a straight-flying threat and a drone that, on trigger, slews its velocity toward the command under a 3 m/s² acceleration cap (the bound a real airframe imposes), re-running the full assessment at 20 Hz. Plot both 3D trajectories and the separation-versus-time curve, marking the trigger instant, the unassisted CPA prediction, and the actual minimum separation achieved — then sweep the trigger horizon from 0.5 s to 5 s and plot achieved miss distance against warning time, which makes the price of late detection quantitative. Finally, make the threat pursue: re-aim its velocity at the drone’s current position each tick and watch the fixed-vector escape degrade as pursuit speed rises. Three sentences: at what pursuer speed does the perpendicular escape stop clearing the safety radius, and which For More technique would you reach for first, and why? In SITL, the same loop runs against PX4 with the command streamed as an Offboard velocity setpoint — the configuration the related lab’s threat-injection exercise grades.</p>
+<p><strong>Related Lab:</strong> See <a href="../../appendices/appendix-b-labs.html#autonomous-state-machine-control">Appendix B</a> for the lab assignment that applies this chapter’s concepts.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../chapters/04-path-planning-coordination/04-02-path-planning-search-grids.html" class="pagination-link" aria-label="Path Planning on the Edge: Search Grids and Coverage Algorithms">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Path Planning on the Edge: Search Grids and Coverage Algorithms</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../chapters/04-path-planning-coordination/04-04-finite-state-machines-behavior-trees.html" class="pagination-link" aria-label="Finite State Machines and Behavior Trees for Mission Logic">
+        <span class="nav-page-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Finite State Machines and Behavior Trees for Mission Logic</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
