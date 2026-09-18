@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" font-family="Helvetica, Arial, sans-serif" xml:space="preserve">
+  <defs>
+    <marker id="tlTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+    <marker id="tlAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b26a1a"/>
+    </marker>
+    <marker id="tlGrey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#666"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="640" fill="#ffffff"/>
+
+  <text x="480" y="28" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">Two loops, one camera</text>
+  <text x="480" y="50" font-size="13" fill="#555" text-anchor="middle">Both loops consume the same detection; they differ in what they compute from it, how fast they act, and what they can fail at.</text>
+
+  <!-- detector -->
+  <rect x="38" y="240" width="158" height="96" rx="8" fill="#f4f8f9" stroke="#444" stroke-width="1.8"/>
+  <text x="117" y="272" font-size="13" font-weight="bold" fill="#222" text-anchor="middle">Detector</text>
+  <text x="117" y="290" font-size="10.5" fill="#555" text-anchor="middle">(Part III pipeline)</text>
+  <text x="117" y="310" font-size="10.5" fill="#555" text-anchor="middle">bounding box + depth,</text>
+  <text x="117" y="324" font-size="10.5" fill="#555" text-anchor="middle">tracked frame to frame</text>
+
+  <!-- split arrows -->
+  <path d="M 196 268 C 226 240 236 200 250 176" fill="none" stroke="#1a7a8a" stroke-width="2.4" marker-end="url(#tlTeal)"/>
+  <text x="230" y="192" font-size="10" fill="#1a4a5a" font-style="italic" text-anchor="end">box centroid</text>
+  <path d="M 196 312 C 226 340 236 380 250 404" fill="none" stroke="#b26a1a" stroke-width="2.4" marker-end="url(#tlAmber)"/>
+  <text x="230" y="396" font-size="10" fill="#8a4d0f" font-style="italic" text-anchor="end">box + depth</text>
+
+  <!-- INNER LOOP band (teal) -->
+  <rect x="256" y="86" width="460" height="150" rx="10" fill="#eef4f5" stroke="#1a7a8a" stroke-width="1.6"/>
+  <text x="270" y="110" font-size="12.5" font-weight="bold" fill="#1a4a5a">INNER LOOP &#8212; image-based (IBVS)</text>
+  <text x="700" y="110" font-size="10.5" fill="#1a4a5a" font-style="italic" text-anchor="end">every frame, ~30 Hz</text>
+
+  <rect x="272" y="126" width="180" height="64" rx="6" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.4"/>
+  <text x="362" y="150" font-size="11" font-weight="bold" fill="#1a4a5a" text-anchor="middle">pixel error</text>
+  <text x="362" y="166" font-size="10.5" fill="#333" text-anchor="middle">(e&#8202;<tspan font-size="75%" baseline-shift="sub">x</tspan>, e&#8202;<tspan font-size="75%" baseline-shift="sub">y</tspan>) from image centre</text>
+  <text x="362" y="180" font-size="10" fill="#555" font-style="italic" text-anchor="middle">no depth, no calibration</text>
+
+  <line x1="452" y1="158" x2="500" y2="158" stroke="#1a7a8a" stroke-width="2.2" marker-end="url(#tlTeal)"/>
+
+  <rect x="504" y="126" width="196" height="64" rx="6" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.4"/>
+  <text x="602" y="150" font-size="11" font-weight="bold" fill="#1a4a5a" text-anchor="middle">proportional centering law</text>
+  <text x="602" y="166" font-size="10.5" fill="#333" text-anchor="middle">&#969;&#8202;<tspan font-size="75%" baseline-shift="sub">z</tspan> = K&#8202;<tspan font-size="75%" baseline-shift="sub">yaw</tspan>&#8202;&#234;&#8202;<tspan font-size="75%" baseline-shift="sub">x</tspan>,&#160;&#160;v&#8202;<tspan font-size="75%" baseline-shift="sub">D</tspan> = K&#8202;<tspan font-size="75%" baseline-shift="sub">alt</tspan>&#8202;&#234;&#8202;<tspan font-size="75%" baseline-shift="sub">y</tspan></text>
+  <text x="602" y="180" font-size="10" fill="#555" font-style="italic" text-anchor="middle">deadband + saturation</text>
+
+  <text x="270" y="222" font-size="10.5" fill="#1a4a5a" font-style="italic">answers: &#8220;am I still looking at it &#8212; which way did it just move?&#8221;</text>
+
+  <!-- OUTER LOOP band (amber) -->
+  <rect x="256" y="346" width="460" height="168" rx="10" fill="#fdf6ec" stroke="#b26a1a" stroke-width="1.6"/>
+  <text x="270" y="370" font-size="12.5" font-weight="bold" fill="#8a4d0f">OUTER LOOP &#8212; position-based (PBVS)</text>
+  <text x="700" y="370" font-size="10.5" fill="#8a4d0f" font-style="italic" text-anchor="end">detection + transform rate</text>
+
+  <rect x="272" y="386" width="130" height="62" rx="6" fill="#ffffff" stroke="#b26a1a" stroke-width="1.4"/>
+  <text x="337" y="410" font-size="11" font-weight="bold" fill="#8a4d0f" text-anchor="middle">depth lookup</text>
+  <text x="337" y="426" font-size="10.5" fill="#333" text-anchor="middle">at the box centroid</text>
+
+  <line x1="402" y1="417" x2="428" y2="417" stroke="#b26a1a" stroke-width="2.2" marker-end="url(#tlAmber)"/>
+
+  <rect x="432" y="386" width="140" height="62" rx="6" fill="#ffffff" stroke="#b26a1a" stroke-width="1.4"/>
+  <text x="502" y="406" font-size="11" font-weight="bold" fill="#8a4d0f" text-anchor="middle">frame chain</text>
+  <text x="502" y="422" font-size="10.5" fill="#333" text-anchor="middle">camera &#8594; body &#8594; NED</text>
+  <text x="502" y="437" font-size="10" fill="#555" font-style="italic" text-anchor="middle">the Coordinate Frames chapter</text>
+
+  <line x1="572" y1="417" x2="598" y2="417" stroke="#b26a1a" stroke-width="2.2" marker-end="url(#tlAmber)"/>
+
+  <rect x="602" y="386" width="100" height="62" rx="6" fill="#ffffff" stroke="#b26a1a" stroke-width="1.4"/>
+  <text x="652" y="406" font-size="11" font-weight="bold" fill="#8a4d0f" text-anchor="middle">approach /</text>
+  <text x="652" y="420" font-size="11" font-weight="bold" fill="#8a4d0f" text-anchor="middle">standoff</text>
+  <text x="652" y="436" font-size="10.5" fill="#333" text-anchor="middle">to the 3D estimate</text>
+
+  <text x="270" y="470" font-size="10.5" fill="#8a4d0f" font-style="italic">answers: &#8220;where is it, how do I get there, when do I stop?&#8221;</text>
+  <text x="270" y="487" font-size="10.5" fill="#8a4d0f" font-style="italic">carries the calibration + depth error budget (~0.5 m at 6 m)</text>
+  <text x="270" y="502" font-size="10.5" fill="#8a4d0f" font-style="italic">and updates only while the target is seen</text>
+
+  <!-- merge into combiner -->
+  <path d="M 716 158 C 752 168 766 210 772 246" fill="none" stroke="#1a7a8a" stroke-width="2.4" marker-end="url(#tlTeal)"/>
+  <path d="M 716 417 C 752 407 766 340 772 316" fill="none" stroke="#b26a1a" stroke-width="2.4" marker-end="url(#tlAmber)"/>
+
+  <rect x="742" y="250" width="180" height="62" rx="8" fill="#f4f8f9" stroke="#444" stroke-width="1.8"/>
+  <text x="832" y="272" font-size="11.5" font-weight="bold" fill="#222" text-anchor="middle">combine commands</text>
+  <text x="832" y="288" font-size="10.5" fill="#555" text-anchor="middle">yaw/vertical from inner loop,</text>
+  <text x="832" y="302" font-size="10.5" fill="#555" text-anchor="middle">approach from outer loop</text>
+
+  <line x1="832" y1="312" x2="832" y2="352" stroke="#666" stroke-width="2.2" marker-end="url(#tlGrey)"/>
+  <text x="842" y="336" font-size="10" fill="#555" font-style="italic">shared slew limiter</text>
+
+  <rect x="742" y="356" width="180" height="58" rx="8" fill="#ffffff" stroke="#444" stroke-width="1.8"/>
+  <text x="832" y="379" font-size="11.5" font-weight="bold" fill="#222" text-anchor="middle">PX4 flight controller</text>
+  <text x="832" y="395" font-size="10.5" fill="#555" text-anchor="middle">Offboard velocity + yaw-rate</text>
+
+  <!-- feedback path -->
+  <path d="M 832 414 C 832 560 300 580 117 560 C 100 558 100 400 108 340" fill="none" stroke="#666" stroke-width="1.8" stroke-dasharray="6 5" marker-end="url(#tlGrey)"/>
+  <text x="480" y="545" font-size="10.5" fill="#555" font-style="italic" text-anchor="middle">aircraft motion moves the camera &#8212; the world closes both loops through the same lens</text>
+
+  <!-- coupling note -->
+  <rect x="742" y="86" width="188" height="120" rx="8" fill="#ffffff" stroke="#ddd" stroke-width="1.2"/>
+  <text x="836" y="108" font-size="11.5" font-weight="bold" fill="#333" text-anchor="middle">The coupling</text>
+  <text x="754" y="128" font-size="10" fill="#333">If the goose leaves the frame, the</text>
+  <text x="754" y="142" font-size="10" fill="#333">detector goes silent and BOTH</text>
+  <text x="754" y="156" font-size="10" fill="#333">loops lose their input. The inner</text>
+  <text x="754" y="170" font-size="10" fill="#333">loop&#8217;s job is to keep the outer</text>
+  <text x="754" y="184" font-size="10" fill="#333">loop&#8217;s estimate alive &#8212; you</text>
+  <text x="754" y="198" font-size="10" fill="#333">cannot localize what you cannot see.</text>
+
+  <text x="480" y="600" font-size="11.5" fill="#555" text-anchor="middle" font-style="italic">Neither loop is redundant: delete the outer loop and the drone can stare but never arrive or stop;</text>
+  <text x="480" y="616" font-size="11.5" fill="#555" text-anchor="middle" font-style="italic">delete the inner loop and one aggressive correction walks the goose out of frame &#8212; blinding both.</text>
+</svg>

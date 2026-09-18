@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="fmArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#444"/>
+    </marker>
+  </defs>
+
+  <!-- background -->
+  <rect x="0" y="0" width="960" height="480" fill="#ffffff"/>
+
+  <!-- titles -->
+  <text x="480" y="30" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">Three materials, three failure modes</text>
+  <text x="480" y="52" font-size="12.5" fill="#555" text-anchor="middle">how failure announces itself &#8212; and what each material can and cannot absorb</text>
+
+  <!-- ============ panel A: carbon laminate ============ -->
+  <text x="170" y="88" font-size="15" font-weight="bold" fill="#222" text-anchor="middle">carbon laminate</text>
+  <text x="170" y="106" font-size="12.5" fill="#555" text-anchor="middle">brittle fracture and delamination</text>
+
+  <!-- load arrow onto the snapped beam -->
+  <line x1="170" y1="124" x2="170" y2="152" stroke="#444" stroke-width="2.2" marker-end="url(#fmArrow)"/>
+  <text x="182" y="138" font-size="11.5" fill="#555">load</text>
+
+  <!-- snapped laminate: left fragment -->
+  <g transform="rotate(-4 45 195)">
+    <path d="M45,178 h115 l7,6 l-9,6 l10,6 l-6,10 h-117 z" fill="#4a4a4a" stroke="#222" stroke-width="1.5"/>
+    <g stroke="#8a8a8a" stroke-width="0.9">
+      <line x1="48" y1="186" x2="160" y2="186"/>
+      <line x1="48" y1="194" x2="162" y2="194"/>
+      <line x1="48" y1="202" x2="158" y2="202"/>
+    </g>
+  </g>
+  <!-- snapped laminate: right fragment -->
+  <g transform="rotate(4 295 195)">
+    <path d="M295,178 h-109 l-7,6 l9,6 l-10,6 l6,10 h111 z" fill="#4a4a4a" stroke="#222" stroke-width="1.5"/>
+    <g stroke="#8a8a8a" stroke-width="0.9">
+      <line x1="188" y1="186" x2="292" y2="186"/>
+      <line x1="186" y1="194" x2="292" y2="194"/>
+      <line x1="190" y1="202" x2="292" y2="202"/>
+    </g>
+  </g>
+  <!-- splinters at the break -->
+  <g stroke="#222" stroke-width="1">
+    <line x1="167" y1="174" x2="172" y2="165"/>
+    <line x1="178" y1="172" x2="184" y2="164"/>
+    <line x1="170" y1="212" x2="165" y2="221"/>
+    <line x1="181" y1="214" x2="186" y2="222"/>
+  </g>
+  <text x="170" y="246" font-size="12.5" fill="#222" text-anchor="middle">elastic to ~1&#8211;1.5 % strain, then fracture:</text>
+  <text x="170" y="263" font-size="12.5" fill="#222" text-anchor="middle">no yield, no bend, no warning</text>
+
+  <!-- delamination sketch -->
+  <line x1="170" y1="284" x2="170" y2="304" stroke="#444" stroke-width="2.2" marker-end="url(#fmArrow)"/>
+  <text x="183" y="296" font-size="11.5" fill="#555">impact</text>
+  <rect x="50" y="310" width="240" height="34" fill="#4a4a4a" stroke="#222" stroke-width="1.5"/>
+  <g stroke="#8a8a8a" stroke-width="0.9">
+    <line x1="53" y1="319" x2="287" y2="319"/>
+    <line x1="53" y1="327" x2="287" y2="327"/>
+    <line x1="53" y1="335" x2="287" y2="335"/>
+  </g>
+  <path d="M115,327 Q170,317 225,327 Q170,337 115,327 Z" fill="#ffffff" stroke="#c9524e" stroke-width="1.5"/>
+  <text x="170" y="372" font-size="12.5" fill="#222" text-anchor="middle">impact delamination: plies separate inside &#8212;</text>
+  <text x="170" y="389" font-size="12.5" fill="#222" text-anchor="middle">looks intact, stiffness gone; taps dull, not ringing</text>
+
+  <!-- ============ panel B: aluminium ============ -->
+  <text x="490" y="88" font-size="15" font-weight="bold" fill="#222" text-anchor="middle">aluminium</text>
+  <text x="490" y="106" font-size="12.5" fill="#555" text-anchor="middle">ductile yield</text>
+
+  <!-- clamp at the fixed end -->
+  <line x1="385" y1="158" x2="385" y2="222" stroke="#555" stroke-width="2.5"/>
+  <g stroke="#777" stroke-width="1.2">
+    <line x1="385" y1="164" x2="375" y2="174"/>
+    <line x1="385" y1="178" x2="375" y2="188"/>
+    <line x1="385" y1="192" x2="375" y2="202"/>
+    <line x1="385" y1="206" x2="375" y2="216"/>
+  </g>
+
+  <!-- original straight position -->
+  <line x1="385" y1="190" x2="640" y2="190" stroke="#999" stroke-width="1.2" stroke-dasharray="6 5"/>
+  <text x="640" y="182" font-size="11" font-style="italic" fill="#777" text-anchor="end">original line</text>
+
+  <!-- bent bar: straight arm plus permanently bent arm -->
+  <rect x="385" y="177" width="100" height="26" fill="#b5b5b5" stroke="#555" stroke-width="1.5"/>
+  <polygon points="493.4,180.0 593.0,263.6 576.2,283.6 476.6,200.0" fill="#b5b5b5" stroke="#555" stroke-width="1.5"/>
+
+  <!-- plastic hinge highlight -->
+  <circle cx="485" cy="192" r="26" fill="none" stroke="#c05a1e" stroke-width="1.8" stroke-dasharray="4 4"/>
+  <line x1="452" y1="252" x2="470" y2="215" stroke="#c05a1e" stroke-width="1.2"/>
+  <text x="432" y="270" font-size="12" fill="#c05a1e" text-anchor="middle">plastic hinge &#8212;</text>
+  <text x="432" y="286" font-size="12" fill="#c05a1e" text-anchor="middle">permanent set</text>
+
+  <!-- load arrow at the free end -->
+  <line x1="592" y1="212" x2="592" y2="248" stroke="#444" stroke-width="2.2" marker-end="url(#fmArrow)"/>
+  <text x="604" y="230" font-size="11.5" fill="#555">load</text>
+
+  <text x="490" y="372" font-size="12.5" fill="#222" text-anchor="middle">yields before it breaks: the bend is the warning &#8212;</text>
+  <text x="490" y="389" font-size="12.5" fill="#222" text-anchor="middle">absorbs impact energy by deforming plastically</text>
+
+  <!-- ============ panel C: printed thermoplastic ============ -->
+  <text x="810" y="88" font-size="15" font-weight="bold" fill="#222" text-anchor="middle">printed thermoplastic</text>
+  <text x="810" y="106" font-size="12.5" fill="#555" text-anchor="middle">layer separation along the weld planes</text>
+
+  <!-- peel load arrow -->
+  <line x1="900" y1="160" x2="900" y2="128" stroke="#444" stroke-width="2.2" marker-end="url(#fmArrow)"/>
+  <text x="893" y="124" font-size="11.5" fill="#555" text-anchor="end">load across layers</text>
+
+  <!-- top block of bead rows, peeled up along a weld plane -->
+  <g transform="rotate(-6 710 214)">
+    <rect x="710" y="168" width="200" height="13" rx="6.5" fill="#5b84b8" stroke="#2f4d75" stroke-width="1.3"/>
+    <rect x="710" y="184" width="200" height="13" rx="6.5" fill="#5b84b8" stroke="#2f4d75" stroke-width="1.3"/>
+    <rect x="710" y="200" width="200" height="13" rx="6.5" fill="#5b84b8" stroke="#2f4d75" stroke-width="1.3"/>
+  </g>
+  <!-- bottom block of bead rows -->
+  <rect x="710" y="222" width="200" height="13" rx="6.5" fill="#5b84b8" stroke="#2f4d75" stroke-width="1.3"/>
+  <rect x="710" y="238" width="200" height="13" rx="6.5" fill="#5b84b8" stroke="#2f4d75" stroke-width="1.3"/>
+  <rect x="710" y="254" width="200" height="13" rx="6.5" fill="#5b84b8" stroke="#2f4d75" stroke-width="1.3"/>
+  <rect x="710" y="270" width="200" height="13" rx="6.5" fill="#5b84b8" stroke="#2f4d75" stroke-width="1.3"/>
+
+  <!-- the weld plane the crack follows -->
+  <line x1="712" y1="218" x2="908" y2="218" stroke="#c9524e" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="810" y="324" font-size="12" fill="#222" text-anchor="middle">the crack runs along an interlayer weld,</text>
+  <text x="810" y="340" font-size="12" fill="#222" text-anchor="middle">not through the plastic</text>
+
+  <text x="810" y="372" font-size="12.5" fill="#222" text-anchor="middle">interlayer welds: 30&#8211;70 % of bulk strength &#8212;</text>
+  <text x="810" y="389" font-size="12.5" fill="#222" text-anchor="middle">the part splits along the weld planes</text>
+
+  <!-- footer -->
+  <text x="480" y="430" font-size="13" font-style="italic" fill="#222" text-anchor="middle">Match the failure behaviour to the component&#8217;s job: stiff and brittle for flying structure that must not flex;</text>
+  <text x="480" y="450" font-size="13" font-style="italic" fill="#222" text-anchor="middle">tough and compliant for crash structure that must absorb a hit by deforming &#8212; with loads kept in the layer plane.</text>
+</svg>

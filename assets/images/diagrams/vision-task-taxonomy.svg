@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 470" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <g id="vttScene">
+      <!-- panel scene: sky, grass, goose -->
+      <rect x="0" y="0" width="250" height="150" fill="#dcebf2" stroke="#1a4a5a" stroke-width="2"/>
+      <rect x="1" y="95" width="248" height="54" fill="#eef6f0"/>
+      <g fill="#4a4a4a">
+        <ellipse cx="140" cy="98" rx="32" ry="14"/>
+        <path d="M 161 92 C 169 82, 171 70, 167 58" stroke="#4a4a4a" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <circle cx="167" cy="54" r="5.5"/>
+        <path d="M 172 52 L 182 55 L 172 58 z"/>
+        <path d="M 108 95 L 93 88 L 106 102 z"/>
+      </g>
+    </g>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="470" fill="#ffffff"/>
+
+  <text x="450" y="32" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">Three tasks, one input tensor</text>
+  <text x="450" y="54" font-size="13" fill="#555" text-anchor="middle">The same 480 &#215; 640 &#215; 3 frame goes in; what differs is the structure of what comes out.</text>
+
+  <!-- ============ panel 1: classification ============ -->
+  <text x="155" y="90" font-size="14.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">Classification</text>
+  <use href="#vttScene" x="30" y="102"/>
+  <!-- output -->
+  <rect x="30" y="272" width="250" height="58" rx="6" fill="#f2f6f8" stroke="#1a7a8a" stroke-width="1.5"/>
+  <text x="155" y="295" font-size="13" fill="#222" text-anchor="middle" font-family="Menlo, Consolas, monospace">goose: 0.94</text>
+  <text x="155" y="315" font-size="11.5" fill="#555" text-anchor="middle" font-family="Menlo, Consolas, monospace">no_goose: 0.06</text>
+  <text x="155" y="352" font-size="12" fill="#222" text-anchor="middle">one score per class,</text>
+  <text x="155" y="368" font-size="12" fill="#222" text-anchor="middle">for the whole frame</text>
+  <text x="155" y="390" font-size="11.5" fill="#822" text-anchor="middle" font-style="italic">says a goose exists somewhere</text>
+  <text x="155" y="405" font-size="11.5" fill="#822" text-anchor="middle" font-style="italic">in 307,200 pixels &#8212; not where</text>
+
+  <!-- ============ panel 2: detection ============ -->
+  <text x="450" y="90" font-size="14.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">Object detection</text>
+  <use href="#vttScene" x="325" y="102"/>
+  <!-- bounding box around goose (scene-local goose spans x~90..185, y~48..112 => +325,+102) -->
+  <rect x="408" y="144" width="110" height="78" fill="none" stroke="#8a5210" stroke-width="3"/>
+  <rect x="408" y="130" width="86" height="15" fill="#8a5210"/>
+  <text x="451" y="141.5" font-size="10.5" fill="#ffffff" text-anchor="middle">goose 0.91</text>
+  <!-- box centre -->
+  <circle cx="463" cy="183" r="3.5" fill="#822"/>
+  <!-- output -->
+  <rect x="325" y="272" width="250" height="58" rx="6" fill="#f2f6f8" stroke="#1a7a8a" stroke-width="1.5"/>
+  <text x="450" y="295" font-size="12" fill="#222" text-anchor="middle" font-family="Menlo, Consolas, monospace">(u, v, w, h, class, conf)</text>
+  <text x="450" y="315" font-size="11.5" fill="#555" text-anchor="middle" font-family="Menlo, Consolas, monospace">(332, 165, 190, 132, goose, 0.91)</text>
+  <text x="450" y="352" font-size="12" fill="#222" text-anchor="middle">a list of boxes &#8212; zero, one,</text>
+  <text x="450" y="368" font-size="12" fill="#222" text-anchor="middle">or many entries per frame</text>
+  <text x="450" y="390" font-size="11.5" fill="#2f5a3a" text-anchor="middle" font-style="italic">the box centre is a bearing to steer</text>
+  <text x="450" y="405" font-size="11.5" fill="#2f5a3a" text-anchor="middle" font-style="italic">toward &#8212; what the Detector node needs</text>
+
+  <!-- ============ panel 3: pose / keypoints ============ -->
+  <text x="745" y="90" font-size="14.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">Pose / keypoint estimation</text>
+  <use href="#vttScene" x="620" y="102"/>
+  <!-- keypoints on goose: head(787,156), neck base(783,190), body centre(760,200), tail(715,193), wingtip(755,187)-->
+  <g stroke="#822" stroke-width="1.8" fill="none">
+    <line x1="787" y1="156" x2="783" y2="188"/>
+    <line x1="783" y1="188" x2="762" y2="199"/>
+    <line x1="762" y1="199" x2="717" y2="194"/>
+  </g>
+  <g fill="#e8b04a" stroke="#822" stroke-width="1.5">
+    <circle cx="787" cy="156" r="4.5"/>
+    <circle cx="783" cy="188" r="4.5"/>
+    <circle cx="762" cy="199" r="4.5"/>
+    <circle cx="717" cy="194" r="4.5"/>
+  </g>
+  <text x="800" y="152" font-size="10" fill="#822">head</text>
+  <text x="796" y="192" font-size="10" fill="#822">neck</text>
+  <text x="756" y="228" font-size="10" fill="#822" text-anchor="middle">body</text>
+  <text x="712" y="184" font-size="10" fill="#822" text-anchor="end">tail</text>
+  <!-- output -->
+  <rect x="620" y="272" width="250" height="58" rx="6" fill="#f2f6f8" stroke="#1a7a8a" stroke-width="1.5"/>
+  <text x="745" y="295" font-size="12" fill="#222" text-anchor="middle" font-family="Menlo, Consolas, monospace">head:(462,54) neck:(458,88)</text>
+  <text x="745" y="315" font-size="12" fill="#555" text-anchor="middle" font-family="Menlo, Consolas, monospace">body:(437,98) tail:(392,93)</text>
+  <text x="745" y="352" font-size="12" fill="#222" text-anchor="middle">named (u, v) coordinates</text>
+  <text x="745" y="368" font-size="12" fill="#222" text-anchor="middle">per detected animal</text>
+  <text x="745" y="390" font-size="11.5" fill="#555" text-anchor="middle" font-style="italic">geometry within the object:</text>
+  <text x="745" y="405" font-size="11.5" fill="#555" text-anchor="middle" font-style="italic">which way the bird is facing</text>
+
+  <!-- footer -->
+  <text x="450" y="438" font-size="13" fill="#222" text-anchor="middle">Output structure is a mission decision: richer structure costs more computation and more labelled training data.</text>
+  <text x="450" y="458" font-size="12.5" fill="#555" text-anchor="middle" font-style="italic">The running example flies the middle column &#8212; detection &#8212; because deterrence needs a target to close on, not a yes/no.</text>
+</svg>

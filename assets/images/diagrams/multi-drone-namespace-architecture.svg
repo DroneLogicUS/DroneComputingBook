@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 700" font-family="Helvetica, Arial, sans-serif" xml:space="preserve">
+  <defs>
+    <marker id="mnTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+    <marker id="mnAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b26a1a"/>
+    </marker>
+    <marker id="mnGrey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#666"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="700" fill="#ffffff"/>
+
+  <text x="480" y="26" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">From one drone to N: namespaces, one new node, two crossing arrows</text>
+  <text x="480" y="47" font-size="13" fill="#555" text-anchor="middle">The single-drone stack the reader already knows, cloned per namespace &#8212; launched differently, not rewritten.</text>
+
+  <!-- ===== fleet coordinator ===== -->
+  <rect x="325" y="62" width="310" height="52" rx="8" fill="#b26a1a"/>
+  <text x="480" y="83" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">FLEET COORDINATOR</text>
+  <text x="480" y="99" font-size="10.5" fill="#fbe8d0" text-anchor="middle">slow loop, 1 Hz: sectors and roles &#8212; owns no aircraft</text>
+
+  <!-- role assignment arrows down -->
+  <path d="M 400 114 L 248 150" fill="none" stroke="#b26a1a" stroke-width="2" marker-end="url(#mnAmber)"/>
+  <path d="M 560 114 L 712 150" fill="none" stroke="#b26a1a" stroke-width="2" marker-end="url(#mnAmber)"/>
+  <text x="292" y="126" font-size="10" fill="#8a4d0f" text-anchor="end">goose/role: "herd:0"</text>
+  <text x="668" y="126" font-size="10" fill="#8a4d0f">goose/role: "guard:exit"</text>
+  <!-- telemetry up (subscriptions) -->
+  <path d="M 190 150 L 322 86" fill="none" stroke="#999" stroke-width="1.2" stroke-dasharray="4 4" marker-end="url(#mnGrey)"/>
+  <path d="M 770 150 L 638 86" fill="none" stroke="#999" stroke-width="1.2" stroke-dasharray="4 4" marker-end="url(#mnGrey)"/>
+  <text x="222" y="98" font-size="9.5" font-style="italic" fill="#777" text-anchor="end">positions, targets</text>
+  <text x="738" y="98" font-size="9.5" font-style="italic" fill="#777">positions, targets</text>
+
+  <!-- ===== namespace boxes ===== -->
+  <rect x="30" y="150" width="435" height="418" rx="10" fill="#f4f8f9" stroke="#8fb4bc" stroke-width="1.6"/>
+  <rect x="495" y="150" width="435" height="418" rx="10" fill="#f4f8f9" stroke="#8fb4bc" stroke-width="1.6"/>
+  <text x="52" y="174" font-size="14" font-weight="bold" fill="#1a4a5a" font-family="Courier, monospace">/drone_1/</text>
+  <text x="517" y="174" font-size="14" font-weight="bold" fill="#1a4a5a" font-family="Courier, monospace">/drone_2/</text>
+
+  <!-- ===== per-namespace stack (drone_1, x offset 0; drone_2, x offset 465) ===== -->
+  <!-- supervisor -->
+  <g>
+    <rect x="60" y="188" width="250" height="52" rx="7" fill="#1a7a8a"/>
+    <text x="185" y="209" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">MISSION SUPERVISOR</text>
+    <text x="185" y="224" font-size="10" fill="#d8ecef" text-anchor="middle">five-state machine &#183; 20 Hz tick &#183; single writer</text>
+    <rect x="525" y="188" width="250" height="52" rx="7" fill="#1a7a8a"/>
+    <text x="650" y="209" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">MISSION SUPERVISOR</text>
+    <text x="650" y="224" font-size="10" fill="#d8ecef" text-anchor="middle">five-state machine &#183; 20 Hz tick &#183; single writer</text>
+  </g>
+  <!-- heartbeat note -->
+  <text x="330" y="200" font-size="9.5" font-style="italic" fill="#8a4d0f">role stale &gt; 5 s:</text>
+  <text x="330" y="212" font-size="9.5" font-style="italic" fill="#8a4d0f">finish own sector,</text>
+  <text x="330" y="224" font-size="9.5" font-style="italic" fill="#8a4d0f">then return home</text>
+  <text x="795" y="200" font-size="9.5" font-style="italic" fill="#8a4d0f">role stale &gt; 5 s:</text>
+  <text x="795" y="212" font-size="9.5" font-style="italic" fill="#8a4d0f">finish own sector,</text>
+  <text x="795" y="224" font-size="9.5" font-style="italic" fill="#8a4d0f">then return home</text>
+
+  <!-- token badge -->
+  <g>
+    <rect x="88" y="256" width="196" height="24" rx="12" fill="#fdf6ec" stroke="#b26a1a" stroke-width="1.3"/>
+    <text x="186" y="272" font-size="9.5" fill="#8a4d0f" text-anchor="middle" font-family="Courier, monospace">goose/active_controller</text>
+    <rect x="553" y="256" width="196" height="24" rx="12" fill="#fdf6ec" stroke="#b26a1a" stroke-width="1.3"/>
+    <text x="651" y="272" font-size="9.5" fill="#8a4d0f" text-anchor="middle" font-family="Courier, monospace">goose/active_controller</text>
+  </g>
+  <text x="186" y="294" font-size="9" font-style="italic" fill="#8a4d0f" text-anchor="middle">the token: per-vehicle scope</text>
+  <text x="651" y="294" font-size="9" font-style="italic" fill="#8a4d0f" text-anchor="middle">the token: per-vehicle scope</text>
+  <path d="M 185 240 L 185 254" fill="none" stroke="#b26a1a" stroke-width="1.6" marker-end="url(#mnAmber)"/>
+  <path d="M 650 240 L 650 254" fill="none" stroke="#b26a1a" stroke-width="1.6" marker-end="url(#mnAmber)"/>
+
+  <!-- behavior nodes -->
+  <g>
+    <rect x="60" y="308" width="110" height="44" rx="7" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.5"/>
+    <text x="115" y="326" font-size="11" font-weight="bold" fill="#1a4a5a" text-anchor="middle">navigation</text>
+    <text x="115" y="341" font-size="9.5" fill="#555" text-anchor="middle">sector sweep</text>
+    <rect x="200" y="308" width="110" height="44" rx="7" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.5"/>
+    <text x="255" y="326" font-size="11" font-weight="bold" fill="#1a4a5a" text-anchor="middle">harassment</text>
+    <text x="255" y="341" font-size="9.5" fill="#555" text-anchor="middle">orbit / herd</text>
+    <rect x="525" y="308" width="110" height="44" rx="7" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.5"/>
+    <text x="580" y="326" font-size="11" font-weight="bold" fill="#1a4a5a" text-anchor="middle">navigation</text>
+    <text x="580" y="341" font-size="9.5" fill="#555" text-anchor="middle">corridor guard</text>
+    <rect x="665" y="308" width="110" height="44" rx="7" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.5"/>
+    <text x="720" y="326" font-size="11" font-weight="bold" fill="#1a4a5a" text-anchor="middle">harassment</text>
+    <text x="720" y="341" font-size="9.5" fill="#555" text-anchor="middle">orbit / herd</text>
+  </g>
+  <path d="M 186 280 L 130 306" fill="none" stroke="#b26a1a" stroke-width="1.3" stroke-dasharray="4 3"/>
+  <path d="M 186 280 L 242 306" fill="none" stroke="#b26a1a" stroke-width="1.3" stroke-dasharray="4 3"/>
+  <path d="M 651 280 L 595 306" fill="none" stroke="#b26a1a" stroke-width="1.3" stroke-dasharray="4 3"/>
+  <path d="M 651 280 L 707 306" fill="none" stroke="#b26a1a" stroke-width="1.3" stroke-dasharray="4 3"/>
+
+  <!-- perception -->
+  <g>
+    <rect x="340" y="308" width="105" height="44" rx="7" fill="#ffffff" stroke="#888" stroke-width="1.3"/>
+    <text x="392" y="326" font-size="11" font-weight="bold" fill="#444" text-anchor="middle">perception</text>
+    <text x="392" y="341" font-size="9" fill="#555" text-anchor="middle" font-family="Courier, monospace">goose/target</text>
+    <rect x="805" y="308" width="105" height="44" rx="7" fill="#ffffff" stroke="#888" stroke-width="1.3"/>
+    <text x="857" y="326" font-size="11" font-weight="bold" fill="#444" text-anchor="middle">perception</text>
+    <text x="857" y="341" font-size="9" fill="#555" text-anchor="middle" font-family="Courier, monospace">goose/target</text>
+  </g>
+
+  <!-- separation filter -->
+  <g>
+    <rect x="105" y="392" width="260" height="42" rx="7" fill="#fdf6ec" stroke="#b26a1a" stroke-width="1.6"/>
+    <text x="235" y="409" font-size="11" font-weight="bold" fill="#8a4d0f" text-anchor="middle">peer-separation filter (ORCA-style)</text>
+    <text x="235" y="424" font-size="9.5" font-style="italic" fill="#8a4d0f" text-anchor="middle">every setpoint passes through it &#8212; like the safety-radius projection</text>
+    <rect x="570" y="392" width="260" height="42" rx="7" fill="#fdf6ec" stroke="#b26a1a" stroke-width="1.6"/>
+    <text x="700" y="409" font-size="11" font-weight="bold" fill="#8a4d0f" text-anchor="middle">peer-separation filter (ORCA-style)</text>
+    <text x="700" y="424" font-size="9.5" font-style="italic" fill="#8a4d0f" text-anchor="middle">every setpoint passes through it &#8212; like the safety-radius projection</text>
+  </g>
+  <path d="M 115 352 L 195 390" fill="none" stroke="#1a7a8a" stroke-width="1.8" marker-end="url(#mnTeal)"/>
+  <path d="M 255 352 L 245 390" fill="none" stroke="#1a7a8a" stroke-width="1.8" marker-end="url(#mnTeal)"/>
+  <path d="M 580 352 L 660 390" fill="none" stroke="#1a7a8a" stroke-width="1.8" marker-end="url(#mnTeal)"/>
+  <path d="M 720 352 L 710 390" fill="none" stroke="#1a7a8a" stroke-width="1.8" marker-end="url(#mnTeal)"/>
+
+  <!-- PX4 bridge -->
+  <g>
+    <rect x="105" y="470" width="260" height="52" rx="7" fill="#e8eef0" stroke="#1a7a8a" stroke-width="1.6"/>
+    <text x="235" y="490" font-size="11.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">PX4 bridge &#8212; own autopilot instance</text>
+    <text x="235" y="507" font-size="9.5" fill="#555" text-anchor="middle" font-family="Courier, monospace">fmu/in/... , fmu/out/vehicle_local_position</text>
+    <rect x="570" y="470" width="260" height="52" rx="7" fill="#e8eef0" stroke="#1a7a8a" stroke-width="1.6"/>
+    <text x="700" y="490" font-size="11.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">PX4 bridge &#8212; own autopilot instance</text>
+    <text x="700" y="507" font-size="9.5" fill="#555" text-anchor="middle" font-family="Courier, monospace">fmu/in/... , fmu/out/vehicle_local_position</text>
+  </g>
+  <path d="M 235 434 L 235 468" fill="none" stroke="#1a7a8a" stroke-width="2" marker-end="url(#mnTeal)"/>
+  <path d="M 700 434 L 700 468" fill="none" stroke="#1a7a8a" stroke-width="2" marker-end="url(#mnTeal)"/>
+  <text x="248" y="454" font-size="9.5" font-style="italic" fill="#1a4a5a">Offboard setpoints</text>
+  <text x="713" y="454" font-size="9.5" font-style="italic" fill="#1a4a5a">Offboard setpoints</text>
+
+  <!-- per-namespace footnote -->
+  <text x="247" y="546" font-size="9.5" font-style="italic" fill="#666" text-anchor="middle">supervisor, token, behaviors, T_HARASS_DONE: all unchanged from the single-drone chapters</text>
+  <text x="712" y="546" font-size="9.5" font-style="italic" fill="#666" text-anchor="middle">same stack, different launch namespace and sector assignment</text>
+
+  <!-- ===== crossing peer telemetry (the two arrows that cross namespaces) ===== -->
+  <path d="M 365 496 C 470 496 480 413 568 407" fill="none" stroke="#b26a1a" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#mnAmber)"/>
+  <path d="M 570 512 C 470 516 460 427 367 415" fill="none" stroke="#b26a1a" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#mnAmber)"/>
+  <text x="467" y="463" font-size="10" font-weight="bold" fill="#8a4d0f" text-anchor="middle">peer telemetry</text>
+  <text x="467" y="476" font-size="9.5" font-style="italic" fill="#8a4d0f" text-anchor="middle">crosses namespaces</text>
+
+  <!-- ===== footer: the three rules ===== -->
+  <rect x="30" y="584" width="900" height="102" rx="8" fill="#f7f7f7" stroke="#cccccc" stroke-width="1"/>
+  <text x="480" y="606" font-size="12" font-weight="bold" fill="#333" text-anchor="middle">Three rules carry the whole extension</text>
+  <text x="52" y="628" font-size="11" fill="#444">1. Everything about flying one aircraft stays inside that aircraft's namespace &#8212; the single-drone stack is launched, not rewritten.</text>
+  <text x="52" y="648" font-size="11" fill="#444">2. The active-controller token arbitrates nodes within a vehicle, never vehicles within a fleet &#8212; it is scoped to one PX4's setpoint stream.</text>
+  <text x="52" y="668" font-size="11" fill="#444">3. The coordinator allocates work but owns no aircraft &#8212; its death degrades the mission (fallback: finish sector, go home), grounds nothing.</text>
+</svg>

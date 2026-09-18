@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 480" font-family="Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="900" height="480" fill="#ffffff"/>
+
+  <text x="450" y="30" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">Scoring one detection: IoU decides the match, and the counts fill a confusion matrix</text>
+
+  <!-- ===== left: IoU geometry ===== -->
+  <text x="185" y="66" font-size="13.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">Intersection over Union (IoU)</text>
+
+  <!-- GT box: (55,95) 150x120 ; pred: (100,110) 150x120 ; intersection (100,110)-(205,215) -->
+  <rect x="100" y="110" width="105" height="105" fill="#f6e3c5"/>
+  <rect x="55" y="95" width="150" height="120" fill="none" stroke="#1a4a5a" stroke-width="2.5" stroke-dasharray="7 4"/>
+  <rect x="100" y="110" width="150" height="120" fill="none" stroke="#8a5210" stroke-width="2.5"/>
+  <text x="60" y="90" font-size="11.5" fill="#1a4a5a" font-weight="bold">ground truth (labeled box)</text>
+  <text x="252" y="243" font-size="11.5" fill="#8a5210" font-weight="bold" text-anchor="end">prediction</text>
+  <text x="152" y="167" font-size="11" fill="#6a4a10" text-anchor="middle">overlap</text>
+
+  <g font-size="12" fill="#222">
+    <text x="40" y="272">|GT| = 8,000 px&#178;&#160;&#160;&#160;|pred| = 8,000 px&#178;</text>
+    <text x="40" y="292">intersection = 4,900 px&#178;</text>
+    <text x="40" y="312">union = 8,000 + 8,000 &#8722; 4,900 = 11,100 px&#178;</text>
+    <text x="40" y="338" font-weight="bold">IoU = 4,900 / 11,100 = 0.44</text>
+  </g>
+  <text x="40" y="360" font-size="11.5" fill="#822" font-style="italic">0.44 &lt; 0.50 &#8594; no match: this detection</text>
+  <text x="40" y="374" font-size="11.5" fill="#822" font-style="italic">counts as a false positive, and the goose</text>
+  <text x="40" y="388" font-size="11.5" fill="#822" font-style="italic">it grazed as a false negative</text>
+
+  <!-- ===== middle: outcome rules ===== -->
+  <rect x="330" y="56" width="240" height="330" rx="8" fill="#f2f6f8" stroke="#1a7a8a" stroke-width="1.5"/>
+  <text x="450" y="80" font-size="13.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">Every detection and every</text>
+  <text x="450" y="97" font-size="13.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">labeled object gets one verdict</text>
+
+  <g font-size="12" fill="#222">
+    <text x="346" y="128" font-weight="bold" fill="#2f5a3a">True positive (TP)</text>
+    <text x="346" y="145">detection matches a ground-truth</text>
+    <text x="346" y="160">box: IoU &#8805; 0.5, correct class,</text>
+    <text x="346" y="175">and that box not already claimed</text>
+
+    <text x="346" y="205" font-weight="bold" fill="#822">False positive (FP)</text>
+    <text x="346" y="222">detection with no matching truth:</text>
+    <text x="346" y="237">low IoU, wrong class, or a</text>
+    <text x="346" y="252">duplicate box on a claimed goose</text>
+
+    <text x="346" y="282" font-weight="bold" fill="#8a5210">False negative (FN)</text>
+    <text x="346" y="299">a labeled goose no detection</text>
+    <text x="346" y="314">matched &#8212; the miss the mission</text>
+    <text x="346" y="329">cares most about</text>
+  </g>
+  <text x="346" y="352" font-size="11" fill="#555" font-style="italic">&#8220;true negative&#8221; is undefined: the</text>
+  <text x="346" y="366" font-size="11" fill="#555" font-style="italic">background correctly left unboxed</text>
+  <text x="346" y="380" font-size="11" fill="#555" font-style="italic">cannot be counted</text>
+
+  <!-- ===== right: confusion matrix ===== -->
+  <text x="740" y="66" font-size="13.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">Worked validation pass, confidence &#8805; 0.5</text>
+  <text x="740" y="84" font-size="12" fill="#555" text-anchor="middle">5 labeled geese; 6 detections kept</text>
+
+  <!-- matrix: cells at x 676 and 776, width 100, rows at y 136 and 198 -->
+  <g font-size="11.5">
+    <text x="776" y="110" fill="#555" text-anchor="middle" font-weight="bold">actual</text>
+    <text x="726" y="128" fill="#555" text-anchor="middle">goose present</text>
+    <text x="826" y="128" fill="#555" text-anchor="middle">background</text>
+    <text x="668" y="170" fill="#555" text-anchor="end">detector</text>
+    <text x="668" y="184" fill="#555" text-anchor="end">says goose</text>
+    <text x="668" y="232" fill="#555" text-anchor="end">detector</text>
+    <text x="668" y="246" fill="#555" text-anchor="end">says nothing</text>
+
+    <rect x="676" y="136" width="100" height="62" fill="#eef6f0" stroke="#2f5a3a" stroke-width="1.5"/>
+    <text x="726" y="162" text-anchor="middle" font-weight="bold" fill="#2f5a3a">TP = 4</text>
+    <text x="726" y="180" text-anchor="middle" font-size="10.5" fill="#2f5a3a">geese found</text>
+
+    <rect x="776" y="136" width="100" height="62" fill="#fdf0ee" stroke="#822" stroke-width="1.5"/>
+    <text x="826" y="162" text-anchor="middle" font-weight="bold" fill="#822">FP = 2</text>
+    <text x="826" y="180" text-anchor="middle" font-size="10.5" fill="#822">false alarms</text>
+
+    <rect x="676" y="198" width="100" height="62" fill="#fdf3e6" stroke="#8a5210" stroke-width="1.5"/>
+    <text x="726" y="224" text-anchor="middle" font-weight="bold" fill="#8a5210">FN = 1</text>
+    <text x="726" y="242" text-anchor="middle" font-size="10.5" fill="#8a5210">goose missed</text>
+
+    <rect x="776" y="198" width="100" height="62" fill="#f5f5f5" stroke="#8a8a8a" stroke-width="1.5"/>
+    <text x="826" y="224" text-anchor="middle" font-weight="bold" fill="#8a8a8a">TN = &#8212;</text>
+    <text x="826" y="242" text-anchor="middle" font-size="10.5" fill="#8a8a8a">not counted</text>
+  </g>
+
+  <g font-size="12.5" fill="#222">
+    <text x="620" y="296" font-weight="bold">precision = TP / (TP + FP) = 4 / 6 = 0.67</text>
+    <text x="620" y="330" font-weight="bold">recall = TP / (TP + FN) = 4 / 5 = 0.80</text>
+  </g>
+  <text x="620" y="360" font-size="11.5" fill="#555" font-style="italic">of every 3 alerts, 2 are geese;</text>
+  <text x="620" y="375" font-size="11.5" fill="#555" font-style="italic">of every 5 geese, 4 are found</text>
+
+  <!-- footer -->
+  <rect x="30" y="404" width="840" height="60" rx="6" fill="#fdf3e6" stroke="#8a5210" stroke-width="1"/>
+  <text x="450" y="426" font-size="12.5" fill="#222" text-anchor="middle"><tspan font-weight="bold">Precision answers:</tspan> when the detector cries goose, how often is it right? <tspan font-weight="bold">Recall answers:</tspan> of the geese that were there, how many did it find?</text>
+  <text x="450" y="444" font-size="12.5" fill="#222" text-anchor="middle">Both counts depend on two thresholds chosen by the evaluator, not the model: the IoU cutoff that defines a match (0.5 here)</text>
+  <text x="450" y="459" font-size="12.5" fill="#222" text-anchor="middle">and the confidence cutoff that decides which detections are kept at all &#8212; move either, and both numbers move.</text>
+</svg>

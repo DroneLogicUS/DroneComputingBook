@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1010 660" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="mvrArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+    <marker id="mvrArrowGrey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8a8a8a"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1010" height="660" fill="#ffffff"/>
+
+  <text x="505" y="30" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">Two programming layers for the same autopilot</text>
+  <text x="505" y="52" font-size="13" fill="#555" text-anchor="middle">MAVSDK is a library inside one program; ROS 2 is a middleware between many programs.</text>
+
+  <!-- ===== left panel: MAVSDK ===== -->
+  <rect x="25" y="70" width="460" height="470" rx="10" fill="#fafcfd" stroke="#1a7a8a" stroke-width="2"/>
+  <text x="255" y="96" font-size="15" font-weight="bold" fill="#1a4a5a" text-anchor="middle">MAVSDK &#8212; the direct path</text>
+  <text x="255" y="114" font-size="11.5" fill="#555" text-anchor="middle" font-style="italic">one linear script, steps in order, each awaited</text>
+
+  <rect x="115" y="130" width="280" height="34" rx="6" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.6"/>
+  <text x="255" y="152" font-size="12" fill="#222" text-anchor="middle">connect to the serial link</text>
+  <line x1="255" y1="164" x2="255" y2="180" stroke="#1a7a8a" stroke-width="2" marker-end="url(#mvrArrow)"/>
+
+  <rect x="115" y="184" width="280" height="34" rx="6" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.6"/>
+  <text x="255" y="206" font-size="12" fill="#222" text-anchor="middle">wait for a heartbeat</text>
+  <line x1="255" y1="218" x2="255" y2="234" stroke="#1a7a8a" stroke-width="2" marker-end="url(#mvrArrow)"/>
+
+  <rect x="115" y="238" width="280" height="34" rx="6" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.6"/>
+  <text x="255" y="260" font-size="12" fill="#222" text-anchor="middle">arm &#8594; takeoff &#8594; hover &#8594; land</text>
+
+  <line x1="255" y1="272" x2="255" y2="300" stroke="#1a7a8a" stroke-width="2.4" marker-end="url(#mvrArrow)"/>
+  <text x="267" y="290" font-size="10.5" fill="#222" font-style="italic">MAVLink messages over the UART</text>
+
+  <rect x="115" y="304" width="280" height="46" rx="6" fill="#fdf3e7" stroke="#b26a1a" stroke-width="2"/>
+  <text x="255" y="323" font-size="12.5" font-weight="bold" fill="#8a4d0f" text-anchor="middle">PX4 flight controller</text>
+  <text x="255" y="340" font-size="10.5" fill="#555" text-anchor="middle" font-style="italic">translates each command internally</text>
+
+  <text x="45" y="382" font-size="11.5" font-weight="bold" fill="#1a4a5a">Best for</text>
+  <text x="45" y="400" font-size="11.5" fill="#222">&#8226; single-vehicle missions and waypoint work</text>
+  <text x="45" y="417" font-size="11.5" fill="#222">&#8226; quick prototyping: flying in a dozen lines</text>
+  <text x="45" y="434" font-size="11.5" fill="#222">&#8226; projects where the drone is the whole system</text>
+  <text x="45" y="462" font-size="11.5" font-weight="bold" fill="#8a4d0f">Limitation</text>
+  <text x="45" y="480" font-size="11.5" fill="#222">Not built for multi-sensor fusion, robot-to-robot</text>
+  <text x="45" y="497" font-size="11.5" fill="#222">communication, or large modular architectures &#8212;</text>
+  <text x="45" y="514" font-size="11.5" fill="#222">the program grows monolithic as the mission grows.</text>
+
+  <!-- ===== right panel: ROS 2 ===== -->
+  <rect x="525" y="70" width="460" height="470" rx="10" fill="#fafcfd" stroke="#1a7a8a" stroke-width="2"/>
+  <text x="755" y="96" font-size="15" font-weight="bold" fill="#1a4a5a" text-anchor="middle">ROS 2 &#8212; the middleware path</text>
+  <text x="755" y="114" font-size="11.5" fill="#555" text-anchor="middle" font-style="italic">independent nodes, coupled only by named topics</text>
+
+  <rect x="545" y="132" width="130" height="40" rx="6" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.6"/>
+  <text x="610" y="149" font-size="11.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">Camera node</text>
+  <text x="610" y="164" font-size="10" fill="#555" text-anchor="middle" font-style="italic">frames in</text>
+
+  <line x1="675" y1="152" x2="717" y2="152" stroke="#1a7a8a" stroke-width="2" marker-end="url(#mvrArrow)"/>
+  <text x="696" y="143" font-size="9.5" fill="#222" text-anchor="middle" font-style="italic">/image</text>
+
+  <rect x="721" y="132" width="130" height="40" rx="6" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.6"/>
+  <text x="786" y="149" font-size="11.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">Detection node</text>
+  <text x="786" y="164" font-size="10" fill="#555" text-anchor="middle" font-style="italic">finds the target</text>
+
+  <line x1="786" y1="172" x2="786" y2="196" stroke="#1a7a8a" stroke-width="2" marker-end="url(#mvrArrow)"/>
+  <text x="796" y="188" font-size="9.5" fill="#222" font-style="italic">/target_position</text>
+
+  <rect x="721" y="200" width="130" height="40" rx="6" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.6"/>
+  <text x="786" y="217" font-size="11.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">Mission node</text>
+  <text x="786" y="232" font-size="10" fill="#555" text-anchor="middle" font-style="italic">decides the setpoint</text>
+
+  <rect x="875" y="132" width="100" height="108" rx="6" fill="#ffffff" stroke="#8a8a8a" stroke-width="1.6"/>
+  <text x="925" y="153" font-size="11.5" font-weight="bold" fill="#555" text-anchor="middle">Failsafe</text>
+  <text x="925" y="168" font-size="11.5" font-weight="bold" fill="#555" text-anchor="middle">node</text>
+  <text x="925" y="188" font-size="9.5" fill="#666" text-anchor="middle" font-style="italic">subscribes to the</text>
+  <text x="925" y="201" font-size="9.5" fill="#666" text-anchor="middle" font-style="italic">same topics, can</text>
+  <text x="925" y="214" font-size="9.5" fill="#666" text-anchor="middle" font-style="italic">override any node</text>
+
+  <line x1="851" y1="220" x2="871" y2="220" stroke="#8a8a8a" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#mvrArrowGrey)"/>
+
+  <line x1="786" y1="240" x2="786" y2="262" stroke="#1a7a8a" stroke-width="2" marker-end="url(#mvrArrow)"/>
+  <text x="796" y="256" font-size="9.5" fill="#222" font-style="italic">/fmu/in/trajectory_setpoint &#8230;</text>
+
+  <rect x="655" y="266" width="262" height="38" rx="6" fill="#eef5f7" stroke="#1a7a8a" stroke-width="1.8"/>
+  <text x="786" y="283" font-size="11.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">Micro XRCE-DDS agent</text>
+  <text x="786" y="298" font-size="10" fill="#555" text-anchor="middle" font-style="italic">bridges ROS 2 topics to PX4, no MAVLink</text>
+
+  <line x1="786" y1="304" x2="786" y2="326" stroke="#1a7a8a" stroke-width="2.4" marker-end="url(#mvrArrow)"/>
+  <text x="796" y="320" font-size="10" fill="#222" font-style="italic">uORB topics over the UART</text>
+
+  <rect x="655" y="330" width="262" height="46" rx="6" fill="#fdf3e7" stroke="#b26a1a" stroke-width="2"/>
+  <text x="786" y="349" font-size="12.5" font-weight="bold" fill="#8a4d0f" text-anchor="middle">PX4 flight controller</text>
+  <text x="786" y="366" font-size="10.5" fill="#555" text-anchor="middle" font-style="italic">DDS client exposes its internal topics directly</text>
+
+  <text x="545" y="400" font-size="11.5" font-weight="bold" fill="#1a4a5a">Best for</text>
+  <text x="545" y="418" font-size="11.5" fill="#222">&#8226; multi-sensor, multi-subsystem pipelines</text>
+  <text x="545" y="435" font-size="11.5" fill="#222">&#8226; perception feeding flight decisions directly</text>
+  <text x="545" y="452" font-size="11.5" fill="#222">&#8226; anything needing modularity and reuse</text>
+  <text x="545" y="480" font-size="11.5" font-weight="bold" fill="#8a4d0f">Limitation</text>
+  <text x="545" y="498" font-size="11.5" fill="#222">Steeper learning curve, and real infrastructure</text>
+  <text x="545" y="515" font-size="11.5" fill="#222">&#8212; bridge, message packages, QoS profiles &#8212;</text>
+  <text x="545" y="532" font-size="11.5" fill="#222">to stand up before anything flies.</text>
+
+  <text x="505" y="576" font-size="13" fill="#222" text-anchor="middle">The running example is built on the right-hand path: its detection, navigation, and failsafe functions are separate</text>
+  <text x="505" y="595" font-size="13" fill="#222" text-anchor="middle">processes that must exchange live data &#8212; exactly the architecture MAVSDK is not built to carry.</text>
+</svg>

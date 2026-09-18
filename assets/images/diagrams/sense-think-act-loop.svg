@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 380" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="staArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="820" height="380" fill="#ffffff"/>
+
+  <text x="410" y="36" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">The sense&#8211;think&#8211;act loop</text>
+  <text x="410" y="60" font-size="13" fill="#555" text-anchor="middle">One cycle, run at every level of an autonomous system &#8212; only the rate and the deadline change.</text>
+
+  <!-- SENSE -->
+  <rect x="40" y="100" width="200" height="110" rx="8" fill="#f4f8fa" stroke="#1a4a5a" stroke-width="2"/>
+  <text x="140" y="134" font-size="17" font-weight="bold" fill="#1a4a5a" text-anchor="middle">SENSE</text>
+  <text x="140" y="160" font-size="13" fill="#222" text-anchor="middle">measure the world</text>
+  <text x="140" y="184" font-size="12" fill="#555" text-anchor="middle" font-style="italic">inertial, position,</text>
+  <text x="140" y="199" font-size="12" fill="#555" text-anchor="middle" font-style="italic">and image data</text>
+
+  <!-- THINK -->
+  <rect x="310" y="100" width="200" height="110" rx="8" fill="#f4f8fa" stroke="#1a4a5a" stroke-width="2"/>
+  <text x="410" y="134" font-size="17" font-weight="bold" fill="#1a4a5a" text-anchor="middle">THINK</text>
+  <text x="410" y="160" font-size="13" fill="#222" text-anchor="middle">decide what to do</text>
+  <text x="410" y="184" font-size="12" fill="#555" text-anchor="middle" font-style="italic">estimate state, interpret,</text>
+  <text x="410" y="199" font-size="12" fill="#555" text-anchor="middle" font-style="italic">plan the next move</text>
+
+  <!-- ACT -->
+  <rect x="580" y="100" width="200" height="110" rx="8" fill="#f4f8fa" stroke="#1a4a5a" stroke-width="2"/>
+  <text x="680" y="134" font-size="17" font-weight="bold" fill="#1a4a5a" text-anchor="middle">ACT</text>
+  <text x="680" y="160" font-size="13" fill="#222" text-anchor="middle">change the world</text>
+  <text x="680" y="184" font-size="12" fill="#555" text-anchor="middle" font-style="italic">command the actuators</text>
+  <text x="680" y="199" font-size="12" fill="#555" text-anchor="middle" font-style="italic">that move the vehicle</text>
+
+  <!-- forward arrows -->
+  <line x1="242" y1="155" x2="302" y2="155" stroke="#1a7a8a" stroke-width="2.6" marker-end="url(#staArrow)"/>
+  <line x1="512" y1="155" x2="572" y2="155" stroke="#1a7a8a" stroke-width="2.6" marker-end="url(#staArrow)"/>
+
+  <!-- return path -->
+  <path d="M 680 212 V 285 H 140 V 214" fill="none" stroke="#1a7a8a" stroke-width="2.6"
+        marker-end="url(#staArrow)"/>
+  <text x="410" y="308" font-size="13" fill="#1a7a8a" text-anchor="middle" font-style="italic">every action changes what the next measurement sees</text>
+
+  <text x="410" y="352" font-size="13" fill="#222" text-anchor="middle">Missing a deadline in the innermost loop ends the flight; missing one in the outermost loop only delays a decision.</text>
+</svg>

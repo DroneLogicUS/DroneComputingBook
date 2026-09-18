@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 680" font-family="Helvetica, Arial, sans-serif" xml:space="preserve">
+  <defs>
+    <marker id="mfTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+    <marker id="mfAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b26a1a"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="680" fill="#ffffff"/>
+
+  <text x="480" y="26" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">One mission, end to end: the real eleven-state machine</text>
+  <text x="480" y="46" font-size="13" fill="#555" text-anchor="middle">Every transition fires on one of two triggers: a service call succeeding (amber) or a topic crossing a threshold (teal).</text>
+
+  <!-- ===== PX4 mode bands ===== -->
+  <rect x="700" y="66" width="230" height="118" rx="8" fill="#eef4f5" stroke="#8fb4bc" stroke-width="1" stroke-dasharray="6 4"/>
+  <text x="815" y="82" font-size="9.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">PX4 mode: AUTO.MISSION</text>
+  <rect x="60" y="250" width="620" height="118" rx="8" fill="#fdf6ec" stroke="#d9b98c" stroke-width="1" stroke-dasharray="6 4"/>
+  <text x="370" y="266" font-size="9.5" font-weight="bold" fill="#8a4d0f" text-anchor="middle">PX4 mode: OFFBOARD &#8212; companion computer streams setpoints (token-gated)</text>
+  <rect x="700" y="250" width="230" height="118" rx="8" fill="#eef4f5" stroke="#8fb4bc" stroke-width="1" stroke-dasharray="6 4"/>
+  <text x="815" y="266" font-size="9.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">PX4 mode: AUTO.MISSION</text>
+
+  <!-- ===== startup row ===== -->
+  <rect x="30" y="96" width="90" height="44" rx="7" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.6"/>
+  <text x="75" y="122" font-size="11.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">IDLE</text>
+
+  <rect x="180" y="96" width="110" height="44" rx="7" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.6"/>
+  <text x="235" y="122" font-size="11.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">PREFLIGHT</text>
+
+  <rect x="350" y="96" width="100" height="44" rx="7" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.6"/>
+  <text x="400" y="122" font-size="11.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">ARMING</text>
+
+  <rect x="510" y="96" width="130" height="44" rx="7" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.6"/>
+  <text x="575" y="115" font-size="11" font-weight="bold" fill="#1a4a5a" text-anchor="middle">START_</text>
+  <text x="575" y="130" font-size="11" font-weight="bold" fill="#1a4a5a" text-anchor="middle">MISSION</text>
+
+  <rect x="722" y="96" width="110" height="52" rx="7" fill="#1a7a8a"/>
+  <text x="777" y="118" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">MISSION</text>
+  <text x="777" y="133" font-size="8.5" fill="#d8ecef" text-anchor="middle">PX4 flies the grid;</text>
+  <text x="777" y="143" font-size="8.5" fill="#d8ecef" text-anchor="middle">manager watches topics</text>
+
+  <!-- startup arrows (services) -->
+  <path d="M 120 118 L 176 118" fill="none" stroke="#b26a1a" stroke-width="2.2" marker-end="url(#mfAmber)"/>
+  <text x="148" y="106" font-size="8" fill="#8a4d0f" text-anchor="middle">operator calls</text>
+  <text x="148" y="132" font-size="8" fill="#8a4d0f" text-anchor="middle" font-family="Courier, monospace">start_mission</text>
+
+  <path d="M 290 118 L 346 118" fill="none" stroke="#b26a1a" stroke-width="2.2" marker-end="url(#mfAmber)"/>
+  <text x="318" y="100" font-size="8" fill="#8a4d0f" text-anchor="middle" font-family="Courier, monospace">preflight</text>
+  <text x="318" y="132" font-size="8" fill="#8a4d0f" text-anchor="middle">succeeds*</text>
+
+  <path d="M 450 118 L 506 118" fill="none" stroke="#b26a1a" stroke-width="2.2" marker-end="url(#mfAmber)"/>
+  <text x="478" y="100" font-size="8" fill="#8a4d0f" text-anchor="middle" font-family="Courier, monospace">arm</text>
+  <text x="478" y="132" font-size="8" fill="#8a4d0f" text-anchor="middle">PX4-confirmed</text>
+
+  <path d="M 640 118 L 718 118" fill="none" stroke="#b26a1a" stroke-width="2.2" marker-end="url(#mfAmber)"/>
+  <text x="679" y="100" font-size="8" fill="#8a4d0f" text-anchor="middle" font-family="Courier, monospace">mode_mission</text>
+  <text x="679" y="132" font-size="8" fill="#8a4d0f" text-anchor="middle">AUTO.MISSION entered</text>
+
+  <text x="235" y="160" font-size="8" font-style="italic" fill="#777" text-anchor="middle">* GPS fix, &#8805;8 satellites, battery &#8805;50%,</text>
+  <text x="235" y="171" font-size="8" font-style="italic" fill="#777" text-anchor="middle">valid local position, home position set</text>
+
+  <!-- MISSION -> DONE -->
+  <rect x="840" y="196" width="90" height="50" rx="7" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.6"/>
+  <text x="885" y="214" font-size="11.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">DONE</text>
+  <text x="885" y="228" font-size="7.5" font-style="italic" fill="#777" text-anchor="middle">"grid complete</text>
+  <text x="885" y="238" font-size="7.5" font-style="italic" fill="#777" text-anchor="middle">(loiter after mission)"</text>
+  <path d="M 810 148 C 850 160 870 175 880 193" fill="none" stroke="#1a7a8a" stroke-width="2" marker-end="url(#mfTeal)"/>
+  <text x="836" y="162" font-size="8" fill="#1a4a5a" text-anchor="end" font-family="Courier, monospace">fc_status:</text>
+  <text x="836" y="173" font-size="8" fill="#1a4a5a" text-anchor="end" font-family="Courier, monospace">in_mission seen,</text>
+  <text x="836" y="184" font-size="8" fill="#1a4a5a" text-anchor="end" font-family="Courier, monospace">then in_loiter</text>
+
+  <!-- ===== engagement row ===== -->
+  <rect x="80" y="284" width="140" height="60" rx="7" fill="#ffffff" stroke="#b26a1a" stroke-width="1.8"/>
+  <text x="150" y="306" font-size="11.5" font-weight="bold" fill="#8a4d0f" text-anchor="middle">ENGAGE_PREP</text>
+  <text x="150" y="321" font-size="8.5" fill="#8a4d0f" text-anchor="middle">token &#8594; 'navigation';</text>
+  <text x="150" y="332" font-size="8.5" fill="#8a4d0f" text-anchor="middle">setpoint stream warms up</text>
+
+  <rect x="290" y="284" width="130" height="60" rx="7" fill="#ffffff" stroke="#b26a1a" stroke-width="1.8"/>
+  <text x="355" y="306" font-size="11.5" font-weight="bold" fill="#8a4d0f" text-anchor="middle">ENGAGE</text>
+  <text x="355" y="321" font-size="8.5" fill="#8a4d0f" text-anchor="middle">Navigation closes to the</text>
+  <text x="355" y="332" font-size="8.5" fill="#8a4d0f" text-anchor="middle">3 m standoff point</text>
+
+  <rect x="490" y="284" width="130" height="60" rx="7" fill="#ffffff" stroke="#b26a1a" stroke-width="1.8"/>
+  <text x="555" y="306" font-size="11.5" font-weight="bold" fill="#8a4d0f" text-anchor="middle">HARASS</text>
+  <text x="555" y="321" font-size="8.5" fill="#8a4d0f" text-anchor="middle">token &#8594; 'harassment';</text>
+  <text x="555" y="332" font-size="8.5" fill="#8a4d0f" text-anchor="middle">orbit until time latch</text>
+
+  <rect x="722" y="284" width="110" height="60" rx="7" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.8"/>
+  <text x="777" y="306" font-size="11.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">RESUME</text>
+  <text x="777" y="321" font-size="8.5" fill="#1a4a5a" text-anchor="middle">token &#8594; 'none';</text>
+  <text x="777" y="332" font-size="8.5" fill="#1a4a5a" text-anchor="middle">re-enter the search</text>
+
+  <!-- MISSION -> ENGAGE_PREP (topic trigger) -->
+  <path d="M 722 140 C 500 175 220 210 150 280" fill="none" stroke="#1a7a8a" stroke-width="2.2" marker-end="url(#mfTeal)"/>
+  <text x="330" y="196" font-size="8.5" font-weight="bold" fill="#1a4a5a" font-family="Courier, monospace">/goose/target.confirmed == True</text>
+  <text x="330" y="208" font-size="8.5" fill="#1a4a5a">and the 20 s cooldown has elapsed</text>
+
+  <!-- engagement arrows -->
+  <path d="M 220 314 L 286 314" fill="none" stroke="#b26a1a" stroke-width="2.2" marker-end="url(#mfAmber)"/>
+  <text x="253" y="298" font-size="8" fill="#8a4d0f" text-anchor="middle">after &#8805;1.0 s warmup,</text>
+  <text x="253" y="330" font-size="8" fill="#8a4d0f" text-anchor="middle" font-family="Courier, monospace">mode_offboard</text>
+  <text x="253" y="341" font-size="8" fill="#8a4d0f" text-anchor="middle">succeeds</text>
+
+  <path d="M 420 314 L 486 314" fill="none" stroke="#1a7a8a" stroke-width="2.2" marker-end="url(#mfTeal)"/>
+  <text x="453" y="298" font-size="8" fill="#1a4a5a" text-anchor="middle" font-family="Courier, monospace">nav_arrived</text>
+  <text x="453" y="330" font-size="8" fill="#1a4a5a" text-anchor="middle">reads True</text>
+
+  <path d="M 620 314 L 718 314" fill="none" stroke="#1a7a8a" stroke-width="2.2" marker-end="url(#mfTeal)"/>
+  <text x="669" y="298" font-size="8" fill="#1a4a5a" text-anchor="middle" font-family="Courier, monospace">harass_done</text>
+  <text x="669" y="330" font-size="8" fill="#1a4a5a" text-anchor="middle">reads True</text>
+
+  <!-- RESUME -> MISSION -->
+  <path d="M 777 284 L 777 152" fill="none" stroke="#b26a1a" stroke-width="2.2" marker-end="url(#mfAmber)"/>
+  <text x="768" y="230" font-size="8" fill="#8a4d0f" text-anchor="end" font-family="Courier, monospace">mode_mission</text>
+  <text x="768" y="241" font-size="8" fill="#8a4d0f" text-anchor="end">succeeds; 20 s</text>
+  <text x="768" y="252" font-size="8" fill="#8a4d0f" text-anchor="end">cooldown starts</text>
+
+  <!-- watchdog note -->
+  <rect x="290" y="380" width="330" height="46" rx="6" fill="#f7f7f7" stroke="#bbb" stroke-width="1"/>
+  <text x="455" y="397" font-size="9" font-weight="bold" fill="#444" text-anchor="middle">Shared engagement watchdogs (ENGAGE &amp; HARASS)</text>
+  <text x="455" y="411" font-size="8.5" fill="#555" text-anchor="middle">90 s total engagement elapsed, OR target.valid false &gt; 5 s</text>
+  <text x="455" y="422" font-size="8.5" fill="#555" text-anchor="middle">&#8594; divert to RESUME ("target lost")</text>
+  <path d="M 400 380 L 372 348" fill="none" stroke="#999" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <path d="M 520 380 L 548 348" fill="none" stroke="#999" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <path d="M 620 403 C 700 400 740 370 764 348" fill="none" stroke="#999" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#mfTeal)"/>
+
+  <!-- ===== FAILSAFE ===== -->
+  <rect x="700" y="440" width="230" height="96" rx="8" fill="#fdf6ec" stroke="#b26a1a" stroke-width="2" stroke-dasharray="7 4"/>
+  <text x="815" y="461" font-size="12" font-weight="bold" fill="#8a4d0f" text-anchor="middle">FAILSAFE (terminal)</text>
+  <text x="815" y="477" font-size="8.5" fill="#8a4d0f" text-anchor="middle">_enter_failsafe: parse "SEVERITY:reason",</text>
+  <text x="815" y="489" font-size="8.5" fill="#8a4d0f" text-anchor="middle">set token &#8594; 'none', call land / rtl / hold;</text>
+  <text x="815" y="501" font-size="8.5" fill="#8a4d0f" text-anchor="middle">unrecognized severity &#8594; stand down,</text>
+  <text x="815" y="513" font-size="8.5" fill="#8a4d0f" text-anchor="middle">PX4 native failsafe is in control</text>
+  <text x="815" y="528" font-size="8" font-style="italic" fill="#8a4d0f" text-anchor="middle">internals: Geofencing and Fail-Safes chapter</text>
+
+  <path d="M 660 430 C 690 440 700 448 712 458" fill="none" stroke="#b26a1a" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#mfAmber)"/>
+  <text x="692" y="446" font-size="8.5" font-weight="bold" fill="#8a4d0f" text-anchor="end">entered from ANY state on a /goose/failsafe message</text>
+  <text x="692" y="458" font-size="8.5" fill="#8a4d0f" text-anchor="end">(e.g. "RTL:operator abort") &#8212; or by escalation:</text>
+  <text x="692" y="470" font-size="8.5" fill="#8a4d0f" text-anchor="end">RESUME fails 3&#215; &#8594; "RTL:cannot resume mission"</text>
+  <path d="M 800 344 C 810 380 815 400 815 436" fill="none" stroke="#b26a1a" stroke-width="1.4" stroke-dasharray="6 4" marker-end="url(#mfAmber)"/>
+
+  <!-- ===== footer: pedagogical mapping ===== -->
+  <rect x="30" y="556" width="900" height="110" rx="8" fill="#f7f7f7" stroke="#cccccc" stroke-width="1"/>
+  <text x="480" y="577" font-size="11.5" font-weight="bold" fill="#333" text-anchor="middle">How the Finite State Machines chapter's five teaching states map onto the shipped eleven</text>
+  <text x="52" y="598" font-size="10" fill="#444">IDLE/TAKEOFF &#8594; IDLE + PREFLIGHT + ARMING + START_MISSION &#8212; three service calls, three distinct failure modes, three real states.</text>
+  <text x="52" y="615" font-size="10" fill="#444">SEARCH_GRID &#8594; MISSION (+ RESUME) &#183; HARASS_TARGET &#8594; ENGAGE_PREP + ENGAGE + HARASS &#8212; offboard warmup split from active tracking.</text>
+  <text x="52" y="632" font-size="10" fill="#444">LAND/RETURN-TO-HOME &#8594; FAILSAFE + DONE &#8212; recovery and wind-down, severity-driven rather than state-owned.</text>
+  <text x="52" y="652" font-size="10" font-weight="bold" fill="#8a4d0f">EVADE_THREAT &#8594; no counterpart in the shipped code: it is the book's own scaffolding, built on this FAILSAFE mechanism.</text>
+</svg>

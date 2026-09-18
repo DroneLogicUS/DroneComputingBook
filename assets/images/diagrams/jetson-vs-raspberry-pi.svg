@@ -1,0 +1,166 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 640" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="jvpArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+  </defs>
+
+  <!-- background -->
+  <rect x="0" y="0" width="940" height="640" fill="#ffffff"/>
+
+  <!-- titles -->
+  <text x="470" y="32" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">Raspberry Pi versus NVIDIA Jetson: the companion-computer choice</text>
+  <text x="470" y="54" font-size="12.5" fill="#555" text-anchor="middle">Simplified board layouts; the labeled differences are the ones the decision rule turns on</text>
+
+  <!-- ====================== LEFT: RASPBERRY PI ====================== -->
+  <text x="240" y="88" font-size="16" font-weight="bold" fill="#222" text-anchor="middle">Raspberry Pi</text>
+  <text x="240" y="107" font-size="12" fill="#555" text-anchor="middle">CPU-only &#8212; telemetry relay, logging, mission scripting</text>
+  <text x="240" y="138" font-size="10.5" font-style="italic" fill="#8a959b" text-anchor="middle">(no heatsink required)</text>
+
+  <!-- Pi board -->
+  <rect x="90" y="156" width="300" height="200" rx="8" fill="#f2f6f8" stroke="#1a4a5a" stroke-width="2"/>
+
+  <!-- Pi GPIO header -->
+  <rect x="110" y="166" width="240" height="18" rx="2" fill="#2f3a3f"/>
+  <line x1="116" y1="171" x2="344" y2="171" stroke="#cfd8dc" stroke-width="2.5" stroke-dasharray="3 4"/>
+  <line x1="116" y1="179" x2="344" y2="179" stroke="#cfd8dc" stroke-width="2.5" stroke-dasharray="3 4"/>
+  <text x="230" y="198" font-size="10.5" fill="#555" text-anchor="middle">40-pin GPIO header &#8212; UART pins to the flight controller</text>
+
+  <!-- Pi SoC with 4 CPU cores -->
+  <rect x="125" y="212" width="95" height="72" rx="3" fill="#2f3a3f"/>
+  <rect x="135" y="222" width="28" height="24" fill="#1a7a8a"/>
+  <rect x="168" y="222" width="28" height="24" fill="#1a7a8a"/>
+  <rect x="135" y="252" width="28" height="24" fill="#1a7a8a"/>
+  <rect x="168" y="252" width="28" height="24" fill="#1a7a8a"/>
+  <text x="172" y="299" font-size="11" fill="#222" text-anchor="middle">SoC: 4&#215; ARM CPU cores</text>
+
+  <!-- Pi RAM -->
+  <rect x="245" y="220" width="70" height="56" rx="3" fill="#55636b"/>
+  <text x="280" y="252" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">RAM</text>
+
+  <!-- Pi: empty area where a GPU would be -->
+  <rect x="125" y="308" width="195" height="38" fill="none" stroke="#8a959b" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="222" y="331" font-size="11.5" font-style="italic" fill="#555" text-anchor="middle">no GPU &#8212; no AI accelerator</text>
+
+  <!-- Pi ports (right edge) -->
+  <rect x="368" y="214" width="22" height="28" fill="#c8ced2" stroke="#777" stroke-width="1"/>
+  <rect x="368" y="248" width="22" height="28" fill="#c8ced2" stroke="#777" stroke-width="1"/>
+  <text x="362" y="234" font-size="10" fill="#555" text-anchor="end">USB</text>
+  <rect x="368" y="284" width="22" height="32" fill="#c8ced2" stroke="#777" stroke-width="1"/>
+  <text x="362" y="303" font-size="10" fill="#555" text-anchor="end">Ethernet</text>
+
+  <!-- Pi power (bottom edge) -->
+  <rect x="110" y="350" width="26" height="12" fill="#c8ced2" stroke="#777" stroke-width="1"/>
+  <text x="123" y="376" font-size="10" fill="#555" text-anchor="middle">USB power</text>
+
+  <!-- Pi difference callout -->
+  <line x1="240" y1="392" x2="235" y2="350" stroke="#1a7a8a" stroke-width="1.8" marker-end="url(#jvpArrow)"/>
+  <text x="240" y="408" font-size="12" font-style="italic" fill="#1a7a8a" text-anchor="middle">CPU-only: modern perception is not CPU-shaped &#8212;</text>
+  <text x="240" y="424" font-size="12" font-style="italic" fill="#1a7a8a" text-anchor="middle">parallel tensor ops become a serialized slog (single-digit FPS)</text>
+
+  <!-- Pi cost/power strip -->
+  <rect x="60" y="470" width="360" height="46" rx="6" fill="#f2f6f8" stroke="#1a7a8a" stroke-width="1.5"/>
+  <text x="240" y="489" font-size="12" font-weight="bold" fill="#222" text-anchor="middle">cheap &#183; small &#183; frugal with power</text>
+  <text x="240" y="506" font-size="11.5" fill="#555" text-anchor="middle">fits easily inside the ~12 W avionics power budget</text>
+
+  <!-- ====================== CENTER DIVIDER ====================== -->
+  <circle cx="470" cy="256" r="20" fill="#1a4a5a"/>
+  <text x="470" y="261" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">vs</text>
+
+  <!-- ====================== RIGHT: NVIDIA JETSON ====================== -->
+  <text x="700" y="88" font-size="16" font-weight="bold" fill="#222" text-anchor="middle">NVIDIA Jetson (Nano &#183; Orin NX)</text>
+  <text x="700" y="107" font-size="12" fill="#555" text-anchor="middle">CPU + GPU &#8212; real-time vision and onboard inference</text>
+
+  <!-- Jetson heatsink, exploded above the module -->
+  <text x="592" y="126" font-size="11" font-style="italic" fill="#555" text-anchor="end">heatsink</text>
+  <text x="592" y="140" font-size="11" font-style="italic" fill="#555" text-anchor="end">(+ often a fan)</text>
+  <rect x="600" y="140" width="200" height="8" fill="#8a959b"/>
+  <rect x="602" y="118" width="6" height="22" fill="#8a959b"/>
+  <rect x="620" y="118" width="6" height="22" fill="#8a959b"/>
+  <rect x="638" y="118" width="6" height="22" fill="#8a959b"/>
+  <rect x="656" y="118" width="6" height="22" fill="#8a959b"/>
+  <rect x="674" y="118" width="6" height="22" fill="#8a959b"/>
+  <rect x="692" y="118" width="6" height="22" fill="#8a959b"/>
+  <rect x="710" y="118" width="6" height="22" fill="#8a959b"/>
+  <rect x="728" y="118" width="6" height="22" fill="#8a959b"/>
+  <rect x="746" y="118" width="6" height="22" fill="#8a959b"/>
+  <rect x="764" y="118" width="6" height="22" fill="#8a959b"/>
+  <rect x="782" y="118" width="6" height="22" fill="#8a959b"/>
+  <rect x="794" y="118" width="6" height="22" fill="#8a959b"/>
+  <line x1="610" y1="150" x2="610" y2="164" stroke="#8a959b" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <line x1="790" y1="150" x2="790" y2="164" stroke="#8a959b" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+  <!-- Jetson board (carrier) -->
+  <rect x="550" y="156" width="300" height="200" rx="8" fill="#f2f6f8" stroke="#1a4a5a" stroke-width="2"/>
+
+  <!-- Jetson compute module -->
+  <rect x="568" y="168" width="252" height="134" rx="4" fill="#e8edef" stroke="#55636b" stroke-width="1.5"/>
+
+  <!-- Jetson CPU block -->
+  <rect x="580" y="180" width="82" height="62" rx="3" fill="#2f3a3f"/>
+  <rect x="590" y="188" width="26" height="22" fill="#1a7a8a"/>
+  <rect x="622" y="188" width="26" height="22" fill="#1a7a8a"/>
+  <rect x="590" y="216" width="26" height="22" fill="#1a7a8a"/>
+  <rect x="622" y="216" width="26" height="22" fill="#1a7a8a"/>
+  <text x="621" y="256" font-size="11" fill="#222" text-anchor="middle">4&#215; ARM CPU cores</text>
+
+  <!-- Jetson GPU block (the key difference) -->
+  <rect x="676" y="180" width="132" height="62" rx="3" fill="#e8b04a" stroke="#4a3410" stroke-width="1.5"/>
+  <rect x="684" y="187" width="10" height="12" fill="#4a3410"/>
+  <rect x="699" y="187" width="10" height="12" fill="#4a3410"/>
+  <rect x="714" y="187" width="10" height="12" fill="#4a3410"/>
+  <rect x="729" y="187" width="10" height="12" fill="#4a3410"/>
+  <rect x="744" y="187" width="10" height="12" fill="#4a3410"/>
+  <rect x="759" y="187" width="10" height="12" fill="#4a3410"/>
+  <rect x="774" y="187" width="10" height="12" fill="#4a3410"/>
+  <rect x="789" y="187" width="10" height="12" fill="#4a3410"/>
+  <rect x="684" y="205" width="10" height="12" fill="#4a3410"/>
+  <rect x="699" y="205" width="10" height="12" fill="#4a3410"/>
+  <rect x="714" y="205" width="10" height="12" fill="#4a3410"/>
+  <rect x="729" y="205" width="10" height="12" fill="#4a3410"/>
+  <rect x="744" y="205" width="10" height="12" fill="#4a3410"/>
+  <rect x="759" y="205" width="10" height="12" fill="#4a3410"/>
+  <rect x="774" y="205" width="10" height="12" fill="#4a3410"/>
+  <rect x="789" y="205" width="10" height="12" fill="#4a3410"/>
+  <rect x="684" y="223" width="10" height="12" fill="#4a3410"/>
+  <rect x="699" y="223" width="10" height="12" fill="#4a3410"/>
+  <rect x="714" y="223" width="10" height="12" fill="#4a3410"/>
+  <rect x="729" y="223" width="10" height="12" fill="#4a3410"/>
+  <rect x="744" y="223" width="10" height="12" fill="#4a3410"/>
+  <rect x="759" y="223" width="10" height="12" fill="#4a3410"/>
+  <rect x="774" y="223" width="10" height="12" fill="#4a3410"/>
+  <rect x="789" y="223" width="10" height="12" fill="#4a3410"/>
+  <text x="742" y="256" font-size="11" font-weight="bold" fill="#222" text-anchor="middle">onboard NVIDIA GPU</text>
+
+  <!-- Jetson shared RAM bar -->
+  <rect x="580" y="268" width="228" height="26" rx="3" fill="#55636b"/>
+  <text x="694" y="285" font-size="11.5" fill="#ffffff" text-anchor="middle">RAM &#8212; one memory shared by CPU and GPU</text>
+
+  <!-- Jetson GPIO header -->
+  <rect x="568" y="314" width="190" height="16" rx="2" fill="#2f3a3f"/>
+  <line x1="574" y1="319" x2="752" y2="319" stroke="#cfd8dc" stroke-width="2.5" stroke-dasharray="3 4"/>
+  <line x1="574" y1="325" x2="752" y2="325" stroke="#cfd8dc" stroke-width="2.5" stroke-dasharray="3 4"/>
+  <text x="766" y="327" font-size="10" fill="#555" text-anchor="start">40-pin GPIO</text>
+
+  <!-- Jetson ports (right edge) -->
+  <rect x="826" y="210" width="20" height="26" fill="#c8ced2" stroke="#777" stroke-width="1"/>
+  <rect x="826" y="242" width="20" height="26" fill="#c8ced2" stroke="#777" stroke-width="1"/>
+  <rect x="826" y="276" width="20" height="30" fill="#c8ced2" stroke="#777" stroke-width="1"/>
+  <text x="836" y="344" font-size="9.5" fill="#555" text-anchor="middle">USB &#183; Eth</text>
+
+  <!-- Jetson difference callout -->
+  <line x1="826" y1="398" x2="812" y2="248" stroke="#1a7a8a" stroke-width="1.8" marker-end="url(#jvpArrow)"/>
+  <text x="700" y="408" font-size="12" font-style="italic" fill="#1a7a8a" text-anchor="middle">GPU-shaped workloads &#8212; detection, tracking, fusion &#8212; run at</text>
+  <text x="700" y="424" font-size="12" font-style="italic" fill="#1a7a8a" text-anchor="middle">frame rate; same CUDA / TensorRT toolchain as a desktop GPU</text>
+
+  <!-- Jetson cost/power strip -->
+  <rect x="520" y="470" width="360" height="46" rx="6" fill="#f2f6f8" stroke="#1a7a8a" stroke-width="1.5"/>
+  <text x="700" y="489" font-size="12" font-weight="bold" fill="#222" text-anchor="middle">higher price &#183; more mass &#183; higher power draw</text>
+  <text x="700" y="506" font-size="11.5" fill="#555" text-anchor="middle">heavily loaded, can exceed the ~12 W budget on its own</text>
+
+  <!-- ====================== DECISION-RULE BANNER ====================== -->
+  <rect x="60" y="536" width="820" height="80" rx="8" fill="#10233c"/>
+  <text x="470" y="561" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">The decision rule is mission-shaped</text>
+  <text x="470" y="583" font-size="13" fill="#ffffff" text-anchor="middle">only needs to be told where to go &#8594; Raspberry Pi&#160;&#160;&#160;&#183;&#160;&#160;&#160;must understand what it sees &#8594; Jetson</text>
+  <text x="470" y="604" font-size="12" fill="#e8b04a" text-anchor="middle">Running example: a goose must be recognized by a neural network on the aircraft itself &#8594; Jetson Nano</text>
+</svg>

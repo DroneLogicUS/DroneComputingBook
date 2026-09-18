@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" font-family="Helvetica, Arial, sans-serif" xml:space="preserve">
+  <rect x="0" y="0" width="960" height="640" fill="#ffffff"/>
+
+  <text x="480" y="26" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">Where disease shows in the spectrum</text>
+  <text x="480" y="46" font-size="13" fill="#555" text-anchor="middle">Healthy, fungal-infected, and drought-stressed reflectance (representative curves) — NDVI samples two points; the diagnosis lives on the red-edge shoulder</text>
+
+  <!-- ============ plot panel ============ -->
+  <rect x="40" y="62" width="880" height="420" rx="8" fill="#fafafa" stroke="#ccc" stroke-width="1"/>
+
+  <!-- plot area: x 450..900 nm -> px 110..880 (1 nm = 1.711 px), y refl 0..0.6 -> px 450..90 (0.1 = 60 px) -->
+  <!-- axes -->
+  <line x1="110" y1="90" x2="110" y2="450" stroke="#888" stroke-width="1.2"/>
+  <line x1="110" y1="450" x2="880" y2="450" stroke="#888" stroke-width="1.2"/>
+  <!-- y ticks -->
+  <text x="104" y="454" font-size="9" fill="#555" text-anchor="end">0.0</text>
+  <text x="104" y="394" font-size="9" fill="#555" text-anchor="end">0.1</text>
+  <text x="104" y="334" font-size="9" fill="#555" text-anchor="end">0.2</text>
+  <text x="104" y="274" font-size="9" fill="#555" text-anchor="end">0.3</text>
+  <text x="104" y="214" font-size="9" fill="#555" text-anchor="end">0.4</text>
+  <text x="104" y="154" font-size="9" fill="#555" text-anchor="end">0.5</text>
+  <text x="104" y="94" font-size="9" fill="#555" text-anchor="end">0.6</text>
+  <text x="66" y="270" font-size="11" fill="#555" transform="rotate(-90 66 270)" text-anchor="middle">reflectance &#961;</text>
+  <!-- x ticks: 450,550,650,750,850 -> 110, 281, 452, 623, 794 -->
+  <text x="110" y="466" font-size="9" fill="#555" text-anchor="middle">450</text>
+  <text x="281" y="466" font-size="9" fill="#555" text-anchor="middle">550</text>
+  <text x="452" y="466" font-size="9" fill="#555" text-anchor="middle">650</text>
+  <text x="623" y="466" font-size="9" fill="#555" text-anchor="middle">750</text>
+  <text x="794" y="466" font-size="9" fill="#555" text-anchor="middle">850</text>
+  <text x="866" y="466" font-size="9" fill="#555" text-anchor="middle">nm</text>
+
+  <!-- red-edge shaded band: 700..740 nm -> x 538..606 -->
+  <rect x="538" y="90" width="68" height="360" fill="#b26a1a" opacity="0.12"/>
+  <text x="572" y="430" font-size="10" font-weight="bold" fill="#8a4d0f" text-anchor="middle">red edge</text>
+  <text x="572" y="442" font-size="9" fill="#8a4d0f" text-anchor="middle">700&#8211;740 nm</text>
+
+  <!-- HEALTHY curve (teal): visible low ~0.05, green bump 0.10 @550, red trough 0.04 @670, steep rise 700-750, NIR plateau 0.50 -->
+  <!-- key px: 450:(110,420) 550:(281,390) 620:(400,415) 670:(486,426) 700:(538,400) 720:(572,300) 740:(606,200) 760:(640,160) 800:(709,152) 900:(880,150) -->
+  <path d="M 110 420 C 170 416 230 392 281 390 C 330 388 360 404 400 415 C 440 424 466 427 486 426 C 510 424 524 418 538 400 C 552 378 560 340 572 300 C 584 260 594 224 606 200 C 618 178 628 165 640 160 C 664 153 690 152 709 152 C 770 150 830 150 880 150"
+        fill="none" stroke="#1a7a8a" stroke-width="2.6"/>
+
+  <!-- FUNGAL curve (red): visible raised, red raised ~0.09, shallower shifted red edge, NIR ~0.35 -->
+  <!-- key px: 450:(110,404) 550:(281,372) 620:(400,388) 670:(486,396) 700:(538,376) 720:(572,340) 740:(606,300) 760:(640,270) 800:(709,244) 900:(880,240) -->
+  <path d="M 110 404 C 170 396 230 376 281 372 C 330 370 360 380 400 388 C 440 394 466 397 486 396 C 510 394 524 388 538 376 C 552 362 560 352 572 340 C 584 326 594 312 606 300 C 618 288 628 278 640 270 C 664 256 690 247 709 244 C 770 240 830 240 880 240"
+        fill="none" stroke="#a83232" stroke-width="2.6"/>
+
+  <!-- DROUGHT curve (amber dashed): visible near-healthy slightly raised, red-edge similar position, NIR depressed ~0.33 -->
+  <!-- key px: 450:(110,416) 550:(281,384) 620:(400,410) 670:(486,420) 700:(538,398) 720:(572,330) 740:(606,278) 760:(640,262) 800:(709,254) 900:(880,252) -->
+  <path d="M 110 416 C 170 410 230 386 281 384 C 330 383 360 400 400 410 C 440 418 466 421 486 420 C 510 418 524 412 538 398 C 552 380 560 352 572 330 C 584 308 594 290 606 278 C 618 268 628 264 640 262 C 664 257 690 254 709 254 C 770 252 830 252 880 252"
+        fill="none" stroke="#b26a1a" stroke-width="2.4" stroke-dasharray="7 4"/>
+
+  <!-- curve labels -->
+  <text x="812" y="142" font-size="11" font-weight="bold" fill="#1a7a8a">healthy</text>
+  <text x="812" y="232" font-size="11" font-weight="bold" fill="#7a2424">fungal infection</text>
+  <text x="812" y="270" font-size="11" font-weight="bold" fill="#8a4d0f">drought</text>
+
+  <!-- annotation: NDVI contrast arrow at 840 nm (x=777): healthy 150 vs fungal 241 -->
+  <line x1="777" y1="152" x2="777" y2="240" stroke="#555" stroke-width="1" stroke-dasharray="3 2"/>
+  <text x="130" y="115" font-size="10" font-weight="bold" fill="#333">any stressor shrinks the red &#8594; NIR contrast,</text>
+  <text x="130" y="128" font-size="10" fill="#333">so NDVI falls for all of them alike &#8212; a detector, not a classifier</text>
+  <path d="M 440 111 C 580 92 710 104 772 152" fill="none" stroke="#555" stroke-width="1" stroke-dasharray="3 2"/>
+
+  <!-- annotation: fungal signature -->
+  <text x="150" y="330" font-size="10" font-weight="bold" fill="#7a2424">the fungal signature is opposite-signed:</text>
+  <text x="150" y="343" font-size="10" fill="#7a2424">visible &amp; red-edge reflectance rise as chlorophyll degrades,</text>
+  <text x="150" y="356" font-size="10" fill="#7a2424">NIR falls as cell structure collapses (downy-mildew pattern)</text>
+  <path d="M 300 362 C 330 372 350 376 372 384" fill="none" stroke="#7a2424" stroke-width="1" stroke-dasharray="3 2"/>
+
+  <!-- annotation: drought signature -->
+  <text x="650" y="308" font-size="10" font-weight="bold" fill="#8a4d0f">drought mainly depresses NIR;</text>
+  <text x="650" y="321" font-size="10" fill="#8a4d0f">the visible / red-edge shape survives</text>
+  <path d="M 660 300 C 650 290 644 282 638 272" fill="none" stroke="#8a4d0f" stroke-width="1" stroke-dasharray="3 2"/>
+
+  <!-- annotation: red-edge shoulder -->
+  <text x="420" y="230" font-size="10" font-weight="bold" fill="#1a4a5a">the shoulder&#8217;s slope and position are where</text>
+  <text x="420" y="243" font-size="10" fill="#1a4a5a">the three curves&#8217; <tspan font-style="italic">shapes</tspan> diverge &#8212; the</text>
+  <text x="420" y="256" font-size="10" fill="#1a4a5a">degrees of freedom NDRE / REDSI sample</text>
+  <path d="M 540 260 C 560 272 572 285 580 300" fill="none" stroke="#1a4a5a" stroke-width="1" stroke-dasharray="3 2"/>
+
+  <!-- ============ band-marker strip ============ -->
+  <g>
+    <rect x="40" y="494" width="880" height="86" rx="8" fill="#fafafa" stroke="#ccc" stroke-width="1"/>
+    <line x1="110" y1="530" x2="880" y2="530" stroke="#888" stroke-width="1"/>
+    <!-- NDVI bands: red 665 -> x=478, NIR 840 -> x=777 (teal) -->
+    <line x1="478" y1="522" x2="478" y2="538" stroke="#1a7a8a" stroke-width="3"/>
+    <text x="478" y="516" font-size="9" font-weight="bold" fill="#1a4a5a" text-anchor="middle">665</text>
+    <line x1="777" y1="522" x2="777" y2="538" stroke="#1a7a8a" stroke-width="3"/>
+    <text x="777" y="516" font-size="9" font-weight="bold" fill="#1a4a5a" text-anchor="middle">840</text>
+    <text x="628" y="516" font-size="10" font-weight="bold" fill="#1a4a5a" text-anchor="middle">all NDVI ever samples (teal)</text>
+    <!-- red-edge index bands: 705 -> 546, 730 -> 589, 783 -> 680 (amber) -->
+    <line x1="546" y1="522" x2="546" y2="538" stroke="#b26a1a" stroke-width="3"/>
+    <text x="546" y="550" font-size="9" font-weight="bold" fill="#8a4d0f" text-anchor="middle">705</text>
+    <line x1="589" y1="522" x2="589" y2="538" stroke="#b26a1a" stroke-width="3"/>
+    <text x="589" y="550" font-size="9" font-weight="bold" fill="#8a4d0f" text-anchor="middle">730</text>
+    <line x1="680" y1="522" x2="680" y2="538" stroke="#b26a1a" stroke-width="3"/>
+    <text x="680" y="550" font-size="9" font-weight="bold" fill="#8a4d0f" text-anchor="middle">783</text>
+    <text x="613" y="566" font-size="10" font-weight="bold" fill="#8a4d0f" text-anchor="middle">where NDRE (730) and REDSI (705 + 783) look (amber)</text>
+    <!-- axis context labels -->
+    <text x="150" y="550" font-size="9.5" fill="#777">visible</text>
+    <text x="845" y="550" font-size="9.5" fill="#777">NIR</text>
+  </g>
+
+  <!-- footer -->
+  <text x="480" y="602" font-size="10.5" fill="#555" text-anchor="middle">Mechanism: fungal colonization degrades chlorophyll and collapses cell structure, moving and flattening the red-edge shoulder before the broadband red/NIR contrast fully deteriorates.</text>
+  <text x="480" y="618" font-size="10.5" fill="#555" text-anchor="middle">On the same wheat plots, the red-edge index REDSI identified yellow rust at 84.1&#160;% accuracy versus NDVI&#8217;s 78.8&#160;% &#8212; 85.2&#160;% versus 66.7&#160;% at regional scale (Zheng et al. 2018).</text>
+</svg>

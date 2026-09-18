@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 640" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="ombArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="940" height="640" fill="#ffffff"/>
+
+  <text x="470" y="30" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">The onboard memory bill: the weights are not the bill</text>
+  <text x="470" y="52" font-size="12.5" fill="#555" text-anchor="middle">RAM peak &#8776; activations + input buffers + runtime workspace + application state &#8212; illustrative small detector, drawn to one scale</text>
+
+  <!-- legend -->
+  <rect x="120" y="76" width="14" height="14" fill="#2f3a3f"/>
+  <text x="140" y="88" font-size="11.5" fill="#222">model weights</text>
+  <rect x="256" y="76" width="14" height="14" fill="#e8b04a"/>
+  <text x="276" y="88" font-size="11.5" fill="#222">activations (intermediate tensors)</text>
+  <rect x="500" y="76" width="14" height="14" fill="#1a7a8a"/>
+  <text x="520" y="88" font-size="11.5" fill="#222">camera frame buffers</text>
+  <rect x="672" y="76" width="14" height="14" fill="#55636b"/>
+  <text x="692" y="88" font-size="11.5" fill="#222">runtime workspace + app state</text>
+
+  <!-- baseline -->
+  <line x1="80" y1="520" x2="860" y2="520" stroke="#222" stroke-width="1.5"/>
+
+  <!-- ============ LEFT BAR: what people count ============ -->
+  <text x="200" y="150" font-size="13.5" font-weight="bold" fill="#222" text-anchor="middle">What the datasheet mindset counts</text>
+  <text x="200" y="168" font-size="11.5" fill="#555" text-anchor="middle">&#8220;the model is 12.8 MB&#8221;</text>
+
+  <rect x="150" y="469" width="100" height="51" fill="#2f3a3f"/>
+  <text x="200" y="498" font-size="11" fill="#ffffff" text-anchor="middle">weights</text>
+  <text x="200" y="541" font-size="11.5" fill="#222" text-anchor="middle">12.8 MB</text>
+  <text x="200" y="557" font-size="10.5" font-style="italic" fill="#555" text-anchor="middle">3.2 M params &#215; 4 B (float32)</text>
+
+  <!-- ============ MIDDLE BAR: what the device must hold ============ -->
+  <text x="470" y="150" font-size="13.5" font-weight="bold" fill="#222" text-anchor="middle">What the device must actually hold</text>
+  <text x="470" y="168" font-size="11.5" fill="#555" text-anchor="middle">float32 model, 640 &#215; 640 input</text>
+
+  <!-- total 231px: workspace 24, buffers 12, activations 144, weights 51 (bottom) -->
+  <rect x="420" y="469" width="100" height="51" fill="#2f3a3f"/>
+  <rect x="420" y="325" width="100" height="144" fill="#e8b04a"/>
+  <rect x="420" y="313" width="100" height="12" fill="#1a7a8a"/>
+  <rect x="420" y="289" width="100" height="24" fill="#55636b"/>
+  <text x="470" y="498" font-size="11" fill="#ffffff" text-anchor="middle">weights 12.8 MB</text>
+  <text x="470" y="392" font-size="11" font-weight="bold" fill="#4a3410" text-anchor="middle">activations ~36 MB</text>
+  <text x="470" y="408" font-size="10" font-style="italic" fill="#4a3410" text-anchor="middle">scale with input resolution</text>
+  <line x1="522" y1="319" x2="560" y2="319" stroke="#1a7a8a" stroke-width="1.2"/>
+  <text x="565" y="323" font-size="10.5" fill="#1a7a8a">frame buffers ~3 MB</text>
+  <line x1="522" y1="299" x2="560" y2="299" stroke="#55636b" stroke-width="1.2"/>
+  <text x="565" y="303" font-size="10.5" fill="#55636b">workspace + state ~6 MB</text>
+  <text x="470" y="541" font-size="11.5" font-weight="bold" fill="#222" text-anchor="middle">peak &#8776; 58 MB</text>
+  <text x="470" y="557" font-size="10.5" font-style="italic" fill="#555" text-anchor="middle">4.5&#215; the number on the datasheet</text>
+
+  <!-- brace arrow from left bar to middle bar -->
+  <line x1="262" y1="420" x2="408" y2="420" stroke="#1a7a8a" stroke-width="1.8" marker-end="url(#ombArrow)"/>
+  <text x="335" y="410" font-size="10.5" font-style="italic" fill="#1a7a8a" text-anchor="middle">the rest of the bill</text>
+
+  <!-- ============ RIGHT BAR: after the two levers ============ -->
+  <text x="740" y="150" font-size="13.5" font-weight="bold" fill="#222" text-anchor="middle">After the chapter&#8217;s two levers</text>
+  <text x="740" y="168" font-size="11.5" fill="#555" text-anchor="middle">int8 model, 320 &#215; 320 input</text>
+
+  <!-- total 42px: workspace 8, buffers 12, activations 9, weights 13 (bottom) -->
+  <rect x="690" y="507" width="100" height="13" fill="#2f3a3f"/>
+  <rect x="690" y="498" width="100" height="9" fill="#e8b04a"/>
+  <rect x="690" y="486" width="100" height="12" fill="#1a7a8a"/>
+  <rect x="690" y="478" width="100" height="8" fill="#55636b"/>
+  <line x1="792" y1="513" x2="820" y2="513" stroke="#2f3a3f" stroke-width="1.2"/>
+  <text x="825" y="517" font-size="10.5" fill="#2f3a3f">weights 3.2 MB</text>
+  <line x1="792" y1="502" x2="820" y2="500" stroke="#b8860b" stroke-width="1.2"/>
+  <text x="825" y="502" font-size="10.5" fill="#b8860b">activations ~2.3 MB</text>
+  <line x1="792" y1="492" x2="820" y2="486" stroke="#1a7a8a" stroke-width="1.2"/>
+  <text x="825" y="488" font-size="10.5" fill="#1a7a8a">frame buffers ~3 MB</text>
+  <line x1="792" y1="482" x2="820" y2="472" stroke="#55636b" stroke-width="1.2"/>
+  <text x="825" y="474" font-size="10.5" fill="#55636b">workspace ~2 MB</text>
+  <text x="740" y="541" font-size="11.5" font-weight="bold" fill="#222" text-anchor="middle">peak &#8776; 10.5 MB</text>
+  <text x="740" y="557" font-size="10.5" font-style="italic" fill="#555" text-anchor="middle">frame buffers barely move: uint8 already</text>
+
+  <!-- lever annotations -->
+  <line x1="532" y1="250" x2="680" y2="250" stroke="#1a7a8a" stroke-width="1.8" marker-end="url(#ombArrow)"/>
+  <text x="606" y="222" font-size="11" font-weight="bold" fill="#1a7a8a" text-anchor="middle">the levers multiply</text>
+  <text x="606" y="238" font-size="10.5" fill="#1a7a8a" text-anchor="middle">&#247;4 precision (float32 &#8594; int8) &#183; &#247;4 pixels (640&#178; &#8594; 320&#178;)</text>
+
+  <!-- MCU line -->
+  <line x1="80" y1="519" x2="860" y2="519" stroke="#a33a2a" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="80" y="580" font-size="11" font-style="italic" fill="#a33a2a">The red dashed line one pixel above the baseline is an entire 256 KB MCU SRAM at this scale &#8212;</text>
+  <text x="80" y="596" font-size="11" font-style="italic" fill="#a33a2a">even the fully optimized companion-computer budget is ~40&#215; a microcontroller&#8217;s whole memory.</text>
+
+  <!-- scale note -->
+  <text x="860" y="580" font-size="10.5" fill="#555" text-anchor="end">vertical scale: 1 MB &#8776; 4 px</text>
+  <text x="860" y="596" font-size="10.5" fill="#555" text-anchor="end">activation figures are representative, not exact</text>
+</svg>

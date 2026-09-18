@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="asAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b26a1a"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="960" height="640" fill="#ffffff"/>
+  <text x="480" y="30" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">A* on an occupancy grid: expand the cheapest promising cell first</text>
+  <text x="480" y="52" font-size="13" fill="#555" text-anchor="middle">Every shaded cell was expanded before the goal was reached; the search leans toward the goal because f = g + h, not g alone.</text>
+  <rect x="246" y="300" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="292" y="300" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="338" y="300" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="154" y="254" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="154" y="346" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="200" y="254" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="200" y="346" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="246" y="254" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="292" y="254" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="292" y="346" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="338" y="254" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="338" y="346" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="108" y="254" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="108" y="346" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="200" y="208" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="200" y="392" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="246" y="208" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="246" y="392" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="292" y="208" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="338" y="208" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="338" y="392" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="154" y="208" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="154" y="392" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="246" y="162" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="246" y="438" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="292" y="162" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="292" y="438" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="338" y="162" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="62" y="300" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="108" y="208" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="108" y="392" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="200" y="162" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="200" y="438" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="62" y="254" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="62" y="346" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="476" y="438" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="522" y="392" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="568" y="300" width="46" height="46" fill="#e3f1f3"/>
+  <rect x="154" y="300" width="46" height="46" fill="#bcdde2"/>
+  <rect x="200" y="300" width="46" height="46" fill="#bcdde2"/>
+  <rect x="246" y="346" width="46" height="46" fill="#bcdde2"/>
+  <rect x="292" y="392" width="46" height="46" fill="#bcdde2"/>
+  <rect x="338" y="438" width="46" height="46" fill="#bcdde2"/>
+  <rect x="384" y="438" width="46" height="46" fill="#bcdde2"/>
+  <rect x="430" y="438" width="46" height="46" fill="#bcdde2"/>
+  <rect x="476" y="392" width="46" height="46" fill="#bcdde2"/>
+  <rect x="522" y="346" width="46" height="46" fill="#bcdde2"/>
+  <rect x="568" y="346" width="46" height="46" fill="#bcdde2"/>
+  <rect x="384" y="116" width="46" height="46" fill="#4a4a4a"/>
+  <rect x="384" y="162" width="46" height="46" fill="#4a4a4a"/>
+  <rect x="384" y="208" width="46" height="46" fill="#4a4a4a"/>
+  <rect x="384" y="254" width="46" height="46" fill="#4a4a4a"/>
+  <rect x="384" y="300" width="46" height="46" fill="#4a4a4a"/>
+  <rect x="384" y="346" width="46" height="46" fill="#4a4a4a"/>
+  <rect x="384" y="392" width="46" height="46" fill="#4a4a4a"/>
+  <line x1="62" y1="116" x2="62" y2="530" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="108" y1="116" x2="108" y2="530" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="154" y1="116" x2="154" y2="530" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="200" y1="116" x2="200" y2="530" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="246" y1="116" x2="246" y2="530" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="292" y1="116" x2="292" y2="530" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="338" y1="116" x2="338" y2="530" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="384" y1="116" x2="384" y2="530" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="430" y1="116" x2="430" y2="530" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="476" y1="116" x2="476" y2="530" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="522" y1="116" x2="522" y2="530" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="568" y1="116" x2="568" y2="530" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="614" y1="116" x2="614" y2="530" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="660" y1="116" x2="660" y2="530" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="706" y1="116" x2="706" y2="530" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="62" y1="116" x2="706" y2="116" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="62" y1="162" x2="706" y2="162" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="62" y1="208" x2="706" y2="208" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="62" y1="254" x2="706" y2="254" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="62" y1="300" x2="706" y2="300" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="62" y1="346" x2="706" y2="346" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="62" y1="392" x2="706" y2="392" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="62" y1="438" x2="706" y2="438" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="62" y1="484" x2="706" y2="484" stroke="#cfcfcf" stroke-width="1"/>
+  <line x1="62" y1="530" x2="706" y2="530" stroke="#cfcfcf" stroke-width="1"/>
+  <polyline points="131.0,323.0 177.0,323.0 223.0,323.0 269.0,369.0 315.0,415.0 361.0,461.0 407.0,461.0 453.0,461.0 499.0,415.0 545.0,369.0 591.0,369.0 637.0,323.0" fill="none" stroke="#1a7a8a" stroke-width="3.4"/>
+  <circle cx="131.0" cy="323.0" r="14" fill="#1a7a8a"/>
+  <text x="131.0" y="328.0" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">S</text>
+  <circle cx="637.0" cy="323.0" r="14" fill="#b26a1a"/>
+  <text x="637.0" y="328.0" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle">G</text>
+  <line x1="315.0" y1="415.0" x2="627.0" y2="333.0" stroke="#b26a1a" stroke-width="1.8" stroke-dasharray="6 5" marker-end="url(#asAmber)"/>
+  <text x="407.0" y="106" font-size="11" font-weight="bold" fill="#444" text-anchor="middle">obstacle cells (occupied)</text>
+  <text x="730" y="180" font-size="12.5" font-weight="bold" fill="#222">Per-cell bookkeeping</text>
+  <text x="730" y="206" font-size="11.5" fill="#333">g(n): cost from S so far</text>
+  <text x="730" y="230" font-size="11.5" fill="#333">h(n): straight-line</text>
+  <text x="730" y="246" font-size="11.5" fill="#333">distance to G (dashed)</text>
+  <text x="730" y="270" font-size="11.5" font-weight="bold" fill="#333">f(n) = g(n) + h(n)</text>
+  <text x="730" y="300" font-size="11" fill="#555" font-style="italic">h never overestimates</text>
+  <text x="730" y="316" font-size="11" fill="#555" font-style="italic">(admissible), so the</text>
+  <text x="730" y="332" font-size="11" fill="#555" font-style="italic">first path to reach G</text>
+  <text x="730" y="348" font-size="11" fill="#555" font-style="italic">is the shortest one.</text>
+  <rect x="62" y="564" width="20" height="20" fill="#e3f1f3" stroke="#cfcfcf"/>
+  <text x="90" y="579" font-size="11.5" fill="#333">expanded (50 of 119 free cells)</text>
+  <rect x="312" y="564" width="20" height="20" fill="#bcdde2" stroke="#cfcfcf"/>
+  <text x="340" y="579" font-size="11.5" fill="#333">final path (12 cells)</text>
+  <rect x="502" y="564" width="20" height="20" fill="#4a4a4a"/>
+  <text x="530" y="579" font-size="11.5" fill="#333">obstacle</text>
+  <line x1="622" y1="574" x2="662" y2="574" stroke="#b26a1a" stroke-width="1.8" stroke-dasharray="6 5"/>
+  <text x="670" y="579" font-size="11.5" fill="#333">heuristic h to G</text>
+  <text x="480" y="612" font-size="11.5" fill="#555" text-anchor="middle" font-style="italic">The lawnmower answers &#8220;how do I see every point of an area?&#8221;; A* answers &#8220;how do I reach one point past what is in the way?&#8221; &#8212;</text>
+  <text x="480" y="628" font-size="11.5" fill="#555" text-anchor="middle" font-style="italic">different questions, different algorithms, one mission. This figure&#8217;s expansion and path were computed by the chapter&#8217;s own A* implementation.</text>
+</svg>

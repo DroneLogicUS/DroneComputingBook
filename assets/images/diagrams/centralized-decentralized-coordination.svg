@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 660" font-family="Helvetica, Arial, sans-serif" xml:space="preserve">
+  <defs>
+    <marker id="cdTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+    <marker id="cdAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b26a1a"/>
+    </marker>
+    <g id="cdDrone">
+      <line x1="-8" y1="-8" x2="8" y2="8" stroke="#1a7a8a" stroke-width="2.4"/>
+      <line x1="-8" y1="8" x2="8" y2="-8" stroke="#1a7a8a" stroke-width="2.4"/>
+      <circle cx="-8" cy="-8" r="3.4" fill="#1a7a8a"/>
+      <circle cx="8" cy="-8" r="3.4" fill="#1a7a8a"/>
+      <circle cx="-8" cy="8" r="3.4" fill="#1a7a8a"/>
+      <circle cx="8" cy="8" r="3.4" fill="#1a7a8a"/>
+    </g>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="660" fill="#ffffff"/>
+
+  <text x="480" y="28" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">One axis, three architectures: where does the deciding happen?</text>
+  <text x="480" y="50" font-size="13" fill="#555" text-anchor="middle">Same fleet, same mission &#8212; different owners of the global picture, different failure modes.</text>
+
+  <!-- ============ LEFT PANEL: CENTRALIZED ============ -->
+  <rect x="20" y="68" width="295" height="470" rx="10" fill="#f4f8f9" stroke="#c8d8dc" stroke-width="1.2"/>
+  <text x="167" y="94" font-size="14.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">Centralized (star)</text>
+
+  <!-- drones -->
+  <use href="#cdDrone" transform="translate(65 150)"/>
+  <use href="#cdDrone" transform="translate(135 125)"/>
+  <use href="#cdDrone" transform="translate(205 125)"/>
+  <use href="#cdDrone" transform="translate(272 150)"/>
+
+  <!-- hub -->
+  <rect x="112" y="228" width="112" height="46" rx="7" fill="#1a7a8a"/>
+  <text x="168" y="248" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">GROUND STATION</text>
+  <text x="168" y="264" font-size="10.5" fill="#d8ecef" text-anchor="middle">the only global picture</text>
+
+  <!-- star links -->
+  <line x1="140" y1="228" x2="70" y2="165" stroke="#1a7a8a" stroke-width="1.8"/>
+  <line x1="158" y1="228" x2="137" y2="140" stroke="#1a7a8a" stroke-width="1.8"/>
+  <line x1="178" y1="228" x2="203" y2="140" stroke="#1a7a8a" stroke-width="1.8"/>
+  <line x1="198" y1="228" x2="266" y2="165" stroke="#1a7a8a" stroke-width="1.8"/>
+
+  <text x="167" y="296" font-size="10.5" font-style="italic" fill="#555" text-anchor="middle">hub computes all assignments and</text>
+  <text x="167" y="310" font-size="10.5" font-style="italic" fill="#555" text-anchor="middle">trajectories; agents execute</text>
+
+  <text x="36" y="338" font-size="11" font-weight="bold" fill="#1a4a5a">Strong:</text>
+  <text x="36" y="354" font-size="10.5" fill="#333">&#8226; global planning, one place to debug</text>
+  <text x="36" y="369" font-size="10.5" fill="#333">&#8226; predictable, optimizable coordination</text>
+  <text x="36" y="392" font-size="11" font-weight="bold" fill="#8a4d0f">Weak:</text>
+  <text x="36" y="408" font-size="10.5" fill="#333">&#8226; hub = single point of failure</text>
+  <text x="36" y="423" font-size="10.5" fill="#333">&#8226; every byte transits one radio link</text>
+  <text x="36" y="438" font-size="10.5" fill="#333">&#8226; scaling limited by the hub</text>
+
+  <rect x="32" y="452" width="270" height="30" rx="5" fill="#fdf0ec" stroke="#d9b0a0" stroke-width="1"/>
+  <text x="167" y="471" font-size="10.5" font-style="italic" fill="#8a3d2a" text-anchor="middle">lose the hub, ground the fleet</text>
+
+  <text x="167" y="504" font-size="10" font-style="italic" fill="#666" text-anchor="middle">real example: 49 nano-quadrotors flown indoors</text>
+  <text x="167" y="518" font-size="10" font-style="italic" fill="#666" text-anchor="middle">by one central process over a few shared radios</text>
+
+  <!-- ============ MIDDLE PANEL: DECENTRALIZED ============ -->
+  <rect x="333" y="68" width="295" height="470" rx="10" fill="#f4f8f9" stroke="#c8d8dc" stroke-width="1.2"/>
+  <text x="480" y="94" font-size="14.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">Decentralized (mesh)</text>
+
+  <!-- drones -->
+  <use href="#cdDrone" transform="translate(400 150)"/>
+  <use href="#cdDrone" transform="translate(560 150)"/>
+  <use href="#cdDrone" transform="translate(400 240)"/>
+  <use href="#cdDrone" transform="translate(560 240)"/>
+
+  <!-- mesh links (peer-to-peer, dashed both ways) -->
+  <line x1="415" y1="150" x2="545" y2="150" stroke="#1a7a8a" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <line x1="415" y1="240" x2="545" y2="240" stroke="#1a7a8a" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <line x1="400" y1="165" x2="400" y2="225" stroke="#1a7a8a" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <line x1="560" y1="165" x2="560" y2="225" stroke="#1a7a8a" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <line x1="413" y1="162" x2="547" y2="228" stroke="#1a7a8a" stroke-width="1.3" stroke-dasharray="6 4" opacity="0.6"/>
+  <line x1="547" y1="162" x2="413" y2="228" stroke="#1a7a8a" stroke-width="1.3" stroke-dasharray="6 4" opacity="0.6"/>
+
+  <text x="480" y="296" font-size="10.5" font-style="italic" fill="#555" text-anchor="middle">each agent decides from local sensing plus</text>
+  <text x="480" y="310" font-size="10.5" font-style="italic" fill="#555" text-anchor="middle">neighbor exchange; global behavior emerges</text>
+
+  <text x="349" y="338" font-size="11" font-weight="bold" fill="#1a4a5a">Strong:</text>
+  <text x="349" y="354" font-size="10.5" fill="#333">&#8226; no single point of failure</text>
+  <text x="349" y="369" font-size="10.5" fill="#333">&#8226; scales; fast local reactions</text>
+  <text x="349" y="392" font-size="11" font-weight="bold" fill="#8a4d0f">Weak:</text>
+  <text x="349" y="408" font-size="10.5" fill="#333">&#8226; global behavior must be proven, not read</text>
+  <text x="349" y="423" font-size="10.5" fill="#333">&#8226; synchronization is hard</text>
+  <text x="349" y="438" font-size="10.5" fill="#333">&#8226; debugging spread across N logs</text>
+
+  <rect x="345" y="452" width="270" height="30" rx="5" fill="#eef4f5" stroke="#b9ced3" stroke-width="1"/>
+  <text x="480" y="471" font-size="10.5" font-style="italic" fill="#1a4a5a" text-anchor="middle">lose any aircraft, the rest continue</text>
+
+  <text x="480" y="504" font-size="10" font-style="italic" fill="#666" text-anchor="middle">real example: a fielded swarm whose drones detected</text>
+  <text x="480" y="518" font-size="10" font-style="italic" fill="#666" text-anchor="middle">neighbors by onboard camera &#8212; no radio link at all</text>
+
+  <!-- ============ RIGHT PANEL: HYBRID ============ -->
+  <rect x="646" y="68" width="295" height="470" rx="10" fill="#fdf6ec" stroke="#dcc9a8" stroke-width="1.2"/>
+  <text x="793" y="94" font-size="14.5" font-weight="bold" fill="#8a4d0f" text-anchor="middle">Hybrid: allocate globally, react locally</text>
+
+  <!-- coordinator -->
+  <rect x="733" y="112" width="120" height="40" rx="7" fill="#b26a1a"/>
+  <text x="793" y="129" font-size="11.5" font-weight="bold" fill="#ffffff" text-anchor="middle">COORDINATOR</text>
+  <text x="793" y="144" font-size="10" fill="#fbe8d0" text-anchor="middle">slow loop: sectors, roles</text>
+
+  <!-- drones -->
+  <use href="#cdDrone" transform="translate(700 215)"/>
+  <use href="#cdDrone" transform="translate(793 245)"/>
+  <use href="#cdDrone" transform="translate(886 215)"/>
+
+  <!-- assignment links (solid, downward) -->
+  <path d="M 760 152 L 708 200" fill="none" stroke="#b26a1a" stroke-width="1.8" marker-end="url(#cdAmber)"/>
+  <path d="M 793 152 L 793 228" fill="none" stroke="#b26a1a" stroke-width="1.8" marker-end="url(#cdAmber)"/>
+  <path d="M 826 152 L 878 200" fill="none" stroke="#b26a1a" stroke-width="1.8" marker-end="url(#cdAmber)"/>
+
+  <!-- peer links (dashed) -->
+  <line x1="716" y1="218" x2="777" y2="240" stroke="#1a7a8a" stroke-width="1.4" stroke-dasharray="5 4"/>
+  <line x1="809" y1="240" x2="870" y2="218" stroke="#1a7a8a" stroke-width="1.4" stroke-dasharray="5 4"/>
+
+  <!-- local reflex loops -->
+  <path d="M 668 202 A 12 12 0 1 0 672 226" fill="none" stroke="#1a7a8a" stroke-width="1.5" marker-end="url(#cdTeal)"/>
+  <path d="M 918 202 A 12 12 0 1 1 914 226" fill="none" stroke="#1a7a8a" stroke-width="1.5" marker-end="url(#cdTeal)"/>
+  <text x="793" y="285" font-size="10" font-style="italic" fill="#1a4a5a" text-anchor="middle">each drone keeps fast local loops: mission tick,</text>
+  <text x="793" y="299" font-size="10" font-style="italic" fill="#1a4a5a" text-anchor="middle">evasion, patterns, peer collision avoidance</text>
+
+  <text x="662" y="330" font-size="11" font-weight="bold" fill="#1a4a5a">The split:</text>
+  <text x="662" y="346" font-size="10.5" fill="#333">&#8226; global picture where it helps (allocation)</text>
+  <text x="662" y="361" font-size="10.5" fill="#333">&#8226; deadlines stay on the aircraft (reflexes)</text>
+  <text x="662" y="376" font-size="10.5" fill="#333">&#8226; no fast loop ever transits the hub</text>
+
+  <text x="662" y="400" font-size="11" font-weight="bold" fill="#8a4d0f">The fallback:</text>
+  <text x="662" y="416" font-size="10.5" fill="#333">&#8226; heartbeat guard on the coordinator's topic</text>
+  <text x="662" y="431" font-size="10.5" fill="#333">&#8226; on silence: finish own sector, return home</text>
+
+  <rect x="658" y="452" width="270" height="30" rx="5" fill="#eef4f5" stroke="#b9ced3" stroke-width="1"/>
+  <text x="793" y="471" font-size="10.5" font-style="italic" fill="#1a4a5a" text-anchor="middle">coordinator loss degrades &#8212; grounds nothing</text>
+
+  <text x="793" y="504" font-size="10" font-style="italic" fill="#666" text-anchor="middle">the running example's own two-drone design:</text>
+  <text x="793" y="518" font-size="10" font-style="italic" fill="#666" text-anchor="middle">central allocator, per-drone reflexes and token</text>
+
+  <!-- ============ FOOTER: the evidence ============ -->
+  <rect x="20" y="554" width="921" height="88" rx="8" fill="#f7f7f7" stroke="#cccccc" stroke-width="1"/>
+  <text x="480" y="578" font-size="12" font-weight="bold" fill="#333" text-anchor="middle">What a controlled comparison reported (five architectures, same sweep-coverage task)</text>
+  <text x="480" y="599" font-size="11" fill="#444" text-anchor="middle">centralized: generally stronger on coverage completeness, uniformity, and completion time &#8226; decentralized: generally stronger on</text>
+  <text x="480" y="615" font-size="11" fill="#444" text-anchor="middle">scalability (4 &#8594; 16 robots) and fault tolerance (up to 75% failures) &#8226; a hybrid reported better outcomes across more scenarios than either extreme</text>
+  <text x="480" y="634" font-size="10" font-style="italic" fill="#777" text-anchor="middle">the trade-off is a menu, not a dilemma &#8212; the strongest fielded designs order from both columns</text>
+</svg>

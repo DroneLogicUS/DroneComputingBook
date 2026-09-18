@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 660" font-family="Helvetica, Arial, sans-serif" xml:space="preserve">
+  <rect x="0" y="0" width="960" height="660" fill="#ffffff"/>
+
+  <text x="480" y="26" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">Four vibration signatures, read in the frequency domain</text>
+  <text x="480" y="46" font-size="13" fill="#555" text-anchor="middle">Sketches after the worked airframe comparison in PX4&#8217;s Flight Review documentation: healthy is one peak at the low end, low and flat everywhere else.</text>
+
+  <!-- ============ panel 1: QAV-R ============ -->
+  <g>
+    <rect x="40" y="70" width="430" height="250" rx="8" fill="#fafafa" stroke="#ccc" stroke-width="1"/>
+    <text x="56" y="92" font-size="12.5" font-weight="bold" fill="#1a4a5a">QAV-R 5&#8243; racer</text>
+    <rect x="356" y="78" width="100" height="20" rx="10" fill="#1a7a8a"/>
+    <text x="406" y="92" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">EXCELLENT</text>
+    <!-- axes -->
+    <line x1="80" y1="260" x2="440" y2="260" stroke="#888" stroke-width="1.2"/>
+    <line x1="80" y1="110" x2="80" y2="260" stroke="#888" stroke-width="1.2"/>
+    <text x="76" y="118" font-size="8.5" fill="#777" text-anchor="end">amp.</text>
+    <text x="80" y="274" font-size="8.5" fill="#777" text-anchor="middle">0</text>
+    <text x="152" y="274" font-size="8.5" fill="#777" text-anchor="middle">50</text>
+    <text x="224" y="274" font-size="8.5" fill="#777" text-anchor="middle">100</text>
+    <text x="296" y="274" font-size="8.5" fill="#777" text-anchor="middle">150</text>
+    <text x="368" y="274" font-size="8.5" fill="#777" text-anchor="middle">200</text>
+    <text x="440" y="274" font-size="8.5" fill="#777" text-anchor="middle">Hz</text>
+    <!-- trace: single low peak, flat elsewhere -->
+    <path d="M 80 252 L 88 236 L 96 150 L 104 236 L 112 250 L 160 253 L 240 254 L 320 254 L 440 255"
+          fill="none" stroke="#1a7a8a" stroke-width="2.2"/>
+    <text x="120" y="146" font-size="9" fill="#1a4a5a">single peak below ~20 Hz</text>
+    <text x="250" y="238" font-size="9" fill="#1a4a5a">low and flat</text>
+    <text x="56" y="300" font-size="9.5" fill="#555">So clean the software filter cutoffs can be raised — less filtering, less control latency.</text>
+  </g>
+
+  <!-- ============ panel 2: F450 ============ -->
+  <g>
+    <rect x="490" y="70" width="430" height="250" rx="8" fill="#fafafa" stroke="#ccc" stroke-width="1"/>
+    <text x="506" y="92" font-size="12.5" font-weight="bold" fill="#1a4a5a">DJI F450</text>
+    <rect x="836" y="78" width="70" height="20" rx="10" fill="#5a8a5a"/>
+    <text x="871" y="92" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">GOOD</text>
+    <line x1="530" y1="260" x2="890" y2="260" stroke="#888" stroke-width="1.2"/>
+    <line x1="530" y1="110" x2="530" y2="260" stroke="#888" stroke-width="1.2"/>
+    <text x="526" y="118" font-size="8.5" fill="#777" text-anchor="end">amp.</text>
+    <text x="530" y="274" font-size="8.5" fill="#777" text-anchor="middle">0</text>
+    <text x="602" y="274" font-size="8.5" fill="#777" text-anchor="middle">50</text>
+    <text x="674" y="274" font-size="8.5" fill="#777" text-anchor="middle">100</text>
+    <text x="746" y="274" font-size="8.5" fill="#777" text-anchor="middle">150</text>
+    <text x="818" y="274" font-size="8.5" fill="#777" text-anchor="middle">200</text>
+    <text x="890" y="274" font-size="8.5" fill="#777" text-anchor="middle">Hz</text>
+    <!-- trace: low peak + 100 Hz bump -->
+    <path d="M 530 252 L 538 234 L 546 158 L 554 236 L 562 250 L 610 253 L 646 250 L 662 226 L 674 206 L 686 226 L 702 250 L 760 253 L 890 255"
+          fill="none" stroke="#1a7a8a" stroke-width="2.2"/>
+    <text x="674" y="196" font-size="9" fill="#8a4d0f" text-anchor="middle">bump at ~100 Hz:</text>
+    <text x="674" y="185" font-size="9" font-weight="bold" fill="#8a4d0f" text-anchor="middle">blade-passing frequency</text>
+    <text x="506" y="300" font-size="9.5" fill="#555">Mildly elevated energy where the blades beat the air — visible, expected, tolerable.</text>
+  </g>
+
+  <!-- ============ panel 3: S500 ============ -->
+  <g>
+    <rect x="40" y="340" width="430" height="250" rx="8" fill="#fafafa" stroke="#ccc" stroke-width="1"/>
+    <text x="56" y="362" font-size="12.5" font-weight="bold" fill="#1a4a5a">S500</text>
+    <rect x="340" y="348" width="116" height="20" rx="10" fill="#b26a1a"/>
+    <text x="398" y="362" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">BORDERLINE</text>
+    <line x1="80" y1="530" x2="440" y2="530" stroke="#888" stroke-width="1.2"/>
+    <line x1="80" y1="380" x2="80" y2="530" stroke="#888" stroke-width="1.2"/>
+    <text x="76" y="388" font-size="8.5" fill="#777" text-anchor="end">amp.</text>
+    <text x="80" y="544" font-size="8.5" fill="#777" text-anchor="middle">0</text>
+    <text x="152" y="544" font-size="8.5" fill="#777" text-anchor="middle">50</text>
+    <text x="224" y="544" font-size="8.5" fill="#777" text-anchor="middle">100</text>
+    <text x="296" y="544" font-size="8.5" fill="#777" text-anchor="middle">150</text>
+    <text x="368" y="544" font-size="8.5" fill="#777" text-anchor="middle">200</text>
+    <text x="440" y="544" font-size="8.5" fill="#777" text-anchor="middle">Hz</text>
+    <!-- trace: like F450 but raised broadband floor -->
+    <path d="M 80 520 L 88 500 L 96 428 L 104 502 L 112 514 L 150 512 L 196 502 L 212 484 L 224 472 L 236 484 L 252 504 L 300 508 L 360 512 L 440 516"
+          fill="none" stroke="#b26a1a" stroke-width="2.2"/>
+    <path d="M 80 524 L 440 524" fill="none" stroke="#ccc" stroke-width="1" stroke-dasharray="4 3"/>
+    <text x="330" y="494" font-size="9" fill="#8a4d0f">raised broadband floor</text>
+    <text x="56" y="570" font-size="9.5" fill="#555">Similar shape, more energy everywhere; in the raw-acceleration plot the z-axis trace closes on x/y —</text>
+    <text x="56" y="583" font-size="9.5" fill="#555">at the limit where vibration starts to degrade flight performance.</text>
+  </g>
+
+  <!-- ============ panel 4: landing gear resonance ============ -->
+  <g>
+    <rect x="490" y="340" width="430" height="250" rx="8" fill="#fdf3f0" stroke="#a83232" stroke-width="1.3"/>
+    <text x="506" y="362" font-size="12.5" font-weight="bold" fill="#7a2424">Landing-gear resonance (failure case)</text>
+    <rect x="810" y="348" width="96" height="20" rx="10" fill="#a83232"/>
+    <text x="858" y="362" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">FIX FIRST</text>
+    <line x1="530" y1="530" x2="890" y2="530" stroke="#888" stroke-width="1.2"/>
+    <line x1="530" y1="380" x2="530" y2="530" stroke="#888" stroke-width="1.2"/>
+    <text x="526" y="388" font-size="8.5" fill="#777" text-anchor="end">amp.</text>
+    <text x="530" y="544" font-size="8.5" fill="#777" text-anchor="middle">0</text>
+    <text x="602" y="544" font-size="8.5" fill="#777" text-anchor="middle">50</text>
+    <text x="674" y="544" font-size="8.5" fill="#777" text-anchor="middle">100</text>
+    <text x="746" y="544" font-size="8.5" fill="#777" text-anchor="middle">150</text>
+    <text x="818" y="544" font-size="8.5" fill="#777" text-anchor="middle">200</text>
+    <text x="890" y="544" font-size="8.5" fill="#777" text-anchor="middle">Hz</text>
+    <!-- trace: strong single peak near 50 Hz -->
+    <path d="M 530 520 L 540 504 L 548 460 L 556 502 L 566 514 L 586 510 L 596 468 L 602 396 L 608 466 L 618 508 L 660 514 L 740 516 L 890 518"
+          fill="none" stroke="#a83232" stroke-width="2.2"/>
+    <text x="640" y="404" font-size="9" font-weight="bold" fill="#7a2424">strong single peak near 50 Hz —</text>
+    <text x="640" y="416" font-size="9" fill="#7a2424">low, and close to the vehicle&#8217;s own dynamics</text>
+    <text x="506" y="570" font-size="9.5" fill="#555">Too near the frequencies of real attitude motion for filtering to remove without also delaying</text>
+    <text x="506" y="583" font-size="9.5" fill="#555">genuine control response — a mechanical fix (stiffen or damp the gear) is the only good one.</text>
+  </g>
+
+  <!-- footer -->
+  <rect x="40" y="606" width="880" height="42" rx="8" fill="#f7f7f7" stroke="#ccc" stroke-width="1"/>
+  <text x="480" y="623" font-size="10.5" fill="#444" text-anchor="middle">The running example&#8217;s two-blade props spin near 90 Hz in hover, so its healthy log shows blade-passing energy near 181 Hz —</text>
+  <text x="480" y="638" font-size="10.5" fill="#444" text-anchor="middle">the Anatomy of a Multirotor chapter&#8217;s excitation frequencies, now read back out of the flight log.</text>
+</svg>

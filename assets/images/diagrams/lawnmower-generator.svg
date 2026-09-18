@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="lgArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+    <marker id="lgDim" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#666"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="640" fill="#ffffff"/>
+
+  <text x="480" y="28" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">The lawnmower generator: a bounding box, a spacing, and nothing else</text>
+  <text x="480" y="50" font-size="13" fill="#555" text-anchor="middle">Two inputs fix the whole path: the box gives the legs their length, the spacing gives them their count.</text>
+
+  <!-- swath bands around legs 3 and 4 (drawn first, behind everything) -->
+  <rect x="341" y="120" width="130" height="372" fill="#e3f1f3"/>
+  <rect x="419" y="120" width="130" height="372" fill="#e3f1f3"/>
+  <rect x="419" y="120" width="52" height="372" fill="#bcdde2"/>
+
+  <!-- bounding box -->
+  <rect x="250" y="120" width="390" height="372" fill="none" stroke="#b26a1a" stroke-width="2.4"/>
+  <text x="243" y="505" font-size="11" fill="#8a4d0f" text-anchor="middle" font-weight="bold">(x<tspan font-size="9" dy="3">min</tspan><tspan dy="-3">, y</tspan><tspan font-size="9" dy="3">min</tspan><tspan dy="-3">)</tspan></text>
+  <text x="243" y="112" font-size="11" fill="#8a4d0f" text-anchor="middle" font-weight="bold">(x<tspan font-size="9" dy="3">max</tspan><tspan dy="-3">, y</tspan><tspan font-size="9" dy="3">min</tspan><tspan dy="-3">)</tspan></text>
+  <text x="655" y="505" font-size="11" fill="#8a4d0f" text-anchor="start" font-weight="bold">(x<tspan font-size="9" dy="3">min</tspan><tspan dy="-3">, y</tspan><tspan font-size="9" dy="3">max</tspan><tspan dy="-3">)</tspan></text>
+  <text x="655" y="112" font-size="11" fill="#8a4d0f" text-anchor="start" font-weight="bold">(x<tspan font-size="9" dy="3">max</tspan><tspan dy="-3">, y</tspan><tspan font-size="9" dy="3">max</tspan><tspan dy="-3">)</tspan></text>
+
+  <!-- north arrow -->
+  <line x1="915" y1="95" x2="915" y2="60" stroke="#666" stroke-width="2" marker-end="url(#lgDim)"/>
+  <text x="915" y="109" font-size="11" font-weight="bold" fill="#666" text-anchor="middle">N (+x)</text>
+  <line x1="898" y1="112" x2="933" y2="112" stroke="#666" stroke-width="2" marker-end="url(#lgDim)"/>
+  <text x="915" y="128" font-size="11" font-weight="bold" fill="#666" text-anchor="middle">E (+y)</text>
+
+  <!-- generated path: 6 legs, boustrophedon -->
+  <polyline points="250,492 250,120 328,120 328,492 406,492 406,120 484,120 484,492 562,492 562,120 640,120 640,492"
+            fill="none" stroke="#1a7a8a" stroke-width="2.6"/>
+  <!-- direction arrows mid-leg -->
+  <line x1="250" y1="320" x2="250" y2="290" stroke="#1a7a8a" stroke-width="2.6" marker-end="url(#lgArrow)"/>
+  <line x1="328" y1="290" x2="328" y2="320" stroke="#1a7a8a" stroke-width="2.6" marker-end="url(#lgArrow)"/>
+  <line x1="406" y1="320" x2="406" y2="290" stroke="#1a7a8a" stroke-width="2.6" marker-end="url(#lgArrow)"/>
+  <line x1="484" y1="290" x2="484" y2="320" stroke="#1a7a8a" stroke-width="2.6" marker-end="url(#lgArrow)"/>
+  <line x1="562" y1="320" x2="562" y2="290" stroke="#1a7a8a" stroke-width="2.6" marker-end="url(#lgArrow)"/>
+  <line x1="640" y1="290" x2="640" y2="320" stroke="#1a7a8a" stroke-width="2.6" marker-end="url(#lgArrow)"/>
+
+  <!-- waypoints: 12 numbered circles -->
+  <circle cx="250" cy="492" r="9" fill="#1a7a8a"/><text x="250" y="496" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">1</text>
+  <circle cx="250" cy="120" r="9" fill="#1a7a8a"/><text x="250" y="124" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">2</text>
+  <circle cx="328" cy="120" r="9" fill="#1a7a8a"/><text x="328" y="124" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">3</text>
+  <circle cx="328" cy="492" r="9" fill="#1a7a8a"/><text x="328" y="496" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">4</text>
+  <circle cx="406" cy="492" r="9" fill="#1a7a8a"/><text x="406" y="496" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">5</text>
+  <circle cx="406" cy="120" r="9" fill="#1a7a8a"/><text x="406" y="124" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">6</text>
+  <circle cx="484" cy="120" r="9" fill="#1a7a8a"/><text x="484" y="124" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">7</text>
+  <circle cx="484" cy="492" r="9" fill="#1a7a8a"/><text x="484" y="496" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">8</text>
+  <circle cx="562" cy="492" r="9" fill="#1a7a8a"/><text x="562" y="496" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">9</text>
+  <circle cx="562" cy="120" r="9" fill="#1a7a8a"/><text x="562" y="124" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">10</text>
+  <circle cx="640" cy="120" r="9" fill="#1a7a8a"/><text x="640" y="124" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">11</text>
+  <circle cx="640" cy="492" r="9" fill="#1a7a8a"/><text x="640" y="496" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle">12</text>
+
+  <!-- spacing dimension between legs 4 and 5 (px 406 and 484), above box -->
+  <line x1="406" y1="88" x2="484" y2="88" stroke="#666" stroke-width="1.4" marker-start="url(#lgDim)" marker-end="url(#lgDim)"/>
+  <text x="445" y="79" font-size="11" fill="#666" text-anchor="middle" font-style="italic">step = 6.6 m</text>
+
+  <!-- swath + overlap annotations, below box -->
+  <line x1="341" y1="528" x2="471" y2="528" stroke="#666" stroke-width="1.4" marker-start="url(#lgDim)" marker-end="url(#lgDim)"/>
+  <text x="406" y="545" font-size="11" fill="#666" text-anchor="middle" font-style="italic">swath w = 11 m seen by the camera along one leg</text>
+  <line x1="419" y1="555" x2="471" y2="555" stroke="#4a7d87" stroke-width="1.4" marker-start="url(#lgDim)" marker-end="url(#lgDim)"/>
+  <text x="445" y="572" font-size="11" fill="#1a4a5a" text-anchor="middle" font-style="italic">overlap w &#8722; step = 4.4 m &#8212; the margin cross-track error may spend</text>
+
+  <!-- left dimension: leg length -->
+  <line x1="222" y1="120" x2="222" y2="492" stroke="#666" stroke-width="1.4" marker-start="url(#lgDim)" marker-end="url(#lgDim)"/>
+  <text x="210" y="306" font-size="11" fill="#666" text-anchor="middle" font-style="italic" transform="rotate(-90 210 306)">leg length L = x<tspan font-size="9" dy="3">max</tspan><tspan dy="-3"> &#8722; x</tspan><tspan font-size="9" dy="3">min</tspan><tspan dy="-3"> = 60 m</tspan></text>
+
+  <!-- width dimension across top, above spacing -->
+  <line x1="250" y1="66" x2="640" y2="66" stroke="#666" stroke-width="1.4" marker-start="url(#lgDim)" marker-end="url(#lgDim)"/>
+  <text x="320" y="79" font-size="11" fill="#666" text-anchor="middle" font-style="italic">W = y<tspan font-size="9" dy="3">max</tspan><tspan dy="-3"> &#8722; y</tspan><tspan font-size="9" dy="3">min</tspan><tspan dy="-3"> = 33 m</tspan></text>
+
+  <!-- right-side arithmetic block -->
+  <text x="690" y="180" font-size="12.5" font-weight="bold" fill="#222" text-anchor="start">The generator's arithmetic</text>
+  <text x="690" y="205" font-size="11.5" fill="#333" text-anchor="start">inputs: box, s<tspan font-size="9" dy="3">max</tspan><tspan dy="-3"> = 6.6 m, altitude 5.5 m</tspan></text>
+  <text x="690" y="232" font-size="11.5" fill="#333" text-anchor="start">n = &#8968;W / s<tspan font-size="9" dy="3">max</tspan><tspan dy="-3">&#8969; + 1 = &#8968;33 / 6.6&#8969; + 1 = 6 legs</tspan></text>
+  <text x="690" y="259" font-size="11.5" fill="#333" text-anchor="start">step = W / (n &#8722; 1) = 33 / 5 = 6.6 m &#8804; s<tspan font-size="9" dy="3">max</tspan></text>
+  <text x="690" y="286" font-size="11.5" fill="#333" text-anchor="start">output: 2n = 12 waypoints, all at z = &#8722;5.5 m</text>
+  <text x="690" y="313" font-size="11.5" fill="#333" text-anchor="start">track = nL + (n &#8722; 1)&#183;step</text>
+  <text x="690" y="337" font-size="11.5" fill="#333" text-anchor="start">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;= 6(60) + 5(6.6) = 393 m</text>
+  <text x="690" y="375" font-size="11" fill="#555" text-anchor="start" font-style="italic">Even legs fly north, odd legs fly south,</text>
+  <text x="690" y="391" font-size="11" fill="#555" text-anchor="start" font-style="italic">so each leg starts where the previous</text>
+  <text x="690" y="407" font-size="11" fill="#555" text-anchor="start" font-style="italic">one ended &#8212; the row step comes free.</text>
+  <text x="690" y="437" font-size="11" fill="#555" text-anchor="start" font-style="italic">First and last legs ride the box edges;</text>
+  <text x="690" y="453" font-size="11" fill="#555" text-anchor="start" font-style="italic">half their swath falls outside the box &#8212;</text>
+  <text x="690" y="469" font-size="11" fill="#555" text-anchor="start" font-style="italic">conservative over-coverage, not a bug.</text>
+
+  <!-- footer -->
+  <text x="480" y="602" font-size="11.5" fill="#555" text-anchor="middle" font-style="italic">No geofence, no home position, no mission items yet &#8212; this is the pure geometry the generator emits as an ordered NED waypoint list.</text>
+  <text x="480" y="618" font-size="11.5" fill="#555" text-anchor="middle" font-style="italic">The Mission Scripting chapter's machinery &#8212; setpoint streaming and the acceptance-radius arrival test &#8212; turns it into a flown mission.</text>
+</svg>

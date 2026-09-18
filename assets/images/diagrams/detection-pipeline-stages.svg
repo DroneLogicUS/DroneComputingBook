@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400" font-family="Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="900" height="400" fill="#ffffff"/>
+  <defs>
+    <marker id="dpsArrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M 0 0 L 8 4.5 L 0 9 z" fill="#444"/>
+    </marker>
+    <marker id="dpsArrowRed" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M 0 0 L 8 4.5 L 0 9 z" fill="#822"/>
+    </marker>
+  </defs>
+
+  <text x="450" y="30" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">The detection pipeline: from raw footage to a flying detector</text>
+  <text x="450" y="52" font-size="13" fill="#555" text-anchor="middle">This chapter builds the first five stages; the previous chapter already built the last two.</text>
+
+  <!-- tier bands -->
+  <rect x="30" y="80" width="628" height="180" rx="8" fill="#f7f4ee" stroke="#8a8a8a" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="42" y="100" font-size="12" font-weight="bold" fill="#8a5210">WORKSTATION / CLOUD TIER &#8212; deadline-free, compute-hungry, done once per model</text>
+  <rect x="672" y="80" width="198" height="180" rx="8" fill="#eef4f6" stroke="#1a7a8a" stroke-width="1.5"/>
+  <text x="771" y="100" font-size="12" font-weight="bold" fill="#1a4a5a" text-anchor="middle">COMPANION TIER &#8212; every frame</text>
+
+  <!-- row 1 stages -->
+  <g font-size="12.5" fill="#222">
+    <rect x="44" y="116" width="130" height="58" rx="6" fill="#f2f6f8" stroke="#1a4a5a" stroke-width="1.5"/>
+    <text x="109" y="138" text-anchor="middle" font-weight="bold">1. Collect</text>
+    <text x="109" y="155" text-anchor="middle" font-size="11">flight video, phone</text>
+    <text x="109" y="169" text-anchor="middle" font-size="11">footage, public sets</text>
+
+    <rect x="198" y="116" width="130" height="58" rx="6" fill="#f2f6f8" stroke="#1a4a5a" stroke-width="1.5"/>
+    <text x="263" y="138" text-anchor="middle" font-weight="bold">2. Extract frames</text>
+    <text x="263" y="155" text-anchor="middle" font-size="11">video &#8594; still images,</text>
+    <text x="263" y="169" text-anchor="middle" font-size="11">sampled, deduplicated</text>
+
+    <rect x="352" y="116" width="130" height="58" rx="6" fill="#fdf3e6" stroke="#8a5210" stroke-width="2"/>
+    <text x="417" y="138" text-anchor="middle" font-weight="bold">3. Label</text>
+    <text x="417" y="155" text-anchor="middle" font-size="11">draw boxes, assign</text>
+    <text x="417" y="169" text-anchor="middle" font-size="11">classes &#8212; YOLO format</text>
+
+    <rect x="506" y="116" width="130" height="58" rx="6" fill="#f2f6f8" stroke="#1a4a5a" stroke-width="1.5"/>
+    <text x="571" y="138" text-anchor="middle" font-weight="bold">4. Split &amp; augment</text>
+    <text x="571" y="155" text-anchor="middle" font-size="11">train / validation,</text>
+    <text x="571" y="169" text-anchor="middle" font-size="11">no leakage</text>
+
+    <line x1="174" y1="145" x2="196" y2="145" stroke="#444" stroke-width="1.5" marker-end="url(#dpsArrow)"/>
+    <line x1="328" y1="145" x2="350" y2="145" stroke="#444" stroke-width="1.5" marker-end="url(#dpsArrow)"/>
+    <line x1="482" y1="145" x2="504" y2="145" stroke="#444" stroke-width="1.5" marker-end="url(#dpsArrow)"/>
+  </g>
+
+  <!-- row 2 stages -->
+  <g font-size="12.5" fill="#222">
+    <rect x="198" y="192" width="130" height="58" rx="6" fill="#fdf3e6" stroke="#8a5210" stroke-width="2"/>
+    <text x="263" y="214" text-anchor="middle" font-weight="bold">5. Train</text>
+    <text x="263" y="231" text-anchor="middle" font-size="11">fine-tune YOLOv8n</text>
+    <text x="263" y="245" text-anchor="middle" font-size="11">(transfer learning)</text>
+
+    <rect x="352" y="192" width="130" height="58" rx="6" fill="#fdf3e6" stroke="#8a5210" stroke-width="2"/>
+    <text x="417" y="214" text-anchor="middle" font-weight="bold">6. Evaluate</text>
+    <text x="417" y="231" text-anchor="middle" font-size="11">precision, recall,</text>
+    <text x="417" y="245" text-anchor="middle" font-size="11">mAP on held-out val</text>
+
+    <rect x="506" y="192" width="130" height="58" rx="6" fill="#ffffff" stroke="#8a8a8a" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <text x="571" y="214" text-anchor="middle" font-weight="bold" fill="#555">7. Convert &#183; optimize</text>
+    <text x="571" y="231" text-anchor="middle" font-size="11" fill="#555">export, quantize (int8),</text>
+    <text x="571" y="245" text-anchor="middle" font-size="11" fill="#555">TensorRT &#8212; prev. chapter</text>
+
+    <!-- elbow from split to train -->
+    <path d="M 571 174 L 571 182 L 263 182 L 263 190" stroke="#444" stroke-width="1.5" fill="none" marker-end="url(#dpsArrow)"/>
+    <line x1="328" y1="221" x2="350" y2="221" stroke="#444" stroke-width="1.5" marker-end="url(#dpsArrow)"/>
+    <line x1="482" y1="221" x2="504" y2="221" stroke="#444" stroke-width="1.5" marker-end="url(#dpsArrow)"/>
+  </g>
+
+  <!-- deploy stage -->
+  <rect x="694" y="163" width="154" height="66" rx="6" fill="#f2f6f8" stroke="#1a7a8a" stroke-width="2"/>
+  <text x="771" y="186" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#222">8. Infer onboard</text>
+  <text x="771" y="203" text-anchor="middle" font-size="11" fill="#222">Detector node, every</text>
+  <text x="771" y="217" text-anchor="middle" font-size="11" fill="#222">frame, at frame rate</text>
+  <line x1="636" y1="221" x2="658" y2="221" stroke="#444" stroke-width="1.5" marker-end="url(#dpsArrow)"/>
+  <line x1="658" y1="221" x2="658" y2="196" stroke="#444" stroke-width="1.5" fill="none"/>
+  <line x1="658" y1="196" x2="692" y2="196" stroke="#444" stroke-width="1.5" marker-end="url(#dpsArrow)"/>
+
+  <!-- iteration loop -->
+  <path d="M 771 229 L 771 300 L 109 300 L 109 176" stroke="#822" stroke-width="1.8" fill="none" stroke-dasharray="6 4" marker-end="url(#dpsArrowRed)"/>
+  <text x="440" y="292" font-size="12" fill="#822" font-style="italic" text-anchor="middle">the loop that matters: flight-time mistakes tell you what data to collect next &#8212; hard cases go back into stage 1</text>
+
+  <!-- footer -->
+  <rect x="30" y="318" width="840" height="62" rx="6" fill="#f2f6f8" stroke="#1a4a5a" stroke-width="1"/>
+  <text x="450" y="340" font-size="12.5" fill="#222" text-anchor="middle"><tspan font-weight="bold">Where the time goes:</tspan> stages 1&#8211;3 &#8212; the dataset work &#8212; are the bottleneck of a real detection project, not stage 5.</text>
+  <text x="450" y="358" font-size="12.5" fill="#222" text-anchor="middle">Training a small model takes minutes on a rented GPU; collecting and labeling the data it learns from takes days.</text>
+  <text x="450" y="374" font-size="11.5" fill="#555" font-style="italic" text-anchor="middle">Amber stages are this chapter's center of mass: labeling, training, and knowing whether the result is any good.</text>
+</svg>

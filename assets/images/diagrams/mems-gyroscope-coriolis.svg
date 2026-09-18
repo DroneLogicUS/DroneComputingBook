@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 540" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#444"/>
+    </marker>
+    <marker id="arrowblue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#10233c"/>
+    </marker>
+  </defs>
+
+  <!-- background -->
+  <rect x="0" y="0" width="780" height="540" fill="#ffffff"/>
+
+  <!-- angular-rate symbol: rotation axis out of the page -->
+  <circle cx="120" cy="70" r="11" fill="#ffffff" stroke="#444" stroke-width="2"/>
+  <circle cx="120" cy="70" r="3" fill="#444"/>
+  <path d="M 145 82 A 28 28 0 1 1 145 58" fill="none" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="165" y="63" font-size="15" fill="#222">angular rate &#969;</text>
+  <text x="165" y="82" font-size="14" fill="#222">(rotation axis out of the page)</text>
+
+  <!-- top fixed sense electrode (anchored) -->
+  <rect x="285" y="150" width="210" height="18" fill="#e8b04a" stroke="#9a6b1f" stroke-width="1.5"/>
+  <text x="60" y="145" font-size="15" fill="#222">fixed sense electrode (anchored)</text>
+  <line x1="230" y1="149" x2="295" y2="156" stroke="#888" stroke-width="1.2"/>
+
+  <!-- bottom fixed sense electrode (anchored) -->
+  <rect x="285" y="352" width="210" height="18" fill="#e8b04a" stroke="#9a6b1f" stroke-width="1.5"/>
+  <text x="390" y="393" font-size="15" fill="#222" text-anchor="middle">fixed sense electrode (anchored)</text>
+
+  <!-- sense gaps C1 and C2 -->
+  <line x1="330" y1="168" x2="330" y2="200" stroke="#444" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <text x="345" y="188" font-size="13" fill="#222">C&#8321;</text>
+  <line x1="330" y1="320" x2="330" y2="352" stroke="#444" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <text x="345" y="342" font-size="13" fill="#222">C&#8322;</text>
+
+  <!-- anchors -->
+  <rect x="50" y="235" width="40" height="60" fill="#8a8a8a" stroke="#555" stroke-width="1.5"/>
+  <rect x="690" y="235" width="40" height="60" fill="#8a8a8a" stroke="#555" stroke-width="1.5"/>
+  <text x="40" y="318" font-size="15" fill="#222">anchor (to substrate)</text>
+
+  <!-- flexure springs (serpentine) -->
+  <path d="M 90 265 H 115 V 240 H 135 V 290 H 155 V 240 H 175 V 290 H 195 V 265 H 270"
+        fill="none" stroke="#555" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M 690 265 H 665 V 240 H 645 V 290 H 625 V 240 H 605 V 290 H 585 V 265 H 510"
+        fill="none" stroke="#555" stroke-width="5" stroke-linejoin="round"/>
+  <text x="95" y="210" font-size="15" fill="#222">flexure spring</text>
+  <line x1="135" y1="215" x2="140" y2="237" stroke="#888" stroke-width="1.2"/>
+
+  <!-- proof mass -->
+  <rect x="270" y="200" width="240" height="120" fill="#7da7d9" stroke="#34567f" stroke-width="2"/>
+  <text x="380" y="242" font-size="17" fill="#10233c" text-anchor="middle" font-weight="bold">proof mass, m</text>
+
+  <!-- drive-mode oscillation inside the mass -->
+  <line x1="300" y1="290" x2="440" y2="290" stroke="#10233c" stroke-width="2.5" marker-start="url(#arrowblue)" marker-end="url(#arrowblue)"/>
+  <text x="370" y="262" font-size="14" fill="#10233c" text-anchor="middle" font-style="italic">drive mode:</text>
+  <text x="370" y="280" font-size="14" fill="#10233c" text-anchor="middle" font-style="italic">oscillation, velocity v</text>
+
+  <!-- Coriolis-induced sense-mode displacement -->
+  <line x1="488" y1="305" x2="488" y2="212" stroke="#10233c" stroke-width="3" marker-end="url(#arrowblue)"/>
+  <text x="520" y="152" font-size="15" fill="#10233c" font-style="italic">Coriolis acceleration</text>
+  <text x="520" y="174" font-size="15" fill="#10233c" font-style="italic">a<tspan font-size="11" dy="4">cor</tspan><tspan dy="-4"> = &#8722;2 &#969; &#215; v</tspan></text>
+  <text x="520" y="198" font-size="14" fill="#222">pumps the sense mode:</text>
+  <text x="520" y="216" font-size="14" fill="#222">the mass displaces toward</text>
+  <text x="520" y="234" font-size="14" fill="#222">one electrode, &#8733; &#969;</text>
+  <line x1="516" y1="182" x2="493" y2="208" stroke="#888" stroke-width="1.2"/>
+
+  <!-- axes legend -->
+  <line x1="70" y1="465" x2="140" y2="465" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="148" y="470" font-size="14" fill="#222">drive axis</text>
+  <line x1="70" y1="465" x2="70" y2="400" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="60" y="390" font-size="14" fill="#222">sense axis</text>
+
+  <!-- relation caption -->
+  <text x="390" y="505" font-size="15" fill="#222" text-anchor="middle" font-style="italic">drive vibration v + package rotation &#969; &#8594; Coriolis force &#8722;2m &#969;&#215;v &#8594; sense-mode displacement</text>
+  <text x="390" y="527" font-size="15" fill="#222" text-anchor="middle" font-style="italic">&#8594; &#916;C = C&#8321; &#8722; C&#8322; &#8733; angular rate &#969;</text>
+</svg>

@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 660" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <pattern id="dangerHatch" width="8" height="8" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <rect width="8" height="8" fill="#f7e2df"/>
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#d9958c" stroke-width="2.5"/>
+    </pattern>
+    <marker id="arrowGrey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#666"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="660" fill="#ffffff"/>
+
+  <text x="450" y="28" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">the three-metre orbit, drawn to scale</text>
+  <text x="450" y="47" font-size="13" fill="#555" text-anchor="middle" font-style="italic">every distance in the argument on one linear axis (metres of separation from the goose)</text>
+
+  <!-- ===================== MAIN SCALE: 0-125 m, x = 70 + m*6.08 ===================== -->
+
+  <!-- Lane A: measured goose responses (teal) -->
+  <text x="70" y="80" font-size="12.5" fill="#1d5f6b" font-weight="bold">measured Canada goose responses to an approaching vehicle (Blackwell et al. 2019)</text>
+  <rect x="305" y="88" width="196" height="28" rx="3" fill="#cde8ec" stroke="#2a7f8f" stroke-width="1.5"/>
+  <text x="403" y="100" font-size="10.5" fill="#1d5f6b" text-anchor="middle" font-weight="bold">flight-initiation distance</text>
+  <text x="403" y="112" font-size="10.5" fill="#1d5f6b" text-anchor="middle" font-weight="bold">38.6&#8211;70.9 m</text>
+  <text x="403" y="130" font-size="10" fill="#3a7a86" text-anchor="middle" font-style="italic">geese take flight (tangential &#8594; direct approach)</text>
+  <rect x="607" y="88" width="196" height="28" rx="3" fill="#e3f2f4" stroke="#5da3ae" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text x="705" y="100" font-size="10.5" fill="#3a7a86" text-anchor="middle">alert distance</text>
+  <text x="705" y="112" font-size="10.5" fill="#3a7a86" text-anchor="middle">88.4&#8211;120.5 m</text>
+  <text x="705" y="130" font-size="10" fill="#5b939d" text-anchor="middle" font-style="italic">vigilance begins</text>
+
+  <!-- Lane B: avoidance literature (grey) -->
+  <text x="70" y="163" font-size="12.5" fill="#555" font-weight="bold">disturbance-avoidance literature (written to avoid reactions, not to provoke them)</text>
+  <line x1="94" y1="172" x2="94" y2="192" stroke="#777" stroke-width="2"/>
+  <text x="99" y="200" font-size="10" fill="#666">4 m &#8212; closest documented</text>
+  <text x="99" y="212" font-size="10" fill="#666">non-disturbing approach:</text>
+  <text x="99" y="224" font-size="10" fill="#666" font-style="italic">one slow lateral pass</text>
+  <line x1="313" y1="172" x2="313" y2="192" stroke="#777" stroke-width="2"/>
+  <text x="313" y="212" font-size="10" fill="#666" text-anchor="middle">&#8805;40 m multirotor altitude,</text>
+  <text x="313" y="224" font-size="10" fill="#666" text-anchor="middle">no waterfowl disturbance</text>
+  <rect x="374" y="174" width="182" height="24" rx="3" fill="#ececec" stroke="#8a8a8a" stroke-width="1.2"/>
+  <text x="465" y="185" font-size="10" fill="#555" text-anchor="middle">50&#8211;80 m review recommendation,</text>
+  <text x="465" y="196" font-size="10" fill="#555" text-anchor="middle" font-style="italic">horizontal distance to birds</text>
+  <line x1="678" y1="172" x2="678" y2="192" stroke="#777" stroke-width="2"/>
+  <text x="678" y="212" font-size="10" fill="#666" text-anchor="middle">100 m proposed code of practice:</text>
+  <text x="678" y="224" font-size="10" fill="#666" text-anchor="middle">no approach within 100 m</text>
+
+  <!-- Lane C: the running example (red/amber) -->
+  <text x="70" y="252" font-size="12.5" fill="#8a3125" font-weight="bold">the running example's own numbers</text>
+  <rect x="70" y="260" width="24" height="26" fill="url(#dangerHatch)" stroke="#b3392b" stroke-width="1.2"/>
+  <rect x="100" y="260" width="19" height="26" fill="#f2e3c8" stroke="#b07d2a" stroke-width="1.2"/>
+  <rect x="119" y="260" width="42" height="26" fill="#e8d3a7" stroke="#8a6512" stroke-width="1.4"/>
+  <line x1="88" y1="254" x2="88" y2="292" stroke="#b3392b" stroke-width="3"/>
+  <text x="169" y="272" font-size="10.5" fill="#6d5210">&#8592; designed orbit band 8&#8211;15 m; keep-out buffer 5&#8211;8 m; flagged danger zone &lt;3&#8211;4 m</text>
+  <text x="169" y="290" font-size="10.5" fill="#b3392b" font-weight="bold">&#8592; shipped default: orbit_radius_m = 3.0 &#8212; inside the flagged zone</text>
+
+  <!-- main axis -->
+  <line x1="70" y1="310" x2="830" y2="310" stroke="#333" stroke-width="1.6"/>
+  <g font-size="11" fill="#444" text-anchor="middle">
+    <line x1="70" y1="310" x2="70" y2="317" stroke="#333" stroke-width="1.4"/><text x="70" y="331">0</text>
+    <line x1="191.6" y1="310" x2="191.6" y2="317" stroke="#333" stroke-width="1.4"/><text x="191.6" y="331">20</text>
+    <line x1="313.2" y1="310" x2="313.2" y2="317" stroke="#333" stroke-width="1.4"/><text x="313.2" y="331">40</text>
+    <line x1="434.8" y1="310" x2="434.8" y2="317" stroke="#333" stroke-width="1.4"/><text x="434.8" y="331">60</text>
+    <line x1="556.4" y1="310" x2="556.4" y2="317" stroke="#333" stroke-width="1.4"/><text x="556.4" y="331">80</text>
+    <line x1="678" y1="310" x2="678" y2="317" stroke="#333" stroke-width="1.4"/><text x="678" y="331">100</text>
+    <line x1="799.6" y1="310" x2="799.6" y2="317" stroke="#333" stroke-width="1.4"/><text x="799.6" y="331">120</text>
+  </g>
+  <text x="830" y="347" font-size="11" fill="#444" text-anchor="end" font-style="italic">metres</text>
+
+  <!-- magnifier connectors from 0-16 m region down to inset -->
+  <line x1="70" y1="310" x2="70" y2="392" stroke="#999" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <line x1="167.3" y1="310" x2="830" y2="392" stroke="#999" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <rect x="130" y="350" width="640" height="18" fill="#ffffff" opacity="0.9"/>
+  <text x="450" y="363" font-size="11.5" fill="#666" text-anchor="middle" font-style="italic">the first 16 m &#8212; where the entire shipped-versus-designed discrepancy lives &#8212; magnified below</text>
+
+  <!-- ===================== INSET: 0-16 m, x = 70 + m*47.5 ===================== -->
+  <rect x="55" y="392" width="790" height="190" rx="6" fill="#fbfaf8" stroke="#bbb" stroke-width="1.2"/>
+
+  <!-- goose silhouette + wingspan bracket -->
+  <g transform="translate(70,492)">
+    <path d="M 0 8 Q 18 -10 40 -2 Q 44 -14 50 -16 L 56 -13 L 52 -8 Q 60 -4 66 2 Q 78 -6 88 6 Q 70 10 52 8 Q 44 16 36 12 Q 18 14 0 8 Z" fill="#a5843f"/>
+  </g>
+  <path d="M 70 512 L 70 520 L 157.9 520 L 157.9 512" fill="none" stroke="#7a5210" stroke-width="1.3"/>
+  <text x="114" y="534" font-size="10.5" fill="#7a5210" text-anchor="middle">wingspan up to ~1.85 m</text>
+  <text x="114" y="547" font-size="10" fill="#7a5210" text-anchor="middle" font-style="italic">3 m &#8776; less than two wingspans</text>
+
+  <!-- danger zone 0-4 m -->
+  <rect x="70" y="412" width="190" height="40" fill="url(#dangerHatch)" stroke="#b3392b" stroke-width="1.4"/>
+  <text x="165" y="406" font-size="11" fill="#b3392b" text-anchor="middle" font-weight="bold">flagged zone &lt;3&#8211;4 m</text>
+  <line x1="245" y1="453" x2="278" y2="465" stroke="#b3392b" stroke-width="1" stroke-dasharray="3 2"/>
+  <text x="315" y="472" font-size="10.5" fill="#b3392b" text-anchor="middle" font-style="italic">&#8220;bird-strike &#8230; or scatter in panic&#8221;</text>
+  <text x="315" y="485" font-size="10" fill="#b3392b" text-anchor="middle" font-style="italic">&#8212; the design documentation's own warning</text>
+
+  <!-- shipped default line at 3.0 m -->
+  <line x1="212.5" y1="408" x2="212.5" y2="456" stroke="#b3392b" stroke-width="4"/>
+  <circle cx="212.5" cy="432" r="7" fill="#b3392b"/>
+  <text x="222" y="428" font-size="11.5" fill="#b3392b" font-weight="bold">3.0 m</text>
+  <text x="222" y="441" font-size="10" fill="#b3392b">shipped default</text>
+
+  <!-- keep-out buffer 5-8 m -->
+  <rect x="307.5" y="412" width="142.5" height="40" fill="#f2e3c8" stroke="#b07d2a" stroke-width="1.4"/>
+  <text x="378" y="430" font-size="11" fill="#6d5210" text-anchor="middle" font-weight="bold">keep-out buffer</text>
+  <text x="378" y="444" font-size="11" fill="#6d5210" text-anchor="middle">5&#8211;8 m</text>
+
+  <!-- design band 8-15 m -->
+  <rect x="450" y="412" width="332.5" height="40" fill="#e8d3a7" stroke="#8a6512" stroke-width="1.6"/>
+  <text x="616" y="430" font-size="11.5" fill="#5c430c" text-anchor="middle" font-weight="bold">designed orbit band 8&#8211;15 m</text>
+  <text x="616" y="444" font-size="10.5" fill="#5c430c" text-anchor="middle" font-style="italic">&#8220;a common practical starting point for hazing drones&#8221; &#8212; same document</text>
+
+  <!-- geometry annotation -->
+  <text x="380" y="506" font-size="10.5" fill="#444">at R = 3 m and 3 m altitude the drone also sits at arctan(3/3) = 45&#176; elevation &#8212;</text>
+  <text x="380" y="520" font-size="10.5" fill="#444">halfway to the overhead geometry birds find most threatening;</text>
+  <text x="380" y="534" font-size="10.5" fill="#444">the design band's R = 12 m, h = 6 m orbit presents at a lateral ~27&#176;</text>
+
+  <!-- inset axis -->
+  <line x1="70" y1="556" x2="830" y2="556" stroke="#333" stroke-width="1.4"/>
+  <g font-size="10.5" fill="#444" text-anchor="middle">
+    <line x1="70" y1="556" x2="70" y2="562" stroke="#333" stroke-width="1.2"/><text x="70" y="575">0</text>
+    <line x1="165" y1="556" x2="165" y2="562" stroke="#333" stroke-width="1.2"/><text x="165" y="575">2</text>
+    <line x1="260" y1="556" x2="260" y2="562" stroke="#333" stroke-width="1.2"/><text x="260" y="575">4</text>
+    <line x1="355" y1="556" x2="355" y2="562" stroke="#333" stroke-width="1.2"/><text x="355" y="575">6</text>
+    <line x1="450" y1="556" x2="450" y2="562" stroke="#333" stroke-width="1.2"/><text x="450" y="575">8</text>
+    <line x1="545" y1="556" x2="545" y2="562" stroke="#333" stroke-width="1.2"/><text x="545" y="575">10</text>
+    <line x1="640" y1="556" x2="640" y2="562" stroke="#333" stroke-width="1.2"/><text x="640" y="575">12</text>
+    <line x1="735" y1="556" x2="735" y2="562" stroke="#333" stroke-width="1.2"/><text x="735" y="575">14</text>
+    <line x1="830" y1="556" x2="830" y2="562" stroke="#333" stroke-width="1.2"/><text x="830" y="575">16 m</text>
+  </g>
+
+  <!-- footer -->
+  <text x="450" y="608" font-size="11" fill="#555" text-anchor="middle" font-style="italic">flight-initiation distances are from a vehicle-approach study, not a drone study &#8212; cited as a same-species baseline, not a drone FID;</text>
+  <text x="450" y="624" font-size="11" fill="#555" text-anchor="middle" font-style="italic">even the lowest measured value (38.6 m) is thirteen times the shipped 3.0 m orbit radius.</text>
+  <text x="450" y="644" font-size="11" fill="#333" text-anchor="middle" font-weight="bold">a deterrence mission legitimately operates inside the avoidance literature's distances &#8212; but 3 m is an order of magnitude below the entire conversation.</text>
+</svg>

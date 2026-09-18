@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" font-family="Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="900" height="620" fill="#ffffff"/>
+
+  <text x="450" y="30" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">From flickering boxes to stable objects</text>
+  <text x="450" y="52" font-size="13" fill="#555" text-anchor="middle">Ten consecutive frames at 30 FPS (33 ms apart): the same scene, seen by the detector alone and by the tracker.</text>
+
+  <!-- ===== top lane: raw detections ===== -->
+  <rect x="30" y="68" width="840" height="150" rx="8" fill="#fdf0ee" stroke="#822" stroke-width="1.5"/>
+  <text x="46" y="92" font-size="13.5" font-weight="bold" fill="#822">Raw per-frame detections &#8212; what the detector alone provides</text>
+
+  <!-- 10 frame slots: x = 60 + (i-1)*81, w 76, y 104..164 -->
+  <g>
+    <!-- slot frames -->
+    <g fill="#ffffff" stroke="#999" stroke-width="1">
+      <rect x="60"  y="104" width="76" height="60"/><rect x="141" y="104" width="76" height="60"/>
+      <rect x="222" y="104" width="76" height="60"/><rect x="303" y="104" width="76" height="60"/>
+      <rect x="384" y="104" width="76" height="60"/><rect x="465" y="104" width="76" height="60"/>
+      <rect x="546" y="104" width="76" height="60"/><rect x="627" y="104" width="76" height="60"/>
+      <rect x="708" y="104" width="76" height="60"/><rect x="789" y="104" width="76" height="60"/>
+    </g>
+    <!-- goose detections (green boxes), drifting slightly right frame to frame -->
+    <g fill="#eef6f0" stroke="#2f5a3a" stroke-width="2">
+      <rect x="72"  y="122" width="30" height="20"/>
+      <rect x="155" y="123" width="30" height="20"/>
+      <rect x="238" y="124" width="30" height="20"/>
+      <!-- frame 4: missed -->
+      <rect x="404" y="126" width="30" height="20"/>
+      <rect x="487" y="127" width="30" height="20"/>
+      <rect x="568" y="128" width="30" height="20"/>
+      <!-- frame 8: missed -->
+      <rect x="732" y="130" width="30" height="20"/>
+      <rect x="815" y="131" width="30" height="20"/>
+    </g>
+    <!-- misses -->
+    <g font-size="12" fill="#822" text-anchor="middle" font-weight="bold">
+      <text x="341" y="132">&#10007; missed</text>
+      <text x="341" y="146" font-size="10" font-weight="normal">(motion blur)</text>
+      <text x="665" y="132">&#10007; missed</text>
+      <text x="665" y="146" font-size="10" font-weight="normal">(blur)</text>
+    </g>
+    <!-- false positive in frame 6 -->
+    <rect x="474" y="146" width="26" height="14" fill="none" stroke="#822" stroke-width="2" stroke-dasharray="4 2"/>
+    <text x="503" y="190" font-size="10" fill="#822" text-anchor="middle">false positive (shadow)</text>
+    <!-- frame numbers -->
+    <g font-size="10" fill="#777" text-anchor="middle">
+      <text x="98" y="177">1</text><text x="179" y="177">2</text><text x="260" y="177">3</text><text x="341" y="177">4</text>
+      <text x="422" y="177">5</text><text x="503" y="177">6</text><text x="584" y="177">7</text><text x="665" y="177">8</text>
+      <text x="746" y="177">9</text><text x="827" y="177">10</text>
+    </g>
+  </g>
+  <text x="450" y="208" font-size="12" fill="#822" font-style="italic" text-anchor="middle">logic wired to this lane aborts on every dropout and acts on every false alarm &#8212; a state machine's nightmare input</text>
+
+  <!-- ===== bottom lane: tracks ===== -->
+  <rect x="30" y="226" width="840" height="150" rx="8" fill="#eef6f0" stroke="#2f5a3a" stroke-width="1.5"/>
+  <text x="46" y="250" font-size="13.5" font-weight="bold" fill="#2f5a3a">Tracks &#8212; after association across frames</text>
+
+  <!-- main track bar: frames 1..10, x 60..865, y 264..290; coasted over frames 4 (303..379) and 8 (627..703) -->
+  <rect x="60" y="264" width="243" height="26" fill="#dcebf2" stroke="#1a4a5a" stroke-width="2"/>
+  <rect x="303" y="264" width="76" height="26" fill="#f2f6f8" stroke="#1a4a5a" stroke-width="2" stroke-dasharray="5 3"/>
+  <rect x="379" y="264" width="248" height="26" fill="#dcebf2" stroke="#1a4a5a" stroke-width="2"/>
+  <rect x="627" y="264" width="76" height="26" fill="#f2f6f8" stroke="#1a4a5a" stroke-width="2" stroke-dasharray="5 3"/>
+  <rect x="703" y="264" width="162" height="26" fill="#dcebf2" stroke="#1a4a5a" stroke-width="2"/>
+  <text x="70" y="282" font-size="11.5" fill="#1a4a5a" font-weight="bold">track ID 7 &#183; goose</text>
+  <text x="341" y="282" font-size="9.5" fill="#1a4a5a" text-anchor="middle">coasted</text>
+  <text x="665" y="282" font-size="9.5" fill="#1a4a5a" text-anchor="middle">coasted</text>
+  <text x="770" y="305" font-size="10.5" fill="#555" text-anchor="middle">dashed = carried by motion</text>
+  <text x="770" y="318" font-size="10.5" fill="#555" text-anchor="middle">prediction, not a detection</text>
+
+  <!-- confirmation marker at end of frame 5 (x 460) -->
+  <line x1="460" y1="258" x2="460" y2="296" stroke="#8a5210" stroke-width="2.5"/>
+  <path d="M 460 258 L 452 248 L 468 248 z" fill="#8a5210"/>
+  <text x="460" y="240" font-size="11" fill="#8a5210" font-weight="bold" text-anchor="middle">persistence threshold met</text>
+  <text x="455" y="312" font-size="10.5" fill="#8a5210" text-anchor="middle">confirmed after 5 frames &#8594; decision fires</text>
+  <text x="455" y="325" font-size="10.5" fill="#8a5210" font-weight="bold" text-anchor="middle">5 &#215; 33 ms &#8776; 167 ms from first sighting to action</text>
+
+  <!-- tentative track from FP -->
+  <rect x="465" y="336" width="76" height="18" fill="#fdf3e6" stroke="#8a5210" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <text x="551" y="345" font-size="10.5" fill="#8a5210" text-anchor="start">tentative track from the false positive &#8212;</text>
+  <text x="551" y="359" font-size="10.5" fill="#8a5210" text-anchor="start">unmatched next frame, dies, never confirmed</text>
+
+  <!-- ===== loop row ===== -->
+  <g font-size="12" text-anchor="middle">
+    <rect x="45"  y="396" width="180" height="58" rx="6" fill="#f2f6f8" stroke="#1a4a5a" stroke-width="1.5"/>
+    <text x="135" y="417" font-weight="bold" fill="#1a4a5a">1. detect</text>
+    <text x="135" y="434" font-size="10.5" fill="#555">run the detector on the frame:</text>
+    <text x="135" y="447" font-size="10.5" fill="#555">boxes, classes, confidences</text>
+
+    <rect x="255" y="396" width="180" height="58" rx="6" fill="#f2f6f8" stroke="#1a4a5a" stroke-width="1.5"/>
+    <text x="345" y="417" font-weight="bold" fill="#1a4a5a">2. associate</text>
+    <text x="345" y="434" font-size="10.5" fill="#555">match boxes to tracks: overlap,</text>
+    <text x="345" y="447" font-size="10.5" fill="#555">predicted motion, confidence</text>
+
+    <rect x="465" y="396" width="180" height="58" rx="6" fill="#f2f6f8" stroke="#1a4a5a" stroke-width="1.5"/>
+    <text x="555" y="417" font-weight="bold" fill="#1a4a5a">3. update</text>
+    <text x="555" y="434" font-size="10.5" fill="#555">extend matched tracks, coast</text>
+    <text x="555" y="447" font-size="10.5" fill="#555">unmatched briefly, retire dead</text>
+
+    <rect x="675" y="396" width="180" height="58" rx="6" fill="#eef6f0" stroke="#2f5a3a" stroke-width="1.5"/>
+    <text x="765" y="417" font-weight="bold" fill="#2f5a3a">4. decide</text>
+    <text x="765" y="434" font-size="10.5" fill="#555">act only on confirmed tracks:</text>
+    <text x="765" y="447" font-size="10.5" fill="#555">count, alert, pursue</text>
+  </g>
+  <g stroke="#555" stroke-width="1.5" fill="#555">
+    <line x1="225" y1="425" x2="248" y2="425"/><path d="M 248 421 L 256 425 L 248 429 z"/>
+    <line x1="435" y1="425" x2="458" y2="425"/><path d="M 458 421 L 466 425 L 458 429 z"/>
+    <line x1="645" y1="425" x2="668" y2="425"/><path d="M 668 421 L 676 425 L 668 429 z"/>
+  </g>
+  <text x="450" y="474" font-size="11" fill="#555" text-anchor="middle" font-style="italic">ByteTrack and BoT-SORT implement this loop with no neural network of their own &#8212; microseconds of bookkeeping per frame</text>
+
+  <!-- ===== footer: failure modes ===== -->
+  <rect x="30" y="490" width="840" height="112" rx="8" fill="#fbfbfb" stroke="#bbb" stroke-width="1"/>
+  <text x="46" y="512" font-size="12.5" font-weight="bold" fill="#222">Tracking's own failure modes &#8212; each corrupts a different consumer:</text>
+  <text x="60" y="533" font-size="11.5" fill="#222"><tspan font-weight="bold" fill="#822">ID switch</tspan> &#8212; the same goose gets a new identity after blur or a crossing &#8594; corrupts counts, re-triggers per-target logic.</text>
+  <text x="60" y="553" font-size="11.5" fill="#222"><tspan font-weight="bold" fill="#822">Duplicate track</tspan> &#8212; one goose carried as two flickering identities &#8594; inflates counts, splits the deterrence logic's attention.</text>
+  <text x="60" y="573" font-size="11.5" fill="#222"><tspan font-weight="bold" fill="#822">Lost track</tspan> &#8212; the track dies while the goose is still present &#8594; silently ends a deterrence run early.</text>
+  <text x="60" y="592" font-size="11" fill="#555" font-style="italic">none appear in detector metrics &#8212; evaluate on video, at track level: identity consistency, count stability against a hand count.</text>
+</svg>

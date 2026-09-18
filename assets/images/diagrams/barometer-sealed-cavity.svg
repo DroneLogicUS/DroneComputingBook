@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 520" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#444"/>
+    </marker>
+  </defs>
+
+  <!-- background -->
+  <rect x="0" y="0" width="780" height="520" fill="#ffffff"/>
+
+  <!-- ambient air label -->
+  <text x="410" y="40" font-size="15" fill="#222" text-anchor="middle">ambient air (open to the outside through the package port)</text>
+
+  <!-- ambient pressure arrows pressing down on the membrane -->
+  <line x1="290" y1="80" x2="290" y2="140" stroke="#444" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="350" y1="80" x2="350" y2="150" stroke="#444" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="410" y1="80" x2="410" y2="155" stroke="#444" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="470" y1="80" x2="470" y2="150" stroke="#444" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="530" y1="80" x2="530" y2="140" stroke="#444" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="410" y="70" font-size="15" fill="#222" text-anchor="middle" font-style="italic">ambient pressure P</text>
+
+  <!-- silicon substrate with etched cavity -->
+  <path d="M 200 175 H 260 V 350 H 560 V 175 H 620 V 430 H 200 Z" fill="#8a8a8a" stroke="#555" stroke-width="2"/>
+  <text x="410" y="400" font-size="15" fill="#f2f2f2" text-anchor="middle">silicon substrate</text>
+
+  <!-- sealed cavity interior -->
+  <rect x="260" y="180" width="300" height="170" fill="#f3f6fa"/>
+  <text x="410" y="285" font-size="15" fill="#222" text-anchor="middle">sealed reference cavity</text>
+  <text x="410" y="306" font-size="14" fill="#222" text-anchor="middle" font-style="italic">trapped at reference pressure P<tspan font-size="10" dy="3">ref</tspan></text>
+
+  <!-- undeflected membrane position (dashed) -->
+  <line x1="260" y1="162" x2="560" y2="162" stroke="#34567f" stroke-width="1.5" stroke-dasharray="6 5"/>
+
+  <!-- flexible membrane, bowed inward by ambient pressure -->
+  <path d="M 260 158 Q 410 194 560 158 L 560 172 Q 410 208 260 172 Z" fill="#7da7d9" stroke="#34567f" stroke-width="2"/>
+  <text x="60" y="112" font-size="15" fill="#222">flexible silicon membrane</text>
+  <line x1="180" y1="117" x2="285" y2="156" stroke="#888" stroke-width="1.2"/>
+
+  <!-- piezoresistors at the membrane edges (alternative readout) -->
+  <rect x="268" y="160" width="26" height="10" fill="#e8b04a" stroke="#9a6b1f" stroke-width="1.5"/>
+  <rect x="526" y="160" width="26" height="10" fill="#e8b04a" stroke="#9a6b1f" stroke-width="1.5"/>
+  <text x="45" y="200" font-size="14" fill="#222">piezoresistors at the</text>
+  <text x="45" y="218" font-size="14" fill="#222">membrane flex points</text>
+  <text x="45" y="236" font-size="14" fill="#222">(strain readout)</text>
+  <line x1="160" y1="205" x2="266" y2="170" stroke="#333" stroke-width="1.2"/>
+
+  <!-- fixed electrode on the cavity floor (capacitive readout) -->
+  <rect x="310" y="332" width="200" height="14" fill="#e8b04a" stroke="#9a6b1f" stroke-width="1.5"/>
+  <text x="45" y="300" font-size="14" fill="#222">fixed electrode on</text>
+  <text x="45" y="318" font-size="14" fill="#222">the cavity floor:</text>
+  <text x="45" y="336" font-size="14" fill="#222">C rises as the</text>
+  <text x="45" y="354" font-size="14" fill="#222">gap narrows</text>
+  <line x1="140" y1="345" x2="308" y2="340" stroke="#333" stroke-width="1.2"/>
+
+  <!-- gap annotation -->
+  <line x1="410" y1="200" x2="410" y2="330" stroke="#444" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <text x="422" y="255" font-size="13" fill="#222">gap &#8594; C</text>
+
+  <!-- membrane-at-rest and deflection annotations -->
+  <text x="628" y="140" font-size="14" fill="#222">membrane at rest</text>
+  <text x="628" y="158" font-size="14" fill="#222">(P = P<tspan font-size="10" dy="3">ref</tspan><tspan dy="-3">)</tspan></text>
+  <line x1="626" y1="148" x2="562" y2="161" stroke="#888" stroke-width="1.2"/>
+  <text x="628" y="192" font-size="14" fill="#222">deflection</text>
+  <text x="628" y="210" font-size="14" fill="#222">&#8733; P &#8722; P<tspan font-size="10" dy="3">ref</tspan></text>
+  <line x1="626" y1="196" x2="500" y2="176" stroke="#888" stroke-width="1.2"/>
+
+  <!-- altitude exchange-rate note -->
+  <text x="628" y="255" font-size="14" fill="#222">near sea level,</text>
+  <text x="628" y="273" font-size="14" fill="#222">P falls &#8776; 12 Pa per</text>
+  <text x="628" y="291" font-size="14" fill="#222">metre of climb</text>
+
+  <!-- readout chain caption -->
+  <text x="390" y="470" font-size="15" fill="#222" text-anchor="middle" font-style="italic">ambient P &#8594; membrane deflection &#8594; &#916;C (or &#916;R) &#8594; digitized pressure</text>
+  <text x="390" y="496" font-size="15" fill="#222" text-anchor="middle" font-style="italic">&#8594; altitude h = 44330 [1 &#8722; (P/P&#8320;)^(1/5.255)] metres</text>
+</svg>

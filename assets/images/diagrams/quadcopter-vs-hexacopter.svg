@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrowR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#c9524e"/>
+    </marker>
+    <marker id="arrowB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5b84b8"/>
+    </marker>
+  </defs>
+
+  <!-- background -->
+  <rect x="0" y="0" width="900" height="620" fill="#ffffff"/>
+
+  <!-- panel titles -->
+  <text x="230" y="38" font-size="16" font-weight="bold" fill="#222" text-anchor="middle">Quadcopter &#8212; four rotors, two pairs</text>
+  <text x="670" y="38" font-size="16" font-weight="bold" fill="#222" text-anchor="middle">Hexacopter &#8212; six rotors, three pairs</text>
+
+  <!-- centre divider -->
+  <line x1="450" y1="58" x2="450" y2="545" stroke="#e0e0e0" stroke-width="1"/>
+
+  <!-- ================= QUADCOPTER (left) ================= -->
+  <!-- arms -->
+  <g stroke="#8a8a8a" stroke-width="7" stroke-linecap="round">
+    <line x1="230" y1="210" x2="150" y2="130"/>
+    <line x1="230" y1="210" x2="310" y2="130"/>
+    <line x1="230" y1="210" x2="150" y2="290"/>
+    <line x1="230" y1="210" x2="310" y2="290"/>
+  </g>
+  <!-- centre hub -->
+  <circle cx="230" cy="210" r="13" fill="#d5d5d5" stroke="#666" stroke-width="1.5"/>
+
+  <!-- rotor discs (dashed) -->
+  <circle cx="150" cy="130" r="47" fill="none" stroke="#c9524e" stroke-width="2" stroke-dasharray="7 5"/>
+  <circle cx="310" cy="130" r="47" fill="none" stroke="#5b84b8" stroke-width="2" stroke-dasharray="7 5"/>
+  <circle cx="150" cy="290" r="47" fill="none" stroke="#5b84b8" stroke-width="2" stroke-dasharray="7 5"/>
+  <circle cx="310" cy="290" r="47" fill="none" stroke="#c9524e" stroke-width="2" stroke-dasharray="7 5"/>
+
+  <!-- rotation arrows -->
+  <path d="M 183.8 142.3 A 36 36 0 0 0 122.4 106.9" fill="none" stroke="#c9524e" stroke-width="2.2" marker-end="url(#arrowR)"/>
+  <path d="M 276.2 142.3 A 36 36 0 0 1 337.6 106.9" fill="none" stroke="#5b84b8" stroke-width="2.2" marker-end="url(#arrowB)"/>
+  <path d="M 116.2 302.3 A 36 36 0 0 1 177.6 266.9" fill="none" stroke="#5b84b8" stroke-width="2.2" marker-end="url(#arrowB)"/>
+  <path d="M 343.8 302.3 A 36 36 0 0 0 282.4 266.9" fill="none" stroke="#c9524e" stroke-width="2.2" marker-end="url(#arrowR)"/>
+
+  <!-- motors -->
+  <g fill="#3f3f3f">
+    <circle cx="150" cy="130" r="6"/><circle cx="310" cy="130" r="6"/>
+    <circle cx="150" cy="290" r="6"/><circle cx="310" cy="290" r="6"/>
+  </g>
+
+  <!-- rotation-direction labels -->
+  <g font-size="11" font-weight="bold" text-anchor="middle">
+    <text x="150" y="158" fill="#c9524e">CCW</text>
+    <text x="310" y="158" fill="#5b84b8">CW</text>
+    <text x="150" y="318" fill="#5b84b8">CW</text>
+    <text x="310" y="318" fill="#c9524e">CCW</text>
+  </g>
+
+  <!-- ================= HEXACOPTER (right) ================= -->
+  <!-- arms -->
+  <g stroke="#8a8a8a" stroke-width="6" stroke-linecap="round">
+    <line x1="670" y1="210" x2="670" y2="118"/>
+    <line x1="670" y1="210" x2="750" y2="164"/>
+    <line x1="670" y1="210" x2="750" y2="256"/>
+    <line x1="670" y1="210" x2="670" y2="302"/>
+    <line x1="670" y1="210" x2="590" y2="256"/>
+    <line x1="670" y1="210" x2="590" y2="164"/>
+  </g>
+  <!-- centre hub -->
+  <circle cx="670" cy="210" r="13" fill="#d5d5d5" stroke="#666" stroke-width="1.5"/>
+
+  <!-- rotor discs (dashed) -->
+  <circle cx="670" cy="118" r="40" fill="none" stroke="#c9524e" stroke-width="2" stroke-dasharray="6 4"/>
+  <circle cx="750" cy="164" r="40" fill="none" stroke="#5b84b8" stroke-width="2" stroke-dasharray="6 4"/>
+  <circle cx="750" cy="256" r="40" fill="none" stroke="#c9524e" stroke-width="2" stroke-dasharray="6 4"/>
+  <circle cx="670" cy="302" r="40" fill="none" stroke="#5b84b8" stroke-width="2" stroke-dasharray="6 4"/>
+  <circle cx="590" cy="256" r="40" fill="none" stroke="#c9524e" stroke-width="2" stroke-dasharray="6 4"/>
+  <circle cx="590" cy="164" r="40" fill="none" stroke="#5b84b8" stroke-width="2" stroke-dasharray="6 4"/>
+
+  <!-- rotation arrows -->
+  <path d="M 698.2 128.3 A 30 30 0 0 0 647.0 98.7" fill="none" stroke="#c9524e" stroke-width="2" marker-end="url(#arrowR)"/>
+  <path d="M 721.8 174.3 A 30 30 0 0 1 773.0 144.7" fill="none" stroke="#5b84b8" stroke-width="2" marker-end="url(#arrowB)"/>
+  <path d="M 778.2 266.3 A 30 30 0 0 0 727.0 236.7" fill="none" stroke="#c9524e" stroke-width="2" marker-end="url(#arrowR)"/>
+  <path d="M 641.8 312.3 A 30 30 0 0 1 693.0 282.7" fill="none" stroke="#5b84b8" stroke-width="2" marker-end="url(#arrowB)"/>
+  <path d="M 618.2 266.3 A 30 30 0 0 0 567.0 236.7" fill="none" stroke="#c9524e" stroke-width="2" marker-end="url(#arrowR)"/>
+  <path d="M 561.8 174.3 A 30 30 0 0 1 613.0 144.7" fill="none" stroke="#5b84b8" stroke-width="2" marker-end="url(#arrowB)"/>
+
+  <!-- motors -->
+  <g fill="#3f3f3f">
+    <circle cx="670" cy="118" r="5.5"/><circle cx="750" cy="164" r="5.5"/>
+    <circle cx="750" cy="256" r="5.5"/><circle cx="670" cy="302" r="5.5"/>
+    <circle cx="590" cy="256" r="5.5"/><circle cx="590" cy="164" r="5.5"/>
+  </g>
+
+  <!-- rotation-direction labels -->
+  <g font-size="10" font-weight="bold" text-anchor="middle">
+    <text x="646" y="147" fill="#c9524e">CCW</text>
+    <text x="750" y="189" fill="#5b84b8">CW</text>
+    <text x="750" y="281" fill="#c9524e">CCW</text>
+    <text x="670" y="327" fill="#5b84b8">CW</text>
+    <text x="590" y="281" fill="#c9524e">CCW</text>
+    <text x="590" y="189" fill="#5b84b8">CW</text>
+  </g>
+
+  <!-- pair notes -->
+  <text x="230" y="360" font-size="12" font-style="italic" fill="#555" text-anchor="middle">two counter-rotating pairs &#8212; diagonal rotors spin the same way</text>
+  <text x="670" y="360" font-size="12" font-style="italic" fill="#555" text-anchor="middle">rotation directions alternate around the ring &#8212; three pairs</text>
+
+  <!-- control-logic callouts -->
+  <g font-size="12.5" fill="#222" text-anchor="middle">
+    <text x="230" y="384"><tspan font-weight="bold">roll / pitch &#8212;</tspan> differential thrust: speed up the rotors on</text>
+    <text x="230" y="401">one side, slow the other; the imbalance tilts the aircraft</text>
+    <text x="230" y="423"><tspan font-weight="bold">yaw &#8212;</tspan> differential drag torque: speed up one pair, slow</text>
+    <text x="230" y="440">the other; the net reaction torque rotates the airframe</text>
+    <text x="670" y="384">same roll, pitch, and yaw logic, spread across six</text>
+    <text x="670" y="401">actuators: any moment demand is met by six small</text>
+    <text x="670" y="418">speed changes instead of four larger ones</text>
+  </g>
+
+  <!-- comparison rules -->
+  <line x1="30" y1="456" x2="430" y2="456" stroke="#ddd" stroke-width="1"/>
+  <line x1="490" y1="456" x2="870" y2="456" stroke="#ddd" stroke-width="1"/>
+
+  <!-- comparison stats -->
+  <g font-size="12.5" fill="#222" text-anchor="middle">
+    <text x="230" y="476"><tspan font-weight="bold">total disc area</tspan> (four 10-inch props): 4 &#215; 0.0507 = 0.203 m&#178;</text>
+    <text x="230" y="498"><tspan font-weight="bold">induced hover power</tspan> for a given thrust: 1.00&#215; (baseline)</text>
+    <text x="230" y="520"><tspan font-weight="bold">one rotor out (4 &#8594; 3):</tspan> no way to balance thrust and</text>
+    <text x="230" y="537">torque &#8212; the quadcopter falls</text>
+    <text x="670" y="476"><tspan font-weight="bold">total disc area</tspan> (six 10-inch props): 6 &#215; 0.0507 = 0.304 m&#178;</text>
+    <text x="670" y="498"><tspan font-weight="bold">induced hover power</tspan>: &#8730;(0.203/0.304) = 0.82&#215; &#8212; an 18 % saving</text>
+    <text x="670" y="520"><tspan font-weight="bold">one rotor out (6 &#8594; 5):</tspan> each survivor carries 6/5 = 1.2&#215; its</text>
+    <text x="670" y="537">share &#8212; yaw is surrendered; the aircraft degrades and lands</text>
+  </g>
+
+  <!-- footer -->
+  <text x="450" y="575" font-size="14" font-style="italic" fill="#222" text-anchor="middle">same span, same propellers: six rotors buy 1.5&#215; the disc area and a survivable rotor failure; four buy simplicity and less mass</text>
+  <text x="450" y="597" font-size="12.5" fill="#555" text-anchor="middle">the 18 % saving is fragile &#8212; two extra motors, ESCs, and arms add 15&#8211;25 % to empty weight, and hover power grows as W<tspan dy="-4" font-size="9.5">3/2</tspan></text>
+</svg>

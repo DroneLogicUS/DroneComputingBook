@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 400" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrowT" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+  </defs>
+
+  <!-- background -->
+  <rect x="0" y="0" width="780" height="400" fill="#ffffff"/>
+
+  <!-- Flight Controller box -->
+  <rect x="50" y="60" width="220" height="280" rx="6" fill="#f4f8fa" stroke="#1a4a5a" stroke-width="2"/>
+  <rect x="50" y="60" width="220" height="46" rx="6" fill="#1a4a5a"/>
+  <rect x="50" y="92" width="220" height="14" fill="#1a4a5a"/>
+  <text x="160" y="90" font-size="17" font-weight="bold" fill="#ffffff" text-anchor="middle">Flight Controller</text>
+  <text x="160" y="128" font-size="13" fill="#555" text-anchor="middle">(Pixhawk TELEM2, 3.3 V logic)</text>
+
+  <!-- Companion Computer box -->
+  <rect x="510" y="60" width="220" height="280" rx="6" fill="#f4f8fa" stroke="#1a4a5a" stroke-width="2"/>
+  <rect x="510" y="60" width="220" height="46" rx="6" fill="#1a4a5a"/>
+  <rect x="510" y="92" width="220" height="14" fill="#1a4a5a"/>
+  <text x="620" y="90" font-size="17" font-weight="bold" fill="#ffffff" text-anchor="middle">Companion Computer</text>
+  <text x="620" y="128" font-size="13" fill="#555" text-anchor="middle">(UART header, 3.3 V logic)</text>
+
+  <!-- FC pins -->
+  <circle cx="270" cy="170" r="7" fill="#1a7a8a"/>
+  <text x="252" y="175" font-size="15" font-weight="bold" fill="#222" text-anchor="end">TX</text>
+  <circle cx="270" cy="235" r="7" fill="#1a7a8a"/>
+  <text x="252" y="240" font-size="15" font-weight="bold" fill="#222" text-anchor="end">RX</text>
+  <circle cx="270" cy="300" r="7" fill="#666666"/>
+  <text x="252" y="305" font-size="15" font-weight="bold" fill="#222" text-anchor="end">GND</text>
+
+  <!-- CC pins -->
+  <circle cx="510" cy="170" r="7" fill="#1a7a8a"/>
+  <text x="528" y="175" font-size="15" font-weight="bold" fill="#222">RX</text>
+  <circle cx="510" cy="235" r="7" fill="#1a7a8a"/>
+  <text x="528" y="240" font-size="15" font-weight="bold" fill="#222">TX</text>
+  <circle cx="510" cy="300" r="7" fill="#666666"/>
+  <text x="528" y="305" font-size="15" font-weight="bold" fill="#222">GND</text>
+
+  <!-- Wire: FC TX -> CC RX -->
+  <line x1="277" y1="170" x2="501" y2="170" stroke="#1a7a8a" stroke-width="2.5" marker-end="url(#arrowT)"/>
+  <text x="390" y="158" font-size="13" fill="#1a7a8a" text-anchor="middle" font-style="italic">TX &#8594; RX  (FC transmits, computer listens)</text>
+
+  <!-- Wire: CC TX -> FC RX -->
+  <line x1="503" y1="235" x2="279" y2="235" stroke="#1a7a8a" stroke-width="2.5" marker-end="url(#arrowT)"/>
+  <text x="390" y="223" font-size="13" fill="#1a7a8a" text-anchor="middle" font-style="italic">RX &#8592; TX  (computer transmits, FC listens)</text>
+
+  <!-- Wire: GND - GND -->
+  <line x1="277" y1="300" x2="503" y2="300" stroke="#666666" stroke-width="2.5" stroke-dasharray="8 6"/>
+  <text x="390" y="288" font-size="13" fill="#555" text-anchor="middle" font-style="italic">GND &#8596; GND  (shared voltage reference)</text>
+
+  <!-- caption -->
+  <text x="390" y="375" font-size="14" fill="#222" text-anchor="middle">The crossover rule: each transmitter drives the other device&#8217;s receiver; grounds are tied together.</text>
+  <text x="390" y="30" font-size="15" font-weight="bold" fill="#222" text-anchor="middle">UART crossover: three wires between flight controller and companion computer</text>
+</svg>

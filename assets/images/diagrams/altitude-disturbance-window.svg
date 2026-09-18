@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" font-family="Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="960" height="640" fill="#ffffff"/>
+
+  <text x="480" y="30" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">The altitude negotiation &#8212; pixels push down, geese push up</text>
+  <text x="480" y="52" font-size="13" fill="#555" text-anchor="middle">Detection range, disturbance response, and regulation all constrain the same number; sensor resolution is the lever that moves the floor.</text>
+
+  <!-- altitude axis: y = 480 - 3*alt ; 0m=480, 130m=90 -->
+  <line x1="120" y1="480" x2="120" y2="88" stroke="#222" stroke-width="1.5"/>
+  <line x1="112" y1="480" x2="900" y2="480" stroke="#222" stroke-width="1.5"/>
+  <g font-size="10.5" fill="#555" text-anchor="end">
+    <text x="106" y="484">0 m</text>
+    <text x="106" y="424">20 m</text>
+    <text x="106" y="364">40 m</text>
+    <text x="106" y="304">60 m</text>
+    <text x="106" y="244">80 m</text>
+    <text x="106" y="184">100 m</text>
+    <text x="106" y="118">122 m</text>
+  </g>
+  <g stroke="#e5e5e5" stroke-width="1">
+    <line x1="120" y1="420" x2="900" y2="420"/>
+    <line x1="120" y1="360" x2="900" y2="360"/>
+    <line x1="120" y1="300" x2="900" y2="300"/>
+    <line x1="120" y1="240" x2="900" y2="240"/>
+    <line x1="120" y1="180" x2="900" y2="180"/>
+  </g>
+
+  <!-- regulatory ceiling -->
+  <line x1="120" y1="114" x2="900" y2="114" stroke="#822" stroke-width="2" stroke-dasharray="7 4"/>
+  <text x="890" y="106" font-size="11.5" fill="#822" text-anchor="end" font-weight="bold">regulatory ceiling: 122 m (Part 107) &#8212; the hard lid from Part I</text>
+
+  <!-- LEFT BAND: detection pressure (pushes down) -->
+  <g>
+    <rect x="140" y="180" width="290" height="300" fill="#fdf8f0" stroke="#8a5210" stroke-width="1.5" rx="6"/>
+    <text x="285" y="200" font-size="13" font-weight="bold" fill="#8a5210" text-anchor="middle">what detection needs: pixels on target</text>
+    <text x="285" y="216" font-size="10.5" fill="#8a5210" text-anchor="middle" font-style="italic">running example&#8217;s camera, 640-column mode (&#8776;2.45 mrad/px)</text>
+    <!-- entries at altitudes -->
+    <g font-size="11.5" fill="#333">
+      <text x="160" y="424">20 m &#8594; &#8776;7 px per goose &#8212; a smudge,</text>
+      <text x="205" y="437">the working floor</text>
+      <text x="160" y="456">10 m &#8594; &#8776;14 px &#8212; a bird, with a neck</text>
+      <text x="205" y="469">to compose features from</text>
+      <text x="160" y="364">40 m &#8594; &#8776;3&#8211;4 px &#8212; below any detector&#8217;s floor</text>
+      <text x="160" y="257">80 m &#8594; &#8776;2 px</text>
+      <text x="160" y="395" font-style="italic" fill="#8a5210">detection pressure points DOWN &#8595;</text>
+    </g>
+  </g>
+
+  <!-- RIGHT BAND: disturbance pressure (pushes up) -->
+  <g>
+    <rect x="450" y="130" width="440" height="350" fill="#eef5ee" stroke="#2f5a3a" stroke-width="1.5" rx="6" fill-opacity="0.6"/>
+    <text x="670" y="150" font-size="13" font-weight="bold" fill="#2f5a3a" text-anchor="middle">what the geese tolerate: measured flushing response</text>
+    <text x="670" y="166" font-size="10.5" fill="#2f5a3a" text-anchor="middle" font-style="italic">field study, 24 wild goose flocks approached by a quadrotor</text>
+    <!-- 100 m marker -->
+    <line x1="450" y1="180" x2="890" y2="180" stroke="#2f5a3a" stroke-width="1.5" stroke-dasharray="5 3"/>
+    <text x="470" y="196" font-size="11.5" fill="#2f5a3a" font-weight="bold">at 100 m: 74% of approaches overflew without flushing the flock</text>
+    <text x="470" y="212" font-size="11" fill="#2f5a3a">recommended survey altitude &#8776;100 m, approach from &#8776;500 m out</text>
+    <!-- below 100 m -->
+    <rect x="450" y="180" width="440" height="300" fill="#fdf0ee" opacity="0.65"/>
+    <text x="470" y="250" font-size="11.5" fill="#822" font-weight="bold">below 100 m: only 20% of approaches succeeded &#8212;</text>
+    <text x="470" y="266" font-size="11.5" fill="#822">most flocks flushed before the aircraft arrived overhead</text>
+    <text x="470" y="300" font-size="11" fill="#822" font-style="italic">vigilance rises once the aircraft is within &#8776;200&#8211;300 m</text>
+    <text x="670" y="345" font-size="11" fill="#2f5a3a" font-style="italic" text-anchor="middle">disturbance-free-survey pressure points UP &#8593;</text>
+    <text x="470" y="400" font-size="11" fill="#555">for a deterrence mission the flush is the goal &#8212; but only</text>
+    <text x="470" y="415" font-size="11" fill="#555">on command: an uncommanded flush during search scatters the</text>
+    <text x="470" y="430" font-size="11" fill="#555">flock before it is localized, counted, or deliberately driven</text>
+  </g>
+
+  <!-- sheep paper marker at 80 m -->
+  <line x1="120" y1="240" x2="450" y2="240" stroke="#1a7a8a" stroke-width="2"/>
+  <circle cx="444" cy="240" r="5" fill="#e6f2f4" stroke="#1a7a8a" stroke-width="2"/>
+  <line x1="443" y1="247" x2="431" y2="281" stroke="#1a7a8a" stroke-width="1.2"/>
+  <g text-anchor="end" fill="#1a7a8a">
+    <text x="425" y="296" font-size="11.5" font-weight="bold">sheep study: 80 m &#8212; and still &#8776;20&#215;10 px</text>
+    <text x="425" y="311" font-size="11">per sheep, because its 2048-column frames</text>
+    <text x="425" y="326" font-size="11">keep &#8776;0.8 mrad/px &#8212; three times the running</text>
+    <text x="425" y="341" font-size="11">example&#8217;s 640-mode angular resolution</text>
+  </g>
+
+  <!-- footer -->
+  <text x="480" y="520" font-size="12.5" fill="#222" text-anchor="middle"><tspan font-weight="bold">The bind:</tspan> at the disturbance-safe 100 m, the running example&#8217;s 640-column mode puts one or two pixels on a goose &#8212; nothing detects that.</text>
+  <text x="480" y="538" font-size="12.5" fill="#222" text-anchor="middle">The reconciling lever is not altitude but <tspan font-style="italic">angular resolution</tspan>: more columns on target (full sensor width, a longer lens, or a cropped</text>
+  <text x="480" y="556" font-size="12.5" fill="#222" text-anchor="middle">region of interest) moves the detection floor up toward the tolerance band &#8212; at the memory and compute prices Part III has already itemized.</text>
+  <text x="480" y="586" font-size="10.5" fill="#888" text-anchor="middle" font-style="italic">Pixel counts from the Images as Data chapter&#8217;s pixels-on-target arithmetic (0.35 m goose body); flushing figures as reported by the goose-disturbance field study.</text>
+</svg>

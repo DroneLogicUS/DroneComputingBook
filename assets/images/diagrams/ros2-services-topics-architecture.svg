@@ -1,0 +1,156 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 780" font-family="Helvetica, Arial, sans-serif" xml:space="preserve">
+  <defs>
+    <marker id="stTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+    <marker id="stAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b26a1a"/>
+    </marker>
+    <marker id="stGrey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#777"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="780" fill="#ffffff"/>
+
+  <text x="480" y="26" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">The Goose Management System as one ROS 2 graph</text>
+  <text x="480" y="46" font-size="13" fill="#555" text-anchor="middle">Services command and confirm (amber); Topics assert and stream (teal); PX4's bridge carries telemetry and setpoints (grey).</text>
+
+  <!-- ===== operator ===== -->
+  <rect x="30" y="70" width="160" height="50" rx="8" fill="#f0f0f0" stroke="#888" stroke-width="1.4"/>
+  <text x="110" y="91" font-size="12" font-weight="bold" fill="#444" text-anchor="middle">OPERATOR / GCS</text>
+  <text x="110" y="107" font-size="9.5" fill="#666" text-anchor="middle">two buttons, both services</text>
+
+  <!-- ===== mission manager ===== -->
+  <rect x="330" y="66" width="310" height="58" rx="8" fill="#1a7a8a"/>
+  <text x="485" y="88" font-size="13.5" font-weight="bold" fill="#ffffff" text-anchor="middle">MISSION MANAGER</text>
+  <text x="485" y="104" font-size="10" fill="#d8ecef" text-anchor="middle">10 Hz tick &#183; sequences the mission &#183; sole writer of the token</text>
+  <text x="485" y="116" font-size="9" fill="#d8ecef" text-anchor="middle" font-family="Courier, monospace">mission_manager.py</text>
+
+  <!-- operator -> MM services -->
+  <path d="M 190 95 L 326 95" fill="none" stroke="#b26a1a" stroke-width="2.4" marker-end="url(#stAmber)"/>
+  <text x="258" y="82" font-size="9.5" font-weight="bold" fill="#8a4d0f" text-anchor="middle" font-family="Courier, monospace">/goose/start_mission</text>
+  <text x="258" y="110" font-size="9.5" font-weight="bold" fill="#8a4d0f" text-anchor="middle" font-family="Courier, monospace">/goose/abort</text>
+
+  <!-- ===== failsafe monitor ===== -->
+  <rect x="730" y="66" width="200" height="58" rx="8" fill="#b26a1a"/>
+  <text x="830" y="88" font-size="12.5" font-weight="bold" fill="#ffffff" text-anchor="middle">FAILSAFE</text>
+  <text x="830" y="103" font-size="9.5" fill="#fbe8d0" text-anchor="middle">1 Hz independent watchdog</text>
+  <text x="830" y="116" font-size="9" fill="#fbe8d0" text-anchor="middle">Geofencing &amp; Fail-Safes ch.</text>
+
+  <!-- failsafe -> MM topic -->
+  <path d="M 726 95 L 644 95" fill="none" stroke="#1a7a8a" stroke-width="2" marker-end="url(#stTeal)"/>
+  <text x="686" y="82" font-size="9.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle" font-family="Courier, monospace">/goose/failsafe</text>
+  <text x="686" y="108" font-size="8.5" font-style="italic" fill="#1a4a5a" text-anchor="middle">"SEVERITY:reason"</text>
+  <text x="686" y="119" font-size="8.5" font-style="italic" fill="#1a4a5a" text-anchor="middle">1 Hz while active</text>
+
+  <!-- ===== token band ===== -->
+  <rect x="310" y="152" width="190" height="38" rx="13" fill="#fdf6ec" stroke="#b26a1a" stroke-width="1.4"/>
+  <text x="405" y="167" font-size="9.5" fill="#8a4d0f" text-anchor="middle" font-family="Courier, monospace">/goose/active_controller</text>
+  <text x="405" y="182" font-size="8" font-style="italic" fill="#8a4d0f" text-anchor="middle">'none' | 'navigation' | 'harassment' &#183; 1 Hz</text>
+  <path d="M 470 124 L 435 150" fill="none" stroke="#1a7a8a" stroke-width="2" marker-end="url(#stTeal)"/>
+  <path d="M 350 190 L 200 226" fill="none" stroke="#1a7a8a" stroke-width="1.6" marker-end="url(#stTeal)"/>
+  <path d="M 450 190 L 430 226" fill="none" stroke="#1a7a8a" stroke-width="1.6" marker-end="url(#stTeal)"/>
+
+  <!-- ===== behavior + perception row ===== -->
+  <rect x="90" y="230" width="200" height="66" rx="8" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.6"/>
+  <text x="190" y="251" font-size="12" font-weight="bold" fill="#1a4a5a" text-anchor="middle">NAVIGATION</text>
+  <text x="190" y="266" font-size="9.5" fill="#555" text-anchor="middle">20 Hz approach-point streamer</text>
+  <text x="190" y="280" font-size="8.5" fill="#777" text-anchor="middle">Path Planning on the Edge ch. mechanics</text>
+
+  <rect x="330" y="230" width="200" height="66" rx="8" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.6"/>
+  <text x="430" y="251" font-size="12" font-weight="bold" fill="#1a4a5a" text-anchor="middle">HARASS</text>
+  <text x="430" y="266" font-size="9.5" fill="#555" text-anchor="middle">orbit generator, time-latched done</text>
+  <text x="430" y="280" font-size="8.5" fill="#777" text-anchor="middle">Harassment Pattern Generation ch.</text>
+
+  <rect x="620" y="230" width="220" height="66" rx="8" fill="#ffffff" stroke="#888" stroke-width="1.5"/>
+  <text x="730" y="251" font-size="12" font-weight="bold" fill="#444" text-anchor="middle">DETECTOR</text>
+  <text x="730" y="266" font-size="9.5" fill="#555" text-anchor="middle">10 Hz Target publisher &#183; never controls</text>
+  <text x="730" y="280" font-size="8.5" fill="#777" text-anchor="middle">Part III pipeline + Coordinate Frames ch.</text>
+
+  <!-- vision feed into detector -->
+  <rect x="860" y="238" width="86" height="50" rx="6" fill="#f7f7f7" stroke="#aaa" stroke-width="1.2"/>
+  <text x="903" y="257" font-size="9" font-weight="bold" fill="#555" text-anchor="middle">vision</text>
+  <text x="903" y="269" font-size="9" font-weight="bold" fill="#555" text-anchor="middle">pipeline</text>
+  <text x="903" y="281" font-size="8" fill="#777" text-anchor="middle">(Part III)</text>
+  <path d="M 860 263 L 844 263" fill="none" stroke="#1a7a8a" stroke-width="1.6" marker-end="url(#stTeal)"/>
+  <text x="900" y="302" font-size="8" fill="#1a4a5a" text-anchor="middle" font-family="Courier, monospace">/detections_3d</text>
+
+  <!-- detector -> target consumers -->
+  <path d="M 700 230 C 660 180 580 140 644 112" fill="none" stroke="#1a7a8a" stroke-width="2" marker-end="url(#stTeal)"/>
+  <path d="M 620 276 L 534 266" fill="none" stroke="#1a7a8a" stroke-width="1.6" marker-end="url(#stTeal)"/>
+  <path d="M 626 296 C 500 340 380 330 294 288" fill="none" stroke="#1a7a8a" stroke-width="1.6" marker-end="url(#stTeal)"/>
+  <text x="628" y="172" font-size="9.5" font-weight="bold" fill="#1a4a5a" font-family="Courier, monospace">/goose/target</text>
+  <text x="628" y="184" font-size="8.5" font-style="italic" fill="#1a4a5a">Target, 10 Hz &#183; valid / confirmed</text>
+
+  <!-- nav/harass report topics up to MM -->
+  <path d="M 160 230 C 160 170 250 130 326 106" fill="none" stroke="#1a7a8a" stroke-width="1.6" marker-end="url(#stTeal)"/>
+  <text x="140" y="176" font-size="9" font-weight="bold" fill="#1a4a5a" font-family="Courier, monospace">/goose/nav_arrived</text>
+  <text x="140" y="188" font-size="9" font-weight="bold" fill="#1a4a5a" font-family="Courier, monospace">/goose/nav_distance</text>
+  <text x="140" y="200" font-size="8.5" font-style="italic" fill="#1a4a5a">Bool &#183; Float32, 20 Hz</text>
+  <path d="M 470 230 L 482 128" fill="none" stroke="#1a7a8a" stroke-width="1.6" marker-end="url(#stTeal)"/>
+  <text x="492" y="212" font-size="9" font-weight="bold" fill="#1a4a5a" font-family="Courier, monospace">/goose/harass_done</text>
+  <text x="492" y="224" font-size="8.5" font-style="italic" fill="#1a4a5a">Bool, while pattern complete</text>
+
+  <!-- ===== flight controller ===== -->
+  <rect x="290" y="420" width="380" height="70" rx="8" fill="#1a7a8a"/>
+  <text x="480" y="443" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">FLIGHT CONTROLLER</text>
+  <text x="480" y="459" font-size="10" fill="#d8ecef" text-anchor="middle">sole PX4 command author &#183; "executes and reports, never decides"</text>
+  <text x="480" y="473" font-size="9.5" fill="#d8ecef" text-anchor="middle">every command verified against vehicle state &#183; 5 Hz FcStatus</text>
+  <text x="480" y="485" font-size="8.5" fill="#d8ecef" text-anchor="middle" font-family="Courier, monospace">flight_controller_node.py</text>
+
+  <!-- MM -> FC services -->
+  <path d="M 355 124 C 210 180 350 330 348 418" fill="none" stroke="#b26a1a" stroke-width="2.6" marker-end="url(#stAmber)"/>
+  <rect x="52" y="330" width="248" height="62" rx="6" fill="#fdf6ec" stroke="#b26a1a" stroke-width="1.2"/>
+  <text x="176" y="346" font-size="9" font-weight="bold" fill="#8a4d0f" text-anchor="middle">Trigger services &#8212; return only on PX4-confirmed state</text>
+  <text x="176" y="361" font-size="8.7" fill="#8a4d0f" text-anchor="middle" font-family="Courier, monospace">/goose/fc/preflight &#183; arm &#183; disarm</text>
+  <text x="176" y="374" font-size="8.7" fill="#8a4d0f" text-anchor="middle" font-family="Courier, monospace">mode_mission &#183; mode_offboard &#183; mode_hold</text>
+  <text x="176" y="387" font-size="8.7" fill="#8a4d0f" text-anchor="middle" font-family="Courier, monospace">rtl &#183; land</text>
+  <path d="M 300 361 L 336 380" fill="none" stroke="#b26a1a" stroke-width="1.2" stroke-dasharray="3 3"/>
+
+  <!-- FC -> MM status topic -->
+  <path d="M 560 420 C 610 320 590 200 552 128" fill="none" stroke="#1a7a8a" stroke-width="2" marker-end="url(#stTeal)"/>
+  <text x="608" y="332" font-size="9.5" font-weight="bold" fill="#1a4a5a" font-family="Courier, monospace">/goose/fc_status</text>
+  <text x="608" y="344" font-size="8.5" font-style="italic" fill="#1a4a5a">FcStatus, 5 Hz:</text>
+  <text x="608" y="356" font-size="8.5" font-style="italic" fill="#1a4a5a">in_mission &#183; in_loiter &#183; in_offboard</text>
+
+  <!-- ===== drone ===== -->
+  <rect x="290" y="560" width="380" height="72" rx="8" fill="#3a4a52"/>
+  <text x="480" y="584" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">DRONE &#8212; PX4 + airframe</text>
+  <text x="480" y="600" font-size="9.5" fill="#cfdadf" text-anchor="middle">onboard AUTO.MISSION executor &#183; native failsafes &#183; flies the aircraft</text>
+  <text x="480" y="614" font-size="9" fill="#cfdadf" text-anchor="middle" font-family="Courier, monospace">/fmu/out/* telemetry &#8592;&#8594; /fmu/in/* commands &amp; setpoints</text>
+  <text x="480" y="626" font-size="8.5" fill="#cfdadf" text-anchor="middle">Parts I&#8211;II: the bridge, the modes, the dead-man's switch</text>
+
+  <!-- FC <-> drone -->
+  <path d="M 430 490 L 430 558" fill="none" stroke="#777" stroke-width="2" marker-end="url(#stGrey)"/>
+  <text x="418" y="522" font-size="8.7" fill="#555" text-anchor="end">VehicleCommand &#8212; sent,</text>
+  <text x="418" y="534" font-size="8.7" fill="#555" text-anchor="end">retried &#215;3, then verified</text>
+  <path d="M 530 558 L 530 490" fill="none" stroke="#777" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#stGrey)"/>
+  <text x="542" y="522" font-size="8.7" fill="#555">/fmu/out/* telemetry</text>
+  <text x="542" y="534" font-size="8.7" fill="#555">(status, position, battery, GPS&#8230;)</text>
+
+  <!-- nav/harass setpoints -> drone -->
+  <path d="M 150 296 C 150 480 220 560 286 584" fill="none" stroke="#777" stroke-width="1.8" marker-end="url(#stGrey)"/>
+  <path d="M 400 296 C 360 380 340 480 366 556" fill="none" stroke="#777" stroke-width="1.8" marker-end="url(#stGrey)"/>
+  <text x="128" y="452" font-size="8.7" fill="#555">OffboardControlMode +</text>
+  <text x="128" y="464" font-size="8.7" fill="#555">TrajectorySetpoint, 20 Hz &#8212;</text>
+  <text x="128" y="476" font-size="8.7" font-weight="bold" fill="#8a4d0f">only while the token names them</text>
+
+  <!-- telemetry to detector & failsafe -->
+  <path d="M 670 590 C 800 560 850 400 800 296" fill="none" stroke="#777" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#stGrey)"/>
+  <text x="828" y="440" font-size="8.5" fill="#555">attitude + local position</text>
+  <text x="828" y="452" font-size="8.5" fill="#555">(for the frame conversion)</text>
+  <path d="M 670 574 C 850 520 900 300 880 128" fill="none" stroke="#777" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#stGrey)"/>
+  <text x="880" y="330" font-size="8.5" fill="#555" text-anchor="middle">position, battery,</text>
+  <text x="880" y="342" font-size="8.5" fill="#555" text-anchor="middle">status &#8594; watchdog</text>
+
+  <!-- ===== legend + footer ===== -->
+  <rect x="30" y="656" width="900" height="106" rx="8" fill="#f7f7f7" stroke="#cccccc" stroke-width="1"/>
+  <line x1="52" y1="678" x2="102" y2="678" stroke="#b26a1a" stroke-width="2.6" marker-end="url(#stAmber)"/>
+  <text x="110" y="682" font-size="10.5" fill="#444"><tspan font-weight="bold">Service</tspan> &#8212; request&#8211;response; the caller blocks until the action is confirmed done (or times out and fails).</text>
+  <line x1="52" y1="700" x2="102" y2="700" stroke="#1a7a8a" stroke-width="2" marker-end="url(#stTeal)"/>
+  <text x="110" y="704" font-size="10.5" fill="#444"><tspan font-weight="bold">Topic</tspan> &#8212; continuous publish/subscribe stream at the labeled rate; no reply, no acknowledgement, any number of listeners.</text>
+  <line x1="52" y1="722" x2="102" y2="722" stroke="#777" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#stGrey)"/>
+  <text x="110" y="726" font-size="10.5" fill="#444"><tspan font-weight="bold">PX4 bridge</tspan> &#8212; the autopilot's own /fmu/in and /fmu/out channels: telemetry out, commands and token-gated setpoints in.</text>
+  <text x="480" y="750" font-size="10.5" font-style="italic" fill="#333" text-anchor="middle">A service edge means the caller waits for proof; a topic edge means the publisher asserts and moves on.</text>
+</svg>

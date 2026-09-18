@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620" font-family="Helvetica, Arial, sans-serif" xml:space="preserve">
+  <defs>
+    <marker id="pxTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+    <marker id="pxAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b26a1a"/>
+    </marker>
+    <marker id="pxGrey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#666"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="620" fill="#ffffff"/>
+
+  <text x="480" y="28" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">The centering error: where the goose is, minus where you want it</text>
+  <text x="480" y="50" font-size="13" fill="#555" text-anchor="middle">One frame from the running example&#8217;s 640 &#215; 480 camera; the bounding box is the Part III detector&#8217;s output.</text>
+
+  <!-- image-coordinate axes outside the frame -->
+  <line x1="90" y1="78" x2="165" y2="78" stroke="#666" stroke-width="1.8" marker-end="url(#pxGrey)"/>
+  <text x="172" y="82" font-size="11" font-weight="bold" fill="#555">u (columns)</text>
+  <line x1="73" y1="95" x2="73" y2="165" stroke="#666" stroke-width="1.8" marker-end="url(#pxGrey)"/>
+  <text x="73" y="182" font-size="11" font-weight="bold" fill="#555" text-anchor="middle">v (rows)</text>
+  <text x="86" y="90" font-size="10.5" fill="#555" text-anchor="end">(0, 0)</text>
+
+  <!-- the image frame -->
+  <rect x="90" y="95" width="480" height="360" fill="#fbfdfd" stroke="#444" stroke-width="2"/>
+  <text x="566" y="470" font-size="10.5" fill="#555" text-anchor="end">(640, 480)</text>
+
+  <!-- image centre crosshair -->
+  <line x1="314" y1="275" x2="346" y2="275" stroke="#444" stroke-width="1.6"/>
+  <line x1="330" y1="259" x2="330" y2="291" stroke="#444" stroke-width="1.6"/>
+  <circle cx="330" cy="275" r="3" fill="#444"/>
+  <text x="322" y="322" font-size="11" font-weight="bold" fill="#333" text-anchor="middle">image centre</text>
+  <text x="322" y="336" font-size="10.5" fill="#333" text-anchor="middle">(c&#8202;<tspan font-size="75%" baseline-shift="sub">x</tspan>, c&#8202;<tspan font-size="75%" baseline-shift="sub">y</tspan>) = (320, 240)</text>
+
+  <!-- deadband (exaggerated for legibility) -->
+  <rect x="300" y="252" width="60" height="46" fill="none" stroke="#1a7a8a" stroke-width="1.3" stroke-dasharray="4 4"/>
+  <text x="296" y="245" font-size="10" fill="#1a4a5a" font-style="italic" text-anchor="end">deadband &#177;5%</text>
+  <text x="296" y="258" font-size="10" fill="#1a4a5a" font-style="italic" text-anchor="end">(exaggerated)</text>
+
+  <!-- detected bounding box and goose -->
+  <rect x="420" y="209" width="60" height="42" fill="none" stroke="#b26a1a" stroke-width="2.2"/>
+  <ellipse cx="447" cy="233" rx="15" ry="8.5" fill="#b26a1a" opacity="0.85"/>
+  <line x1="459" y1="229" x2="465" y2="220" stroke="#b26a1a" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="466" cy="218" r="4" fill="#b26a1a"/>
+  <text x="450" y="186" font-size="11" font-weight="bold" fill="#8a4d0f" text-anchor="middle">detected goose</text>
+  <text x="450" y="200" font-size="10.5" fill="#8a4d0f" text-anchor="middle">centroid (u, v) = (480, 180)</text>
+
+  <!-- centroid -->
+  <circle cx="450" cy="230" r="4.5" fill="#fff" stroke="#8a4d0f" stroke-width="2"/>
+
+  <!-- error vector (hypotenuse), then its two components -->
+  <line x1="330" y1="275" x2="446" y2="233" stroke="#999" stroke-width="1.4" stroke-dasharray="3 4"/>
+  <text x="374" y="242" font-size="10" fill="#777" font-style="italic" transform="rotate(-20 374 242)">error vector e</text>
+
+  <line x1="330" y1="275" x2="443" y2="275" stroke="#1a7a8a" stroke-width="3" marker-end="url(#pxTeal)"/>
+  <text x="390" y="296" font-size="11.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">e&#8202;<tspan font-size="75%" baseline-shift="sub">x</tspan> = u &#8722; c&#8202;<tspan font-size="75%" baseline-shift="sub">x</tspan> = +160 px</text>
+  <text x="390" y="310" font-size="10" fill="#1a4a5a" font-style="italic" text-anchor="middle">positive: right of centre</text>
+
+  <line x1="450" y1="275" x2="450" y2="242" stroke="#1a7a8a" stroke-width="3" marker-end="url(#pxTeal)"/>
+  <text x="462" y="262" font-size="11.5" font-weight="bold" fill="#1a4a5a" text-anchor="start">e&#8202;<tspan font-size="75%" baseline-shift="sub">y</tspan> = v &#8722; c&#8202;<tspan font-size="75%" baseline-shift="sub">y</tspan> = &#8722;60 px</text>
+  <text x="462" y="276" font-size="10" fill="#1a4a5a" font-style="italic" text-anchor="start">negative: above centre</text>
+
+  <!-- sidebar 1: pixels to commands -->
+  <rect x="620" y="95" width="310" height="252" rx="8" fill="#f4f8f9" stroke="#c5d8dc" stroke-width="1.5"/>
+  <text x="775" y="119" font-size="13" font-weight="bold" fill="#1a4a5a" text-anchor="middle">From pixels to commands</text>
+  <text x="638" y="145" font-size="11.5" fill="#333">normalize by the half-frame:</text>
+  <text x="650" y="168" font-size="11.5" fill="#333">&#234;&#8202;<tspan font-size="75%" baseline-shift="sub">x</tspan> = 160 / 320 = +0.50</text>
+  <text x="650" y="188" font-size="11.5" fill="#333">&#234;&#8202;<tspan font-size="75%" baseline-shift="sub">y</tspan> = &#8722;60 / 240 = &#8722;0.25</text>
+  <text x="638" y="212" font-size="11.5" fill="#333">both exceed the 0.05 deadband &#8594; act:</text>
+  <text x="650" y="237" font-size="11.5" font-weight="bold" fill="#1a4a5a">&#969;&#8202;<tspan font-size="75%" baseline-shift="sub">z</tspan> = K&#8202;<tspan font-size="75%" baseline-shift="sub">yaw</tspan> &#234;&#8202;<tspan font-size="75%" baseline-shift="sub">x</tspan> = 0.8 &#215; 0.50 = +0.40 rad/s</text>
+  <text x="650" y="253" font-size="10.5" fill="#1a4a5a" font-style="italic">&#8594; yaw right, about 23&#176;/s</text>
+  <text x="650" y="278" font-size="11.5" font-weight="bold" fill="#1a4a5a">v&#8202;<tspan font-size="75%" baseline-shift="sub">D</tspan> = K&#8202;<tspan font-size="75%" baseline-shift="sub">alt</tspan> &#234;&#8202;<tspan font-size="75%" baseline-shift="sub">y</tspan> = 1.2 &#215; (&#8722;0.25) = &#8722;0.30 m/s</text>
+  <text x="650" y="294" font-size="10.5" fill="#1a4a5a" font-style="italic">&#8594; negative D is up: climb at 0.30 m/s</text>
+  <text x="638" y="322" font-size="10.5" fill="#555" font-style="italic">normalized error is resolution-independent:</text>
+  <text x="638" y="336" font-size="10.5" fill="#555" font-style="italic">the gains survive a camera-mode change.</text>
+
+  <!-- sidebar 2: sign discipline -->
+  <rect x="620" y="368" width="310" height="170" rx="8" fill="#ffffff" stroke="#ddd" stroke-width="1.2"/>
+  <text x="775" y="391" font-size="12" font-weight="bold" fill="#333" text-anchor="middle">Sign discipline (FRD / NED)</text>
+  <text x="638" y="414" font-size="10.5" fill="#333">positive yaw rate = nose right &#8594; the image</text>
+  <text x="638" y="428" font-size="10.5" fill="#333">slides left &#8594; e&#8202;<tspan font-size="75%" baseline-shift="sub">x</tspan> shrinks: negative feedback.</text>
+  <text x="638" y="450" font-size="10.5" fill="#333">positive v&#8202;<tspan font-size="75%" baseline-shift="sub">D</tspan> = descend &#8594; the image slides up</text>
+  <text x="638" y="464" font-size="10.5" fill="#333">&#8594; e&#8202;<tspan font-size="75%" baseline-shift="sub">y</tspan> shrinks: negative feedback.</text>
+  <text x="638" y="486" font-size="10.5" font-weight="bold" fill="#8a4d0f">One flipped sign is positive feedback:</text>
+  <text x="638" y="500" font-size="10.5" fill="#8a4d0f">every correction pushes the goose farther</text>
+  <text x="638" y="514" font-size="10.5" fill="#8a4d0f">from centre until it leaves the frame.</text>
+
+  <text x="480" y="590" font-size="11.5" fill="#555" text-anchor="middle" font-style="italic">The error lives entirely in the image plane &#8212; no depth, no calibration, no world frame. That is the point: this loop answers only</text>
+  <text x="480" y="606" font-size="11.5" fill="#555" text-anchor="middle" font-style="italic">&#8220;which way did the target move,&#8221; and answers it at frame rate.</text>
+</svg>

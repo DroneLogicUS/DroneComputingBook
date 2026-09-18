@@ -1,0 +1,219 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" font-family="Helvetica, Arial, sans-serif" xml:space="preserve">
+  <defs>
+    <marker id="mtTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+    <marker id="mtAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b26a1a"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="600" fill="#ffffff"/>
+
+  <text x="480" y="26" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">One flight through the whole book</text>
+  <text x="480" y="46" font-size="12.5" fill="#555" text-anchor="middle">A complete Goose Management System mission, phase by phase, with the Part whose engineering is load-bearing at each moment.</text>
+
+  <!-- ===== column guides ===== -->
+  <!-- 8 columns, x = 30 + i*112.5, width 112.5 -->
+  <g stroke="#e3e3e3" stroke-width="1">
+    <line x1="142" y1="62" x2="142" y2="560"/>
+    <line x1="254" y1="62" x2="254" y2="560"/>
+    <line x1="366" y1="62" x2="366" y2="560"/>
+    <line x1="478" y1="62" x2="478" y2="560"/>
+    <line x1="590" y1="62" x2="590" y2="560"/>
+    <line x1="702" y1="62" x2="702" y2="560"/>
+    <line x1="814" y1="62" x2="814" y2="560"/>
+  </g>
+
+  <!-- ===== altitude profile ===== -->
+  <text x="34" y="76" font-size="9" font-weight="bold" fill="#777">altitude (not to scale)</text>
+  <!-- reference: ground line -->
+  <line x1="30" y1="186" x2="930" y2="186" stroke="#bbb" stroke-width="1"/>
+  <!-- profile: launch climb, search at 5.5 m with sweep zigzag, engage/orbit ~6 m, evade spike to safe altitude, resume, return climb + descent -->
+  <path d="M 60 184
+           L 100 126
+           L 150 126 L 165 118 L 180 126 L 195 118 L 210 126 L 225 118 L 240 126 L 300 126
+           L 366 126
+           L 430 120
+           L 470 120"
+        fill="none" stroke="#1a7a8a" stroke-width="2.4"/>
+  <!-- orbit loop glyph in HARASS column -->
+  <ellipse cx="522" cy="120" rx="26" ry="10" fill="none" stroke="#1a7a8a" stroke-width="2.4"/>
+  <!-- evade spike (amber) -->
+  <path d="M 548 120 C 600 118 618 96 648 88 L 676 88 C 692 100 700 112 712 122"
+        fill="none" stroke="#b26a1a" stroke-width="2.4" stroke-dasharray="7 4"/>
+  <!-- resume + finish + return -->
+  <path d="M 712 122 L 760 126 L 800 126
+           L 826 104 L 872 104 L 900 184"
+        fill="none" stroke="#1a7a8a" stroke-width="2.4"/>
+  <!-- altitude annotations -->
+  <text x="205" y="146" font-size="8" fill="#1a4a5a">search: 5.5 m constant</text>
+  <text x="205" y="156" font-size="8" fill="#1a4a5a">(the swath formula's h)</text>
+  <text x="522" y="146" font-size="8" fill="#1a4a5a" text-anchor="middle">orbit: R = 12 m, h = 6 m</text>
+  <text x="522" y="156" font-size="8" fill="#1a4a5a" text-anchor="middle">(field-configured, in band)</text>
+  <text x="662" y="80" font-size="8" fill="#8a4d0f" text-anchor="middle">climb toward safe altitude</text>
+  <text x="864" y="96" font-size="8" fill="#1a4a5a" text-anchor="middle">return altitude</text>
+  <text x="66" y="176" font-size="8" fill="#777">arm</text>
+  <text x="898" y="176" font-size="8" fill="#777" text-anchor="end">disarm</text>
+
+  <!-- ===== PX4 mode strip ===== -->
+  <text x="34" y="212" font-size="9" font-weight="bold" fill="#777">PX4 mode</text>
+  <rect x="98" y="200" width="268" height="16" fill="#eef4f5" stroke="#8fb4bc" stroke-width="1"/>
+  <text x="232" y="212" font-size="8.5" fill="#1a4a5a" text-anchor="middle">AUTO.MISSION (onboard executor)</text>
+  <rect x="366" y="200" width="336" height="16" fill="#fdf6ec" stroke="#d9b98c" stroke-width="1"/>
+  <text x="534" y="212" font-size="8.5" fill="#8a4d0f" text-anchor="middle">OFFBOARD (companion streams setpoints, token-gated)</text>
+  <rect x="702" y="200" width="112" height="16" fill="#eef4f5" stroke="#8fb4bc" stroke-width="1"/>
+  <text x="758" y="212" font-size="8.5" fill="#1a4a5a" text-anchor="middle">AUTO.MISSION</text>
+  <rect x="814" y="200" width="116" height="16" fill="#eef4f5" stroke="#8fb4bc" stroke-width="1"/>
+  <text x="872" y="212" font-size="8.5" fill="#1a4a5a" text-anchor="middle">AUTO.RTL / land</text>
+
+  <!-- ===== phase boxes ===== -->
+  <!-- row of phase headers -->
+  <g font-size="10.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">
+    <text x="86" y="242">LAUNCH</text>
+    <text x="198" y="242">SEARCH</text>
+    <text x="310" y="242">DETECT &amp; CONFIRM</text>
+    <text x="422" y="242">ENGAGE</text>
+    <text x="534" y="242">HARASS</text>
+    <text x="646" y="242" fill="#8a4d0f">EVADE (injected)</text>
+    <text x="758" y="242">RESUME &#8594; DONE</text>
+    <text x="870" y="242">RETURN &amp; LAND</text>
+  </g>
+
+  <!-- states + triggers -->
+  <g font-size="8" fill="#333">
+    <g text-anchor="middle">
+      <text x="86" y="258" font-weight="bold" fill="#555">IDLE &#8594; PREFLIGHT &#8594;</text>
+      <text x="86" y="268" font-weight="bold" fill="#555">ARMING &#8594; START_MISSION</text>
+      <text x="86" y="282">one operator call, then three</text>
+      <text x="86" y="292">services verified against PX4;</text>
+      <text x="86" y="302">&#8805;8 satellites, battery &#8805;50%,</text>
+      <text x="86" y="312">home position set; ULog opens</text>
+
+      <text x="198" y="258" font-weight="bold" fill="#555">MISSION</text>
+      <text x="198" y="272">PX4 flies the pre-uploaded</text>
+      <text x="198" y="282">lawnmower list (6.6 m rows);</text>
+      <text x="198" y="292">companion streams nothing;</text>
+      <text x="198" y="302">detector + failsafe watch</text>
+      <text x="198" y="312">continuously the whole time</text>
+
+      <text x="310" y="258" font-weight="bold" fill="#555">MISSION (exit guard)</text>
+      <text x="310" y="272">5 clustered hits in 2 s</text>
+      <text x="310" y="282">&#8594; target.confirmed;</text>
+      <text x="310" y="292">cooldown elapsed;</text>
+      <text x="310" y="302">token &#8594; 'navigation'</text>
+
+      <text x="422" y="258" font-weight="bold" fill="#555">ENGAGE_PREP &#8594; ENGAGE</text>
+      <text x="422" y="272">1.0 s setpoint warmup, then</text>
+      <text x="422" y="282">mode_offboard succeeds;</text>
+      <text x="422" y="292">20 Hz approach to standoff;</text>
+      <text x="422" y="302">nav_arrived &#8594; token</text>
+      <text x="422" y="312">&#8594; 'harassment'</text>
+
+      <text x="534" y="258" font-weight="bold" fill="#555">HARASS</text>
+      <text x="534" y="272">re-centering orbit around</text>
+      <text x="534" y="282">the tracked flock center;</text>
+      <text x="534" y="292">ends on behavior (flock leaves)</text>
+      <text x="534" y="302">with the timer as backstop;</text>
+      <text x="534" y="312">90 s / 5 s watchdogs armed</text>
+
+      <text x="646" y="258" font-weight="bold" fill="#8a4d0f">EVADE_THREAT</text>
+      <text x="646" y="272" fill="#8a4d0f">closing, soon, and inside</text>
+      <text x="646" y="282" fill="#8a4d0f">the safety radius &#8594; preempt;</text>
+      <text x="646" y="292" fill="#8a4d0f">stash state + leg, climb out;</text>
+      <text x="646" y="302" fill="#8a4d0f">clear = opening AND far;</text>
+      <text x="646" y="312" fill="#8a4d0f">stale track &#8594; resume search</text>
+
+      <text x="758" y="258" font-weight="bold" fill="#555">RESUME &#8594; MISSION &#8594; DONE</text>
+      <text x="758" y="272">token &#8594; 'none';</text>
+      <text x="758" y="282">mode_mission verified;</text>
+      <text x="758" y="292">20 s cooldown; sweep ends:</text>
+      <text x="758" y="302">in_mission seen,</text>
+      <text x="758" y="312">then in_loiter</text>
+
+      <text x="870" y="258" font-weight="bold" fill="#555">wind-down</text>
+      <text x="870" y="272">RTL sized by the battery</text>
+      <text x="870" y="282">arithmetic; descend, land,</text>
+      <text x="870" y="292">disarm; ULog closes;</text>
+      <text x="870" y="302">two recorders correlated</text>
+      <text x="870" y="312">on one timeline</text>
+    </g>
+  </g>
+
+  <!-- ===== provenance lane ===== -->
+  <rect x="30" y="332" width="900" height="14" fill="#f0f0f0"/>
+  <text x="480" y="343" font-size="9" font-weight="bold" fill="#555" text-anchor="middle">whose engineering is load-bearing (where the internals live)</text>
+
+  <g font-size="7.8" fill="#1a4a5a" text-anchor="middle">
+    <text x="86" y="360">Part I: airframe, battery,</text>
+    <text x="86" y="370">companion computer, Part 107</text>
+    <text x="86" y="380">envelope (Airspace Law)</text>
+    <text x="86" y="390">Part II: PX4 services, arming</text>
+    <text x="86" y="400">Part V: System Architecture</text>
+    <text x="86" y="410">(the service ladder)</text>
+
+    <text x="198" y="360">Part II: Mission Scripting</text>
+    <text x="198" y="370">(.plan, AUTO.MISSION)</text>
+    <text x="198" y="380">Part IV: Path Planning</text>
+    <text x="198" y="390">(the generator's arithmetic)</text>
+    <text x="198" y="400">Part I: sensing + EKF feeding</text>
+    <text x="198" y="410">the whole estimate chain</text>
+
+    <text x="310" y="360">Part III: capture &#8594; infer &#8594;</text>
+    <text x="310" y="370">publish on edge hardware</text>
+    <text x="310" y="380">Part IV: Coordinate Frames</text>
+    <text x="310" y="390">(optical &#8594; NED)</text>
+    <text x="310" y="400">Part V: valid/confirmed</text>
+    <text x="310" y="410">two-boolean hysteresis</text>
+
+    <text x="422" y="360">Part II: Offboard rules,</text>
+    <text x="422" y="370">dead-man's switch</text>
+    <text x="422" y="380">Part IV: stream-and-arrive</text>
+    <text x="422" y="390">mechanics, relocated here</text>
+    <text x="422" y="400">Part V: token handoff</text>
+    <text x="422" y="410">(ENGAGE_PREP's reason to exist)</text>
+
+    <text x="534" y="360">Part IV: Harassment Patterns,</text>
+    <text x="534" y="370">Target Tracking (two-loop)</text>
+    <text x="534" y="380">Part V: Ethics &#8212; parameters</text>
+    <text x="534" y="390">in the 8&#8211;15 m band,</text>
+    <text x="534" y="400">behavioral termination,</text>
+    <text x="534" y="410">exposure logged per flock</text>
+
+    <text x="646" y="360" fill="#8a4d0f">Part IV: Threat Evasion</text>
+    <text x="646" y="370" fill="#8a4d0f">(the vector), FSM chapter</text>
+    <text x="646" y="380" fill="#8a4d0f">(the preemption discipline)</text>
+    <text x="646" y="390" fill="#8a4d0f">attached at the seam the</text>
+    <text x="646" y="400" fill="#8a4d0f">System Architecture chapter</text>
+    <text x="646" y="410" fill="#8a4d0f">named &#8212; see note below</text>
+
+    <text x="758" y="360">Part V: System Architecture</text>
+    <text x="758" y="370">(RESUME's escalation:</text>
+    <text x="758" y="380">3 failures &#8594; RTL)</text>
+    <text x="758" y="390">Part II: mode verification</text>
+    <text x="758" y="400">Part IV: coverage claim</text>
+    <text x="758" y="410">completed, no swath lost</text>
+
+    <text x="870" y="360">Part II: Geofencing &amp;</text>
+    <text x="870" y="370">Fail-Safes (RTL margins)</text>
+    <text x="870" y="380">Part I: reserve in the</text>
+    <text x="870" y="390">mission time budget</text>
+    <text x="870" y="400">Part V: Post-Flight</text>
+    <text x="870" y="410">Diagnostics (reading it all)</text>
+  </g>
+
+  <!-- watchdog / failsafe underlay note -->
+  <rect x="30" y="428" width="900" height="34" rx="6" fill="#fdf6ec" stroke="#d9b98c" stroke-width="1"/>
+  <text x="480" y="442" font-size="8.5" font-weight="bold" fill="#8a4d0f" text-anchor="middle">running beneath every phase: the Failsafe watchdog (1 Hz, SEVERITY:reason), PX4's own native failsafes beneath that, and the safety pilot above both &#8212;</text>
+  <text x="480" y="454" font-size="8.5" fill="#8a4d0f" text-anchor="middle">the authority ladder of the Geofencing and Fail-Safes chapter, present in the trace precisely by never having to appear in it</text>
+
+  <!-- ===== footer notes ===== -->
+  <rect x="30" y="476" width="900" height="84" rx="8" fill="#f7f7f7" stroke="#cccccc" stroke-width="1"/>
+  <text x="480" y="495" font-size="10.5" font-weight="bold" fill="#333" text-anchor="middle">Reading the trace</text>
+  <text x="52" y="513" font-size="9" fill="#444">Teal segments fly on PX4's onboard executor &#8212; the companion computer could crash without the sweep missing a leg. Amber and token-gated segments fly on the</text>
+  <text x="52" y="526" font-size="9" fill="#444">companion's 20 Hz streams, where the dead-man's switch is the safety net. The EVADE phase is drawn dashed because it is the book's own Part IV extension: the</text>
+  <text x="52" y="539" font-size="9" fill="#444">shipped machine routes threats through the severity protocol instead, and the extension attaches as a new severity or a new state between the watchdogs and</text>
+  <text x="52" y="552" font-size="9" fill="#444">RESUME. Every solid transition in this flight is one of two species &#8212; a service returning verified success, or a topic crossing a threshold.</text>
+
+  <text x="480" y="580" font-size="9.5" font-style="italic" fill="#666" text-anchor="middle">No phase of the flight is held up by one Part alone &#8212; which is the point of tracing it: integration is where the book's chapters stop being chapters.</text>
+</svg>

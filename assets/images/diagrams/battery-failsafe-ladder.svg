@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 500" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="bfArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="980" height="500" fill="#ffffff"/>
+
+  <text x="490" y="28" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">The battery failsafe ladder: mission thresholds above the firmware floor</text>
+  <text x="490" y="50" font-size="13" fill="#555" text-anchor="middle">Remaining charge fraction, left to right &#8212; for the running example's 77 Wh pack at a 365 W mission draw, 1% &#8776; 7.6 seconds of flight.</text>
+
+  <!-- axis: 100% at x=80, 0% at x=900 ; x = 80 + (100-p)*8.2 -->
+  <!-- main bar bands, y 120..190 -->
+  <!-- normal ops 100..30% : x 80..654 -->
+  <rect x="80" y="120" width="574" height="70" fill="#eef6f0" stroke="#4a8a5a" stroke-width="1.8"/>
+  <text x="367" y="150" font-size="13" font-weight="bold" fill="#2f5a3a" text-anchor="middle">normal operations</text>
+  <text x="367" y="168" font-size="10.5" fill="#4a6a52" text-anchor="middle" font-style="italic">mission proceeds; watchdog publishes nothing</text>
+
+  <!-- RTL band 30..15% : x 654..777 -->
+  <rect x="654" y="120" width="123" height="70" fill="#fdf3e3" stroke="#b26a1a" stroke-width="1.8"/>
+  <text x="715" y="146" font-size="12" font-weight="bold" fill="#8a5210" text-anchor="middle">RTL:battery</text>
+  <text x="715" y="162" font-size="9.5" fill="#8a5210" text-anchor="middle" font-style="italic">abandon the mission,</text>
+  <text x="715" y="175" font-size="9.5" fill="#8a5210" text-anchor="middle" font-style="italic">fly home now</text>
+
+  <!-- LAND band 15..0% : x 777..900 -->
+  <rect x="777" y="120" width="123" height="70" fill="#fbeaea" stroke="#a33" stroke-width="1.8"/>
+  <text x="838" y="146" font-size="12" font-weight="bold" fill="#822" text-anchor="middle">LAND:battery</text>
+  <text x="838" y="162" font-size="9.5" fill="#822" text-anchor="middle" font-style="italic">no energy to go home &#8212;</text>
+  <text x="838" y="175" font-size="9.5" fill="#822" text-anchor="middle" font-style="italic">descend where you are</text>
+
+  <!-- axis ticks -->
+  <line x1="80" y1="190" x2="80" y2="202" stroke="#555" stroke-width="1.4"/>
+  <text x="80" y="218" font-size="10.5" fill="#555" text-anchor="middle">100%</text>
+  <line x1="244" y1="190" x2="244" y2="202" stroke="#555" stroke-width="1.4"/>
+  <text x="244" y="218" font-size="10.5" fill="#555" text-anchor="middle">80%</text>
+  <line x1="408" y1="190" x2="408" y2="202" stroke="#555" stroke-width="1.4"/>
+  <text x="408" y="218" font-size="10.5" fill="#555" text-anchor="middle">60%</text>
+  <line x1="572" y1="190" x2="572" y2="202" stroke="#555" stroke-width="1.4"/>
+  <text x="572" y="218" font-size="10.5" fill="#555" text-anchor="middle">40%</text>
+  <line x1="654" y1="190" x2="654" y2="206" stroke="#b26a1a" stroke-width="2.2"/>
+  <text x="654" y="222" font-size="11" font-weight="bold" fill="#8a5210" text-anchor="middle">30%</text>
+  <text x="654" y="236" font-size="9.5" fill="#8a5210" text-anchor="middle" font-style="italic">battery_rtl</text>
+  <line x1="777" y1="190" x2="777" y2="206" stroke="#a33" stroke-width="2.2"/>
+  <text x="777" y="222" font-size="11" font-weight="bold" fill="#822" text-anchor="middle">15%</text>
+  <text x="777" y="236" font-size="9.5" fill="#822" text-anchor="middle" font-style="italic">battery_land</text>
+  <line x1="900" y1="190" x2="900" y2="202" stroke="#555" stroke-width="1.4"/>
+  <text x="900" y="218" font-size="10.5" fill="#555" text-anchor="middle">0%</text>
+
+  <!-- worst-case RTL cost bracket above the bar: 30% to 18% => x 654..752 -->
+  <line x1="654" y1="104" x2="752" y2="104" stroke="#555" stroke-width="1.6" marker-start="url(#bfArrow)" marker-end="url(#bfArrow)"/>
+  <line x1="654" y1="98" x2="654" y2="110" stroke="#555" stroke-width="1.2"/>
+  <line x1="752" y1="98" x2="752" y2="110" stroke="#555" stroke-width="1.2"/>
+  <text x="703" y="80" font-size="10.5" fill="#222" text-anchor="middle" font-style="italic">worst-case return from the fence edge</text>
+  <text x="703" y="94" font-size="10.5" fill="#222" text-anchor="middle" font-style="italic">&#8776; 90 s &#8776; 12% of the pack</text>
+
+  <!-- firmware floor row, y 270..320 -->
+  <text x="80" y="268" font-size="12.5" font-weight="bold" fill="#222">Beneath the watchdog: the firmware's own ladder (PX4 defaults) &#8212; the floor the mission thresholds sit above</text>
+  <line x1="80" y1="300" x2="900" y2="300" stroke="#bbb" stroke-width="1.4"/>
+  <!-- 15% warn x=777, 7% x=842.6, 5% x=859 -->
+  <line x1="777" y1="292" x2="777" y2="308" stroke="#b26a1a" stroke-width="2"/>
+  <text x="777" y="330" font-size="10" fill="#8a5210" text-anchor="middle">15% warn</text>
+  <line x1="843" y1="292" x2="843" y2="308" stroke="#a33" stroke-width="2"/>
+  <text x="836" y="348" font-size="10" fill="#822" text-anchor="middle">7% critical</text>
+  <line x1="859" y1="292" x2="859" y2="308" stroke="#822" stroke-width="2"/>
+  <text x="884" y="330" font-size="10" fill="#822" text-anchor="middle">5% land</text>
+  <line x1="836" y1="336" x2="842" y2="310" stroke="#ccc" stroke-width="1"/>
+
+  <!-- margin annotations -->
+  <rect x="80" y="374" width="820" height="86" rx="8" fill="#fafcfd" stroke="#cfdfe4" stroke-width="1.4"/>
+  <text x="96" y="398" font-size="11" fill="#222"><tspan font-weight="bold">Why the mission thresholds sit so high.</tspan> At 30% remaining, 23 Wh are left &#8212; about 3.8 minutes at mission draw &#8212; against a</text>
+  <text x="96" y="415" font-size="11" fill="#222">worst-case return, from 200 m out at 30 m altitude, of roughly 90 seconds: the RTL trigger buys the trip home twice over. At 15%,</text>
+  <text x="96" y="432" font-size="11" fill="#222">under two minutes remain, the cells approach the steep knee of the discharge curve, and the only safe destination is straight down.</text>
+  <text x="96" y="449" font-size="11" fill="#222">The firmware defaults protect the aircraft; the mission thresholds, set far above them, protect the mission's worst-case geometry.</text>
+
+  <text x="490" y="484" font-size="11" fill="#555" text-anchor="middle" font-style="italic">Same doctrine as the 10 ft institutional ceiling under the 400 ft legal one: the platform's floor is where your margins begin, not where they end.</text>
+</svg>

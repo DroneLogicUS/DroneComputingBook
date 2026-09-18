@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 390" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="clfArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+    <marker id="clfArrowGrey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#777777"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="860" height="390" fill="#ffffff"/>
+
+  <text x="430" y="30" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">The closed control loop</text>
+  <text x="430" y="52" font-size="13" fill="#555" text-anchor="middle">The controller never sees the world &#8212; only the error between the setpoint and the estimated state.</text>
+
+  <!-- disturbance arrow into plant -->
+  <text x="595" y="82" font-size="12" fill="#777" text-anchor="middle" font-style="italic">disturbances: wind, payload shift, motor mismatch</text>
+  <line x1="595" y1="90" x2="595" y2="126" stroke="#777777" stroke-width="2" marker-end="url(#clfArrowGrey)"/>
+
+  <!-- reference input -->
+  <text x="80" y="150" font-size="12.5" fill="#222" text-anchor="middle">setpoint</text>
+  <text x="80" y="166" font-size="12.5" fill="#222" text-anchor="middle" font-style="italic">r(t)</text>
+  <line x1="30" y1="178" x2="128" y2="178" stroke="#1a7a8a" stroke-width="2.4" marker-end="url(#clfArrow)"/>
+
+  <!-- summing junction -->
+  <circle cx="146" cy="178" r="15" fill="#f4f8fa" stroke="#1a4a5a" stroke-width="2"/>
+  <text x="139" y="176" font-size="13" fill="#1a4a5a" text-anchor="middle" font-weight="bold">+</text>
+  <text x="152" y="190" font-size="13" fill="#1a4a5a" text-anchor="middle" font-weight="bold">&#8722;</text>
+
+  <!-- error arrow -->
+  <line x1="163" y1="178" x2="248" y2="178" stroke="#1a7a8a" stroke-width="2.4" marker-end="url(#clfArrow)"/>
+  <text x="206" y="158" font-size="12.5" fill="#222" text-anchor="middle" font-style="italic">e(t) = r(t) &#8722; y(t)</text>
+
+  <!-- controller box -->
+  <rect x="256" y="138" width="164" height="80" rx="8" fill="#f4f8fa" stroke="#1a4a5a" stroke-width="2"/>
+  <text x="338" y="170" font-size="15" font-weight="bold" fill="#1a4a5a" text-anchor="middle">Controller</text>
+  <text x="338" y="192" font-size="12" fill="#555" text-anchor="middle" font-style="italic">the PID law</text>
+
+  <!-- command arrow -->
+  <line x1="420" y1="178" x2="496" y2="178" stroke="#1a7a8a" stroke-width="2.4" marker-end="url(#clfArrow)"/>
+  <text x="458" y="158" font-size="12.5" fill="#222" text-anchor="middle" font-style="italic">command u(t)</text>
+
+  <!-- plant box -->
+  <rect x="504" y="138" width="182" height="80" rx="8" fill="#f4f8fa" stroke="#1a4a5a" stroke-width="2"/>
+  <text x="595" y="170" font-size="15" font-weight="bold" fill="#1a4a5a" text-anchor="middle">Plant</text>
+  <text x="595" y="192" font-size="12" fill="#555" text-anchor="middle" font-style="italic">quadrotor dynamics</text>
+
+  <!-- output -->
+  <line x1="686" y1="178" x2="800" y2="178" stroke="#1a7a8a" stroke-width="2.4" marker-end="url(#clfArrow)"/>
+  <circle cx="742" cy="178" r="4" fill="#1a7a8a"/>
+  <text x="770" y="158" font-size="12.5" fill="#222" text-anchor="middle" font-style="italic">output y(t)</text>
+
+  <!-- feedback path -->
+  <path d="M 742 182 V 292 H 626" fill="none" stroke="#1a7a8a" stroke-width="2.4" marker-end="url(#clfArrow)"/>
+  <rect x="420" y="262" width="200" height="60" rx="8" fill="#f4f8fa" stroke="#1a4a5a" stroke-width="2"/>
+  <text x="520" y="287" font-size="14" font-weight="bold" fill="#1a4a5a" text-anchor="middle">Sensors + estimator</text>
+  <text x="520" y="307" font-size="11.5" fill="#555" text-anchor="middle" font-style="italic">gyro, accelerometer, GPS &#8594; EKF2</text>
+  <path d="M 420 292 H 146 V 197" fill="none" stroke="#1a7a8a" stroke-width="2.4" marker-end="url(#clfArrow)"/>
+  <text x="283" y="284" font-size="12.5" fill="#222" text-anchor="middle" font-style="italic">estimated state &#375;(t)</text>
+
+  <text x="430" y="368" font-size="13" fill="#222" text-anchor="middle">Example: commanded roll 0&#176;, estimated roll +8&#176; &#8594; e = &#8722;8&#176;, and the controller commands torque back toward level.</text>
+</svg>

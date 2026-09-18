@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620" font-family="Helvetica, Arial, sans-serif" xml:space="preserve">
+  <defs>
+    <marker id="uaAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b26a1a"/>
+    </marker>
+    <marker id="uaTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="620" fill="#ffffff"/>
+
+  <text x="480" y="26" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">Anatomy of a .ulg flight log — and the tools that open it</text>
+  <text x="480" y="46" font-size="13" fill="#555" text-anchor="middle">One self-describing binary file per arming session; six pyulog scripts and one web app turn it back into evidence.</text>
+
+  <!-- ===== the file ===== -->
+  <rect x="40" y="70" width="360" height="450" rx="10" fill="#fafafa" stroke="#888" stroke-width="1.6"/>
+  <text x="220" y="94" font-size="14" font-weight="bold" fill="#222" text-anchor="middle" font-family="Courier, monospace">flight.ulg</text>
+  <text x="220" y="110" font-size="9.5" fill="#666" text-anchor="middle">written by the logger from arming to disarm &#183; little-endian throughout</text>
+
+  <!-- header band -->
+  <rect x="60" y="122" width="320" height="56" rx="6" fill="#f0f0f0" stroke="#888" stroke-width="1.3"/>
+  <text x="72" y="141" font-size="11" font-weight="bold" fill="#444">HEADER — 16 fixed bytes</text>
+  <text x="72" y="157" font-size="9.5" fill="#666">magic byte sequence &#183; format version &#183;</text>
+  <text x="72" y="169" font-size="9.5" fill="#666">start timestamp in microseconds</text>
+
+  <!-- definitions band -->
+  <rect x="60" y="186" width="320" height="120" rx="6" fill="#fdf6ec" stroke="#b26a1a" stroke-width="1.3"/>
+  <text x="72" y="205" font-size="11" font-weight="bold" fill="#8a4d0f">DEFINITIONS — the file explains itself</text>
+  <text x="72" y="223" font-size="9.5" fill="#6b4a20"><tspan font-family="Courier, monospace" font-weight="bold">'F'</tspan>  format messages: every uORB message&#8217;s field</text>
+  <text x="86" y="235" font-size="9.5" fill="#6b4a20">names and types — no external schema needed</text>
+  <text x="72" y="252" font-size="9.5" fill="#6b4a20"><tspan font-family="Courier, monospace" font-weight="bold">'I'</tspan>  information: hardware version, firmware build</text>
+  <text x="72" y="269" font-size="9.5" fill="#6b4a20"><tspan font-family="Courier, monospace" font-weight="bold">'P'</tspan>/<tspan font-family="Courier, monospace" font-weight="bold">'Q'</tspan>  parameter values at logging start</text>
+  <text x="86" y="281" font-size="9.5" fill="#6b4a20">(+ defaults) — what was actually configured</text>
+  <text x="72" y="298" font-size="8.5" font-style="italic" fill="#8a4d0f">the same values ulog_params extracts</text>
+
+  <!-- data band -->
+  <rect x="60" y="314" width="320" height="188" rx="6" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.5"/>
+  <text x="72" y="333" font-size="11" font-weight="bold" fill="#1a4a5a">DATA — the flight itself</text>
+  <text x="72" y="351" font-size="9.5" fill="#33565f"><tspan font-family="Courier, monospace" font-weight="bold">'A'</tspan>  subscriptions: topic name &#8594; numeric ID</text>
+  <text x="72" y="368" font-size="9.5" fill="#33565f"><tspan font-family="Courier, monospace" font-weight="bold">'D'</tspan>  logged data: timestamped binary payloads —</text>
+  <text x="86" y="381" font-size="9" fill="#33565f" font-family="Courier, monospace">battery_status, vehicle_imu_status,</text>
+  <text x="86" y="393" font-size="9" fill="#33565f" font-family="Courier, monospace">vehicle_status, vehicle_attitude, &#8230;</text>
+  <text x="72" y="411" font-size="9.5" fill="#33565f"><tspan font-family="Courier, monospace" font-weight="bold">'L'</tspan>/<tspan font-family="Courier, monospace" font-weight="bold">'C'</tspan>  logged strings: the text channel —</text>
+  <text x="86" y="424" font-size="9" fill="#33565f" font-family="Courier, monospace">PX4_INFO() / PX4_WARN() / PX4_ERR()</text>
+  <text x="72" y="442" font-size="9.5" fill="#33565f"><tspan font-family="Courier, monospace" font-weight="bold">'O'</tspan>  dropouts: marked gaps where logging paused</text>
+  <text x="86" y="455" font-size="8.5" font-style="italic" fill="#557">(SD card or scheduling trouble — its own diagnosis)</text>
+  <text x="72" y="474" font-size="8.5" font-style="italic" fill="#1a4a5a">numbers and prose share one file, one clock —</text>
+  <text x="72" y="486" font-size="8.5" font-style="italic" fill="#1a4a5a">every message carries a &#181;s timestamp</text>
+
+  <!-- ===== tools column ===== -->
+  <text x="740" y="86" font-size="12" font-weight="bold" fill="#444" text-anchor="middle">pip install pyulog — six scripts</text>
+
+  <!-- ulog_info -->
+  <rect x="560" y="96" width="360" height="50" rx="7" fill="#ffffff" stroke="#b26a1a" stroke-width="1.4"/>
+  <text x="574" y="115" font-size="11" font-weight="bold" fill="#8a4d0f" font-family="Courier, monospace">ulog_info</text>
+  <text x="574" y="132" font-size="9.5" fill="#555">duration, vehicle &amp; firmware, list of logged topics</text>
+  <path d="M 400 121 L 556 121" fill="none" stroke="#b26a1a" stroke-width="1.8" marker-end="url(#uaAmber)"/>
+
+  <!-- ulog_messages -->
+  <rect x="560" y="158" width="360" height="50" rx="7" fill="#ffffff" stroke="#b26a1a" stroke-width="1.4"/>
+  <text x="574" y="177" font-size="11" font-weight="bold" fill="#8a4d0f" font-family="Courier, monospace">ulog_messages</text>
+  <text x="574" y="194" font-size="9.5" fill="#555">the text channel, timestamped: warnings, errors, mode changes</text>
+  <path d="M 400 183 L 556 183" fill="none" stroke="#b26a1a" stroke-width="1.8" marker-end="url(#uaAmber)"/>
+
+  <!-- ulog_params -->
+  <rect x="560" y="220" width="360" height="50" rx="7" fill="#ffffff" stroke="#b26a1a" stroke-width="1.4"/>
+  <text x="574" y="239" font-size="11" font-weight="bold" fill="#8a4d0f" font-family="Courier, monospace">ulog_params</text>
+  <text x="574" y="256" font-size="9.5" fill="#555">every parameter active on this flight — no guessing what was set</text>
+  <path d="M 400 245 L 556 245" fill="none" stroke="#b26a1a" stroke-width="1.8" marker-end="url(#uaAmber)"/>
+
+  <!-- ulog2csv -->
+  <rect x="560" y="282" width="360" height="50" rx="7" fill="#fdf6ec" stroke="#b26a1a" stroke-width="1.6"/>
+  <text x="574" y="301" font-size="11" font-weight="bold" fill="#8a4d0f" font-family="Courier, monospace">ulog2csv -m &lt;topic&gt;</text>
+  <text x="574" y="318" font-size="9.5" fill="#555">one CSV per topic &#8594; pandas, matplotlib, a spreadsheet</text>
+  <path d="M 400 307 L 556 307" fill="none" stroke="#b26a1a" stroke-width="1.8" marker-end="url(#uaAmber)"/>
+
+  <!-- ulog2kml -->
+  <rect x="560" y="344" width="360" height="50" rx="7" fill="#ffffff" stroke="#b26a1a" stroke-width="1.4"/>
+  <text x="574" y="363" font-size="11" font-weight="bold" fill="#8a4d0f" font-family="Courier, monospace">ulog2kml</text>
+  <text x="574" y="380" font-size="9.5" fill="#555">the flown path, replayable in Google Earth</text>
+  <path d="M 400 369 L 556 369" fill="none" stroke="#b26a1a" stroke-width="1.8" marker-end="url(#uaAmber)"/>
+
+  <!-- ulog2ros2bag -->
+  <rect x="560" y="406" width="360" height="50" rx="7" fill="#ffffff" stroke="#b26a1a" stroke-width="1.4"/>
+  <text x="574" y="425" font-size="11" font-weight="bold" fill="#8a4d0f" font-family="Courier, monospace">ulog2ros2bag</text>
+  <text x="574" y="442" font-size="9.5" fill="#555">a ROS 2 bag — the autopilot&#8217;s record on the companion&#8217;s timeline</text>
+  <path d="M 400 431 L 556 431" fill="none" stroke="#b26a1a" stroke-width="1.8" marker-end="url(#uaAmber)"/>
+
+  <!-- flight review -->
+  <rect x="560" y="470" width="360" height="50" rx="7" fill="#1a7a8a"/>
+  <text x="574" y="489" font-size="11" font-weight="bold" fill="#ffffff">Flight Review (logs.px4.io, or self-hosted)</text>
+  <text x="574" y="506" font-size="9.5" fill="#d8ecef">drag the file in: flight-mode timeline, tracking, GPS, vibration panels</text>
+  <path d="M 400 495 L 556 495" fill="none" stroke="#1a7a8a" stroke-width="2" marker-end="url(#uaTeal)"/>
+
+  <!-- footer -->
+  <rect x="40" y="544" width="880" height="56" rx="8" fill="#f7f7f7" stroke="#ccc" stroke-width="1"/>
+  <text x="480" y="566" font-size="10.5" fill="#444" text-anchor="middle">The schemas travel inside the file, and a well-behaved parser resynchronizes past corrupted bytes rather than aborting —</text>
+  <text x="480" y="582" font-size="10.5" fill="#444" text-anchor="middle">so a log truncated by a crash is still partly readable, which is exactly when it matters most.</text>
+</svg>

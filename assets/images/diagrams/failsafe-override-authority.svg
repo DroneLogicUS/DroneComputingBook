@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 640" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="oaArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+    <marker id="oaArrowAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b26a1a"/>
+    </marker>
+    <marker id="oaArrowGrey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8a8a8a"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="980" height="640" fill="#ffffff"/>
+
+  <text x="490" y="28" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">Override authority in the running example: who may preempt whom</text>
+  <text x="490" y="50" font-size="13" fill="#555" text-anchor="middle">Authority rises upward; each layer can silence every layer below it, and no layer can veto one above it.</text>
+
+  <!-- left authority axis -->
+  <line x1="52" y1="560" x2="52" y2="86" stroke="#8a8a8a" stroke-width="2" marker-end="url(#oaArrowGrey)"/>
+  <text x="38" y="330" font-size="11" fill="#555" text-anchor="middle" transform="rotate(-90 38 330)" font-style="italic">increasing authority</text>
+
+  <!-- Layer 1: safety pilot -->
+  <rect x="90" y="76" width="620" height="72" rx="10" fill="#f4f4f4" stroke="#444" stroke-width="2.2"/>
+  <text x="106" y="100" font-size="13.5" font-weight="bold" fill="#222">Safety pilot's RC transmitter</text>
+  <text x="106" y="118" font-size="10.5" fill="#555" font-style="italic">sticks straight to the receiver on the flight controller &#8212; no companion software in the path;</text>
+  <text x="106" y="132" font-size="10.5" fill="#555" font-style="italic">a mode switch seizes control from every layer below, in any state, at any time</text>
+
+  <!-- Layer 2: PX4 native failsafes -->
+  <rect x="90" y="168" width="620" height="86" rx="10" fill="#fdf6ea" stroke="#b26a1a" stroke-width="2.2"/>
+  <text x="106" y="192" font-size="13.5" font-weight="bold" fill="#8a5210">PX4 native failsafes (firmware)</text>
+  <text x="106" y="210" font-size="10.5" fill="#8a5210" font-style="italic">Offboard dead-man's switch &#183; geofence breach action &#183; low-battery ladder &#183; RC / data-link loss;</text>
+  <text x="106" y="224" font-size="10.5" fill="#8a5210" font-style="italic">acts by changing flight mode itself &#8212; needs no cooperation from anything above the autopilot;</text>
+  <text x="106" y="238" font-size="10.5" fill="#8a5210" font-style="italic">reports via the vehicle-status stream, and the layers above stand down when it fires</text>
+
+  <!-- Layer 3: failsafe_monitor -->
+  <rect x="90" y="274" width="620" height="86" rx="10" fill="#f2f8fa" stroke="#1a7a8a" stroke-width="2.2"/>
+  <text x="106" y="298" font-size="13.5" font-weight="bold" fill="#1a4a5a">failsafe_monitor &#8212; the independent mission watchdog</text>
+  <text x="106" y="316" font-size="10.5" fill="#555" font-style="italic">separate process; subscribes to position, battery, and vehicle status; evaluates mission rules at 1 Hz;</text>
+  <text x="106" y="330" font-size="10.5" fill="#555" font-style="italic">publishes &#8220;SEVERITY:reason&#8221; on /goose/failsafe every tick the condition holds &#8212;</text>
+  <text x="106" y="344" font-size="10.5" fill="#555" font-style="italic">HOLD (hover in place) &#183; RTL (return) &#183; LAND (mission abort, descend now)</text>
+
+  <!-- Layer 4: mission_manager -->
+  <rect x="90" y="380" width="620" height="100" rx="10" fill="#f2f8fa" stroke="#1a7a8a" stroke-width="2.2"/>
+  <text x="106" y="404" font-size="13.5" font-weight="bold" fill="#1a4a5a">mission_manager &#8212; executes the override</text>
+  <text x="106" y="422" font-size="10.5" fill="#555" font-style="italic">on any failsafe message: set the active-controller token to &#8216;none&#8217;, drop the pending service call,</text>
+  <text x="106" y="436" font-size="10.5" fill="#555" font-style="italic">enter its terminal FAILSAFE state, and call the matching flight-controller service (hold / rtl / land);</text>
+  <text x="106" y="450" font-size="10.5" fill="#555" font-style="italic">carries watchdogs of its own &#8212; engagement timeout, target lost, repeated resume failure &#8658; RTL;</text>
+  <text x="106" y="464" font-size="10.5" fill="#555" font-style="italic">an unrecognized severity means a PX4 native failsafe is already in control: log it and stand down</text>
+
+  <!-- Layer 5: behavior nodes -->
+  <rect x="90" y="500" width="620" height="72" rx="10" fill="#fafcfd" stroke="#9ab8c0" stroke-width="2"/>
+  <text x="106" y="524" font-size="13.5" font-weight="bold" fill="#446">Behavior nodes: navigation &#183; harassment</text>
+  <text x="106" y="542" font-size="10.5" fill="#555" font-style="italic">lowest authority &#8212; may stream setpoints only while the active-controller token names them;</text>
+  <text x="106" y="556" font-size="10.5" fill="#555" font-style="italic">the token reading &#8216;none&#8217; silences them within one message &#8212; they are never asked, only told</text>
+
+  <!-- preemption arrows between layers -->
+  <line x1="400" y1="148" x2="400" y2="164" stroke="#8a8a8a" stroke-width="2" marker-end="url(#oaArrowGrey)"/>
+  <line x1="400" y1="254" x2="400" y2="270" stroke="#b26a1a" stroke-width="2" marker-end="url(#oaArrowAmber)"/>
+  <line x1="400" y1="360" x2="400" y2="376" stroke="#1a7a8a" stroke-width="2" marker-end="url(#oaArrow)"/>
+  <line x1="400" y1="480" x2="400" y2="496" stroke="#1a7a8a" stroke-width="2" marker-end="url(#oaArrow)"/>
+
+  <!-- right column: message plumbing -->
+  <rect x="740" y="274" width="200" height="206" rx="10" fill="#ffffff" stroke="#cfdfe4" stroke-width="1.6"/>
+  <text x="840" y="298" font-size="11.5" font-weight="bold" fill="#222" text-anchor="middle">the plumbing</text>
+  <text x="752" y="320" font-size="9.5" fill="#555">/goose/failsafe</text>
+  <text x="762" y="333" font-size="9.5" fill="#888" font-style="italic">watchdog &#8594; manager</text>
+  <text x="752" y="354" font-size="9.5" fill="#555">/goose/active_controller</text>
+  <text x="762" y="367" font-size="9.5" fill="#888" font-style="italic">manager &#8594; behavior nodes</text>
+  <text x="752" y="388" font-size="9.5" fill="#555">/goose/fc/mode_hold</text>
+  <text x="752" y="401" font-size="9.5" fill="#555">/goose/fc/rtl &#183; /goose/fc/land</text>
+  <text x="762" y="414" font-size="9.5" fill="#888" font-style="italic">services on the flight-</text>
+  <text x="762" y="427" font-size="9.5" fill="#888" font-style="italic">controller node, which sets</text>
+  <text x="762" y="440" font-size="9.5" fill="#888" font-style="italic">the PX4 flight mode</text>
+  <text x="752" y="461" font-size="9.5" fill="#555">/fmu/out/vehicle_status_v1</text>
+  <text x="762" y="474" font-size="9.5" fill="#888" font-style="italic">PX4's failsafe flag, read by all</text>
+  <line x1="710" y1="317" x2="748" y2="317" stroke="#cfdfe4" stroke-width="1.2"/>
+  <line x1="710" y1="430" x2="748" y2="430" stroke="#cfdfe4" stroke-width="1.2"/>
+
+  <text x="490" y="602" font-size="11" fill="#555" text-anchor="middle" font-style="italic">The design rule: overrides flow strictly downward. The watchdog never streams a setpoint and the behavior nodes never see the failsafe topic &#8212;</text>
+  <text x="490" y="618" font-size="11" fill="#555" text-anchor="middle" font-style="italic">authority is revoked at the token, not negotiated with the node losing it.</text>
+</svg>

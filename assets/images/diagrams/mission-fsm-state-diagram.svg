@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="fsmArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+    <marker id="fsmArrowAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b26a1a"/>
+    </marker>
+    <marker id="fsmArrowTealDash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1000" height="700" fill="#ffffff"/>
+
+  <text x="500" y="26" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">The five-state mission machine</text>
+  <text x="500" y="46" font-size="12.5" fill="#555" text-anchor="middle">Normal sequence left to right; EVADE_THREAT may preempt any flying state (dashed amber) and hand back what it interrupted.</text>
+
+  <!-- top return arcs -->
+  <path d="M 390 150 C 420 42, 850 42, 880 150" fill="none" stroke="#1a7a8a" stroke-width="2.2" marker-end="url(#fsmArrow)"/>
+  <text x="635" y="62" font-size="9.5" fill="#222" text-anchor="middle" font-style="italic">sweep exhausted (i = N), nothing found &#8212; go home</text>
+  <path d="M 600 150 C 570 86, 430 86, 400 150" fill="none" stroke="#1a7a8a" stroke-width="2.2" marker-end="url(#fsmArrow)"/>
+  <text x="500" y="120" font-size="9" fill="#222" text-anchor="middle" font-style="italic">target dispersed &#8744; lost &gt; 3 s :</text>
+  <text x="500" y="133" font-size="9" fill="#222" text-anchor="middle" font-style="italic">resume sweep at stored leg i</text>
+
+  <!-- start marker -->
+  <circle cx="24" cy="198" r="6.5" fill="#222"/>
+  <line x1="31" y1="198" x2="40" y2="198" stroke="#1a7a8a" stroke-width="2.4" marker-end="url(#fsmArrow)"/>
+
+  <!-- IDLE / TAKEOFF -->
+  <rect x="44" y="150" width="166" height="96" rx="10" fill="#fafcfd" stroke="#1a7a8a" stroke-width="2"/>
+  <text x="127" y="174" font-size="13" font-weight="bold" fill="#1a4a5a" text-anchor="middle">IDLE / TAKEOFF</text>
+  <text x="127" y="194" font-size="10" fill="#555" text-anchor="middle" font-style="italic">on ground: warm the stream,</text>
+  <text x="127" y="208" font-size="10" fill="#555" text-anchor="middle" font-style="italic">arm, enter Offboard; then</text>
+  <text x="127" y="222" font-size="10" fill="#555" text-anchor="middle" font-style="italic">climb to mission altitude</text>
+
+  <!-- IDLE -> SEARCH -->
+  <line x1="210" y1="198" x2="266" y2="198" stroke="#1a7a8a" stroke-width="2.4" marker-end="url(#fsmArrow)"/>
+  <line x1="238" y1="208" x2="238" y2="252" stroke="#bbbbbb" stroke-width="1"/>
+  <text x="238" y="266" font-size="9.5" fill="#222" text-anchor="middle" font-style="italic">climb complete:</text>
+  <text x="238" y="279" font-size="9.5" fill="#222" text-anchor="middle" font-style="italic">|z &#8722; z<tspan font-size="7.5" dy="2.5">sp</tspan><tspan dy="-2.5">| &lt; 0.5 m</tspan></text>
+
+  <!-- SEARCH_GRID -->
+  <rect x="270" y="150" width="200" height="96" rx="10" fill="#fafcfd" stroke="#1a7a8a" stroke-width="2"/>
+  <text x="370" y="174" font-size="13" font-weight="bold" fill="#1a4a5a" text-anchor="middle">SEARCH_GRID</text>
+  <text x="370" y="194" font-size="10" fill="#555" text-anchor="middle" font-style="italic">fly the lawnmower list,</text>
+  <text x="370" y="208" font-size="10" fill="#555" text-anchor="middle" font-style="italic">waypoint i of N, constant</text>
+  <text x="370" y="222" font-size="10" fill="#555" text-anchor="middle" font-style="italic">altitude; watch the detector</text>
+
+  <!-- SEARCH -> HARASS -->
+  <line x1="470" y1="198" x2="526" y2="198" stroke="#1a7a8a" stroke-width="2.4" marker-end="url(#fsmArrow)"/>
+  <line x1="498" y1="208" x2="498" y2="252" stroke="#bbbbbb" stroke-width="1"/>
+  <text x="498" y="266" font-size="9.5" fill="#222" text-anchor="middle" font-style="italic">detection confirmed</text>
+  <text x="498" y="279" font-size="9.5" fill="#222" text-anchor="middle" font-style="italic">(persists k frames):</text>
+  <text x="498" y="292" font-size="9.5" fill="#222" text-anchor="middle" font-style="italic">store leg index i</text>
+
+  <!-- HARASS_TARGET -->
+  <rect x="530" y="150" width="210" height="96" rx="10" fill="#fafcfd" stroke="#1a7a8a" stroke-width="2"/>
+  <text x="635" y="174" font-size="13" font-weight="bold" fill="#1a4a5a" text-anchor="middle">HARASS_TARGET</text>
+  <text x="635" y="194" font-size="10" fill="#555" text-anchor="middle" font-style="italic">close on the target; fly the</text>
+  <text x="635" y="208" font-size="10" fill="#555" text-anchor="middle" font-style="italic">deterrence pattern (next chapter)</text>
+  <text x="635" y="222" font-size="10" fill="#555" text-anchor="middle" font-style="italic">inside the standoff radius</text>
+
+  <!-- HARASS -> LAND -->
+  <line x1="740" y1="198" x2="776" y2="198" stroke="#1a7a8a" stroke-width="2.4" marker-end="url(#fsmArrow)"/>
+  <line x1="758" y1="208" x2="758" y2="250" stroke="#bbbbbb" stroke-width="1"/>
+  <text x="745" y="264" font-size="9.5" fill="#222" text-anchor="middle" font-style="italic">battery reserve &#8744;</text>
+  <text x="745" y="277" font-size="9.5" fill="#222" text-anchor="middle" font-style="italic">mission clock expired</text>
+
+  <!-- LAND / RETURN-TO-HOME -->
+  <rect x="780" y="150" width="200" height="96" rx="10" fill="#eef5f7" stroke="#1a7a8a" stroke-width="2"/>
+  <text x="880" y="174" font-size="12" font-weight="bold" fill="#1a4a5a" text-anchor="middle">LAND / RETURN-TO-HOME</text>
+  <text x="880" y="194" font-size="10" fill="#555" text-anchor="middle" font-style="italic">climb to return altitude,</text>
+  <text x="880" y="208" font-size="10" fill="#555" text-anchor="middle" font-style="italic">fly home, descend,</text>
+  <text x="880" y="222" font-size="10" fill="#555" text-anchor="middle" font-style="italic">land, disarm</text>
+
+  <!-- LAND -> end -->
+  <line x1="900" y1="246" x2="900" y2="286" stroke="#1a7a8a" stroke-width="2.2" marker-end="url(#fsmArrow)"/>
+  <circle cx="900" cy="298" r="7" fill="#ffffff" stroke="#222" stroke-width="1.8"/>
+  <circle cx="900" cy="298" r="3.4" fill="#222"/>
+  <text x="914" y="294" font-size="9.5" fill="#222" text-anchor="start" font-style="italic">landed &#8743;</text>
+  <text x="914" y="307" font-size="9.5" fill="#222" text-anchor="start" font-style="italic">disarmed</text>
+
+  <!-- EVADE override drops (dashed amber) -->
+  <path d="M 127 246 C 127 360, 200 455, 326 455" fill="none" stroke="#b26a1a" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#fsmArrowAmber)"/>
+  <line x1="370" y1="246" x2="425" y2="393" stroke="#b26a1a" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#fsmArrowAmber)"/>
+  <line x1="635" y1="246" x2="524" y2="393" stroke="#b26a1a" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#fsmArrowAmber)"/>
+
+  <!-- EVADE_THREAT -->
+  <rect x="330" y="400" width="270" height="110" rx="10" fill="#fdf3e7" stroke="#b26a1a" stroke-width="2.2"/>
+  <text x="465" y="426" font-size="13.5" font-weight="bold" fill="#8a4d0f" text-anchor="middle">EVADE_THREAT</text>
+  <text x="465" y="446" font-size="10" fill="#555" text-anchor="middle" font-style="italic">on entry: stash (state, leg i);</text>
+  <text x="465" y="460" font-size="10" fill="#555" text-anchor="middle" font-style="italic">slew onto the evasion vector,</text>
+  <text x="465" y="474" font-size="10" fill="#555" text-anchor="middle" font-style="italic">recompute it every tick,</text>
+  <text x="465" y="488" font-size="10" fill="#555" text-anchor="middle" font-style="italic">climb toward the safe altitude</text>
+
+  <!-- EVADE resume (dashed teal, back up into SEARCH) -->
+  <line x1="365" y1="396" x2="352" y2="252" stroke="#1a7a8a" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#fsmArrowTealDash)"/>
+  <text x="338" y="318" font-size="9.5" fill="#1a4a5a" text-anchor="end" font-style="italic">threat cleared (opening &#8743;</text>
+  <text x="338" y="331" font-size="9.5" fill="#1a4a5a" text-anchor="end" font-style="italic">range &gt; R<tspan font-size="7.5" dy="2.5">safe</tspan><tspan dy="-2.5"> + margin):</tspan></text>
+  <text x="338" y="344" font-size="9.5" fill="#1a4a5a" text-anchor="end" font-style="italic">resume stored state at leg i</text>
+
+  <!-- EVADE -> LAND -->
+  <line x1="600" y1="455" x2="855" y2="250" stroke="#1a7a8a" stroke-width="2.2" marker-end="url(#fsmArrow)"/>
+  <text x="708" y="390" font-size="9.5" fill="#222" text-anchor="start" font-style="italic">threat will not clear &#8744; battery floor:</text>
+  <text x="708" y="403" font-size="9.5" fill="#222" text-anchor="start" font-style="italic">break off &#8212; climb out, return home</text>
+
+  <!-- override caption -->
+  <text x="465" y="536" font-size="10" fill="#8a4d0f" text-anchor="middle" font-style="italic">dashed amber: the override &#8212; the threat trigger (closing &#8743; t* &#8804; horizon &#8743; miss &lt; R<tspan font-size="8" dy="2.5">safe</tspan><tspan dy="-2.5">)</tspan></text>
+  <text x="465" y="550" font-size="10" fill="#8a4d0f" text-anchor="middle" font-style="italic">may fire from any flying state, and is evaluated before the state dispatch, every tick</text>
+
+  <!-- global fail-safe note -->
+  <rect x="34" y="562" width="330" height="92" rx="8" fill="#fafafa" stroke="#8a8a8a" stroke-width="1.2"/>
+  <text x="48" y="582" font-size="10" font-weight="bold" fill="#444" text-anchor="start">Global fail-safes (checked in every state):</text>
+  <text x="48" y="598" font-size="9.5" fill="#555" text-anchor="start">&#8226; telemetry stale &gt; 0.5 s &#8594; hold position; &gt; 2 s &#8594; LAND/RTH</text>
+  <text x="48" y="612" font-size="9.5" fill="#555" text-anchor="start">&#8226; battery at reserve &#8594; LAND/RTH, whatever the state</text>
+  <text x="48" y="626" font-size="9.5" fill="#555" text-anchor="start">&#8226; geofence breach &#8594; PX4&#8217;s own failsafe takes the aircraft;</text>
+  <text x="58" y="640" font-size="9.5" fill="#555" text-anchor="start">it outranks this machine entirely (Part II)</text>
+
+  <!-- footer -->
+  <text x="500" y="676" font-size="11.5" fill="#555" text-anchor="middle" font-style="italic">Every tick, in order: (1) telemetry health, (2) the threat trigger, (3) the active state&#8217;s exit guard, (4) the active state&#8217;s one action.</text>
+  <text x="500" y="692" font-size="11.5" fill="#555" text-anchor="middle" font-style="italic">Solid arrows advance the mission; dashed arrows defend it. Anything not drawn here cannot happen &#8212; which is the point of drawing it.</text>
+</svg>

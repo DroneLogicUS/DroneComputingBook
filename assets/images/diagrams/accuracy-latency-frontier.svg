@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 540" font-family="Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="900" height="540" fill="#ffffff"/>
+
+  <text x="450" y="30" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">The accuracy&#8211;speed frontier &#8212; one architecture, five sizes</text>
+  <text x="450" y="52" font-size="13" fill="#555" text-anchor="middle">Published YOLOv8 family benchmarks: COCO mAP@0.5:0.95 against compute per frame (GFLOPs), on which latency scales.</text>
+
+  <!-- plot area: x 100..820 for 0..280 GFLOPs (2.571 px/GFLOP); y 400..100 for mAP 30..60 (10 px/point) -->
+  <!-- infeasible band: beyond ~150 GFLOPs -->
+  <rect x="486" y="100" width="334" height="300" fill="#fdf0ee"/>
+  <text x="653" y="122" font-size="11.5" fill="#822" text-anchor="middle" font-style="italic">at Jetson-class compute, frame-rate operation</text>
+  <text x="653" y="137" font-size="11.5" fill="#822" text-anchor="middle" font-style="italic">becomes infeasible out here &#8212; not slower options, non-options</text>
+
+  <!-- gridlines -->
+  <g stroke="#e5e5e5" stroke-width="1">
+    <line x1="100" y1="350" x2="820" y2="350"/>
+    <line x1="100" y1="300" x2="820" y2="300"/>
+    <line x1="100" y1="250" x2="820" y2="250"/>
+    <line x1="100" y1="200" x2="820" y2="200"/>
+    <line x1="100" y1="150" x2="820" y2="150"/>
+    <line x1="100" y1="100" x2="820" y2="100"/>
+  </g>
+
+  <!-- frontier curve through points -->
+  <path d="M 122 327 C 145 280, 155 262, 174 251 C 220 224, 255 208, 303 198 C 380 182, 460 176, 525 171 C 610 165, 700 162, 763 161"
+        fill="none" stroke="#8a5210" stroke-width="2.5"/>
+
+  <!-- data points -->
+  <g>
+    <circle cx="122" cy="327" r="6" fill="#fdf3e6" stroke="#8a5210" stroke-width="2.5"/>
+    <circle cx="174" cy="251" r="6" fill="#fdf3e6" stroke="#8a5210" stroke-width="2.5"/>
+    <circle cx="303" cy="198" r="6" fill="#fdf3e6" stroke="#8a5210" stroke-width="2.5"/>
+    <circle cx="525" cy="171" r="6" fill="#fdf3e6" stroke="#8a5210" stroke-width="2.5"/>
+    <circle cx="763" cy="161" r="6" fill="#fdf3e6" stroke="#8a5210" stroke-width="2.5"/>
+  </g>
+  <!-- highlight ring on n -->
+  <circle cx="122" cy="327" r="13" fill="none" stroke="#1a7a8a" stroke-width="2.5" stroke-dasharray="4 3"/>
+  <text x="140" y="368" font-size="11.5" fill="#1a7a8a" font-weight="bold">what the running example flies</text>
+
+  <!-- point labels -->
+  <g font-size="12" fill="#222">
+    <text x="108" y="310" font-weight="bold">YOLOv8n</text>
+    <text x="140" y="384" font-size="10.5" fill="#555">3.2M &#183; 8.7 GF &#183; 37.3</text>
+    <text x="188" y="248" font-weight="bold">YOLOv8s</text>
+    <text x="188" y="263" font-size="10.5" fill="#555">11.2M &#183; 28.6 GF &#183; 44.9</text>
+    <text x="298" y="182" font-weight="bold">YOLOv8m</text>
+    <text x="298" y="167" font-size="10.5" fill="#555">25.9M &#183; 78.9 GF &#183; 50.2</text>
+    <text x="525" y="200" font-weight="bold" text-anchor="middle">YOLOv8l</text>
+    <text x="525" y="215" font-size="10.5" fill="#555" text-anchor="middle">43.7M &#183; 165.2 GF &#183; 52.9</text>
+    <text x="763" y="188" font-weight="bold" text-anchor="middle">YOLOv8x</text>
+    <text x="763" y="203" font-size="10.5" fill="#555" text-anchor="middle">68.2M &#183; 257.8 GF &#183; 53.9</text>
+  </g>
+
+  <!-- step annotations -->
+  <path d="M 132 335 C 160 330, 172 300, 176 262" fill="none" stroke="#2f5a3a" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="215" y="300" font-size="11.5" fill="#2f5a3a" font-weight="bold">n &#8594; s: 3.3&#215; the compute</text>
+  <text x="215" y="315" font-size="11.5" fill="#2f5a3a">buys +7.6 mAP &#8212; the steep segment</text>
+
+  <text x="650" y="252" font-size="11.5" fill="#822" font-weight="bold" text-anchor="middle">l &#8594; x: 1.6&#215; the compute buys +1.0 mAP</text>
+  <text x="650" y="267" font-size="11.5" fill="#822" text-anchor="middle">&#8212; the flat segment</text>
+
+  <!-- knee marker -->
+  <text x="238" y="222" font-size="11" fill="#8a5210" font-style="italic">the knee: past here, each mAP</text>
+  <text x="238" y="236" font-size="11" fill="#8a5210" font-style="italic">point costs multiples of compute</text>
+
+  <!-- axes -->
+  <line x1="100" y1="400" x2="850" y2="400" stroke="#222" stroke-width="1.5"/>
+  <line x1="100" y1="400" x2="100" y2="85" stroke="#222" stroke-width="1.5"/>
+  <g font-size="10.5" fill="#555" text-anchor="middle">
+    <text x="100" y="415">0</text>
+    <text x="229" y="415">50</text>
+    <text x="357" y="415">100</text>
+    <text x="486" y="415">150</text>
+    <text x="614" y="415">200</text>
+    <text x="743" y="415">250</text>
+  </g>
+  <text x="475" y="436" font-size="12" fill="#222" text-anchor="middle">compute per frame (GFLOPs) &#8212; onboard, latency scales with this axis</text>
+  <g font-size="10.5" fill="#555" text-anchor="end">
+    <text x="94" y="404">30</text>
+    <text x="94" y="354">35</text>
+    <text x="94" y="304">40</text>
+    <text x="94" y="254">45</text>
+    <text x="94" y="204">50</text>
+    <text x="94" y="154">55</text>
+    <text x="94" y="104">60</text>
+  </g>
+  <text x="40" y="250" font-size="12" fill="#222" text-anchor="middle" transform="rotate(-90 40 250)">COCO mAP@0.5:0.95</text>
+
+  <!-- footer -->
+  <text x="450" y="470" font-size="12.5" fill="#222" text-anchor="middle"><tspan font-weight="bold">Three readings:</tspan> accuracy saturates while cost does not; the knee (around s&#8211;m) is where diminishing returns set in;</text>
+  <text x="450" y="488" font-size="12.5" fill="#222" text-anchor="middle">and the right question is never &#8220;which model is best&#8221; but &#8220;which is the <tspan font-style="italic">smallest</tspan> that clears the mission's accuracy floor</text>
+  <text x="450" y="506" font-size="12.5" fill="#222" text-anchor="middle">at the mission's frame rate&#8221; &#8212; answered by the stopwatch and the mission's own validation set, not this chart's COCO numbers.</text>
+</svg>

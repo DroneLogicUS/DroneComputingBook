@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620" font-family="Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="960" height="620" fill="#ffffff"/>
+
+  <text x="480" y="30" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">Reported accuracy across the aerial animal-detection literature</text>
+  <text x="480" y="52" font-size="13" fill="#555" text-anchor="middle">Within each study, the easy condition against the hard one. Metrics differ across studies &#8212; compare the drops, not the bars.</text>
+
+  <!-- plot area: y 400 (60%) .. 120 (100%), 7 px per point -->
+  <g stroke="#e5e5e5" stroke-width="1">
+    <line x1="90" y1="330" x2="890" y2="330"/>
+    <line x1="90" y1="260" x2="890" y2="260"/>
+    <line x1="90" y1="190" x2="890" y2="190"/>
+    <line x1="90" y1="120" x2="890" y2="120"/>
+  </g>
+  <g font-size="10.5" fill="#555" text-anchor="end">
+    <text x="84" y="404">60</text>
+    <text x="84" y="334">70</text>
+    <text x="84" y="264">80</text>
+    <text x="84" y="194">90</text>
+    <text x="84" y="124">100</text>
+  </g>
+  <text x="40" y="260" font-size="12" fill="#222" text-anchor="middle" transform="rotate(-90 40 260)">reported score (%), metric varies by study</text>
+
+  <!-- group 1: cattle, F1 -->
+  <g>
+    <rect x="110" y="126" width="46" height="274" fill="#e6f2ec" stroke="#2f5a3a" stroke-width="1.5"/>
+    <rect x="162" y="195" width="46" height="205" fill="#fdf0ee" stroke="#822" stroke-width="1.5"/>
+    <text x="133" y="118" font-size="11" fill="#2f5a3a" font-weight="bold" text-anchor="middle">99.1</text>
+    <text x="185" y="187" font-size="11" fill="#822" font-weight="bold" text-anchor="middle">89.3</text>
+    <text x="159" y="420" font-size="12" font-weight="bold" fill="#222" text-anchor="middle">Cattle</text>
+    <text x="159" y="435" font-size="10.5" fill="#555" text-anchor="middle">F1-score</text>
+    <text x="159" y="452" font-size="10" fill="#2f5a3a" text-anchor="middle">isolated animals</text>
+    <text x="159" y="466" font-size="10" fill="#822" text-anchor="middle">4-animal clusters</text>
+  </g>
+
+  <!-- group 2: seabirds, mAP -->
+  <g>
+    <rect x="270" y="136" width="46" height="264" fill="#e6f2ec" stroke="#2f5a3a" stroke-width="1.5"/>
+    <rect x="322" y="210" width="46" height="190" fill="#fdf0ee" stroke="#822" stroke-width="1.5"/>
+    <text x="293" y="128" font-size="11" fill="#2f5a3a" font-weight="bold" text-anchor="middle">97.7</text>
+    <text x="345" y="202" font-size="11" fill="#822" font-weight="bold" text-anchor="middle">87.2</text>
+    <text x="319" y="420" font-size="12" font-weight="bold" fill="#222" text-anchor="middle">Seabird colonies</text>
+    <text x="319" y="435" font-size="10.5" fill="#555" text-anchor="middle">mAP</text>
+    <text x="319" y="452" font-size="10" fill="#2f5a3a" text-anchor="middle">albatross: large, spaced</text>
+    <text x="319" y="466" font-size="10" fill="#822" text-anchor="middle">penguin: small, packed</text>
+  </g>
+
+  <!-- group 3: waterfowl incl. geese, reported accuracy; hard bar as band 80-85 -->
+  <g>
+    <rect x="430" y="155" width="46" height="245" fill="#e6f2ec" stroke="#2f5a3a" stroke-width="1.5"/>
+    <rect x="482" y="242" width="46" height="158" fill="#fdf0ee" stroke="#822" stroke-width="1.5"/>
+    <rect x="482" y="225" width="46" height="35" fill="#fdf0ee" stroke="#822" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.7"/>
+    <text x="453" y="147" font-size="11" fill="#2f5a3a" font-weight="bold" text-anchor="middle">&gt;95</text>
+    <text x="505" y="217" font-size="11" fill="#822" font-weight="bold" text-anchor="middle">80&#8211;85</text>
+    <text x="479" y="420" font-size="12" font-weight="bold" fill="#222" text-anchor="middle">Waterfowl (incl. geese)</text>
+    <text x="479" y="435" font-size="10.5" fill="#555" text-anchor="middle">reported detection accuracy</text>
+    <text x="479" y="452" font-size="10" fill="#2f5a3a" text-anchor="middle">birds on open water</text>
+    <text x="479" y="466" font-size="10" fill="#822" text-anchor="middle">vegetated / cropped habitat</text>
+  </g>
+
+  <!-- group 4: sheep, F1, single -->
+  <g>
+    <rect x="610" y="169" width="46" height="231" fill="#e6f2ec" stroke="#2f5a3a" stroke-width="1.5"/>
+    <text x="633" y="161" font-size="11" fill="#2f5a3a" font-weight="bold" text-anchor="middle">93.1</text>
+    <text x="633" y="420" font-size="12" font-weight="bold" fill="#222" text-anchor="middle">Sheep at 80 m</text>
+    <text x="633" y="435" font-size="10.5" fill="#555" text-anchor="middle">F1-score (UNet)</text>
+    <text x="633" y="452" font-size="10" fill="#2f5a3a" text-anchor="middle">near the easy pole: white</text>
+    <text x="633" y="466" font-size="10" fill="#2f5a3a" text-anchor="middle">animals on green pasture</text>
+  </g>
+
+  <!-- group 5: 16-species waterbirds, mAP, single hard -->
+  <g>
+    <rect x="760" y="345" width="46" height="55" fill="#fdf0ee" stroke="#822" stroke-width="1.5"/>
+    <text x="783" y="337" font-size="11" fill="#822" font-weight="bold" text-anchor="middle">67.9</text>
+    <text x="783" y="420" font-size="12" font-weight="bold" fill="#222" text-anchor="middle">16 waterbird species</text>
+    <text x="783" y="435" font-size="10.5" fill="#555" text-anchor="middle">mAP</text>
+    <text x="783" y="452" font-size="10" fill="#822" text-anchor="middle">the other hard axis:</text>
+    <text x="783" y="466" font-size="10" fill="#822" text-anchor="middle">fine-grained species identity</text>
+  </g>
+
+  <!-- axis line -->
+  <line x1="90" y1="400" x2="890" y2="400" stroke="#222" stroke-width="1.5"/>
+
+  <!-- legend -->
+  <g font-size="11" fill="#333">
+    <rect x="620" y="80" width="14" height="11" fill="#e6f2ec" stroke="#2f5a3a" stroke-width="1.2"/>
+    <text x="640" y="90">easy condition</text>
+    <rect x="740" y="80" width="14" height="11" fill="#fdf0ee" stroke="#822" stroke-width="1.2"/>
+    <text x="760" y="90">hard condition</text>
+  </g>
+
+  <!-- footer -->
+  <text x="480" y="500" font-size="12.5" fill="#222" text-anchor="middle"><tspan font-weight="bold">The recurring shape:</tspan> high-80s to high-90s on visually distinct animals against simple backgrounds; a 10&#8211;20-point drop</text>
+  <text x="480" y="518" font-size="12.5" fill="#222" text-anchor="middle">wherever animals cluster, vegetation intrudes, or species must be told apart &#8212; independently, across cattle, seabirds, waterfowl, and sheep.</text>
+  <text x="480" y="536" font-size="12.5" fill="#222" text-anchor="middle">The pattern is a property of the problem, not of any dataset or architecture &#8212; so the running example should expect it too:</text>
+  <text x="480" y="554" font-size="12.5" fill="#222" text-anchor="middle">its validation table will look like the left bars over mown grass and like the right ones at the reedy pond edge.</text>
+  <text x="480" y="584" font-size="10.5" fill="#888" text-anchor="middle" font-style="italic">Figures as reported in the respective studies; the waterfowl accuracies are drawn from the authors&#8217; published summary. F1, mAP, and accuracy</text>
+  <text x="480" y="598" font-size="10.5" fill="#888" text-anchor="middle" font-style="italic">are different computations (the detection-pipeline chapter defines each), so cross-study bar heights are indicative only.</text>
+</svg>

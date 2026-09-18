@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" font-family="Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="900" height="560" fill="#ffffff"/>
+
+  <text x="450" y="30" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">The latency budget &#8212; two clocks, two verdicts</text>
+  <text x="450" y="52" font-size="13" fill="#555" text-anchor="middle">Representative timings: YOLOv8n, int8, TensorRT, on the companion computer; camera at 30 FPS (frame interval 33.3 ms).</text>
+
+  <!-- ===== top panel: one frame end to end ===== -->
+  <rect x="30" y="70" width="840" height="180" rx="8" fill="#fbfbfb" stroke="#bbb" stroke-width="1"/>
+  <text x="46" y="94" font-size="13.5" font-weight="bold" fill="#1a4a5a">One frame, end to end &#8212; latency is the SUM of the stages</text>
+
+  <!-- scale: 13 px per ms, x0=120 ; capture 15, pre 5, infer 25, post 3, track 2 => 650 px -->
+  <!-- ms ruler -->
+  <g stroke="#ccc" stroke-width="1">
+    <line x1="120" y1="112" x2="120" y2="168"/>
+    <line x1="250" y1="112" x2="250" y2="168"/>
+    <line x1="380" y1="112" x2="380" y2="168"/>
+    <line x1="510" y1="112" x2="510" y2="168"/>
+    <line x1="640" y1="112" x2="640" y2="168"/>
+    <line x1="770" y1="112" x2="770" y2="168"/>
+  </g>
+  <g font-size="10" fill="#999" text-anchor="middle">
+    <text x="120" y="109">0</text><text x="250" y="109">10 ms</text><text x="380" y="109">20 ms</text>
+    <text x="510" y="109">30 ms</text><text x="640" y="109">40 ms</text><text x="770" y="109">50 ms</text>
+  </g>
+
+  <!-- stage bar at y 118..158 -->
+  <rect x="120" y="118" width="195" height="40" fill="#dcebf2" stroke="#1a4a5a" stroke-width="1.5"/>
+  <rect x="315" y="118" width="65"  height="40" fill="#f2f6f8" stroke="#1a4a5a" stroke-width="1.5"/>
+  <rect x="380" y="118" width="325" height="40" fill="#fdf3e6" stroke="#8a5210" stroke-width="2"/>
+  <rect x="705" y="118" width="39"  height="40" fill="#eef6f0" stroke="#2f5a3a" stroke-width="1.5"/>
+  <rect x="744" y="118" width="26"  height="40" fill="#efe9f4" stroke="#5a3a6a" stroke-width="1.5"/>
+
+  <g font-size="11" text-anchor="middle" font-weight="bold">
+    <text x="217" y="136" fill="#1a4a5a">capture</text>
+    <text x="217" y="151" fill="#1a4a5a">15 ms</text>
+    <text x="347" y="136" fill="#1a4a5a">pre</text>
+    <text x="347" y="151" fill="#1a4a5a">5</text>
+    <text x="542" y="136" fill="#8a5210">infer (YOLOv8n &#183; int8 &#183; TensorRT)</text>
+    <text x="542" y="151" fill="#8a5210">25 ms</text>
+  </g>
+  <!-- leader labels for thin segments -->
+  <line x1="724" y1="158" x2="724" y2="184" stroke="#2f5a3a" stroke-width="1"/>
+  <text x="860" y="197" font-size="10.5" fill="#2f5a3a" text-anchor="end">post 3 ms (NMS, depth lookup, frame transform)</text>
+  <line x1="757" y1="118" x2="757" y2="100" stroke="#5a3a6a" stroke-width="1"/>
+  <text x="775" y="97" font-size="10.5" fill="#5a3a6a" text-anchor="start">track + publish 2 ms</text>
+  <text x="217" y="176" font-size="10.5" fill="#555" text-anchor="middle">exposure, readout, USB transfer</text>
+  <text x="347" y="176" font-size="10.5" fill="#555" text-anchor="middle">resize, letterbox,</text>
+  <text x="347" y="189" font-size="10.5" fill="#555" text-anchor="middle">normalize</text>
+  <text x="542" y="176" font-size="10.5" fill="#8a5210" font-style="italic" text-anchor="middle">the stage every guide obsesses over &#8212; half the bill</text>
+
+  <!-- sum bracket -->
+  <path d="M 120 208 L 120 216 L 770 216 L 770 208" fill="none" stroke="#222" stroke-width="1.5"/>
+  <text x="445" y="234" font-size="12.5" fill="#222" text-anchor="middle" font-weight="bold">50 ms from photons to published target position &#8212; against a 100 ms mission budget</text>
+
+  <!-- ===== bottom panel: pipelined ===== -->
+  <rect x="30" y="262" width="840" height="200" rx="8" fill="#fbfbfb" stroke="#bbb" stroke-width="1"/>
+  <text x="46" y="286" font-size="13.5" font-weight="bold" fill="#2f5a3a">Frames pipelined &#8212; throughput is set by the SLOWEST stage</text>
+
+  <!-- scale: 6.5 px per ms; frame bar = 325 px; rows offset by 33.3 ms = 216 px; x0 = 60 -->
+  <!-- frame-interval ruler ticks at 0, 33.3, 66.7, 100 ms => x 60, 276, 492, 708 -->
+  <g stroke="#bbb" stroke-width="1" stroke-dasharray="3 3">
+    <line x1="60"  y1="300" x2="60"  y2="420"/>
+    <line x1="276" y1="300" x2="276" y2="420"/>
+    <line x1="492" y1="300" x2="492" y2="420"/>
+    <line x1="708" y1="300" x2="708" y2="420"/>
+  </g>
+  <g font-size="10" fill="#999" text-anchor="middle">
+    <text x="60" y="297">t = 0</text><text x="276" y="297">33.3 ms</text><text x="492" y="297">66.7 ms</text><text x="708" y="297">100 ms</text>
+  </g>
+  <text x="790" y="297" font-size="10" fill="#999" text-anchor="middle">camera frame interval</text>
+
+  <!-- one pipelined row: capture 97.5, pre 32.5, infer 162.5, post 19.5, track 13 -->
+  <g>
+    <!-- frame n at x 60, y 306 -->
+    <rect x="60" y="306" width="97.5" height="26" fill="#dcebf2" stroke="#1a4a5a" stroke-width="1"/>
+    <rect x="157.5" y="306" width="32.5" height="26" fill="#f2f6f8" stroke="#1a4a5a" stroke-width="1"/>
+    <rect x="190" y="306" width="162.5" height="26" fill="#fdf3e6" stroke="#8a5210" stroke-width="1.5"/>
+    <rect x="352.5" y="306" width="19.5" height="26" fill="#eef6f0" stroke="#2f5a3a" stroke-width="1"/>
+    <rect x="372" y="306" width="13" height="26" fill="#efe9f4" stroke="#5a3a6a" stroke-width="1"/>
+    <text x="48" y="324" font-size="11" fill="#222" text-anchor="end">frame n</text>
+    <!-- frame n+1 at x 276, y 346 -->
+    <rect x="276" y="346" width="97.5" height="26" fill="#dcebf2" stroke="#1a4a5a" stroke-width="1"/>
+    <rect x="373.5" y="346" width="32.5" height="26" fill="#f2f6f8" stroke="#1a4a5a" stroke-width="1"/>
+    <rect x="406" y="346" width="162.5" height="26" fill="#fdf3e6" stroke="#8a5210" stroke-width="1.5"/>
+    <rect x="568.5" y="346" width="19.5" height="26" fill="#eef6f0" stroke="#2f5a3a" stroke-width="1"/>
+    <rect x="588" y="346" width="13" height="26" fill="#efe9f4" stroke="#5a3a6a" stroke-width="1"/>
+    <text x="264" y="364" font-size="11" fill="#222" text-anchor="end">frame n+1</text>
+    <!-- frame n+2 at x 492, y 386 -->
+    <rect x="492" y="386" width="97.5" height="26" fill="#dcebf2" stroke="#1a4a5a" stroke-width="1"/>
+    <rect x="589.5" y="386" width="32.5" height="26" fill="#f2f6f8" stroke="#1a4a5a" stroke-width="1"/>
+    <rect x="622" y="386" width="162.5" height="26" fill="#fdf3e6" stroke="#8a5210" stroke-width="1.5"/>
+    <rect x="784.5" y="386" width="19.5" height="26" fill="#eef6f0" stroke="#2f5a3a" stroke-width="1"/>
+    <rect x="804" y="386" width="13" height="26" fill="#efe9f4" stroke="#5a3a6a" stroke-width="1"/>
+    <text x="480" y="404" font-size="11" fill="#222" text-anchor="end">frame n+2</text>
+  </g>
+  <!-- result markers -->
+  <g fill="#2f5a3a">
+    <path d="M 385 332 L 380 342 L 390 342 z"/>
+    <path d="M 601 372 L 596 382 L 606 382 z"/>
+    <path d="M 817 412 L 812 422 L 822 422 z"/>
+  </g>
+  <text x="430" y="440" font-size="11.5" fill="#2f5a3a" text-anchor="middle" font-style="italic">a new result every 33.3 ms (camera-limited; the pipeline's own ceiling is one per 25 ms, its slowest stage)</text>
+  <text x="430" y="455" font-size="11.5" fill="#822" text-anchor="middle" font-style="italic">&#8212; yet each individual answer is still 50 ms old on arrival: high FPS and long latency can coexist</text>
+
+  <!-- footer -->
+  <rect x="30" y="474" width="840" height="70" rx="8" fill="#f2f6f8" stroke="#1a4a5a" stroke-width="1.5"/>
+  <text x="450" y="497" font-size="12.5" fill="#222" text-anchor="middle"><tspan font-weight="bold">The two conditions of real-time.</tspan>  Throughput: slowest stage &#8804; frame interval (here 25 &#8804; 33.3 ms &#10003;).</text>
+  <text x="450" y="515" font-size="12.5" fill="#222" text-anchor="middle">Freshness: sum of stages &#8804; the mission's staleness budget (here 50 &#8804; 100 ms &#10003;).</text>
+  <text x="450" y="533" font-size="12" fill="#822" text-anchor="middle" font-style="italic">A pipeline can pass either test while failing the other &#8212; measure both, and say which one a reported &#8220;latency&#8221; is.</text>
+</svg>

@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 430" font-family="Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="900" height="430" fill="#ffffff"/>
+
+  <text x="450" y="30" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">Three frames, three axis conventions</text>
+  <text x="450" y="52" font-size="13" fill="#555" text-anchor="middle">The same detected goose has three different coordinate descriptions — one per frame — and all three are simultaneously correct.</text>
+
+  <defs>
+    <marker id="arrTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1a7a8a"/>
+    </marker>
+    <marker id="arrAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#b26a1a"/>
+    </marker>
+    <marker id="arrGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2f5a3a"/>
+    </marker>
+  </defs>
+
+  <!-- ===== Panel 1: camera optical frame ===== -->
+  <rect x="20" y="70" width="280" height="300" rx="8" fill="#eef5f7" stroke="#1a7a8a" stroke-width="1.5"/>
+  <text x="160" y="94" font-size="14" font-weight="bold" fill="#1a4a5a" text-anchor="middle">Camera optical frame</text>
+  <text x="160" y="111" font-size="11" fill="#555" text-anchor="middle">ROS REP-103 &#8212; attached to the lens</text>
+
+  <!-- camera body icon -->
+  <rect x="120" y="190" width="56" height="38" rx="4" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.5"/>
+  <circle cx="148" cy="209" r="10" fill="#ffffff" stroke="#1a7a8a" stroke-width="1.5"/>
+  <circle cx="148" cy="209" r="4" fill="#1a7a8a"/>
+
+  <!-- axes from lens centre -->
+  <line x1="148" y1="209" x2="238" y2="209" stroke="#1a7a8a" stroke-width="2.5" marker-end="url(#arrTeal)"/>
+  <text x="244" y="213" font-size="13" font-weight="bold" fill="#1a4a5a">x</text>
+  <text x="212" y="200" font-size="10.5" fill="#555">right in the image</text>
+
+  <line x1="148" y1="209" x2="148" y2="299" stroke="#1a7a8a" stroke-width="2.5" marker-end="url(#arrTeal)"/>
+  <text x="143" y="318" font-size="13" font-weight="bold" fill="#1a4a5a">y</text>
+  <text x="156" y="290" font-size="10.5" fill="#555">down in the image</text>
+
+  <line x1="148" y1="209" x2="196" y2="147" stroke="#1a7a8a" stroke-width="2.5" stroke-dasharray="6 3" marker-end="url(#arrTeal)"/>
+  <text x="200" y="141" font-size="13" font-weight="bold" fill="#1a4a5a">z</text>
+  <text x="36" y="150" font-size="10.5" fill="#555">z: forward, out of the</text>
+  <text x="36" y="163" font-size="10.5" fill="#555">lens (viewing direction)</text>
+
+  <text x="160" y="350" font-size="10.5" fill="#555" text-anchor="middle">Depth Z arrives along this frame&#8217;s z-axis;</text>
+  <text x="160" y="363" font-size="10.5" fill="#555" text-anchor="middle">the detected point P<tspan font-size="8" baseline-shift="sub">C</tspan> lives here first.</text>
+
+  <!-- ===== Panel 2: body FRD frame ===== -->
+  <rect x="310" y="70" width="280" height="300" rx="8" fill="#fdf3e7" stroke="#b26a1a" stroke-width="1.5"/>
+  <text x="450" y="94" font-size="14" font-weight="bold" fill="#8a4d0f" text-anchor="middle">Drone body frame (FRD)</text>
+  <text x="450" y="111" font-size="11" fill="#555" text-anchor="middle">PX4 convention &#8212; rotates with the aircraft</text>
+  <text x="450" y="130" font-size="10" fill="#8a8a8a" text-anchor="middle">(top view, nose pointing up the page)</text>
+
+  <!-- quadrotor top view -->
+  <g stroke="#b26a1a" stroke-width="1.5" fill="#ffffff">
+    <line x1="415" y1="195" x2="485" y2="255"/>
+    <line x1="485" y1="195" x2="415" y2="255"/>
+    <circle cx="415" cy="195" r="14"/>
+    <circle cx="485" cy="195" r="14"/>
+    <circle cx="415" cy="255" r="14"/>
+    <circle cx="485" cy="255" r="14"/>
+    <rect x="438" y="213" width="24" height="24" rx="4"/>
+  </g>
+
+  <!-- axes -->
+  <line x1="450" y1="225" x2="450" y2="152" stroke="#b26a1a" stroke-width="2.5" marker-end="url(#arrAmber)"/>
+  <text x="456" y="152" font-size="13" font-weight="bold" fill="#8a4d0f">x</text>
+  <text x="466" y="166" font-size="10.5" fill="#555">Forward (nose)</text>
+
+  <line x1="450" y1="225" x2="545" y2="225" stroke="#b26a1a" stroke-width="2.5" marker-end="url(#arrAmber)"/>
+  <text x="551" y="229" font-size="13" font-weight="bold" fill="#8a4d0f">y</text>
+  <text x="502" y="215" font-size="10.5" fill="#555">Right</text>
+
+  <!-- z into page symbol -->
+  <circle cx="418" cy="290" r="9" fill="#ffffff" stroke="#b26a1a" stroke-width="2"/>
+  <line x1="412" y1="284" x2="424" y2="296" stroke="#b26a1a" stroke-width="2"/>
+  <line x1="424" y1="284" x2="412" y2="296" stroke="#b26a1a" stroke-width="2"/>
+  <text x="434" y="294" font-size="13" font-weight="bold" fill="#8a4d0f">z</text>
+  <text x="448" y="294" font-size="10.5" fill="#555">Down (into the page)</text>
+
+  <text x="450" y="350" font-size="10.5" fill="#555" text-anchor="middle">The camera bolts to this frame; the mounting</text>
+  <text x="450" y="363" font-size="10.5" fill="#555" text-anchor="middle">pitch &#952; is the fixed extrinsic between the two.</text>
+
+  <!-- ===== Panel 3: local NED frame ===== -->
+  <rect x="600" y="70" width="280" height="300" rx="8" fill="#eef6f0" stroke="#2f5a3a" stroke-width="1.5"/>
+  <text x="740" y="94" font-size="14" font-weight="bold" fill="#2f5a3a" text-anchor="middle">Local NED frame</text>
+  <text x="740" y="111" font-size="11" fill="#555" text-anchor="middle">fixed to the world &#8212; never rotates</text>
+  <text x="740" y="130" font-size="10" fill="#8a8a8a" text-anchor="middle">(map view, North up the page)</text>
+
+  <!-- origin: launch pad -->
+  <rect x="726" y="211" width="28" height="28" rx="4" fill="#ffffff" stroke="#2f5a3a" stroke-width="1.5"/>
+  <text x="740" y="230" font-size="12" font-weight="bold" fill="#2f5a3a" text-anchor="middle">H</text>
+
+  <line x1="740" y1="225" x2="740" y2="152" stroke="#2f5a3a" stroke-width="2.5" marker-end="url(#arrGreen)"/>
+  <text x="746" y="152" font-size="13" font-weight="bold" fill="#2f5a3a">N</text>
+  <text x="756" y="166" font-size="10.5" fill="#555">North</text>
+
+  <line x1="740" y1="225" x2="835" y2="225" stroke="#2f5a3a" stroke-width="2.5" marker-end="url(#arrGreen)"/>
+  <text x="841" y="229" font-size="13" font-weight="bold" fill="#2f5a3a">E</text>
+  <text x="790" y="215" font-size="10.5" fill="#555">East</text>
+
+  <circle cx="708" cy="290" r="9" fill="#ffffff" stroke="#2f5a3a" stroke-width="2"/>
+  <line x1="702" y1="284" x2="714" y2="296" stroke="#2f5a3a" stroke-width="2"/>
+  <line x1="714" y1="284" x2="702" y2="296" stroke="#2f5a3a" stroke-width="2"/>
+  <text x="724" y="294" font-size="13" font-weight="bold" fill="#2f5a3a">D</text>
+  <text x="738" y="294" font-size="10.5" fill="#555">Down (into the page)</text>
+
+  <text x="740" y="337" font-size="10.5" fill="#555" text-anchor="middle">Origin: where the EKF initialized &#8212; the launch</text>
+  <text x="740" y="350" font-size="10.5" fill="#555" text-anchor="middle">point. Altitude is negative D, so &#8722;5.5 m</text>
+  <text x="740" y="363" font-size="10.5" fill="#555" text-anchor="middle">means 5.5 m up. PX4 setpoints live here.</text>
+
+  <!-- footer -->
+  <text x="450" y="398" font-size="11.5" fill="#555" text-anchor="middle">All three are right-handed. The optical and body frames differ only by a relabeling of axes (plus the mounting tilt);</text>
+  <text x="450" y="414" font-size="11.5" fill="#555" text-anchor="middle">the body and NED frames differ by the aircraft&#8217;s full attitude, which changes every instant of the flight.</text>
+</svg>

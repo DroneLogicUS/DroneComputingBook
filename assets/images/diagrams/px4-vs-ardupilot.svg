@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1010 640" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="pvaArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+    <marker id="pvaArrowAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b26a1a"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1010" height="640" fill="#ffffff"/>
+
+  <text x="505" y="30" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">PX4 versus ArduPilot</text>
+  <text x="505" y="52" font-size="13" fill="#555" text-anchor="middle">Two mature open-source autopilots flying the same cascaded loops; the deciding differences are legal and tooling, not control theory.</text>
+
+  <!-- column headers -->
+  <rect x="240" y="72" width="360" height="44" rx="8" fill="#eef5f7" stroke="#1a7a8a" stroke-width="2.2"/>
+  <text x="420" y="94" font-size="15" font-weight="bold" fill="#1a4a5a" text-anchor="middle">PX4</text>
+  <text x="420" y="110" font-size="11" fill="#555" text-anchor="middle" font-style="italic">BSD 3-Clause &#8212; permissive</text>
+
+  <rect x="620" y="72" width="360" height="44" rx="8" fill="#fdf3e7" stroke="#b26a1a" stroke-width="2.2"/>
+  <text x="800" y="94" font-size="15" font-weight="bold" fill="#8a4d0f" text-anchor="middle">ArduPilot</text>
+  <text x="800" y="110" font-size="11" fill="#555" text-anchor="middle" font-style="italic">GPL v3 &#8212; copyleft</text>
+
+  <!-- row labels -->
+  <text x="30" y="152" font-size="12.5" font-weight="bold" fill="#222">License terms</text>
+  <text x="30" y="222" font-size="12.5" font-weight="bold" fill="#222">Ground station</text>
+  <text x="30" y="292" font-size="12.5" font-weight="bold" fill="#222">Documentation</text>
+  <text x="30" y="362" font-size="12.5" font-weight="bold" fill="#222">Update history</text>
+
+  <!-- row separators -->
+  <line x1="20" y1="180" x2="990" y2="180" stroke="#dddddd" stroke-width="1"/>
+  <line x1="20" y1="250" x2="990" y2="250" stroke="#dddddd" stroke-width="1"/>
+  <line x1="20" y1="320" x2="990" y2="320" stroke="#dddddd" stroke-width="1"/>
+  <line x1="20" y1="390" x2="990" y2="390" stroke="#dddddd" stroke-width="1"/>
+
+  <!-- License row -->
+  <text x="420" y="145" font-size="12" fill="#222" text-anchor="middle">Modifications may stay private;</text>
+  <text x="420" y="162" font-size="12" fill="#222" text-anchor="middle">obligation is attribution, not disclosure</text>
+  <text x="800" y="145" font-size="12" fill="#222" text-anchor="middle">Distributing modified firmware obliges you</text>
+  <text x="800" y="162" font-size="12" fill="#222" text-anchor="middle">to offer your source to every recipient</text>
+
+  <!-- Ground station row -->
+  <text x="420" y="215" font-size="12" fill="#222" text-anchor="middle">QGroundControl &#8212; cross-platform,</text>
+  <text x="420" y="232" font-size="12" fill="#222" text-anchor="middle">cleaner interface, fewer knobs</text>
+  <text x="800" y="215" font-size="12" fill="#222" text-anchor="middle">Mission Planner &#8212; Windows-first,</text>
+  <text x="800" y="232" font-size="12" fill="#222" text-anchor="middle">denser interface, more features exposed</text>
+
+  <!-- Documentation row -->
+  <text x="420" y="285" font-size="12" fill="#222" text-anchor="middle">Thinner record of prior projects</text>
+  <text x="420" y="302" font-size="12" fill="#222" text-anchor="middle">to crib from</text>
+  <text x="800" y="285" font-size="12" fill="#222" text-anchor="middle">Extensive, deep documentation from</text>
+  <text x="800" y="302" font-size="12" fill="#222" text-anchor="middle">a longer hobbyist and survey lineage</text>
+
+  <!-- Update row -->
+  <text x="420" y="355" font-size="12" fill="#222" text-anchor="middle">Reputation for cleaner,</text>
+  <text x="420" y="372" font-size="12" fill="#222" text-anchor="middle">more conservative release patches</text>
+  <text x="800" y="355" font-size="12" fill="#222" text-anchor="middle">Faster-moving releases with a</text>
+  <text x="800" y="372" font-size="12" fill="#222" text-anchor="middle">rockier patch history</text>
+
+  <!-- licensing consequence flow -->
+  <rect x="20" y="408" width="970" height="150" rx="8" fill="#fafafa" stroke="#bbbbbb" stroke-width="1.4"/>
+  <text x="505" y="428" font-size="13.5" font-weight="bold" fill="#222" text-anchor="middle">The licensing consequence, drawn out: a team modifies the firmware and ships vehicles containing it</text>
+
+  <rect x="60" y="462" width="250" height="52" rx="6" fill="#ffffff" stroke="#555555" stroke-width="1.6"/>
+  <text x="185" y="484" font-size="12" font-weight="bold" fill="#222" text-anchor="middle">Proprietary firmware change</text>
+  <text x="185" y="502" font-size="11" fill="#555" text-anchor="middle" font-style="italic">e.g. a custom control module</text>
+
+  <line x1="310" y1="474" x2="392" y2="460" stroke="#1a7a8a" stroke-width="2.2" marker-end="url(#pvaArrow)"/>
+  <text x="346" y="456" font-size="10.5" fill="#1a4a5a" font-style="italic" text-anchor="middle">in PX4</text>
+  <line x1="310" y1="502" x2="392" y2="516" stroke="#b26a1a" stroke-width="2.2" marker-end="url(#pvaArrowAmber)"/>
+  <text x="346" y="528" font-size="10.5" fill="#8a4d0f" font-style="italic" text-anchor="middle">in ArduPilot</text>
+
+  <rect x="396" y="438" width="560" height="42" rx="6" fill="#eef5f7" stroke="#1a7a8a" stroke-width="1.8"/>
+  <text x="676" y="456" font-size="12" fill="#1a4a5a" text-anchor="middle" font-weight="bold">BSD: sell the vehicle, keep the source.</text>
+  <text x="676" y="473" font-size="11" fill="#555" text-anchor="middle" font-style="italic">Competitors never see the modification; the only duty is preserving the license notice.</text>
+
+  <rect x="396" y="496" width="560" height="42" rx="6" fill="#fdf3e7" stroke="#b26a1a" stroke-width="1.8"/>
+  <text x="676" y="514" font-size="12" fill="#8a4d0f" text-anchor="middle" font-weight="bold">GPL: sell the vehicle, publish the change.</text>
+  <text x="676" y="531" font-size="11" fill="#555" text-anchor="middle" font-style="italic">Every recipient is entitled to the modified source, and may redistribute it &#8212; including to competitors.</text>
+
+  <text x="505" y="588" font-size="13" fill="#222" text-anchor="middle">Neither obligation touches mission code on the companion computer: a separate program talking over a serial link</text>
+  <text x="505" y="607" font-size="13" fill="#222" text-anchor="middle">is not a derivative work of the firmware, under either license.</text>
+</svg>

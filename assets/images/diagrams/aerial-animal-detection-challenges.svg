@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620" font-family="Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="960" height="620" fill="#ffffff"/>
+
+  <text x="480" y="30" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">Why animals from the air are hard &#8212; five compounding challenges</text>
+  <text x="480" y="52" font-size="13" fill="#555" text-anchor="middle">Each recurs across the published cattle, seabird, waterfowl, and sheep literature; each is absent or fixed for a static ground camera.</text>
+
+  <!-- top contrast banner -->
+  <rect x="30" y="68" width="440" height="86" rx="8" fill="#eef5ee" stroke="#2f5a3a" stroke-width="1.5"/>
+  <text x="250" y="90" font-size="13" font-weight="bold" fill="#2f5a3a" text-anchor="middle">Static camera trap / perimeter camera</text>
+  <text x="250" y="109" font-size="11.5" fill="#333" text-anchor="middle">constant viewpoint &#183; fixed scale &#183; same background every frame,</text>
+  <text x="250" y="125" font-size="11.5" fill="#333" text-anchor="middle">so a background model accumulates over time</text>
+  <text x="250" y="144" font-size="11" fill="#2f5a3a" text-anchor="middle" font-style="italic">background subtraction is viable; scale is known in advance</text>
+
+  <rect x="490" y="68" width="440" height="86" rx="8" fill="#fdf0ee" stroke="#822" stroke-width="1.5"/>
+  <text x="710" y="90" font-size="13" font-weight="bold" fill="#822" text-anchor="middle">Camera on a UAV</text>
+  <text x="710" y="109" font-size="11.5" fill="#333" text-anchor="middle">every frame has a different pose, altitude, lighting angle,</text>
+  <text x="710" y="125" font-size="11.5" fill="#333" text-anchor="middle">and background composition &#8212; no background model survives</text>
+  <text x="710" y="144" font-size="11" fill="#822" text-anchor="middle" font-style="italic">scale-normalization and background-invariance become first-class problems</text>
+
+  <!-- five challenge columns, 2 rows: 3 top, 2 bottom -->
+  <!-- row 1 -->
+  <g>
+    <rect x="30" y="172" width="290" height="180" rx="8" fill="#fdf8f0" stroke="#8a5210" stroke-width="1.5"/>
+    <text x="175" y="195" font-size="13.5" font-weight="bold" fill="#8a5210" text-anchor="middle">1 &#183; Scale variation with altitude</text>
+    <!-- sketch: two drones at two heights, animal sizes -->
+    <g stroke="#8a5210" stroke-width="1.5" fill="none">
+      <path d="M 60 215 h 18 M 69 210 v 10"/>
+      <path d="M 60 250 h 18 M 69 245 v 10"/>
+    </g>
+    <rect x="95" y="211" width="6" height="4" fill="#8a5210"/>
+    <rect x="95" y="244" width="16" height="10" fill="#8a5210"/>
+    <text x="120" y="219" font-size="10.5" fill="#555">high: a few pixels</text>
+    <text x="120" y="252" font-size="10.5" fill="#555">low: tens of pixels</text>
+    <text x="45" y="280" font-size="11" fill="#333">Ground distance per pixel grows with</text>
+    <text x="45" y="295" font-size="11" fill="#333">altitude (GSD relation, Part I) &#8212; and drifts</text>
+    <text x="45" y="310" font-size="11" fill="#333">with terrain relief during a single flight.</text>
+    <text x="45" y="331" font-size="10.5" fill="#8a5210" font-style="italic">cattle work: ~1 cm/px at 30 m, varying &#177;20%</text>
+    <text x="45" y="345" font-size="10.5" fill="#8a5210" font-style="italic">with terrain, needed an explicit correction</text>
+  </g>
+
+  <g>
+    <rect x="335" y="172" width="290" height="180" rx="8" fill="#fdf8f0" stroke="#8a5210" stroke-width="1.5"/>
+    <text x="480" y="195" font-size="13.5" font-weight="bold" fill="#8a5210" text-anchor="middle">2 &#183; Background contrast / camouflage</text>
+    <!-- sketch: animal blob against textured band -->
+    <rect x="365" y="208" width="110" height="42" fill="#e9e4c8"/>
+    <ellipse cx="420" cy="229" rx="12" ry="7" fill="#d8d2b2"/>
+    <text x="485" y="226" font-size="10.5" fill="#555">low-contrast animal</text>
+    <text x="485" y="240" font-size="10.5" fill="#555">against dry pasture</text>
+    <text x="350" y="280" font-size="11" fill="#333">Animal/background contrast is seasonal and</text>
+    <text x="350" y="295" font-size="11" fill="#333">lighting-dependent: pasture runs bright green</text>
+    <text x="350" y="310" font-size="11" fill="#333">to pale yellow; no fixed threshold survives.</text>
+    <text x="350" y="331" font-size="10.5" fill="#8a5210" font-style="italic">waterfowl work: &gt;95% accuracy on open water,</text>
+    <text x="350" y="345" font-size="10.5" fill="#8a5210" font-style="italic">80&#8211;85% where vegetation obscures the birds</text>
+  </g>
+
+  <g>
+    <rect x="640" y="172" width="290" height="180" rx="8" fill="#fdf8f0" stroke="#8a5210" stroke-width="1.5"/>
+    <text x="785" y="195" font-size="13.5" font-weight="bold" fill="#8a5210" text-anchor="middle">3 &#183; Clustering and occlusion</text>
+    <!-- sketch: touching blobs, one box -->
+    <g fill="#f3ead3" stroke="#8a5210" stroke-width="1.2">
+      <ellipse cx="700" cy="228" rx="13" ry="8"/>
+      <ellipse cx="718" cy="224" rx="13" ry="8"/>
+      <ellipse cx="712" cy="236" rx="13" ry="8"/>
+    </g>
+    <rect x="683" y="212" width="52" height="34" fill="none" stroke="#822" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <text x="748" y="226" font-size="10.5" fill="#555">3 animals,</text>
+    <text x="748" y="240" font-size="10.5" fill="#555">1 detection</text>
+    <text x="655" y="280" font-size="11" fill="#333">Animals group; touching bodies merge into</text>
+    <text x="655" y="295" font-size="11" fill="#333">one blob, or overlapping boxes get collapsed</text>
+    <text x="655" y="310" font-size="11" fill="#333">by non-max suppression. The dominant error.</text>
+    <text x="655" y="331" font-size="10.5" fill="#8a5210" font-style="italic">cattle F1: 99.1% isolated &#8594; 89.3% in 4-animal</text>
+    <text x="655" y="345" font-size="10.5" fill="#8a5210" font-style="italic">clusters; sheep UNet fails only on close sheep</text>
+  </g>
+
+  <!-- row 2 -->
+  <g>
+    <rect x="180" y="372" width="290" height="180" rx="8" fill="#fdf8f0" stroke="#8a5210" stroke-width="1.5"/>
+    <text x="325" y="395" font-size="13.5" font-weight="bold" fill="#8a5210" text-anchor="middle">4 &#183; Motion &#8212; theirs and yours</text>
+    <!-- sketch: smeared blob -->
+    <g fill="#f3ead3" stroke="#8a5210" stroke-width="1">
+      <ellipse cx="230" cy="428" rx="14" ry="7" opacity="0.35"/>
+      <ellipse cx="242" cy="428" rx="14" ry="7" opacity="0.6"/>
+      <ellipse cx="254" cy="428" rx="14" ry="7"/>
+    </g>
+    <text x="285" y="425" font-size="10.5" fill="#555">blur, and the same animal</text>
+    <text x="285" y="439" font-size="10.5" fill="#555">in overlapping frames</text>
+    <text x="195" y="470" font-size="11" fill="#333">The platform vibrates and translates; the</text>
+    <text x="195" y="485" font-size="11" fill="#333">animals walk between frames &#8212; blurring</text>
+    <text x="195" y="500" font-size="11" fill="#333">small targets and double-counting moved ones.</text>
+    <text x="195" y="521" font-size="10.5" fill="#8a5210" font-style="italic">cattle protocol: fly during low-activity hours</text>
+    <text x="195" y="535" font-size="10.5" fill="#8a5210" font-style="italic">to keep the animals still while surveying</text>
+  </g>
+
+  <g>
+    <rect x="490" y="372" width="290" height="180" rx="8" fill="#fdf8f0" stroke="#8a5210" stroke-width="1.5"/>
+    <text x="635" y="395" font-size="13.5" font-weight="bold" fill="#8a5210" text-anchor="middle">5 &#183; Structural false positives</text>
+    <!-- sketch: rock and roof boxed -->
+    <path d="M 520 435 l 8 -12 l 10 3 l 6 9 z" fill="#d9d9d9" stroke="#999"/>
+    <rect x="556" y="424" width="22" height="12" fill="#eee" stroke="#999"/>
+    <rect x="514" y="418" width="26" height="22" fill="none" stroke="#822" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <rect x="552" y="419" width="30" height="21" fill="none" stroke="#822" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <text x="595" y="428" font-size="10.5" fill="#555">rock &#183; shed roof:</text>
+    <text x="595" y="442" font-size="10.5" fill="#555">animal-shaped, animal-colored</text>
+    <text x="505" y="470" font-size="11" fill="#333">At 10&#8211;20 pixels, a white rock, a shadow, a</text>
+    <text x="505" y="485" font-size="11" fill="#333">shed roof, or the wrong species carries the</text>
+    <text x="505" y="500" font-size="11" fill="#333">same few features as the target animal.</text>
+    <text x="505" y="521" font-size="10.5" fill="#8a5210" font-style="italic">white roofs cut cattle F1 97.4% &#8594; 92.4%;</text>
+    <text x="505" y="535" font-size="10.5" fill="#8a5210" font-style="italic">sheep networks false-alarmed on fences</text>
+  </g>
+
+  <!-- footer -->
+  <text x="480" y="582" font-size="12.5" fill="#222" text-anchor="middle"><tspan font-weight="bold">The common structure:</tspan> all five are properties of the platform and the animals, not of any one model &#8212; which is why they recur</text>
+  <text x="480" y="600" font-size="12.5" fill="#222" text-anchor="middle">unchanged across species, architectures, and years, and why a pipeline built for geese must budget for every one of them.</text>
+</svg>

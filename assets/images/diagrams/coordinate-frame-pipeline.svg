@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" font-family="Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="900" height="700" fill="#ffffff"/>
+
+  <text x="450" y="30" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">The transformation pipeline: one detection, camera to world</text>
+  <text x="450" y="52" font-size="13" fill="#555" text-anchor="middle">Each stage changes only the description of the goose&#8217;s position, never the goose &#8212; the worked example&#8217;s numbers ride along on the right.</text>
+
+  <defs>
+    <marker id="arrDark" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#444"/>
+    </marker>
+  </defs>
+
+  <!-- ===== Stage 1: detection ===== -->
+  <rect x="60" y="72" width="470" height="52" rx="8" fill="#eef6f0" stroke="#2f5a3a" stroke-width="1.5"/>
+  <text x="76" y="94" font-size="13.5" font-weight="bold" fill="#2f5a3a">Goose detection</text>
+  <text x="76" y="112" font-size="11.5" fill="#555">bounding-box centre in the image + the aligned depth value at that pixel</text>
+  <rect x="560" y="72" width="290" height="52" rx="6" fill="#fafcfd" stroke="#999" stroke-width="1"/>
+  <text x="574" y="94" font-size="12" fill="#333" font-family="Menlo, Consolas, monospace">(u, v) = (400, 300)</text>
+  <text x="574" y="112" font-size="12" fill="#333" font-family="Menlo, Consolas, monospace">depth Z = 6.00 m</text>
+
+  <line x1="295" y1="124" x2="295" y2="164" stroke="#444" stroke-width="2" marker-end="url(#arrDark)"/>
+  <text x="310" y="140" font-size="11.5" fill="#8a4d0f" font-weight="bold">deprojection through the camera intrinsics</text>
+  <text x="310" y="155" font-size="11" fill="#555" font-family="Menlo, Consolas, monospace">X = (u &#8722; c<tspan font-size="8" baseline-shift="sub">x</tspan>)Z/f<tspan font-size="8" baseline-shift="sub">x</tspan>,  Y = (v &#8722; c<tspan font-size="8" baseline-shift="sub">y</tspan>)Z/f<tspan font-size="8" baseline-shift="sub">y</tspan></text>
+
+  <!-- ===== Stage 2: optical frame ===== -->
+  <rect x="60" y="168" width="470" height="52" rx="8" fill="#eef5f7" stroke="#1a7a8a" stroke-width="1.5"/>
+  <text x="76" y="190" font-size="13.5" font-weight="bold" fill="#1a4a5a">Camera optical frame &#8212; P<tspan font-size="10" baseline-shift="sub">C</tspan></text>
+  <text x="76" y="208" font-size="11.5" fill="#555">x right, y down, z forward; attached to the lens, tilted with the mount</text>
+  <rect x="560" y="168" width="290" height="52" rx="6" fill="#fafcfd" stroke="#999" stroke-width="1"/>
+  <text x="574" y="190" font-size="12" fill="#333" font-family="Menlo, Consolas, monospace">P_C = [1.50, 1.13, 6.00] m</text>
+  <text x="574" y="208" font-size="11" fill="#666">1.50 right, 1.13 below centre, 6.00 out</text>
+
+  <line x1="295" y1="220" x2="295" y2="260" stroke="#444" stroke-width="2" marker-end="url(#arrDark)"/>
+  <text x="310" y="236" font-size="11.5" fill="#8a4d0f" font-weight="bold">axis remap + mounting-pitch correction R<tspan font-size="9" baseline-shift="sub">y</tspan>(&#952;)</text>
+  <text x="310" y="251" font-size="11" fill="#555" font-family="Menlo, Consolas, monospace">optical_to_body()  &#8212; fixed at build time (extrinsics)</text>
+
+  <!-- ===== Stage 3: body frame ===== -->
+  <rect x="60" y="264" width="470" height="52" rx="8" fill="#fdf3e7" stroke="#b26a1a" stroke-width="1.5"/>
+  <text x="76" y="286" font-size="13.5" font-weight="bold" fill="#8a4d0f">Drone body frame (FRD) &#8212; P<tspan font-size="10" baseline-shift="sub">B</tspan></text>
+  <text x="76" y="304" font-size="11.5" fill="#555">x forward, y right, z down; rotates with the aircraft every instant</text>
+  <rect x="560" y="264" width="290" height="52" rx="6" fill="#fafcfd" stroke="#999" stroke-width="1"/>
+  <text x="574" y="286" font-size="12" fill="#333" font-family="Menlo, Consolas, monospace">P_B = [3.44, 1.50, 5.04] m</text>
+  <text x="574" y="304" font-size="11" fill="#666">with camera pitched down &#952; = 45&#176;</text>
+
+  <line x1="295" y1="316" x2="295" y2="356" stroke="#444" stroke-width="2" marker-end="url(#arrDark)"/>
+  <text x="310" y="332" font-size="11.5" fill="#8a4d0f" font-weight="bold">attitude rotation R(q) from the EKF quaternion</text>
+  <text x="310" y="347" font-size="11" fill="#555" font-family="Menlo, Consolas, monospace">body_to_ned()  &#8212; changes every flight-controller update</text>
+
+  <!-- ===== Stage 4: relative NED ===== -->
+  <rect x="60" y="360" width="470" height="52" rx="8" fill="#eef5f7" stroke="#1a7a8a" stroke-width="1.5"/>
+  <text x="76" y="382" font-size="13.5" font-weight="bold" fill="#1a4a5a">Local NED, relative to the drone &#8212; P<tspan font-size="10" baseline-shift="sub">rel</tspan></text>
+  <text x="76" y="400" font-size="11.5" fill="#555">axes now world-fixed (North, East, Down) but the origin still rides on the drone</text>
+  <rect x="560" y="360" width="290" height="52" rx="6" fill="#fafcfd" stroke="#999" stroke-width="1"/>
+  <text x="574" y="382" font-size="12" fill="#333" font-family="Menlo, Consolas, monospace">P_rel = [&#8722;1.50, 3.44, 5.04] m</text>
+  <text x="574" y="400" font-size="11" fill="#666">nose East (yaw 90&#176;): forward &#8594; East</text>
+
+  <line x1="295" y1="412" x2="295" y2="452" stroke="#444" stroke-width="2" marker-end="url(#arrDark)"/>
+  <text x="310" y="428" font-size="11.5" fill="#8a4d0f" font-weight="bold">translation: add the drone&#8217;s own EKF position P<tspan font-size="9" baseline-shift="sub">Drone</tspan></text>
+  <text x="310" y="443" font-size="11" fill="#555" font-family="Menlo, Consolas, monospace">optical_to_ned_point() composes the whole chain</text>
+
+  <!-- ===== Stage 5: absolute NED ===== -->
+  <rect x="60" y="456" width="470" height="52" rx="8" fill="#eef6f0" stroke="#2f5a3a" stroke-width="1.5"/>
+  <text x="76" y="478" font-size="13.5" font-weight="bold" fill="#2f5a3a">Absolute local NED &#8212; P<tspan font-size="10" baseline-shift="sub">Goose</tspan></text>
+  <text x="76" y="496" font-size="11.5" fill="#555">origin at the launch point, where the EKF initialized; the world coordinate PX4 flies in</text>
+  <rect x="560" y="456" width="290" height="52" rx="6" fill="#fafcfd" stroke="#999" stroke-width="1"/>
+  <text x="574" y="478" font-size="12" fill="#333" font-family="Menlo, Consolas, monospace">[20.0, 5.0, &#8722;5.50] + P_rel</text>
+  <text x="574" y="496" font-size="12" fill="#333" font-family="Menlo, Consolas, monospace">= [18.50, 8.44, &#8722;0.46] m</text>
+
+  <line x1="295" y1="508" x2="295" y2="548" stroke="#444" stroke-width="2" marker-end="url(#arrDark)"/>
+  <text x="310" y="524" font-size="11.5" fill="#8a4d0f" font-weight="bold">published as the target-position topic</text>
+  <text x="310" y="539" font-size="11" fill="#555">consumed by the mission logic, streamed as Offboard setpoints</text>
+
+  <!-- ===== Stage 6: navigation target ===== -->
+  <rect x="60" y="552" width="470" height="52" rx="8" fill="#f0f0f0" stroke="#444" stroke-width="1.5"/>
+  <text x="76" y="574" font-size="13.5" font-weight="bold" fill="#222">Navigation target</text>
+  <text x="76" y="592" font-size="11.5" fill="#555">the mission logic steers toward the goose in the same frame PX4 already flies in</text>
+  <rect x="560" y="552" width="290" height="52" rx="6" fill="#fafcfd" stroke="#999" stroke-width="1"/>
+  <text x="574" y="574" font-size="11" fill="#666">D = &#8722;0.46 m: the computed goose stands</text>
+  <text x="574" y="592" font-size="11" fill="#666">half a metre above ground &#8212; a sanity check</text>
+
+  <!-- footer -->
+  <rect x="60" y="628" width="790" height="52" rx="8" fill="#fdf3e7" stroke="#b26a1a" stroke-width="1"/>
+  <text x="450" y="650" font-size="11.5" fill="#8a4d0f" text-anchor="middle" font-weight="bold">The whole chain is one line of algebra &#8212; P_NED = P_Drone + R(q) R_y(&#952;) &#928; P_C &#8212; and every arrow is invertible:</text>
+  <text x="450" y="668" font-size="11.5" fill="#555" text-anchor="middle">ned_point_to_optical() runs it backward, which is how simulation plants synthetic geese and how the transform is unit-tested.</text>
+</svg>

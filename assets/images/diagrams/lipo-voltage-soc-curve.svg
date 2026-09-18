@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 560" font-family="Helvetica, Arial, sans-serif">
+  <!-- background -->
+  <rect x="0" y="0" width="880" height="560" fill="#ffffff"/>
+
+  <!-- titles -->
+  <text x="440" y="28" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">The resting-voltage fuel gauge</text>
+  <text x="440" y="50" font-size="12.5" fill="#555" text-anchor="middle">Resting cell voltage against state of charge, with every threshold the battery rules use marked</text>
+  <text x="440" y="68" font-size="12" font-style="italic" fill="#555" text-anchor="middle">valid at rest only &#8212; under load, sag across the internal resistance depresses every reading</text>
+
+  <!-- horizontal gridlines at 0.2 V steps -->
+  <g stroke="#e4e4e4" stroke-width="1">
+    <line x1="100" y1="410.7" x2="800" y2="410.7"/>
+    <line x1="100" y1="361.3" x2="800" y2="361.3"/>
+    <line x1="100" y1="312" x2="800" y2="312"/>
+    <line x1="100" y1="262.7" x2="800" y2="262.7"/>
+    <line x1="100" y1="213.3" x2="800" y2="213.3"/>
+    <line x1="100" y1="164" x2="800" y2="164"/>
+    <line x1="100" y1="114.7" x2="800" y2="114.7"/>
+    <line x1="240" y1="90" x2="240" y2="460"/>
+    <line x1="380" y1="90" x2="380" y2="460"/>
+    <line x1="660" y1="90" x2="660" y2="460"/>
+  </g>
+
+  <!-- storage window band: 50-60 % SoC -->
+  <rect x="450" y="90" width="70" height="370" fill="#e4efdb"/>
+  <line x1="450" y1="90" x2="450" y2="460" stroke="#7a9b5f" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <line x1="520" y1="90" x2="520" y2="460" stroke="#7a9b5f" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <text x="485" y="300" font-size="13" font-weight="bold" fill="#3f6b35" text-anchor="middle">storage window</text>
+  <text x="485" y="318" font-size="12.5" fill="#3f6b35" text-anchor="middle">50&#8211;60 % SoC</text>
+  <text x="485" y="336" font-size="12.5" fill="#3f6b35" text-anchor="middle">3.80&#8211;3.85 V / cell</text>
+
+  <!-- damage region below 3.0 V -->
+  <rect x="100" y="410.7" width="700" height="49.3" fill="#f6e3e2"/>
+  <line x1="100" y1="410.7" x2="800" y2="410.7" stroke="#c9524e" stroke-width="1.4" stroke-dasharray="6 4"/>
+  <text x="450" y="438" font-size="12.5" fill="#7d2f2c" text-anchor="middle">below 3.0 V &#8212; over-discharge: copper current-collector dissolution; dispose, do not recharge</text>
+
+  <!-- full-charge line at 4.20 V -->
+  <line x1="100" y1="114.7" x2="800" y2="114.7" stroke="#888888" stroke-width="1.4" stroke-dasharray="7 5"/>
+  <text x="794" y="107" font-size="12" font-style="italic" fill="#555" text-anchor="end">4.20 V &#8212; full charge</text>
+
+  <!-- practical in-flight floor at ~3.5 V -->
+  <line x1="100" y1="287.3" x2="800" y2="287.3" stroke="#b3592a" stroke-width="1.6" stroke-dasharray="7 5"/>
+  <text x="794" y="280" font-size="12" font-style="italic" fill="#b3592a" text-anchor="end">&#8776;3.5 V &#8212; the knee: practical in-flight floor</text>
+
+  <!-- axes -->
+  <line x1="100" y1="90" x2="100" y2="460" stroke="#999" stroke-width="1.4"/>
+  <line x1="100" y1="460" x2="810" y2="460" stroke="#999" stroke-width="1.4"/>
+  <g font-size="11.5" fill="#555" text-anchor="end">
+    <text x="94" y="414">3.0</text>
+    <text x="94" y="365">3.2</text>
+    <text x="94" y="316">3.4</text>
+    <text x="94" y="267">3.6</text>
+    <text x="94" y="217">3.8</text>
+    <text x="94" y="168">4.0</text>
+    <text x="94" y="119">4.2</text>
+  </g>
+  <g font-size="11.5" fill="#555" text-anchor="middle">
+    <text x="100" y="478">0</text>
+    <text x="240" y="478">20</text>
+    <text x="380" y="478">40</text>
+    <text x="520" y="478">60</text>
+    <text x="660" y="478">80</text>
+    <text x="800" y="478">100</text>
+  </g>
+  <text x="450" y="502" font-size="12.5" fill="#555" text-anchor="middle">state of charge (%)</text>
+  <text x="30" y="275" font-size="12.5" fill="#555" text-anchor="middle" transform="rotate(-90 30 275)">resting cell voltage (V)</text>
+
+  <!-- discharge curve -->
+  <polyline points="100,410.7 107,373.7 114,336.7 121,312 135,287.3 149,275 170,262.7 205,250.3 275,238 380,220.7 450,213.3 485,205.9 520,201 590,188.7 660,171.4 730,149.2 765,134.4 800,114.7"
+            fill="none" stroke="#0c7e9e" stroke-width="2.6" stroke-linejoin="round"/>
+
+  <!-- plateau annotation -->
+  <text x="330" y="150" font-size="12.5" font-style="italic" fill="#555" text-anchor="middle">the plateau: most of the flight lives here,</text>
+  <text x="330" y="167" font-size="12.5" font-style="italic" fill="#555" text-anchor="middle">within a couple of tenths of a volt</text>
+
+  <!-- nominal 3.7 V marker at ~25 % -->
+  <circle cx="275" cy="238" r="4.5" fill="#0c7e9e"/>
+  <line x1="268" y1="245" x2="248" y2="262" stroke="#999" stroke-width="1.2"/>
+  <text x="110" y="272" font-size="12" fill="#222">3.7 V &#8212; about one-quarter charge</text>
+
+  <!-- footer -->
+  <text x="440" y="536" font-size="13" font-style="italic" fill="#222" text-anchor="middle">Pack voltages multiply by cell count: the 3.80&#8211;3.85 V/cell storage window is 15.2&#8211;15.4 V for 4S, 22.8&#8211;23.1 V for 6S.</text>
+</svg>

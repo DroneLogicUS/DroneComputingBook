@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620" font-family="Helvetica, Arial, sans-serif" xml:space="preserve">
+  <rect x="0" y="0" width="960" height="620" fill="#ffffff"/>
+
+  <text x="480" y="26" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">The two-stage survey: coarse everywhere, fine only where flagged</text>
+  <text x="480" y="46" font-size="13" fill="#555" text-anchor="middle">Both stages are the Path Planning chapter&#8217;s lawnmower generator &#8212; one function, two parameterizations</text>
+
+  <!-- ============ left panel: stage 1 ============ -->
+  <g>
+    <rect x="30" y="62" width="440" height="400" rx="8" fill="#fafafa" stroke="#ccc" stroke-width="1"/>
+    <text x="46" y="84" font-size="12.5" font-weight="bold" fill="#1a4a5a">Stage 1 &#8212; coarse survey: the whole field</text>
+    <text x="46" y="99" font-size="10" fill="#555">60 m AGL &#183; 3.2 cm/px GSD &#183; 51 m swath &#183; 15.4 m spacing (70 % side overlap)</text>
+
+    <!-- field: 400 m x 400 m -> 320 px -->
+    <rect x="80" y="112" width="320" height="320" fill="#e7efe2" stroke="#8aa27e" stroke-width="1.4"/>
+
+    <!-- faint index-map cells: uniform, with anomaly cluster upper-right -->
+    <g opacity="0.65">
+      <rect x="320" y="140" width="26" height="26" fill="#e0b25e"/>
+      <rect x="346" y="140" width="26" height="26" fill="#d1853a"/>
+      <rect x="320" y="166" width="26" height="26" fill="#d1853a"/>
+      <rect x="346" y="166" width="26" height="26" fill="#b8542e"/>
+      <rect x="346" y="192" width="26" height="26" fill="#e0b25e"/>
+      <rect x="320" y="192" width="26" height="26" fill="#e8cf9a"/>
+    </g>
+    <!-- flagged sector box: ~60 m -> 48 px -->
+    <rect x="322" y="142" width="52" height="52" fill="none" stroke="#a83232" stroke-width="2" stroke-dasharray="6 3"/>
+    <text x="180" y="164" font-size="9.5" font-weight="bold" fill="#7a2424" text-anchor="end">flagged sector &#8212; low index,</text>
+    <text x="180" y="175" font-size="9.5" fill="#7a2424" text-anchor="end">~60 &#215; 60 m, &#8776;2 % of the field</text>
+    <path d="M 186 168 C 240 168 280 168 318 168" fill="none" stroke="#7a2424" stroke-width="1" stroke-dasharray="3 2"/>
+
+    <!-- coarse lawnmower: 6 legs drawn (spacing exaggerated for legibility) -->
+    <path d="M 106 420 L 106 124 L 158 124 L 158 420 L 210 420 L 210 124 L 262 124 L 262 420 L 314 420 L 314 124 L 366 124 L 366 420"
+          fill="none" stroke="#1a7a8a" stroke-width="2.2"/>
+    <!-- direction arrows -->
+    <path d="M 102 260 L 106 248 L 110 260 Z" fill="#1a7a8a"/>
+    <path d="M 154 284 L 158 296 L 162 284 Z" fill="#1a7a8a"/>
+    <path d="M 206 260 L 210 248 L 214 260 Z" fill="#1a7a8a"/>
+    <path d="M 258 284 L 262 296 L 266 284 Z" fill="#1a7a8a"/>
+    <circle cx="106" cy="420" r="5" fill="#1a7a8a"/>
+    <text x="96" y="438" font-size="9" fill="#1a4a5a">start</text>
+
+    <!-- dimension -->
+    <text x="240" y="446" font-size="9.5" fill="#777" text-anchor="middle">400 m</text>
+    <text x="420" y="276" font-size="9.5" fill="#777" transform="rotate(-90 420 276)" text-anchor="middle">400 m</text>
+
+    <text x="46" y="456" font-size="9.5" fill="#555">27 legs &#183; &#8776;11.2 km of track &#183; &#8776;23 min at 8 m/s &#183; one flight</text>
+    <text x="240" y="120" font-size="8.5" fill="#999" text-anchor="middle">(legs drawn at exaggerated spacing for legibility)</text>
+  </g>
+
+  <!-- ============ connecting arrow ============ -->
+  <g>
+    <path d="M 474 220 C 500 210 512 210 536 220" fill="none" stroke="#b26a1a" stroke-width="2.4"/>
+    <path d="M 530 212 L 542 222 L 526 226 Z" fill="#b26a1a"/>
+    <text x="505" y="196" font-size="10" font-weight="bold" fill="#8a4d0f" text-anchor="middle">flag &#8594; re-fly</text>
+    <text x="505" y="246" font-size="8.5" fill="#8a4d0f" text-anchor="middle">detect, then</text>
+    <text x="505" y="256" font-size="8.5" fill="#8a4d0f" text-anchor="middle">investigate</text>
+  </g>
+
+  <!-- ============ right panel: stage 2 ============ -->
+  <g>
+    <rect x="540" y="62" width="390" height="400" rx="8" fill="#fafafa" stroke="#ccc" stroke-width="1"/>
+    <text x="556" y="84" font-size="12.5" font-weight="bold" fill="#1a4a5a">Stage 2 &#8212; targeted re-fly: the flagged sector only</text>
+    <text x="556" y="99" font-size="10" fill="#555">15 m AGL &#183; 0.8 cm/px GSD &#183; 12.8 m swath &#183; 3.8 m spacing (70 % side overlap)</text>
+
+    <!-- zoomed sector: 60 m -> 288 px -->
+    <rect x="596" y="118" width="288" height="288" fill="#efe4d6" stroke="#a83232" stroke-width="2" stroke-dasharray="6 3"/>
+    <!-- anomaly blotches inside -->
+    <g opacity="0.6">
+      <ellipse cx="700" cy="210" rx="46" ry="30" fill="#d1853a"/>
+      <ellipse cx="760" cy="290" rx="38" ry="26" fill="#b8542e"/>
+      <ellipse cx="670" cy="330" rx="28" ry="18" fill="#e0b25e"/>
+    </g>
+
+    <!-- dense lawnmower: 17 legs at 18 px -->
+    <path d="M 596 400 L 596 124 L 614 124 L 614 400 L 632 400 L 632 124 L 650 124 L 650 400 L 668 400 L 668 124 L 686 124 L 686 400 L 704 400 L 704 124 L 722 124 L 722 400 L 740 400 L 740 124 L 758 124 L 758 400 L 776 400 L 776 124 L 794 124 L 794 400 L 812 400 L 812 124 L 830 124 L 830 400 L 848 400 L 848 124 L 866 124 L 866 400 L 884 400 L 884 124"
+          fill="none" stroke="#1a7a8a" stroke-width="1.6"/>
+    <circle cx="596" cy="400" r="4" fill="#1a7a8a"/>
+
+    <!-- zoom tie-lines from left flagged box -->
+    <line x1="374" y1="142" x2="596" y2="118" stroke="#a83232" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>
+    <line x1="374" y1="194" x2="596" y2="406" stroke="#a83232" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>
+
+    <text x="740" y="424" font-size="9.5" fill="#777" text-anchor="middle">60 m</text>
+    <text x="556" y="442" font-size="9.5" fill="#555">17 legs &#183; &#8776;1.1 km of track &#183; &lt;4 min at 5 m/s</text>
+    <text x="556" y="456" font-size="9.5" fill="#555">per-leaf resolution (the sugar-beet case study&#8217;s 15 m regime): diagnosis, not just detection</text>
+  </g>
+
+  <!-- ============ bottom strip: the arithmetic ============ -->
+  <g>
+    <rect x="30" y="474" width="900" height="96" rx="8" fill="#fff7ea" stroke="#b26a1a" stroke-width="1"/>
+    <text x="46" y="496" font-size="11.5" font-weight="bold" fill="#8a4d0f">The arithmetic that forces the split</text>
+    <text x="46" y="514" font-size="10.5" fill="#333">GSD and swath are both linear in altitude, so the track length needed to cover a fixed area scales as 1/altitude &#8212; and low flight is slow flight (motion blur is measured in pixels).</text>
+    <text x="46" y="531" font-size="10.5" fill="#333">Flying the <tspan font-weight="bold">whole field</tspan> at Stage-2 resolution: 106 legs, &#8776;42.8 km, over two hours at a blur-safe 5 m/s, plus battery swaps.</text>
+    <text x="46" y="548" font-size="10.5" fill="#333">Two stages: &#8776;23 min coarse + &#8776;4 min targeted &#8212; the field covered <tspan font-style="italic">and</tspan> the anomaly diagnosed in under half an hour.</text>
+    <text x="46" y="564" font-size="9.5" fill="#777">Adaptive single-flight variant: a reinforcement-learning scout reached 89.8 % accuracy while sampling only 40 % of an 80-acre field (Zhang et al. 2020).</text>
+  </g>
+
+  <!-- footer -->
+  <text x="480" y="596" font-size="10.5" fill="#555" text-anchor="middle">Stage 1 flags; Stage 2 confirms. The &#8220;detection&#8221; that triggers the re-fly is a depressed patch in a continuous index map &#8212; not a bounding box from a neural network.</text>
+</svg>

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 560" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="ppArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+    <marker id="ppArrowGrey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8a8a8a"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="980" height="560" fill="#ffffff"/>
+
+  <text x="490" y="28" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">The geofence boundary check: point-in-polygon by ray casting</text>
+  <text x="490" y="50" font-size="13" fill="#555" text-anchor="middle">Cast a ray east from the estimated position and count fence-edge crossings: odd &#8658; inside, even &#8658; outside.</text>
+
+  <!-- hard fence polygon: A(300,120) B(700,150) C(660,420) D(260,380) -->
+  <polygon points="300,120 700,150 660,420 260,380" fill="#f2f8fa" stroke="#b26a1a" stroke-width="2.6"/>
+  <text x="500" y="112" font-size="11.5" font-weight="bold" fill="#b26a1a" text-anchor="middle">hard fence &#8212; breach triggers the configured action (RTL)</text>
+
+  <!-- vertex dots + labels -->
+  <circle cx="300" cy="120" r="4" fill="#b26a1a"/>
+  <circle cx="700" cy="150" r="4" fill="#b26a1a"/>
+  <circle cx="660" cy="420" r="4" fill="#b26a1a"/>
+  <circle cx="260" cy="380" r="4" fill="#b26a1a"/>
+  <text x="288" y="112" font-size="10" fill="#8a5210" text-anchor="end">v&#8321; (lat, lon)</text>
+  <text x="712" y="145" font-size="10" fill="#8a5210">v&#8322;</text>
+  <text x="672" y="432" font-size="10" fill="#8a5210">v&#8323;</text>
+  <text x="248" y="394" font-size="10" fill="#8a5210" text-anchor="end">v&#8324;</text>
+
+  <!-- soft warning fence (shrunk inward) -->
+  <polygon points="330,150 668,175 632,392 292,358" fill="none" stroke="#1a7a8a" stroke-width="1.8" stroke-dasharray="7 5"/>
+  <text x="490" y="200" font-size="10.5" fill="#1a7a8a" text-anchor="middle" font-style="italic">soft-warning fence: the hard fence shrunk inward by a margin</text>
+
+  <!-- inside point and its ray at y=260 -->
+  <circle cx="420" cy="260" r="6" fill="#1a7a8a"/>
+  <text x="420" y="245" font-size="11.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">p&#770; (inside)</text>
+  <line x1="426" y1="260" x2="770" y2="260" stroke="#1a7a8a" stroke-width="2.2" marker-end="url(#ppArrow)"/>
+  <circle cx="684" cy="260" r="5.5" fill="none" stroke="#1a7a8a" stroke-width="2.4"/>
+  <text x="700" y="248" font-size="10" fill="#1a4a5a">crossing 1</text>
+  <text x="790" y="256" font-size="10.5" fill="#1a4a5a">1 crossing &#8212; odd</text>
+  <text x="790" y="270" font-size="10.5" font-weight="bold" fill="#1a4a5a">&#8658; inside the fence</text>
+
+  <!-- outside point and its ray at y=300 -->
+  <circle cx="130" cy="300" r="6" fill="#8a8a8a"/>
+  <text x="130" y="285" font-size="11.5" font-weight="bold" fill="#555" text-anchor="middle">p&#770;&#8242; (outside)</text>
+  <line x1="136" y1="300" x2="770" y2="300" stroke="#8a8a8a" stroke-width="2" stroke-dasharray="2 3" marker-end="url(#ppArrowGrey)"/>
+  <circle cx="272" cy="300" r="5.5" fill="none" stroke="#8a8a8a" stroke-width="2.4"/>
+  <circle cx="678" cy="300" r="5.5" fill="none" stroke="#8a8a8a" stroke-width="2.4"/>
+  <text x="255" y="320" font-size="10" fill="#555">crossing 1</text>
+  <text x="662" y="320" font-size="10" fill="#555">crossing 2</text>
+  <text x="790" y="296" font-size="10.5" fill="#555">2 crossings &#8212; even</text>
+  <text x="790" y="310" font-size="10.5" font-weight="bold" fill="#555">&#8658; outside: breach</text>
+
+  <!-- altitude note box -->
+  <rect x="70" y="440" width="840" height="62" rx="8" fill="#fafcfd" stroke="#cfdfe4" stroke-width="1.4"/>
+  <text x="86" y="462" font-size="11" fill="#222"><tspan font-weight="bold">The horizontal test is only half the fence.</tspan> The full geofence is a volume: the polygon (or a radius about home) bounds the</text>
+  <text x="86" y="478" font-size="11" fill="#222">horizontal plane, and a ceiling bounds altitude &#8212; two independent comparisons, evaluated together against the same</text>
+  <text x="86" y="494" font-size="11" fill="#222">estimated position: inside(polygon, p&#770;)  &#8743;  altitude(p&#770;) &lt; ceiling. Breach of either is a breach of the fence.</text>
+
+  <text x="490" y="536" font-size="11" fill="#555" text-anchor="middle" font-style="italic">Each fence edge is tested once per check &#8212; O(m) for an m-vertex polygon &#8212; cheap enough to run against every position update.</text>
+</svg>

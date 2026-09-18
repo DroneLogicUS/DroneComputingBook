@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 580" font-family="Helvetica, Arial, sans-serif" xml:space="preserve">
+  <defs>
+    <marker id="tcTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1a7a8a"/>
+    </marker>
+    <marker id="tcAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b26a1a"/>
+    </marker>
+    <marker id="tcGrey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#666"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="580" fill="#ffffff"/>
+
+  <text x="480" y="28" font-size="18" font-weight="bold" fill="#222" text-anchor="middle">The closing test and the predicted near miss</text>
+  <text x="480" y="50" font-size="13" fill="#555" text-anchor="middle">Plan view, to scale (NED: N up, E right). One dot product says "closing"; one more line of algebra says where and when it passes.</text>
+
+  <!-- compass -->
+  <line x1="80" y1="130" x2="80" y2="92" stroke="#444" stroke-width="2" marker-end="url(#tcGrey)"/>
+  <text x="80" y="84" font-size="12" font-weight="bold" fill="#444" text-anchor="middle">N (+x)</text>
+  <line x1="80" y1="130" x2="118" y2="130" stroke="#444" stroke-width="2" marker-end="url(#tcGrey)"/>
+  <text x="132" y="134" font-size="12" font-weight="bold" fill="#444" text-anchor="start">E (+y)</text>
+
+  <!-- safety radius circle around drone -->
+  <circle cx="170" cy="440" r="114" fill="#fdf3e7" fill-opacity="0.6" stroke="#b26a1a" stroke-width="1.8" stroke-dasharray="7 5"/>
+  <text x="52" y="342" font-size="11" font-weight="bold" fill="#8a4d0f" text-anchor="middle">R&#8202;<tspan font-size="8.5" dy="2">safe</tspan><tspan dy="-2">&#160;= 3 m</tspan></text>
+
+  <!-- threat's relative track (dashed) from threat through CPA and beyond -->
+  <line x1="246" y1="150" x2="246" y2="522" stroke="#1a7a8a" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="258" y="336" font-size="10.5" fill="#1a4a5a" font-style="italic" text-anchor="start">threat's track relative to the drone,</text>
+  <text x="258" y="351" font-size="10.5" fill="#1a4a5a" font-style="italic" text-anchor="start">v&#8202;<tspan font-size="8.5" dy="2">rel</tspan><tspan dy="-2">&#160;= (&#8722;4, 0, 0) m/s</tspan></text>
+
+  <!-- threat vector r: drone -> threat -->
+  <line x1="170" y1="440" x2="240" y2="149" stroke="#666" stroke-width="2.2" marker-end="url(#tcGrey)"/>
+  <text x="168" y="288" font-size="11.5" font-weight="bold" fill="#555" text-anchor="middle" transform="rotate(-77 168 288)">threat vector r = (8, 2, 0),  &#8214;r&#8214; = 8.25 m</text>
+
+  <!-- drone -->
+  <circle cx="170" cy="440" r="9" fill="#1a7a8a"/>
+  <text x="150" y="463" font-size="12" font-weight="bold" fill="#1a4a5a" text-anchor="middle">drone</text>
+  <text x="150" y="477" font-size="10" fill="#555" text-anchor="middle">P&#8202;<tspan font-size="8" dy="2">d</tspan><tspan dy="-2">&#160;= (30, 10, &#8722;10)</tspan></text>
+  <!-- drone velocity -->
+  <line x1="170" y1="428" x2="170" y2="396" stroke="#1a7a8a" stroke-width="2.6" marker-end="url(#tcTeal)"/>
+  <text x="160" y="402" font-size="11" font-weight="bold" fill="#1a4a5a" text-anchor="end">v&#8202;<tspan font-size="9" dy="2">d</tspan><tspan dy="-2">&#160;= 1 m/s N</tspan></text>
+
+  <!-- threat -->
+  <circle cx="246" cy="136" r="9" fill="#b26a1a"/>
+  <text x="272" y="126" font-size="12" font-weight="bold" fill="#8a4d0f" text-anchor="start">goose (threat)</text>
+  <text x="272" y="141" font-size="10" fill="#555" text-anchor="start">P&#8202;<tspan font-size="8" dy="2">t</tspan><tspan dy="-2">&#160;= (38, 12, &#8722;10) &#8212; same altitude</tspan></text>
+  <!-- threat velocity -->
+  <line x1="246" y1="148" x2="246" y2="238" stroke="#b26a1a" stroke-width="3" marker-end="url(#tcAmber)"/>
+  <text x="272" y="200" font-size="11" font-weight="bold" fill="#8a4d0f" text-anchor="start">v&#8202;<tspan font-size="9" dy="2">t</tspan><tspan dy="-2">&#160;= 3 m/s S</tspan></text>
+
+  <!-- CPA point -->
+  <circle cx="246" cy="440" r="6.5" fill="#fff" stroke="#b26a1a" stroke-width="2.5"/>
+  <text x="262" y="432" font-size="11.5" font-weight="bold" fill="#8a4d0f" text-anchor="start">CPA at t* = 2.0 s</text>
+  <text x="262" y="446" font-size="10.5" fill="#555" text-anchor="start" font-style="italic">closest the goose ever gets</text>
+  <text x="262" y="460" font-size="10.5" fill="#555" text-anchor="start" font-style="italic">&#8212; inside the safety radius</text>
+
+  <!-- miss vector -->
+  <line x1="180" y1="440" x2="238" y2="440" stroke="#b26a1a" stroke-width="2.2" marker-start="url(#tcAmber)" marker-end="url(#tcAmber)"/>
+  <text x="209" y="490" font-size="11" font-weight="bold" fill="#8a4d0f" text-anchor="middle">m = (0, 2, 0)</text>
+  <text x="209" y="504" font-size="10.5" fill="#8a4d0f" text-anchor="middle">miss 2.0 m</text>
+
+  <!-- scale bar -->
+  <line x1="330" y1="558" x2="444" y2="558" stroke="#444" stroke-width="2"/>
+  <line x1="330" y1="552" x2="330" y2="564" stroke="#444" stroke-width="2"/>
+  <line x1="444" y1="552" x2="444" y2="564" stroke="#444" stroke-width="2"/>
+  <text x="387" y="548" font-size="10.5" fill="#444" text-anchor="middle">3 m</text>
+
+  <!-- ===== SIDEBAR ===== -->
+  <rect x="560" y="230" width="372" height="216" rx="8" fill="#f4f8f9" stroke="#c5d8dc" stroke-width="1.5"/>
+  <text x="746" y="256" font-size="13.5" font-weight="bold" fill="#1a4a5a" text-anchor="middle">Four numbers, one decision</text>
+  <text x="580" y="284" font-size="12.5" fill="#333">1.  r &#183; v&#8202;<tspan font-size="10" dy="2">rel</tspan><tspan dy="-2">&#160;= (8)(&#8722;4) + (2)(0) + 0 =&#160;</tspan><tspan font-weight="bold">&#8722;32 &lt; 0 &#8594; closing</tspan></text>
+  <text x="580" y="310" font-size="12.5" fill="#333">2.  closing speed = 32 / 8.25 &#8776; 3.9 m/s</text>
+  <text x="580" y="336" font-size="12.5" fill="#333">3.  t* = &#8722;(r &#183; v&#8202;<tspan font-size="10" dy="2">rel</tspan><tspan dy="-2">) / &#8214;v&#8202;</tspan><tspan font-size="10" dy="2">rel</tspan><tspan dy="-2">&#8214;&#178; = 32 / 16 =&#160;</tspan><tspan font-weight="bold">2.0 s</tspan></text>
+  <text x="580" y="362" font-size="12.5" fill="#333">4.  m = r + v&#8202;<tspan font-size="10" dy="2">rel</tspan><tspan dy="-2">&#8202;t* = (0, 2, 0),  &#8214;m&#8214; =&#160;</tspan><tspan font-weight="bold">2.0 m</tspan></text>
+  <text x="580" y="396" font-size="13" font-weight="bold" fill="#8a4d0f">2.0 m &lt; R&#8202;<tspan font-size="10.5" dy="2">safe</tspan><tspan dy="-2">&#160;= 3 m  &#8594;  EVADE, with 2.0 s in hand</tspan></text>
+  <text x="580" y="424" font-size="11" fill="#555" font-style="italic">Prediction turns a wingbeat of warning into two full seconds:</text>
+  <text x="580" y="439" font-size="11" fill="#555" font-style="italic">the escape starts before the encounter is desperate.</text>
+
+  <!-- dot-product legend -->
+  <rect x="560" y="464" width="372" height="70" rx="8" fill="#ffffff" stroke="#ddd" stroke-width="1.2"/>
+  <text x="580" y="486" font-size="11.5" fill="#333"><tspan font-weight="bold">r &#183; v&#8202;<tspan font-size="9.5" dy="2">rel</tspan><tspan dy="-2">&#160;&lt; 0</tspan></tspan>   closing &#8212; separation shrinking</text>
+  <text x="580" y="504" font-size="11.5" fill="#333"><tspan font-weight="bold">r &#183; v&#8202;<tspan font-size="9.5" dy="2">rel</tspan><tspan dy="-2">&#160;&gt; 0</tspan></tspan>   opening &#8212; the threat is departing</text>
+  <text x="580" y="522" font-size="11.5" fill="#333"><tspan font-weight="bold">r &#183; v&#8202;<tspan font-size="9.5" dy="2">rel</tspan><tspan dy="-2">&#160;= 0</tspan></tspan>   abeam &#8212; sideways, neither gaining nor losing</text>
+
+  <!-- footer -->
+  <text x="480" y="577" font-size="11" fill="#555" text-anchor="middle" font-style="italic">The whole test is three multiplications, two additions, and a sign check per update &#8212; cheap enough to run at the estimator's full rate, on every tracked mover.</text>
+</svg>

@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 560" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#444"/>
+    </marker>
+    <pattern id="bufferHatch" width="10" height="10" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <rect width="10" height="10" fill="#f0f0f0"/>
+      <line x1="0" y1="0" x2="0" y2="10" stroke="#c8c8c8" stroke-width="3"/>
+    </pattern>
+    <pattern id="groundHatch" width="12" height="12" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <rect width="12" height="12" fill="#d8d2c4"/>
+      <line x1="0" y1="0" x2="0" y2="12" stroke="#a89f8a" stroke-width="2"/>
+    </pattern>
+  </defs>
+
+  <!-- background -->
+  <rect x="0" y="0" width="820" height="560" fill="#ffffff"/>
+
+  <!-- ===== altitude bands (linear scale: 0.7 px per foot, ground at y=470) ===== -->
+
+  <!-- crewed-aircraft band: 500 ft and above (y 50..120) -->
+  <rect x="150" y="50" width="440" height="70" fill="#fdf0dd" stroke="none"/>
+  <text x="370" y="75" font-size="15" fill="#7a5210" text-anchor="middle" font-weight="bold">crewed aircraft generally operate here</text>
+  <text x="370" y="95" font-size="13" fill="#7a5210" text-anchor="middle" font-style="italic">no lower than 500 ft AGL, except near airports (takeoff and landing)</text>
+
+  <!-- airplane silhouette in crewed band -->
+  <g transform="translate(170,60)">
+    <path d="M 0 0 L 34 0 L 44 -4 L 46 0 L 56 1 L 46 4 L 12 4 Z" fill="#a5843f"/>
+    <path d="M 20 1 L 30 10 L 36 10 L 30 1 Z" fill="#a5843f"/>
+    <path d="M 22 1 L 30 -8 L 36 -8 L 30 0 Z" fill="#a5843f"/>
+    <path d="M 2 0 L 6 -7 L 11 -7 L 8 0 Z" fill="#a5843f"/>
+  </g>
+
+  <!-- 500 ft floor line (dashed) -->
+  <line x1="150" y1="120" x2="590" y2="120" stroke="#a5843f" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="585" y="115" font-size="13" fill="#7a5210" text-anchor="end" font-style="italic">500 ft AGL — typical crewed-aircraft minimum</text>
+
+  <!-- 100 ft buffer band (y 120..190) -->
+  <rect x="150" y="120" width="440" height="70" fill="url(#bufferHatch)"/>
+  <text x="370" y="160" font-size="14" fill="#555" text-anchor="middle">100 ft vertical buffer separating the two regimes</text>
+
+  <!-- Part 107 ceiling line at 400 ft (y=190) -->
+  <line x1="150" y1="190" x2="590" y2="190" stroke="#b3392b" stroke-width="3.5"/>
+  <text x="585" y="184" font-size="14" fill="#b3392b" text-anchor="end" font-weight="bold">400 ft AGL — Part 107 ceiling for small UAS</text>
+
+  <!-- small-UAS band: 0..400 ft (y 190..470) -->
+  <rect x="150" y="190" width="440" height="280" fill="#e8f1fa"/>
+  <text x="370" y="235" font-size="15" fill="#2a4a6d" text-anchor="middle" font-weight="bold">small uncrewed aircraft under Part 107</text>
+  <text x="370" y="255" font-size="13" fill="#2a4a6d" text-anchor="middle" font-style="italic">standard limit: at or below 400 ft above ground level</text>
+
+  <!-- quadcopter icon inside the small-UAS band -->
+  <g transform="translate(345,315)">
+    <line x1="0" y1="0" x2="50" y2="0" stroke="#34567f" stroke-width="4"/>
+    <rect x="18" y="-5" width="14" height="10" rx="2" fill="#34567f"/>
+    <circle cx="0" cy="0" r="5" fill="#34567f"/>
+    <circle cx="50" cy="0" r="5" fill="#34567f"/>
+    <line x1="-14" y1="-7" x2="14" y2="-7" stroke="#34567f" stroke-width="2.5"/>
+    <line x1="36" y1="-7" x2="64" y2="-7" stroke="#34567f" stroke-width="2.5"/>
+    <line x1="0" y1="0" x2="0" y2="-7" stroke="#34567f" stroke-width="2.5"/>
+    <line x1="50" y1="0" x2="50" y2="-7" stroke="#34567f" stroke-width="2.5"/>
+  </g>
+
+  <!-- illustrative 10 ft institutional ceiling (y=463: 10 ft above ground, drawn to scale) -->
+  <line x1="150" y1="463" x2="590" y2="463" stroke="#d97706" stroke-width="2.5"/>
+  <line x1="290" y1="461" x2="290" y2="448" stroke="#888" stroke-width="1.2"/>
+  <text x="290" y="408" font-size="14" fill="#9a5b06" text-anchor="middle" font-weight="bold">10 ft — illustrative institutional ceiling</text>
+  <text x="290" y="426" font-size="13" fill="#9a5b06" text-anchor="middle" font-style="italic">from the worked example: 1/40 of the</text>
+  <text x="290" y="442" font-size="13" fill="#9a5b06" text-anchor="middle" font-style="italic">legal limit, drawn to scale here</text>
+
+  <!-- ground -->
+  <rect x="150" y="470" width="440" height="40" fill="url(#groundHatch)" stroke="#8a8272" stroke-width="1.5"/>
+  <text x="370" y="495" font-size="14" fill="#4a4436" text-anchor="middle" font-weight="bold">ground — 0 ft AGL datum</text>
+
+  <!-- ===== left altitude axis ===== -->
+  <line x1="150" y1="50" x2="150" y2="470" stroke="#444" stroke-width="2"/>
+  <g font-size="13" fill="#444" text-anchor="end">
+    <line x1="142" y1="470" x2="150" y2="470" stroke="#444" stroke-width="2"/>
+    <text x="136" y="474">0 ft</text>
+    <line x1="142" y1="400" x2="150" y2="400" stroke="#444" stroke-width="2"/>
+    <text x="136" y="404">100 ft</text>
+    <line x1="142" y1="330" x2="150" y2="330" stroke="#444" stroke-width="2"/>
+    <text x="136" y="334">200 ft</text>
+    <line x1="142" y1="260" x2="150" y2="260" stroke="#444" stroke-width="2"/>
+    <text x="136" y="264">300 ft</text>
+    <line x1="142" y1="190" x2="150" y2="190" stroke="#444" stroke-width="2"/>
+    <text x="136" y="194">400 ft</text>
+    <line x1="142" y1="120" x2="150" y2="120" stroke="#444" stroke-width="2"/>
+    <text x="136" y="124">500 ft</text>
+  </g>
+  <text x="60" y="270" font-size="14" fill="#444" text-anchor="middle" transform="rotate(-90 60 270)">altitude above ground level (AGL)</text>
+
+  <!-- ===== right-side dimension arrows ===== -->
+  <line x1="640" y1="190" x2="640" y2="470" stroke="#444" stroke-width="2" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <line x1="590" y1="190" x2="650" y2="190" stroke="#bbb" stroke-width="1"/>
+  <line x1="590" y1="470" x2="650" y2="470" stroke="#bbb" stroke-width="1"/>
+  <text x="655" y="320" font-size="14" fill="#444" font-weight="bold">400 ft</text>
+  <text x="655" y="338" font-size="13" fill="#444" font-style="italic">the FAA's air-to-air</text>
+  <text x="655" y="354" font-size="13" fill="#444" font-style="italic">deconfliction ceiling:</text>
+  <text x="655" y="370" font-size="13" fill="#444" font-style="italic">keeps small UAS below</text>
+  <text x="655" y="386" font-size="13" fill="#444" font-style="italic">crewed traffic</text>
+
+  <!-- footer note -->
+  <text x="410" y="536" font-size="13.5" fill="#222" text-anchor="middle">The vertical scale is linear: the 40-to-1 gap between the 400 ft regulatory ceiling and the worked example's</text>
+  <text x="410" y="553" font-size="13.5" fill="#222" text-anchor="middle">10 ft institutional cap is drawn true to proportion — the institutional limit barely clears the ground.</text>
+</svg>
